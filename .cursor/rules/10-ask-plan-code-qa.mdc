@@ -1,0 +1,38 @@
+---
+description: >-
+  Use when the user asks to implement, fix, refactor, debug, make multi-file
+  changes, automate project workflows, or execute code based on an existing
+  plan. Flow: Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code →
+  implementation self-QA. For acceptance review of completed work, use
+  review-gate instead.
+alwaysApply: false
+---
+
+# Ask → Gates → Inspect → Plan → Code → Self-QA
+
+This rule defines **trigger behavior and output contract summary** only. Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`. Overview: `AI_AGENT_WORKFLOW_README.md`.
+
+**Flow:**
+
+```text
+Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA
+```
+
+**Gates are lightweight — not long reviews.** Pass → concise; expand on Revise, Blocked, or Risk.
+
+- **Ask Gate** (after Ask): Status Pass | Pass with Risk | Revise | Blocked. Revise/Blocked → no Inspect/Plan.
+- **Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
+- **Plan Gate** (after Plan): Status Pass | Pass with Risk | Revise | Blocked. **Revise/Blocked → no Code.**
+- **Implementation Self-QA** (after Code): agent self-report — **not** user acceptance (→ `20-review-gate.mdc`).
+
+User **验收 / review / inspect** of completed work → `20-review-gate.mdc`, not Plan Gate.
+
+## Compact Mode
+
+Only **single-file + single-line + no contract change**. Output Compact Ask (Goal, Assumptions, Compact Eligibility, QA). Any eligibility **no** → full flow above. Never skip read-before-edit or Self-QA.
+
+## Self-QA Hard Constraints
+
+- No Passing Evidence → no "fixed/done/passing/verified" in Summary.
+- Commands from `.ai/knowledge/project-context.md` when available.
+- Skipped checks → **Not Verified** (mandatory).
