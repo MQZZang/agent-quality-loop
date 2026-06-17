@@ -11,7 +11,8 @@ Workflow: **Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Co
 | `AGENTS.md` | Cross-tool entry point for agents |
 | `AI_AGENT_WORKFLOW_README.md` | Human-readable workflow guide |
 | `.cursor/rules/` | Always-on and description-triggered rules |
-| `.cursor/skills/` | Full procedural skills |
+| `.cursor/skills/` | Full procedural skills (Cursor) |
+| `.agents/skills/` | Mirrored skills (Codex) |
 | `.ai/knowledge/` | Generic patterns + per-project templates |
 
 ## Install in a Project
@@ -21,6 +22,7 @@ Workflow: **Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Co
 ```bash
 # From your target project root
 cp -r /path/to/cursor-agent-workflow/.cursor ./
+cp -r /path/to/cursor-agent-workflow/.agents ./
 cp -r /path/to/cursor-agent-workflow/.ai ./
 cp /path/to/cursor-agent-workflow/AGENTS.md ./
 cp /path/to/cursor-agent-workflow/AI_AGENT_WORKFLOW_README.md ./
@@ -30,6 +32,7 @@ Windows (PowerShell):
 
 ```powershell
 Copy-Item -Recurse f:\cursor-agent-workflow\.cursor .
+Copy-Item -Recurse f:\cursor-agent-workflow\.agents .
 Copy-Item -Recurse f:\cursor-agent-workflow\.ai .
 Copy-Item f:\cursor-agent-workflow\AGENTS.md .
 Copy-Item f:\cursor-agent-workflow\AI_AGENT_WORKFLOW_README.md .
