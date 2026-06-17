@@ -8,7 +8,11 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 2. **`.ai/knowledge/project-context.md`** — project facts; treat **Not Verified** items as non-facts until confirmed.
 3. **`.ai/knowledge/lessons.md`** — verified past lessons.
 
+For reusable phase prompts and risk-based workflow modes, see **`AI_AGENT_WORKFLOW_README.md`**.
+
 **Description-triggered rules may not auto-load.** At task start, **read the matching rule and skill files explicitly** (do not rely on implicit injection alone):
+
+### Cursor
 
 | Task type | Read |
 |-----------|------|
@@ -16,10 +20,29 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 | Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.cursor/rules/20-review-gate.mdc` + `.cursor/skills/review-gate/SKILL.md` |
 | Create / evaluate / refactor skill, rule, or prompt template | `.cursor/rules/30-skill-factory.mdc` + `.cursor/skills/skill-factory/SKILL.md` |
 
+### Codex
+
+| Task type | Read |
+|-----------|------|
+| Implement / fix / refactor / debug / multi-file change / project automation | `.agents/skills/ask-plan-code-qa/SKILL.md` (+ `.cursor/rules/10-ask-plan-code-qa.mdc` for contract summary) |
+| Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.agents/skills/review-gate/SKILL.md` (+ `.cursor/rules/20-review-gate.mdc` for contract summary) |
+| Create / evaluate / refactor skill, rule, or prompt template | `.agents/skills/skill-factory/SKILL.md` (+ `.cursor/rules/30-skill-factory.mdc` for contract summary) |
+
+**Do not rely on Codex reading `.cursor/skills/`** — use `.agents/skills/` as the Codex skill source. Rules remain under `.cursor/rules/`.
+
+## Skill Paths (Cursor ↔ Codex)
+
+| Tool | Skills location |
+|------|-----------------|
+| **Cursor** | `.cursor/skills/<name>/SKILL.md` |
+| **Codex** | `.agents/skills/<name>/SKILL.md` |
+
+When you change a skill, **sync both paths** so semantics stay identical. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
+
 ## Instruction Priority / Conflict Handling
 
 1. **User's explicit instruction this turn** takes highest priority.
-2. **This repo's `AGENTS.md`, `.cursor/rules/`, and `.cursor/skills/`** are the in-repo workflow baseline.
+2. **This repo's `AGENTS.md`, `.cursor/rules/`, and skills** (`.cursor/skills/` for Cursor, `.agents/skills/` for Codex) are the in-repo workflow baseline.
 3. **External user-level skills** (e.g. global `superpowers-*` skills) — if they conflict with this repo's workflow, follow the user's explicit instruction and this `AGENTS.md` unless the user explicitly asks to use the external skill; then **state how it differs** from the repo workflow.
 4. When unsure which workflow applies, ask before implementing.
 
@@ -32,7 +55,7 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 
 If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
 
-**`ask-plan-code-qa` flow:** Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA. Details: `AI_AGENT_WORKFLOW_README.md` and `.cursor/skills/ask-plan-code-qa/SKILL.md`.
+**`ask-plan-code-qa` flow:** Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA. Details: `AI_AGENT_WORKFLOW_README.md`; skills at `.cursor/skills/` (Cursor) or `.agents/skills/` (Codex).
 
 ## Core Expectations
 
@@ -81,9 +104,9 @@ Stop and ask before:
 
 When changing agent workflow config, verify:
 
-- [ ] Each triggered rule (`10`, `20`, `30`) has a matching skill under `.cursor/skills/<name>/`
+- [ ] Each triggered rule (`10`, `20`, `30`) has matching skills under **both** `.cursor/skills/<name>/` and `.agents/skills/<name>/` (keep in sync)
 - [ ] Each skill has `name`, `description`, When to Use, When Not to Use, Failure Modes, Evaluation Cases (≥3)
-- [ ] `AGENTS.md` indexes all rules and skills
+- [ ] `AGENTS.md` indexes all rules and skills (Cursor + Codex paths)
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
 - [ ] Ask / Plan gates and compact-mode boundary consistent across `00`, `10`, skill, and `AI_AGENT_WORKFLOW_README.md`
