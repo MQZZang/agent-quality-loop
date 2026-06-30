@@ -18,7 +18,7 @@ When the user's primary intent is **检查 / 审查 / 验收 / review / audit / 
 
 **Scope:** **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports** produced by others or earlier turns. **Not** the agent's own post-implement self-QA step — that belongs to rule `10` unless the user explicitly asks you to **review / 验收** that report.
 
-Run the review types relevant to the artifact (requirement, plan, code, or QA report). Each finding must cite **evidence** from the repo or stated facts — not memory alone.
+Run the review types **relevant** to the artifact (requirement, plan, code, or QA report). Omit unused review-type sections in output. Each finding must cite **evidence** from the repo or stated facts — not memory alone.
 
 ## Review Types
 
@@ -67,6 +67,7 @@ Verify: Passing Evidence exists, Not Verified is honest, failures not hidden.
 - If no issues found in a category, state **what was checked** and **what evidence was reviewed** — not only "no problems."
 - Separate **confirmed issues** from **suggestions**.
 - End with a short **verdict**: Proceed / Proceed with fixes / Block until resolved.
+- Output only review-type sections you actually ran — not five empty headings.
 
 ## Must Not
 

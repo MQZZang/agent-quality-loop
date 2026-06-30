@@ -18,7 +18,7 @@ This rule defines **trigger behavior and output contract summary** only. Full pr
 Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA
 ```
 
-**Gates are lightweight — not long reviews.** Pass → concise; expand on Revise, Blocked, or Risk.
+**Gates are lightweight — not long reviews.** Pass → conversational prose per Output Discipline; expand on Revise, Blocked, or Risk.
 
 - **Ask Gate** (after Ask): Status Pass | Pass with Risk | Revise | Blocked. Revise/Blocked → no Inspect/Plan.
 - **Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.

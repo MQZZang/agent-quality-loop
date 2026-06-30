@@ -16,6 +16,29 @@ Never skip steps. Do not edit, refactor, or "fix" before reading relevant files 
 3. **Design** — Choose the smallest correct approach; surface assumptions and risks.
 4. **Execute** — Implement only after the above; verify with evidence.
 
+**Core Loop ↔ internal phases** (agent-side; not always user-visible):
+
+| Core Loop | Internal phases |
+|-----------|-----------------|
+| Read | Read-only Inspect, read-before-edit |
+| Understand | Ask, ambiguities |
+| Design | Plan, readiness gates |
+| Execute | Code, Implementation Self-QA |
+
+快档 compresses **Design presentation**; it does not skip Read, Execute, or verification.
+
+## Risk Dial
+
+| Dial | Use when |
+|------|----------|
+| **快** | single-file, single-line, no contract change, reversible |
+| **常** | default implement / fix / refactor |
+| **慎** | production, contracts, security, data, deploy — use **review-gate** when user asks to 验收 |
+
+## Output Discipline
+
+Default to colleague-style prose. Structured phase headers only for ambiguity, Revise/Blocked, or material risk. **Never** claim done without Passing Evidence.
+
 ## Before Any Edit
 
 - Read the file(s) you will modify and closely related files (imports, types, tests, configs).

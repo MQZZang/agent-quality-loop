@@ -62,13 +62,13 @@ Symlink or copy `.cursor/`, `.ai/`, and entry files into the project root as nee
 
 ## Quick Prompts
 
-**Start implement task:**
+| 意图 | Prompt |
+|------|--------|
+| 小改 | `Follow ask-plan-code-qa 快档` |
+| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
+| 验收 | `Use review-gate only` |
 
-```text
-Follow ask-plan-code-qa: Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA. Keep gates concise on Pass.
-```
-
-**Start acceptance review:**
+**Acceptance review:**
 
 ```text
 Use review-gate only. Do not use Plan Gate or ask-plan-code-qa for acceptance.
