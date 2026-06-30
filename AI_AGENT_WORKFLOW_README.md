@@ -9,6 +9,19 @@ Human-readable guide for Cursor, Codex, and other agents using this workflow.
 
 ---
 
+## Quick Route（一行选档）
+
+| 你的意图 | 说法 |
+|----------|------|
+| 改一个小地方 | `Follow ask-plan-code-qa 快档` |
+| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
+| 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
+| 只验收不改代码 | `review-gate only` |
+
+日常用上一行即可。下文为完整说明；**T0–T8 模板仅用于培训 / onboarding**。
+
+---
+
 ## Workflow Overview
 
 ```text
@@ -34,15 +47,15 @@ Default to concise output; expand only on **Fail**, **Revise**, **Blocked**, or 
 
 ---
 
-## Risk-Based Usage Modes
+## Risk-Based Usage Modes（快 / 常 / 慎）
 
-This workflow supports three execution modes. Not every task needs the full long form.
+Three dials aligned with how developers actually work. Not every task needs the full long form.
 
-| Mode | Use When | Required Flow |
-|------|----------|---------------|
-| **Compact Mode** | single-file + single-line + no contract change | Compact Ask → QA |
-| **Standard Mode** | normal implement / fix / refactor / debug | Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA |
-| **High-Risk Full Mode** | multi-file, unclear root cause, contract change, production / data / security / deploy risk | Standard Mode + independent **Review Gate** |
+| Mode | 档 | Use When | Required Flow |
+|------|-----|----------|---------------|
+| **Compact / 快档** | 快 | single-file + single-line + no contract change | Compact Ask → Code → Self-QA (对话体) |
+| **Standard / 常档** | 常 | normal implement / fix / refactor / debug | Internal Ask → Inspect → Plan → gates; **user sees 思路体 on Pass** |
+| **High-Risk / 慎档** | 慎 | multi-file, unclear root cause, contract change, production / data / security / deploy | 常档 + independent **review-gate** when user asks |
 
 **Gate conduct (all non-trivial modes):**
 
@@ -52,9 +65,9 @@ This workflow supports three execution modes. Not every task needs the full long
 
 | Mode | Ask Gate | Read-only Inspect | Plan Gate | Review Gate |
 |------|----------|-------------------|-----------|-------------|
-| Compact | Optional (brief) | Skip if eligibility confirmed | Skip | No |
-| Standard | Yes (concise) | Yes | Yes (concise) | Only if user asks or residual risk |
-| High-Risk Full | Yes | Yes | Yes | **Yes** (independent review-gate) |
+| 快 | Optional (brief) | Skip if eligibility confirmed | Skip | No |
+| 常 | Yes (internal; prose on Pass) | Yes | Yes (internal; prose on Pass) | Only if user asks or residual risk |
+| 慎 | Yes | Yes | Yes | **Yes** when user asks to 验收 |
 
 ---
 
@@ -304,9 +317,9 @@ Compact **never** skips: read-before-edit, Self-QA, Not Verified.
 
 ---
 
-## Phase Prompt Templates
+## Phase Prompt Templates（培训 / onboarding）
 
-Copy-paste prompts for each phase. See **Risk-Based Usage Modes** to pick Compact / Standard / High-Risk Full before using.
+Copy-paste prompts for learning the full workflow. **Daily use: see Quick Route above.** Pick 快 / 常 / 慎 before using.
 
 ### T0 — 任务分级
 
@@ -315,9 +328,9 @@ Copy-paste prompts for each phase. See **Risk-Based Usage Modes** to pick Compac
 
 请根据 AGENTS.md 和 ask-plan-code-qa 判断这个任务应该使用哪种执行模式：
 
-1. Compact Mode
-2. Standard Mode
-3. High-Risk Full Mode
+1. 快档 (Compact)
+2. 常档 (Standard)
+3. 慎档 (High-Risk)
 
 判断标准：
 - 是否 single-file
@@ -444,50 +457,20 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 请审查：
 【粘贴 Plan / diff 摘要 / Implementation Self-QA / 任务描述】
 
-重点检查：
+只运行与审查对象相关的 review types（不必五段全出）。重点检查：
 
-1. Assumption Review
-   - 是否有未暴露假设
-   - 是否把 Not Verified 当成事实
-   - 是否静默选择了多解路径
-
-2. Context Review
-   - 是否读够目标文件、调用方、测试、配置、文档
-   - 是否遗漏项目上下文
-   - 是否存在未验证上下文
-
-3. Plan Review
-   - 是否解决根因
-   - 是否过度工程
-   - 是否范围清晰
-   - 是否有执行边界
-   - 是否每步有可观测验证
-
-4. Code Review
-   - 是否最小精准变更
-   - 是否同步更新引用方
-   - 是否遗漏跨文件契约
-   - 是否引入无关重构
-   - 是否有潜在 bug
-
-5. QA Review
-   - 是否有 Verification Performed
-   - 是否有 Passing Evidence
-   - 是否有 Failing Evidence
-   - 是否明确 Not Verified
-   - 是否存在无证据成功声明
+- 假设是否暴露；是否把 Not Verified 当事实
+- 是否读够目标文件、调用方、测试、配置
+- 根因、范围、跨文件引用（若审查代码/plan）
+- Passing Evidence 是否支撑结论；Not Verified 是否诚实
 
 请输出：
-- Assumption Review
-- Context Review
-- Plan Review
-- Code Review
-- QA Review
-- Verdict: Pass / Pass with Risk / Proceed with Fixes / Fail
-- Suggested Fix
+- Review Scope（含启用的 review types）
+- 仅相关 review 段的 Findings（问题/证据/风险/修正建议）
+- Verdict: Proceed | Proceed with fixes | Block
+- What Was Checked
 
-不要泛泛而谈。
-每个问题必须给出证据。
+不要泛泛而谈。每个问题必须给出证据。
 ```
 
 ### T4 — Compact Mode

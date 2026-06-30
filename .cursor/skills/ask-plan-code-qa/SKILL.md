@@ -10,15 +10,52 @@ description: >-
 
 ## Purpose
 
-Implementation workflow with **internal gates** so assumptions are exposed, plans are fact-based, and Code starts only after Plan Gate passes — reducing guesswork and false "done" claims.
+**Thinking workflow** — externalize a careful engineer's judgment: understand before acting, deepen only when risk demands, verify before claiming done.
 
-**Gates are lightweight checkpoints, not long review reports.** On **Pass**, stay concise; expand only for **Revise**, **Blocked**, or material **Risk**.
+This is a **思路 skill**, not a paperwork skill. The seven internal phases below are **agent mental checkpoints**, not mandatory user-facing headers on every turn.
 
-**Gate conduct:** Ask Gate and Plan Gate are mandatory for non-trivial tasks, but concise by default. Expand only when there is risk, ambiguity, failure, or high impact.
+**Risk dial** (see `AI_AGENT_WORKFLOW_README.md`; aliases: Compact = 快, Standard = 常, High-Risk = 慎):
 
-Ask Gate 和 Plan Gate 必须存在，但默认应简洁；只有出现风险、歧义、失败或高影响变更时才展开。
+| Dial | When | User-facing feel |
+|------|------|------------------|
+| **快** Fast | single-file + single-line + no contract change, reversible | Pair-programmer pace; evidence still required |
+| **常** Normal | default implement / fix / refactor / debug | Read code → align briefly → change → show evidence |
+| **慎** Careful | production, contracts, security, data, deploy | 常 + user-driven **review-gate** when asked |
 
-**Risk-based modes** (see `AI_AGENT_WORKFLOW_README.md`): Compact / Standard / High-Risk Full. Do not force full workflow or independent Review Gate on every tiny task; use Review Gate for high-risk / important work.
+**Hard invariants** (non-negotiable): read before edit · root cause · minimal change · no success claims without Passing Evidence · pause on destructive/production/secrets.
+
+**Gates** (Ask Gate, Plan Gate) are internal readiness checks — mandatory for 常/慎, concise by default. On **Pass**, merge into natural prose or one-line readiness; expand only on **Revise**, **Blocked**, or material **Risk**.
+
+See `examples.md` for 规则体 vs 思路体 contrast.
+
+## Output Discipline
+
+**Default:** talk like a trusted colleague — prose first, structure only when it helps the user decide.
+
+**Use structured phase headers** only when:
+
+- Requirements are **ambiguous** (assumptions / blocking questions)
+- Readiness is **Revise** or **Blocked**
+- **Material risk** (production, contracts, security, cross-file)
+- User explicitly asks for Plan / review / 验收
+
+**On Pass (normal path):**
+
+- Do **not** emit empty `## Ask Gate` / `## Plan Gate` sections
+- Weave read → align → change → verify into readable flow
+- Self-QA: state what was checked; use evidence bullets — not a template with empty sections
+
+**Internal work still happens:** Agent still runs Ask → Inspect → Plan checks; output discipline controls **what the user sees**.
+
+## User Handshake
+
+User drives at three natural points:
+
+| Point | When | Agent behavior |
+|-------|------|----------------|
+| **歧义** | Multiple valid interpretations | Ask blocking question; do not silently choose |
+| **方案** | Non-trivial change or user said wait | One-sentence approach; proceed unless user objects |
+| **验收** | User says review / 验收 / 把关 | Switch to **review-gate** — not Plan Gate |
 
 ## When to Use
 
@@ -90,6 +127,8 @@ Proceed to Read-only Inspect | Revise Ask | Ask User
 | Pass with Risk | Inspect; note risk mitigation in Plan |
 | Revise | Fix Ask — **no Inspect/Plan** |
 | Blocked | Ask user — **no Inspect/Plan** |
+
+**On Pass:** Fold into one **Readiness** line (e.g. 「需求清楚，读过 X，可继续」) instead of a full `## Ask Gate` block.
 
 ---
 
@@ -175,7 +214,7 @@ Proceed to Code | Revise Plan | Ask User
 
 **Only Pass or Pass with Risk → Code.** Revise/Blocked → do not enter Code.
 
-On **Pass**, answer checks in one line each; no essay.
+On **Pass**, answer checks in one line each; no essay. May merge with Ask Gate into a single Readiness line.
 
 ---
 
@@ -215,9 +254,9 @@ After Code. **Not user acceptance** (→ `review-gate`).
 
 ---
 
-## Compact Mode
+## Compact Mode (快档)
 
-**Only** when **all** true: **single-file + single-line + no contract change**.
+**Only** when **all** true: **single-file + single-line + no contract change**. Same as **快** on the risk dial.
 
 ```markdown
 ## Compact Ask
@@ -252,7 +291,11 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 
 ## Output Contract
 
-Ask · Ask Gate · Read-only Inspect Summary · Plan · Plan Gate · Implementation Self-QA · Compact Ask (when eligible)
+**Default:** conversational flow with evidence; phase headers on-demand per **Output Discipline**.
+
+**When structured:** Ask · Readiness (merged gates on Pass) · Read-only Inspect Summary · Plan · Implementation Self-QA · Compact Ask (快档)
+
+**Always after code:** what changed · verification performed · Passing Evidence or Not Verified
 
 ## Acceptance Criteria
 
@@ -269,7 +312,8 @@ Ask · Ask Gate · Read-only Inspect Summary · Plan · Plan Gate · Implementat
 | Skipped Ask Gate / Plan Gate | Stop; run gate before next phase |
 | Plan without Read-only Inspect | Run Inspect; revise Plan |
 | Code with Plan Gate Revise/Blocked | Stop; revise Plan or ask user |
-| Gate output essay on Pass | Shorten; gates are checkpoints |
+| Gate output essay on Pass | Shorten; use prose or one-line Readiness per Output Discipline |
+| Empty phase headers on Pass | Remove headers; use 思路体 per examples.md |
 | Confused Plan Gate with review-gate | User 验收 → review-gate |
 | Compact used when eligibility fails | Upgrade to full flow |
 | Self-QA success without evidence | Rewrite Summary; Not Verified |
@@ -279,7 +323,7 @@ Ask · Ask Gate · Read-only Inspect Summary · Plan · Plan Gate · Implementat
 ### Happy path
 
 User: "Fix timeout in auth handler."  
-Ask → Ask Gate Pass → Inspect reads handler + tests → Plan → Plan Gate Pass → Code → Self-QA with test output.
+常档: reads handler + tests → brief align → Code → Self-QA with test output (思路体, no empty phase headers). See `examples.md`.
 
 ### Ambiguous case
 

@@ -10,7 +10,9 @@ description: >-
 
 ## Purpose
 
-Structured, evidence-based review to catch hallucinations, missing context, plan gaps, code issues, and false QA confidence before merge or sign-off.
+Evidence-based review thinking — catch hallucinations, missing context, false QA confidence before merge or sign-off.
+
+**思路 skill:** run only the review types relevant to the artifact; default to readable findings, not five empty chapter headings.
 
 ## When to Use
 
@@ -85,32 +87,24 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 
 ## Output Contract
 
-See **Required Output Format** below. Every finding needs 问题 / 证据 / 风险 / 修正建议. Verdict required.
+**Default:** prose findings with evidence. **Structured sections** only for review types you actually ran.
+
+Every finding needs 问题 / 证据 / 风险 / 修正建议. Verdict required.
 
 ## Required Output Format
 
 ```markdown
 ## Review Scope
-<What was reviewed>
+<What was reviewed; which review types apply>
 
-## Assumption Review
+<!-- Include ONLY sections for types you ran. Omit irrelevant types entirely. -->
+
+## <Relevant Review Type(s)>
 ### Findings
 - **问题:** ...
   **证据:** ...
   **风险:** ...
   **修正建议:** ...
-
-## Context Review
-...
-
-## Plan Review
-...
-
-## Code Review
-...
-
-## QA Review
-...
 
 ## Verdict
 Proceed | Proceed with fixes | Block
@@ -119,14 +113,14 @@ Proceed | Proceed with fixes | Block
 <Bullet list of artifacts and commands reviewed>
 ```
 
-If a section has zero issues, still state what was examined.
+If a section has zero issues, state what was examined — do not paste unused review-type headings.
 
 ## Must Not Behavior
 
 - Do not say "looks good" without listing checked evidence.
 - Do not invent file contents, test passes, or user intent.
 - Do not approve QA that lacks Passing Evidence for critical claims.
-- Do not skip Assumption Review on ambiguous requirements.
+- Do not force all five review types when the artifact only needs one (e.g. QA-only → QA Review + Scope).
 
 ## Acceptance Criteria
 
