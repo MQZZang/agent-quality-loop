@@ -2,17 +2,31 @@
 
 Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 
-Workflow: **Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA**, plus a separate **Review Gate** for user-driven acceptance review.
+**思路 skill** for implementation and review — engineer judgment first, structured output only when ambiguity, risk, or blocked. Internal phases (Ask → Inspect → Plan → gates → Code → Self-QA) run agent-side; on **Pass**, default to **对话体** (conversational prose with evidence).
+
+**Risk dial:** 快 (small/reversible) · 常 (default dev) · 慎 (production/contracts/security) — see [AI_AGENT_WORKFLOW_README.md](AI_AGENT_WORKFLOW_README.md).
+
+## Quick Route
+
+| 意图 | Prompt |
+|------|--------|
+| 小改 | `Follow ask-plan-code-qa 快档` |
+| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
+| 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
+| 只验收 | `Use review-gate only` |
+
+Full guide, training prompts (T0–T8), and mode details → **[AI_AGENT_WORKFLOW_README.md](AI_AGENT_WORKFLOW_README.md)**.
 
 ## Contents
 
 | Path | Purpose |
 |------|---------|
 | `AGENTS.md` | Cross-tool entry point for agents |
-| `AI_AGENT_WORKFLOW_README.md` | Human-readable workflow guide |
+| `AI_AGENT_WORKFLOW_README.md` | Human-readable workflow guide + Quick Route |
 | `.cursor/rules/` | Always-on and description-triggered rules |
 | `.cursor/skills/` | Full procedural skills (Cursor) |
 | `.agents/skills/` | Mirrored skills (Codex) |
+| `.cursor/skills/ask-plan-code-qa/examples.md` | 规则体 vs 思路体 output contrast |
 | `.ai/knowledge/` | Generic patterns + per-project templates |
 
 ## Install in a Project
@@ -60,18 +74,16 @@ Symlink or copy `.cursor/`, `.ai/`, and entry files into the project root as nee
 | `20-review-gate` | `review-gate` | Review / 验收 / audit completed work |
 | `30-skill-factory` | `skill-factory` | Create or evaluate skills and rules |
 
+`ask-plan-code-qa` ships with **`examples.md`** (规则体 vs 思路体) — read when calibrating output style.
+
 ## Quick Prompts
 
-| 意图 | Prompt |
-|------|--------|
-| 小改 | `Follow ask-plan-code-qa 快档` |
-| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
-| 验收 | `Use review-gate only` |
-
-**Acceptance review:**
+See **Quick Route** table at the top. Shorthand:
 
 ```text
-Use review-gate only. Do not use Plan Gate or ask-plan-code-qa for acceptance.
+小改 → Follow ask-plan-code-qa 快档
+常規 → Follow ask-plan-code-qa 常档，Pass 时保持对话体
+验收 → Use review-gate only
 ```
 
 ## Maintenance
@@ -82,7 +94,7 @@ When changing workflow config:
 - [ ] Each skill has `name`, `description`, When to Use, When Not to Use, Failure Modes, Evaluation Cases (≥3)
 - [ ] `AGENTS.md` indexes all rules and skills
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
-- [ ] Ask / Plan compact-mode boundary consistent across `00`, `10`, skill, and `AI_AGENT_WORKFLOW_README.md`
+- [ ] Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
 
 ## License
 

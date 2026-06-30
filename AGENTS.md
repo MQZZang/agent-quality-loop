@@ -8,7 +8,9 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 2. **`.ai/knowledge/project-context.md`** — project facts; treat **Not Verified** items as non-facts until confirmed.
 3. **`.ai/knowledge/lessons.md`** — verified past lessons.
 
-For reusable phase prompts and risk-based workflow modes, see **`AI_AGENT_WORKFLOW_README.md`**.
+For reusable phase prompts, risk dial (快/常/慎), and output discipline, see **`AI_AGENT_WORKFLOW_README.md`**.
+
+**Quick Route (daily):** 小改 → `快档` · 正常开发 → `常档`（Pass 对话体）· 高风险 → 常档 + `review-gate` · 只验收 → `review-gate only`.
 
 **Description-triggered rules may not auto-load.** At task start, **read the matching rule and skill files explicitly** (do not rely on implicit injection alone):
 
@@ -16,7 +18,7 @@ For reusable phase prompts and risk-based workflow modes, see **`AI_AGENT_WORKFL
 
 | Task type | Read |
 |-----------|------|
-| Implement / fix / refactor / debug / multi-file change / project automation | `.cursor/rules/10-ask-plan-code-qa.mdc` + `.cursor/skills/ask-plan-code-qa/SKILL.md` |
+| Implement / fix / refactor / debug / multi-file change / project automation | `.cursor/rules/10-ask-plan-code-qa.mdc` + `.cursor/skills/ask-plan-code-qa/SKILL.md` (+ `examples.md` for output style) |
 | Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.cursor/rules/20-review-gate.mdc` + `.cursor/skills/review-gate/SKILL.md` |
 | Create / evaluate / refactor skill, rule, or prompt template | `.cursor/rules/30-skill-factory.mdc` + `.cursor/skills/skill-factory/SKILL.md` |
 
@@ -24,7 +26,7 @@ For reusable phase prompts and risk-based workflow modes, see **`AI_AGENT_WORKFL
 
 | Task type | Read |
 |-----------|------|
-| Implement / fix / refactor / debug / multi-file change / project automation | `.agents/skills/ask-plan-code-qa/SKILL.md` (+ `.cursor/rules/10-ask-plan-code-qa.mdc` for contract summary) |
+| Implement / fix / refactor / debug / multi-file change / project automation | `.agents/skills/ask-plan-code-qa/SKILL.md` (+ `examples.md`; + `.cursor/rules/10-ask-plan-code-qa.mdc` for contract summary) |
 | Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.agents/skills/review-gate/SKILL.md` (+ `.cursor/rules/20-review-gate.mdc` for contract summary) |
 | Create / evaluate / refactor skill, rule, or prompt template | `.agents/skills/skill-factory/SKILL.md` (+ `.cursor/rules/30-skill-factory.mdc` for contract summary) |
 
@@ -55,14 +57,15 @@ When you change a skill, **sync both paths** so semantics stay identical. Cursor
 
 If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
 
-**`ask-plan-code-qa` flow:** Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA. Details: `AI_AGENT_WORKFLOW_README.md`; skills at `.cursor/skills/` (Cursor) or `.agents/skills/` (Codex).
+**`ask-plan-code-qa`:** Thinking workflow — internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA; **user-facing output** defaults to conversational prose on Pass (see Output Discipline in skill + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `AI_AGENT_WORKFLOW_README.md`.
 
 ## Core Expectations
 
 | Principle | Requirement |
 |-----------|-------------|
 | Read before edit | Open target files and related code before modifying |
-| Plan before multi-step work | Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Self-QA (see `ask-plan-code-qa`) |
+| Plan before multi-step work | 常/慎: internal plan + gates; user sees prose on Pass unless ambiguous or high-risk (see `ask-plan-code-qa`) |
+| Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk |
 | Contract changes | Grep/search references when changing APIs, types, paths, components, configs, schemas |
 | Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template — not user acceptance review |
 | Honesty | No "fixed/done/passing/verified" in Summary without Passing Evidence |
@@ -109,4 +112,4 @@ When changing agent workflow config, verify:
 - [ ] `AGENTS.md` indexes all rules and skills (Cursor + Codex paths)
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
-- [ ] Ask / Plan gates and compact-mode boundary consistent across `00`, `10`, skill, and `AI_AGENT_WORKFLOW_README.md`
+- [ ] Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
