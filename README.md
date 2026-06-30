@@ -2,7 +2,7 @@
 
 Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 
-**思路 skill** for implementation and review — engineer judgment first, structured output only when ambiguity, risk, or blocked. Internal phases (Ask → Inspect → Plan → gates → Code → Self-QA) run agent-side; on **Pass**, default to **对话体** (conversational prose with evidence).
+**思路 skill** for implementation and review — **amplify the user's outcome through a shared goal**, not just avoid mistakes. Every task runs four stages: **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** — align one Unified Goal with the user before building, plan within explicit boundaries and standards, execute result-oriented (no half-product), and review against the original goal. Engineer judgment first; structured output only when ambiguity, risk, or blocked. Internal phases (Ask → Inspect → Plan → gates → Code → Self-QA) run agent-side; on **Pass**, default to **对话体** (conversational prose with evidence). Reliability is the guardrail, not the goal.
 
 **Risk dial:** 快 (small/reversible) · 常 (default dev) · 慎 (production/contracts/security) — see [AI_AGENT_WORKFLOW_README.md](AI_AGENT_WORKFLOW_README.md).
 
@@ -94,7 +94,7 @@ When changing workflow config:
 - [ ] Each skill has `name`, `description`, When to Use, When Not to Use, Failure Modes, Evaluation Cases (≥3)
 - [ ] `AGENTS.md` indexes all rules and skills
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
-- [ ] Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
+- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
 
 ## License
 
