@@ -110,3 +110,14 @@ When changing agent workflow config, verify:
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
 - [ ] Ask / Plan gates and compact-mode boundary consistent across `00`, `10`, skill, and `AI_AGENT_WORKFLOW_README.md`
+
+## Cursor Cloud specific instructions
+
+This repository is a **documentation/configuration template** (the "Cursor Agent Workflow"). It is intentionally content-only — Markdown rules (`.cursor/rules/*.mdc`), skill procedure files (`SKILL.md`), and knowledge templates (`.ai/knowledge/*.md`).
+
+Non-obvious facts for future agents:
+
+- **There is nothing to install, build, lint, test, or serve.** No package manager, lockfiles, source code, services, databases, CI, or git hooks exist. The environment-setup update script is intentionally a no-op.
+- **"Running" the product = installing it into a target project.** The core flow is `README.md` "Install in a Project" (Option A): copy `.cursor/`, `.agents/`, `.ai/`, `AGENTS.md`, and `AI_AGENT_WORKFLOW_README.md` into another repo, then copy `.ai/knowledge/project-context.template.md` → `project-context.md`.
+- **The closest thing to a test suite is the "AI Workflow Maintenance Checklist"** above: each rule `10/20/30` must have a matching skill in **both** `.cursor/skills/<name>/` and `.agents/skills/<name>/`, the two copies must stay in sync, each skill needs its required sections, and `AGENTS.md` must index all rules/skills. Validate by inspecting files (e.g. `diff .cursor/skills/<name>/SKILL.md .agents/skills/<name>/SKILL.md`).
+- **When editing a skill, change both `.cursor/skills/<name>/` and `.agents/skills/<name>/`** so Cursor and Codex stay identical.
