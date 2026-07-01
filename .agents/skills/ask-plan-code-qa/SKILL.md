@@ -60,6 +60,7 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 
 - Do **not** emit empty `## Ask Gate` / `## Plan Gate` sections
 - Weave align → read → change → review into readable flow
+- Leave a **minimal reasoning trace** so internal gates are auditable without templates: 「读到 X → 判断 Y → 下一步 Z」 in one line
 - Self-QA: state what was checked and whether the goal was met; use evidence bullets — not a template with empty sections
 
 **Internal work still happens:** Agent still runs Align → Plan → Execute → Review checks; output discipline controls **what the user sees**. Doubt Resolution *reduces* noise — do not dump unresolved doubts on the user.
@@ -74,6 +75,18 @@ User drives at four natural points:
 | **歧义** | Multiple valid interpretations | Ask a genuine blocking question; do not silently choose |
 | **方案** | Non-trivial change or user said wait | One-sentence approach; proceed unless user objects |
 | **验收** | User says review / 验收 / 把关 | Switch to **review-gate** — not Plan Gate |
+
+### Goal Handshake — three states（目标握手三态）
+
+Pick the state, then act — this is how you avoid both over-asking and over-proceeding:
+
+| State | When | Action |
+|-------|------|--------|
+| **直接执行** | Goal obvious / trivial / reversible, or answered by the profile | One-line restatement, then proceed |
+| **带假设继续** (Pass with Risk) | Goal clear enough; remaining gaps are safe, reversible, Inspect-verifiable | State the assumptions, proceed; revisit if wrong |
+| **暂停确认** (Blocked) | A genuine, self-verified blocker that changes direction and cannot be derived from code/context/profile | Ask 1–2 real questions max |
+
+Escalate (暂停确认) only after Doubt Resolution — never reflexively.
 
 ## When to Use
 
@@ -113,6 +126,7 @@ Requirements only. **No code changes.** Act like a product manager: reconstruct 
 ### Blocking Questions (genuine only)
 ```
 
+- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (density, risk tolerance, quality bar, decision habits) **by default** — don't re-ask what it already answers.
 - Expose assumptions; no silent choice on ambiguous requirements.
 - Flag flawed user proposals with evidence.
 - Blocking questions only; safe reversible assumptions may proceed to Inspect if stated.
@@ -344,13 +358,25 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 ### Happy path
 
 User: "Fix timeout in auth handler."  
-常档: reads handler + tests → one-line goal confirmation → Code → Self-QA with test output and goal-met check (思路体, no empty phase headers). See `examples.md`.
+常档: reads handler + tests → one-line goal confirmation → Code → Self-QA with test output and goal-met check (思路体, no empty phase headers). See `examples.md`.  
+**Pass:** goal restated, evidence shown, no empty phase headers. **Fail (hollow):** "已修复" with no test output, or six empty gate headers.
 
 ### Ambiguous case
 
 User: "Make it faster."  
-Ask reconstructs intent and proposes a Unified Goal → Ask Gate Blocked (genuine blocker: no agreed metric) → user picks the metric → continues.
+Ask reconstructs intent and proposes a Unified Goal; Doubt Resolution first, then Ask Gate Blocked on the one genuine blocker (no agreed metric) → user picks the metric → continues.  
+**Pass:** profile consulted, a proposed goal offered, ≤2 real questions. **Fail:** question dump, or silently picks a metric.
 
 ### Boundary / failure
 
 Agent tries Code with Plan Gate Revise → **stop**, revise Plan. User says 「帮我验收」 → switch to **review-gate**, not Plan Gate.
+
+### Diagnostic — flawed user approach
+
+User: "Add a global mutable cache keyed by raw request." (correctness risk)  
+**Pass:** flags the flaw with evidence before implementing; proposes a safer goal-serving approach. **Fail:** implements as-asked without challenge.
+
+### Diagnostic — missing-evidence QA
+
+After Code, no tests were actually run.  
+**Pass:** Summary avoids "fixed/done"; the unrun checks are listed under Not Verified. **Fail:** claims success without Passing Evidence.
