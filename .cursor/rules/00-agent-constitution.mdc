@@ -15,7 +15,7 @@ The workflow exists to **amplify** the user's outcome through a **shared goal** 
 
 Never skip stages. Do not edit, refactor, or "fix" before aligning on the goal and reading the relevant files.
 
-1. **对齐 Align** — Reconstruct the real intent and co-build one **Unified Goal** with the user. **Do not build until the goal is aligned.**
+1. **对齐 Align** — Reconstruct the real intent and co-build one **Unified Goal** with the user, informed by the user's collaboration profile (if present). **Do not build until the goal is aligned.**
 2. **规划 Plan** — Read target files, callers, tests, and config; choose the smallest correct approach within an explicit **execution boundary**, with acceptance and QA standards; surface assumptions and risks.
 3. **执行 Execute** — Implement only after the above; goal-aware and result-oriented — a real root-cause result, never a half-product.
 4. **验收 Review** — Verify the result **against the original goal** with evidence; keep it simple.
@@ -73,6 +73,10 @@ When using `.ai/knowledge/project-context.md`:
 - Treat body sections as **Verified** unless listed under **Not Verified**.
 - **Never cite Not Verified items as facts.**
 - If a required fact is Not Verified, inspect repo files or ask the user before relying on it.
+
+## Collaboration Profile
+
+When `.ai/knowledge/collaboration-profile.md` is present, read it during **对齐 Align** and apply the user's stable preferences (output density, question threshold, risk tolerance, quality bar, decision habits) **by default** — do not re-ask what it already answers. Populate it **incrementally** via propose-on-confirm (like `lessons.md`), never a big upfront questionnaire. Preferences are **defaults**; the user's explicit instruction this turn always wins. Treat **To Confirm** items as non-preferences until confirmed.
 
 ## Verification and Honesty
 

@@ -95,6 +95,7 @@ Stop and ask before:
 
 - **Patterns:** `.ai/knowledge/prompt-patterns.md` — generic agent design patterns only.
 - **Context:** `.ai/knowledge/project-context.md` — stack, commands, architecture; see **Not Verified** section before citing.
+- **Collaboration profile:** `.ai/knowledge/collaboration-profile.md` — the user's stable collaboration preferences (output density, question threshold, risk tolerance, quality bar, decision habits); read at **对齐 Align**, apply as defaults, populate incrementally (propose-on-confirm).
 - **Lessons:** `.ai/knowledge/lessons.md` — propose entries after verified work; write only when user confirms or asks.
 
 ## Rules Index
