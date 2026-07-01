@@ -10,7 +10,7 @@ alwaysApply: false
 
 # 对齐 → 规划 → 执行 → 验收 (Align · Plan · Execute · Review)
 
-This rule defines **trigger behavior and output contract summary** only. Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`. Overview: `AI_AGENT_WORKFLOW_README.md`.
+This rule defines **trigger behavior and output contract summary** only. Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`. Overview: `docs/guide.md`.
 
 **Purpose:** amplify the user's outcome via a **shared goal**; reliability is the guardrail, not the goal.
 
