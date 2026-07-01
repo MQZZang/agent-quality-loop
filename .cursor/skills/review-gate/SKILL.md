@@ -31,7 +31,7 @@ Evidence-based review thinking — catch hallucinations, missing context, false 
 | Plan Review | Completeness, scope, verifiability |
 | Code Review | Correctness, references, minimalism |
 | QA Review | Evidence vs claims |
-| Goal-Achievement Review | Result vs original goal; deviation & why; half-products / over-engineering |
+| Goal-Achievement Review | Result vs original goal; deviation, half-product, over-engineering; preference & process drift |
 
 Run only the types relevant to the artifact under review.
 
@@ -87,11 +87,13 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 
 Output per finding: 问题 · 证据 · 风险 · 修正建议
 
-## Goal-Achievement Review（目标达成复核）
+## Goal-Achievement Review（目标 + 协作达成复核）
 
 - Does the delivered result meet the **original Unified Goal** and its Acceptance Standard?
 - Any deviation from the agreed goal or execution boundary — and why?
 - Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
+- **Preference drift:** does it respect the user's collaboration profile (density, risk tolerance, decision habits)?
+- **Process bloat:** over-asking, over-planning, mechanical/templated output, or evidence that only proves "a command ran" without proving the goal?
 
 Output per finding: 问题 · 证据 · 风险 · 修正建议
 

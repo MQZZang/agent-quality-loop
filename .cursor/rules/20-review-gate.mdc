@@ -68,7 +68,7 @@ Check the result against the **original Unified Goal**, not just the diff.
 
 **Per finding output:** 问题 / 证据 / 风险 / 修正建议
 
-Verify: meets goal + Acceptance Standard, no deviation from boundary, no half-product / scope creep / over-engineering (奥卡姆/Occam).
+Verify: meets goal + Acceptance Standard, no deviation from boundary, no half-product / scope creep / over-engineering (奥卡姆/Occam); respects the user's collaboration profile; no process bloat (over-asking, over-planning, mechanical output, formalistic evidence).
 
 ## Required Behavior
 
