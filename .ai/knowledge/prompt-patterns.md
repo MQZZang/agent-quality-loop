@@ -44,3 +44,19 @@ Separate phases for assumption, context, plan, code, and QA review. Each finding
 ### Eval-driven skill refinement
 
 Every skill ships with ≥3 eval cases (happy, ambiguous, boundary/failure). Update cases when real sessions expose new failure modes; record durable lessons in `lessons.md`.
+
+### Shared goal alignment (combat intent)
+
+Before building, reconstruct the user's real intent (product-manager view) and co-build **one Unified Goal** both sides confirm — like distributing a combat intent so every actor executes toward the same outcome. A wrong goal costs more than any bug; do not build until aligned. Scale the alignment effort with risk and ambiguity (trivial → one-line restatement).
+
+### Doubt resolution before escalation（穷尽求解）
+
+Resolve your own doubts first: read, search, reason to a real conclusion. Escalate only genuine, self-verified blockers grounded in full context — never a reflexive "the process says ask," a model hallucination, or a perfunctory question. Stop short of over-analysis beyond what the decision needs.
+
+### Result-oriented delivery
+
+Deliver a real, root-cause result — never a half-product, scope creep, or show-off code. Apply Occam (奥卡姆): the simplest sufficient change. Verify the outcome against the original goal, not just against the diff.
+
+### Stage-wise, model-agnostic delegation
+
+A task's stages (align · plan · execute · review) may run on different models — e.g. a strong model plans, a cheaper model executes — as **examples only, never hardcoded**. The workflow stays model-agnostic; the executor still understands the goal and may surface a better path or a gap missed earlier.

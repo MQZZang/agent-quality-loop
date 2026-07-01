@@ -57,17 +57,20 @@ When you change a skill, **sync both paths** so semantics stay identical. Cursor
 
 If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
 
-**`ask-plan-code-qa`:** Thinking workflow — internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA; **user-facing output** defaults to conversational prose on Pass (see Output Discipline in skill + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `AI_AGENT_WORKFLOW_README.md`.
+**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `AI_AGENT_WORKFLOW_README.md`.
 
 ## Core Expectations
 
 | Principle | Requirement |
 |-----------|-------------|
+| Align goal first | Co-build and confirm one **Unified Goal** before building; never execute a misaligned goal |
 | Read before edit | Open target files and related code before modifying |
-| Plan before multi-step work | 常/慎: internal plan + gates; user sees prose on Pass unless ambiguous or high-risk (see `ask-plan-code-qa`) |
+| Plan before multi-step work | 常/慎: internal plan (path + boundary + acceptance & QA standards) + gates; user sees prose on Pass unless ambiguous or high-risk (see `ask-plan-code-qa`) |
 | Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk |
+| Resolve own doubts | 穷尽求解 first; escalate only genuine, self-verified blockers — not mechanical or hallucinated asks |
 | Contract changes | Grep/search references when changing APIs, types, paths, components, configs, schemas |
-| Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template — not user acceptance review |
+| Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template (judge against the original goal) — not user acceptance review |
+| Result-oriented | Deliver a real root-cause result; no half-product, no over-engineering (奥卡姆/Occam) |
 | Honesty | No "fixed/done/passing/verified" in Summary without Passing Evidence |
 | Project context | Cite only **Verified** facts from `project-context.md`; never treat **Not Verified** as fact |
 | Prompt hygiene | Do not copy leaked or proprietary system prompt text |
@@ -112,4 +115,4 @@ When changing agent workflow config, verify:
 - [ ] `AGENTS.md` indexes all rules and skills (Cursor + Codex paths)
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
-- [ ] Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
+- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`

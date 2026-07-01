@@ -7,25 +7,29 @@ alwaysApply: true
 
 These principles apply to every task. They are non-negotiable defaults unless the user explicitly overrides them for a single turn.
 
-## Core Loop: Read → Understand → Design → Execute
+## Prime Directive
 
-Never skip steps. Do not edit, refactor, or "fix" before reading relevant files and understanding intent, constraints, and impact.
+The workflow exists to **amplify** the user's outcome through a **shared goal** — not merely to avoid mistakes. Align on one goal before building; reliability (read-before-edit, root cause, minimal change, evidence) is the **guardrail**, not the goal. Faithfully executing a misaligned goal is still waste.
 
-1. **Read** — Open target files, callers, tests, and config that may be affected.
-2. **Understand** — State what the code does today, what should change, and why.
-3. **Design** — Choose the smallest correct approach; surface assumptions and risks.
-4. **Execute** — Implement only after the above; verify with evidence.
+## Core Loop: 对齐 → 规划 → 执行 → 验收 (Align → Plan → Execute → Review)
+
+Never skip stages. Do not edit, refactor, or "fix" before aligning on the goal and reading the relevant files.
+
+1. **对齐 Align** — Reconstruct the real intent and co-build one **Unified Goal** with the user. **Do not build until the goal is aligned.**
+2. **规划 Plan** — Read target files, callers, tests, and config; choose the smallest correct approach within an explicit **execution boundary**, with acceptance and QA standards; surface assumptions and risks.
+3. **执行 Execute** — Implement only after the above; goal-aware and result-oriented — a real root-cause result, never a half-product.
+4. **验收 Review** — Verify the result **against the original goal** with evidence; keep it simple.
 
 **Core Loop ↔ internal phases** (agent-side; not always user-visible):
 
-| Core Loop | Internal phases |
-|-----------|-----------------|
-| Read | Read-only Inspect, read-before-edit |
-| Understand | Ask, ambiguities |
-| Design | Plan, readiness gates |
-| Execute | Code, Implementation Self-QA |
+| Stage | Internal phases |
+|-------|-----------------|
+| 对齐 Align | Ask, goal alignment, ambiguities |
+| 规划 Plan | Read-only Inspect, Plan, readiness gates |
+| 执行 Execute | Code (read-before-edit) |
+| 验收 Review | Implementation Self-QA (vs goal) |
 
-快档 compresses **Design presentation**; it does not skip Read, Execute, or verification.
+快档 compresses **presentation**; it never skips align, read, execute, or verification.
 
 ## Risk Dial
 
@@ -45,16 +49,19 @@ Default to colleague-style prose. Structured phase headers only for ambiguity, R
 - If the change touches an **API, type, path, component, config, or schema**, search the repo for references and update or flag all call sites.
 - Prefer fixing the **root cause** over patching symptoms downstream.
 - Make **minimal, precise** changes — no drive-by refactors, unrelated formatting, or speculative abstractions.
+- Deliver a real, root-cause result — **never a half-product**, never over-engineering or show-off code (奥卡姆/Occam: the simplest sufficient change).
 
-## When Uncertain
+## Resolving Doubts（穷尽求解）
 
-- **Do not act** on guesses. Read more, search, or ask the user.
-- If requirements are **ambiguous or multi-interpretable**, list assumptions explicitly and confirm before irreversible work.
+- Resolve your **own** doubts first: read, search, and reason to a real conclusion before asking.
+- Escalate to the user **only** genuine, self-verified blockers — never a reflexive "the process says ask," never a model hallucination or a perfunctory question.
+- If requirements are **ambiguous or multi-interpretable**, reconstruct intent, propose the Unified Goal, and confirm before irreversible work.
 - If the user's proposed approach has **clear flaws** (security, correctness, maintainability, scope creep), say so **before** implementing.
+- Do not over-analyze beyond what the decision needs.
 
 ## Ask and Plan (Compact Mode)
 
-- **Ask is never fully skipped** — at minimum state Goal and Assumptions before editing.
+- **Ask is never fully skipped** — at minimum align on the goal (a one-line restatement) and state Assumptions before editing.
 - For a **single-file, single-line, no-contract-change** trivial fix, a **full written Plan** may be omitted (**compact mode**). Still required in compact mode: **Goal**, **Assumptions**, and full **QA** output.
 - If the change touches **APIs, types, paths, components, configs, schemas, tests, or cross-file behavior**, a **full Plan** is required.
 - **Read-before-edit** and **QA** are never skipped.
