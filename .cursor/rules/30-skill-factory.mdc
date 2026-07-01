@@ -72,5 +72,6 @@ Document in the skill or companion file:
 
 ## Maintenance
 
+- After editing `.cursor/skills/`, run `./scripts/sync-skills.sh` to update `.agents/skills/`.
 - Remove or merge skills that duplicate rules or each other.
 - Update eval cases when the workflow changes.
