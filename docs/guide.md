@@ -104,10 +104,11 @@ Requirements understanding only. **Do not modify code.** Act like a product mana
 ### Blocking Questions (genuine only)
 ```
 
+- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences by default.
 - Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** (trivial → one-line restatement).
 - Expose assumptions; do not silently pick among ambiguous requirements.
 - Challenge flawed user approaches with evidence.
-- Resolve your own doubts first; ask **genuine blocking** questions only — not reflexive ones.
+- Resolve your own doubts first; ask **genuine blocking** questions only — not reflexive ones (see Goal Handshake three states in the skill).
 
 ---
 
