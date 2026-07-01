@@ -12,7 +12,7 @@ description: >-
 
 Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the **original Unified Goal**: a real result, no half-products, no over-engineering.
 
-**思路 skill:** run only the review types relevant to the artifact; default to readable findings, not five empty chapter headings.
+**思路 skill:** run only the review types relevant to the artifact; default to readable findings, not empty review-type chapter headings.
 
 ## When to Use
 
@@ -92,7 +92,7 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 - Does the delivered result meet the **original Unified Goal** and its Acceptance Standard?
 - Any deviation from the agreed goal or execution boundary — and why?
 - Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
-- **Preference drift:** does it respect the user's collaboration profile (density, risk tolerance, decision habits)?
+- **Preference drift:** does it respect the user's collaboration profile (output density, question threshold, risk tolerance, quality bar, decision habits)?
 - **Process bloat:** over-asking, over-planning, mechanical/templated output, or evidence that only proves "a command ran" without proving the goal?
 
 Output per finding: 问题 · 证据 · 风险 · 修正建议
@@ -132,7 +132,7 @@ If a section has zero issues, state what was examined — do not paste unused re
 - Do not say "looks good" without listing checked evidence.
 - Do not invent file contents, test passes, or user intent.
 - Do not approve QA that lacks Passing Evidence for critical claims.
-- Do not force all five review types when the artifact only needs one (e.g. QA-only → QA Review + Scope).
+- Do not force all review types when the artifact only needs one (e.g. QA-only → QA Review + Scope).
 
 ## Acceptance Criteria
 

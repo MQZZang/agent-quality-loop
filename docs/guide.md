@@ -104,7 +104,7 @@ Requirements understanding only. **Do not modify code.** Act like a product mana
 ### Blocking Questions (genuine only)
 ```
 
-- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences by default.
+- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (output density, question threshold, risk tolerance, quality bar, decision habits) by default.
 - Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** (trivial → one-line restatement).
 - Expose assumptions; do not silently pick among ambiguous requirements.
 - Challenge flawed user approaches with evidence.
@@ -645,8 +645,8 @@ $review-gate
 
 ## Maintenance Rules
 
-- **Skill (Cursor):** `.cursor/skills/<name>/SKILL.md` — full procedure for Cursor.
-- **Skill (Codex):** `.agents/skills/<name>/SKILL.md` — mirror of Cursor skill; run **`./scripts/sync-skills.sh`** after every skill change.
+- **Skill (Cursor):** `.cursor/skills/<name>/SKILL.md` — full procedure for Cursor; **edit here only**.
+- **Skill (Codex):** `.agents/skills/<name>/SKILL.md` — mirror of Cursor skill; run **`./scripts/sync-skills.sh`** after every skill change — **never edit `.agents/skills/` directly**.
 - **Rule** (`.cursor/rules/*.mdc`): triggers + output contract summary only.
 - Keep `.cursor/skills/` and `.agents/skills/` **semantically identical**.
 - Do not copy leaked or proprietary system prompts.
@@ -659,6 +659,7 @@ $review-gate
 - [ ] Goal-first: Unified Goal aligned before building; Ask Gate carries Goal Alignment
 - [ ] Plan carries Execution Boundary + Acceptance Standard + QA Standard
 - [ ] Doubt Resolution (穷尽求解): escalate only genuine, self-verified blockers
+- [ ] Collaboration profile (L2): read at 对齐 Align; apply defaults; propose-on-confirm population
 - [ ] Result-oriented: no half-product, no over-engineering (Occam); Self-QA judges against the original goal
 - [ ] Ask Gate + Plan Gate with Pass / Pass with Risk / Revise / Blocked
 - [ ] Read-only Inspect forbids file modification
