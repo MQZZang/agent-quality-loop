@@ -126,7 +126,7 @@ Requirements only. **No code changes.** Act like a product manager: reconstruct 
 ### Blocking Questions (genuine only)
 ```
 
-- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (density, risk tolerance, quality bar, decision habits) **by default** — don't re-ask what it already answers.
+- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (output density, question threshold, risk tolerance, quality bar, decision habits) **by default** — don't re-ask what it already answers.
 - Expose assumptions; no silent choice on ambiguous requirements.
 - Flag flawed user proposals with evidence.
 - Blocking questions only; safe reversible assumptions may proceed to Inspect if stated.

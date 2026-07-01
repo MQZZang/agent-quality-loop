@@ -39,7 +39,7 @@ For reusable phase prompts, risk dial (快/常/慎), and output discipline, see 
 | **Cursor** | `.cursor/skills/<name>/SKILL.md` |
 | **Codex** | `.agents/skills/<name>/SKILL.md` |
 
-When you change a skill, **sync both paths** so semantics stay identical — run `./scripts/sync-skills.sh` from repo root. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
+When you change a skill, edit **`.cursor/skills/` only** — never edit `.agents/skills/` directly — then run `./scripts/sync-skills.sh` from repo root to update the Codex mirror. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
 
 ## Instruction Priority / Conflict Handling
 
@@ -117,4 +117,4 @@ When changing agent workflow config, verify:
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
 - [ ] Run `./scripts/sync-skills.sh` after editing `.cursor/skills/`
-- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `docs/guide.md`
+- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), collaboration-profile (L2), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `docs/guide.md`
