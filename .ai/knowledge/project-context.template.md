@@ -1,6 +1,6 @@
 # Project Context Template
 
-Copy this file to `project-context.md` in each project that uses this workflow pack, then fill in verified facts.
+Copy this file to `project-context.md` in each project that uses AI Agent Collaboration Assistant, then fill in verified facts.
 
 **Agent usage:** Sections above **Not Verified** are confirmed facts. Items listed under **Not Verified** are not facts — inspect the repo or ask the user before relying on them. Never cite Not Verified content as confirmed.
 

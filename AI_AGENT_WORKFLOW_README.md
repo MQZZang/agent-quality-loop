@@ -1,4 +1,4 @@
-# AI Agent Workflow — Guide Moved
+# AI Agent Collaboration Assistant — Guide Moved
 
 The full human-readable guide (Quick Route, T0–T8 training prompts, phase details) lives at:
 
