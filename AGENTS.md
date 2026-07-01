@@ -8,7 +8,7 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 2. **`.ai/knowledge/project-context.md`** — project facts; treat **Not Verified** items as non-facts until confirmed.
 3. **`.ai/knowledge/lessons.md`** — verified past lessons.
 
-For reusable phase prompts, risk dial (快/常/慎), and output discipline, see **`AI_AGENT_WORKFLOW_README.md`**.
+For reusable phase prompts, risk dial (快/常/慎), and output discipline, see **`docs/guide.md`**.
 
 **Quick Route (daily):** 小改 → `快档` · 正常开发 → `常档`（Pass 对话体）· 高风险 → 常档 + `review-gate` · 只验收 → `review-gate only`.
 
@@ -39,7 +39,7 @@ For reusable phase prompts, risk dial (快/常/慎), and output discipline, see 
 | **Cursor** | `.cursor/skills/<name>/SKILL.md` |
 | **Codex** | `.agents/skills/<name>/SKILL.md` |
 
-When you change a skill, **sync both paths** so semantics stay identical. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
+When you change a skill, **sync both paths** so semantics stay identical — run `./scripts/sync-skills.sh` from repo root. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
 
 ## Instruction Priority / Conflict Handling
 
@@ -57,7 +57,7 @@ When you change a skill, **sync both paths** so semantics stay identical. Cursor
 
 If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
 
-**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `AI_AGENT_WORKFLOW_README.md`.
+**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `docs/guide.md`.
 
 ## Core Expectations
 
@@ -115,4 +115,5 @@ When changing agent workflow config, verify:
 - [ ] `AGENTS.md` indexes all rules and skills (Cursor + Codex paths)
 - [ ] QA templates retain **Passing Evidence** and **Not Verified**
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
-- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
+- [ ] Run `./scripts/sync-skills.sh` after editing `.cursor/skills/`
+- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `docs/guide.md`
