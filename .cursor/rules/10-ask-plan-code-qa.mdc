@@ -17,13 +17,14 @@ This rule defines **trigger behavior and output contract summary** only. Full pr
 **Flow (four stages):**
 
 ```text
-对齐 Ask → Ask Gate → 规划 Inspect → Plan → Plan Gate → 执行 Code → 验收 Self-QA
+对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 验收 Self-QA
 ```
 
 **Gates are lightweight — not long reviews.** Pass → conversational prose per Output Discipline; expand on Revise, Blocked, or Risk.
 
 - **对齐 / Ask Gate** (after Ask): align one **Unified Goal** with the user; Status Pass | Pass with Risk | Revise | Blocked. **No Inspect/Plan until the goal is aligned.** Blocked must be a genuine, self-verified blocker — not reflexive.
 - **规划 / Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
+- **Semantic Invariant Guardrail** (semantic-risk tasks only): before final Plan, protect the user's intended meaning with 3–7 Must-Hold Checks when source labels, schema names, UI text, categories, or default technical terms may differ from business/product concepts. Skip when no real semantic risk exists.
 - **规划 / Plan** carries **Execution Boundary + Acceptance Standard + QA Standard** and no unresolved doubt.
 - **Plan Gate** (after Plan): Status Pass | Pass with Risk | Revise | Blocked. **Revise/Blocked → no Code.**
 - **执行 / Code:** goal-aware and result-oriented — a real root-cause result, **never a half-product** or over-engineering.
@@ -40,5 +41,6 @@ Only **single-file + single-line + no contract change**. Output Compact Ask (Goa
 ## Self-QA Hard Constraints
 
 - No Passing Evidence → no "fixed/done/passing/verified" in Summary.
+- Semantic-risk conclusions → report compact Must-Hold Check evidence, or mark Not Verified / Cannot Infer.
 - Commands from `.ai/knowledge/project-context.md` when available.
 - Skipped checks → **Not Verified** (mandatory).

@@ -106,3 +106,26 @@ Pass
 **验收（Code 后，对照最初目标）：**  
 **目标达成？** 同集合二次导出 1.2s→80ms；改版本后回源——达成。  
 **改了：** `export/service.ts`　**验证：** `npm test -- export` — 9 passed　**非半成品检查：** 无 TODO、无半接线的失效路径。
+
+---
+
+## Example 4 — Semantic Invariant Guardrail（常档）
+
+**User:** 统计哪些客户可见流程用了审批状态。
+
+### ❌ 错误做法
+
+grep 所有 `status` / `workflow_state` / `approval_status`，把命中的字段都算作"审批状态"，最后给出一个看似完整的清单。
+
+### ✅ 思路体（只在语义风险存在时加 Must-Hold Checks）
+
+读到 `workflow_state` 同时用于内部流转，`approval_status` 才出现在客户可见流程配置里；字段名存在语义风险。
+
+**Must-Hold Checks（保护结论）：**
+- `approval_status` 必须有证据表明对应用户说的"审批状态"，不能仅凭字段名。
+- 内部 `workflow_state` 不计入"客户可见流程"。
+- 如果某流程缺少可见性配置，结论里标为 Not Verified，不静默归类。
+
+**做法：** 先以客户可见配置限定范围，再映射审批状态字段。
+
+**验收：** 清单总数与客户可见流程数可对账；未配置可见性的 2 个流程列入 Not Verified；没有把内部流转状态混入审批状态。

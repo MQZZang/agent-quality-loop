@@ -65,12 +65,14 @@ powershell -ExecutionPolicy Bypass -File scripts/fix-superpowers-windows.ps1
 ## Workflow Overview
 
 ```text
-对齐 Ask → Ask Gate → 规划 Inspect → Plan → Plan Gate → 执行 Code → 验收 Self-QA [→ Review Gate when high-risk]
+对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 验收 Self-QA [→ Review Gate when high-risk]
 ```
 
 Four stages: **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review**.
 
 **Core principle:** Align one **Unified Goal** with the user before building — a wrong goal costs more than any bug. Gates must exist, but stay **concise by default**; expand only on risk, ambiguity, failure, or high impact. Resolve your own doubts (穷尽求解) and escalate only genuine, self-verified blockers. Independent **Review Gate** is not required every time — use it for important / high-risk tasks.
+
+**Semantic Invariant Guardrail:** for complex analysis, extraction, classification, documentation, or code tasks where source labels may not equal the user's business/product concepts, define 3–7 compact **Must-Hold Checks** before final Plan. Checks protect meaning, scope, hierarchy, exclusivity, count integrity, missing data, or evidence binding. Skip this silently when there is no real semantic risk.
 
 **Ask Gate / Plan Gate are lightweight gates — not long review reports.**  
 Default to concise output; expand only on **Fail**, **Revise**, **Blocked**, or material **Risk**.
@@ -80,6 +82,7 @@ Default to concise output; expand only on **Fail**, **Revise**, **Blocked**, or 
 | **Ask** | 对齐 | Reconstruct intent; co-build & confirm one Unified Goal; no code changes |
 | **Ask Gate** | 对齐 | Goal aligned? Can we proceed to inspect/plan? |
 | **Read-only Inspect** | 规划 | Gather facts from repo before Plan |
+| **Semantic Scan** | 规划 | If concept mapping can change the conclusion, define minimal Must-Hold Checks |
 | **Plan** | 规划 | Approach + path + execution boundary + acceptance & QA standards |
 | **Plan Gate** | 规划 | Can we enter Code? |
 | **Code** | 执行 | Goal-aware, minimal, root-cause edits; no half-product |
@@ -96,7 +99,7 @@ Three dials aligned with how developers actually work. Not every task needs the 
 | Mode | 档 | Use When | Required Flow |
 |------|-----|----------|---------------|
 | **Compact / 快档** | 快 | single-file + single-line + no contract change | Compact Ask → Code → Self-QA (对话体) |
-| **Standard / 常档** | 常 | normal implement / fix / refactor / debug | Internal Ask → Inspect → Plan → gates; **user sees 思路体 on Pass** |
+| **Standard / 常档** | 常 | normal implement / fix / refactor / debug | Internal Ask → Inspect → Semantic Scan (if risk) → Plan → gates; **user sees 思路体 on Pass** |
 | **High-Risk / 慎档** | 慎 | multi-file, unclear root cause, contract change, production / data / security / deploy | 常档 + independent **review-gate** when user asks |
 
 **Gate conduct (all non-trivial modes):**
@@ -215,6 +218,7 @@ After Read-only Inspect (or documented skip). First **shed any existing perspect
 ### Assumptions
 ### Approach & Path (approach + ordered iteration steps)
 ### Execution Boundary (in-scope · out-of-scope/non-goals · do-not-touch · hard limits)
+### Must-Hold Checks (semantic risk only)
 ### Files to Modify
 ### Cross-file Reference Checks
 ### Impact Scope
@@ -224,6 +228,7 @@ After Read-only Inspect (or documented skip). First **shed any existing perspect
 ```
 
 - Each step needs an **observable verification** method.
+- If semantic risk exists, include 3–7 Must-Hold Checks with simple verification paths; if none exists, do not invent them.
 - Root-cause first; minimal precise change; no unrelated refactors, useless files, or over-engineering (奥卡姆/Occam).
 - Contract/cross-file changes → list grep/search checks.
 - The plan itself carries **no unresolved doubt** (穷尽求解).
@@ -243,6 +248,7 @@ Pass | Pass with Risk | Revise | Blocked
 ### Goal-Alignment Check (plan serves the confirmed goal)
 ### Root-Cause Check
 ### Boundary / Scope Check
+### Semantic Boundary Check (if risk)
 ### Cross-file Check
 ### Acceptance & QA Check
 ### Doubt Check (no self-resolvable doubts left; only genuine blockers escalated)
@@ -260,6 +266,8 @@ Proceed to Code | Revise Plan | Ask User
 | **Pass with Risk** | State how risk is handled in Code or Self-QA |
 | **Revise** | Fix Plan — **no Code** |
 | **Blocked** | Ask user — **no Code** |
+
+**Semantic Boundary Check:** if semantic risk exists, Must-Hold Checks must protect the user-confirmed meaning; if no semantic risk exists, do not force extra checks.
 
 **Plan Gate not Pass / Pass with Risk → do not enter Code.**
 
@@ -291,6 +299,7 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 ### Goal Met? (vs Unified Goal + Acceptance Standard: met / deviation & why)
 ### Changed Files
 ### Verification Performed
+### Must-Hold Checks (semantic risk only)
 ### Passing Evidence
 ### Failing Evidence
 ### Not Verified
@@ -299,6 +308,7 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 ```
 
 - Judge **against the original goal** — keep it simple, low-noise; do not over-test for ceremony.
+- Report Must-Hold Checks only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
 - No evidence → no success claims.
 - Skipped checks → **Not Verified**.
 - QA commands from `.ai/knowledge/project-context.md` when available.
@@ -339,7 +349,7 @@ User says 「帮我验收」, 「review this diff」, 「检查 QA 是否可信�
 If **any** eligibility = **no** → full flow:
 
 ```text
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA
+Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate → Code → Implementation Self-QA
 ```
 
 Compact **never** skips: read-before-edit, Self-QA, Not Verified.
@@ -400,7 +410,7 @@ Copy-paste prompts for learning the full workflow. **Daily use: see Quick Route 
 - 是否需要独立 review-gate
 ```
 
-### T1 — 启动任务：Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
+### T1 — 启动任务：Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
 
 ```text
 使用 ask-plan-code-qa。
@@ -410,7 +420,7 @@ Copy-paste prompts for learning the full workflow. **Daily use: see Quick Route 
 
 请按以下流程执行：
 
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
+Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
 
 任务是：
 【在这里写任务】
@@ -439,7 +449,8 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 
 4. Plan：
    - 必须基于 Read-only Inspect 的事实
-   - 包含 Goal、Context、Assumptions、Approach & Path、Execution Boundary、Files to Modify、Cross-file Reference Checks、Impact Scope、Acceptance Standard、QA Standard、Pause Conditions
+   - 包含 Goal、Context、Assumptions、Approach & Path、Execution Boundary、Must-Hold Checks（仅语义风险任务）、Files to Modify、Cross-file Reference Checks、Impact Scope、Acceptance Standard、QA Standard、Pause Conditions
+   - 如存在语义风险，加入 3–7 条 Must-Hold Checks；如不存在，不要硬凑
    - 每个 Execution Step 必须有可观测验证方法
    - 优先根因修复
    - 最小精准变更
@@ -447,7 +458,7 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 
 5. Plan Gate：
    - Status 使用 Pass / Pass with Risk / Revise / Blocked
-   - 检查 Root-Cause、Scope、Context、Cross-file、QA
+   - 检查 Root-Cause、Scope、Semantic Boundary（如有风险）、Context、Cross-file、QA
    - 如果 Plan Gate 未通过，不得进入 Code
 
 不要修改代码。
@@ -487,6 +498,7 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
    - Goal Met?（对照统一目标 + 验收标准）
    - Changed Files
    - Verification Performed
+   - Must-Hold Checks（仅语义风险任务）
    - Passing Evidence
    - Failing Evidence
    - Not Verified
@@ -554,7 +566,7 @@ Compact Mode 只有同时满足以下条件才允许：
 ### QA
 
 如果任一条件为 no，请升级为完整流程：
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
+Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
 
 任务是：
 【在这里写任务】
@@ -656,7 +668,7 @@ $ask-plan-code-qa
 先不要修改代码。
 
 请按以下流程输出：
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
+Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
 
 任务是：
 【在这里写任务】
@@ -696,6 +708,7 @@ $review-gate
 - [ ] Four-stage model (对齐 / 规划 / 执行 / 验收) documented in skill + this guide
 - [ ] Goal-first: Unified Goal aligned before building; Ask Gate carries Goal Alignment
 - [ ] Plan carries Execution Boundary + Acceptance Standard + QA Standard
+- [ ] Semantic-risk tasks carry compact Must-Hold Checks and preserve user-confirmed business/product meaning
 - [ ] Doubt Resolution (穷尽求解): escalate only genuine, self-verified blockers
 - [ ] Collaboration profile (L2): read at 对齐 Align; apply defaults; propose-on-confirm population
 - [ ] Result-oriented: no half-product, no over-engineering (Occam); Self-QA judges against the original goal
