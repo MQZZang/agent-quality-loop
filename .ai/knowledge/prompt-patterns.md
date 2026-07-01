@@ -49,7 +49,7 @@ Every skill ships with ≥3 eval cases (happy, ambiguous, boundary/failure). Upd
 
 Before building, reconstruct the user's real intent (product-manager view) and co-build **one Unified Goal** both sides confirm — like distributing a combat intent so every actor executes toward the same outcome. A wrong goal costs more than any bug; do not build until aligned. Scale the alignment effort with risk and ambiguity (trivial → one-line restatement).
 
-### Doubt resolution before escalation（穷尽求解）
+### Doubt Resolution（穷尽求解）
 
 Resolve your own doubts first: read, search, reason to a real conclusion. Escalate only genuine, self-verified blockers grounded in full context — never a reflexive "the process says ask," a model hallucination, or a perfunctory question. Stop short of over-analysis beyond what the decision needs.
 

@@ -19,7 +19,7 @@ Evidence-based review thinking — catch hallucinations, missing context, false 
 - User asks to **review / 验收 / inspect / audit / validate**
 - **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports**
 - Hallucination check, risk check, omission check on artifacts (not on in-progress implement unless reviewing a prior report)
-- **Goal-achievement / 目标达成** check: does the result meet the original Unified Goal within its boundary?
+- **Goal-Achievement / 目标达成** check: does the result meet the original Unified Goal within its boundary?
 - User asks to verify "done" claims or review before merge
 
 ## Review Types

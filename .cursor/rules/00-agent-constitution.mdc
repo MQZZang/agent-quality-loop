@@ -51,7 +51,7 @@ Default to colleague-style prose. Structured phase headers only for ambiguity, R
 - Make **minimal, precise** changes — no drive-by refactors, unrelated formatting, or speculative abstractions.
 - Deliver a real, root-cause result — **never a half-product**, never over-engineering or show-off code (奥卡姆/Occam: the simplest sufficient change).
 
-## Resolving Doubts（穷尽求解）
+## Doubt Resolution（穷尽求解）
 
 - Resolve your **own** doubts first: read, search, and reason to a real conclusion before asking.
 - Escalate to the user **only** genuine, self-verified blockers — never a reflexive "the process says ask," never a model hallucination or a perfunctory question.
