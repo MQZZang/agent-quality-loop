@@ -1,6 +1,6 @@
 # AI Agents — Project Entry
 
-Cross-tool compatibility pointer for Cursor and other coding agents working in a repository that installs this workflow.
+Cross-tool compatibility pointer for Cursor and other coding agents working in a repository that installs AI Agent Collaboration Assistant.
 
 ## Read First
 

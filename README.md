@@ -1,4 +1,4 @@
-# Cursor Agent Workflow
+# AI Agent Collaboration Assistant
 
 Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 
@@ -35,23 +35,23 @@ Training prompts (T0–T8) and full workflow details → **[docs/guide.md](docs/
 
 ```bash
 # From your target project root
-cp -r /path/to/cursor-agent-workflow/.cursor ./
-cp -r /path/to/cursor-agent-workflow/.agents ./
-cp -r /path/to/cursor-agent-workflow/.ai ./
-cp -r /path/to/cursor-agent-workflow/docs ./
-cp /path/to/cursor-agent-workflow/AGENTS.md ./
-cp /path/to/cursor-agent-workflow/AI_AGENT_WORKFLOW_README.md ./
+cp -r /path/to/ai-agent-collaboration-assistant/.cursor ./
+cp -r /path/to/ai-agent-collaboration-assistant/.agents ./
+cp -r /path/to/ai-agent-collaboration-assistant/.ai ./
+cp -r /path/to/ai-agent-collaboration-assistant/docs ./
+cp /path/to/ai-agent-collaboration-assistant/AGENTS.md ./
+cp /path/to/ai-agent-collaboration-assistant/AI_AGENT_WORKFLOW_README.md ./
 ```
 
 Windows (PowerShell):
 
 ```powershell
-Copy-Item -Recurse f:\cursor-agent-workflow\.cursor .
-Copy-Item -Recurse f:\cursor-agent-workflow\.agents .
-Copy-Item -Recurse f:\cursor-agent-workflow\.ai .
-Copy-Item -Recurse f:\cursor-agent-workflow\docs .
-Copy-Item f:\cursor-agent-workflow\AGENTS.md .
-Copy-Item f:\cursor-agent-workflow\AI_AGENT_WORKFLOW_README.md .
+Copy-Item -Recurse f:\ai-agent-collaboration-assistant\.cursor .
+Copy-Item -Recurse f:\ai-agent-collaboration-assistant\.agents .
+Copy-Item -Recurse f:\ai-agent-collaboration-assistant\.ai .
+Copy-Item -Recurse f:\ai-agent-collaboration-assistant\docs .
+Copy-Item f:\ai-agent-collaboration-assistant\AGENTS.md .
+Copy-Item f:\ai-agent-collaboration-assistant\AI_AGENT_WORKFLOW_README.md .
 ```
 
 Then customize:
@@ -62,7 +62,7 @@ Then customize:
 ### Option B — Submodule
 
 ```bash
-git submodule add git@github.com:YOUR_USER/cursor-agent-workflow.git .cursor-agent-workflow
+git submodule add git@github.com:YOUR_USER/ai-agent-collaboration-assistant.git .ai-agent-collaboration-assistant
 ```
 
 Symlink or copy `.cursor/`, `.agents/`, `.ai/`, `docs/`, and entry files into the project root as needed.

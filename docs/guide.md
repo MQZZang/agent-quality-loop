@@ -1,4 +1,4 @@
-# AI Agent Workflow
+# AI Agent Collaboration Assistant
 
 Human-readable guide for Cursor, Codex, and other agents using this workflow.
 
