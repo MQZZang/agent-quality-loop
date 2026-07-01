@@ -62,7 +62,7 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 - Weave align → read → change → review into readable flow
 - Self-QA: state what was checked and whether the goal was met; use evidence bullets — not a template with empty sections
 
-**Internal work still happens:** Agent still runs Align → Plan → Review checks; output discipline controls **what the user sees**. Doubt Resolution *reduces* noise — do not dump unresolved doubts on the user.
+**Internal work still happens:** Agent still runs Align → Plan → Execute → Review checks; output discipline controls **what the user sees**. Doubt Resolution *reduces* noise — do not dump unresolved doubts on the user.
 
 ## User Handshake
 

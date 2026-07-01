@@ -84,7 +84,7 @@ When changing workflow config:
 
 1. Edit skills under `.cursor/skills/`.
 2. Run `./scripts/sync-skills.sh` to update `.agents/skills/`.
-3. Verify checklist in `AGENTS.md` (mirrors, four-stage consistency, Passing Evidence / Not Verified).
+3. Verify checklist in `AGENTS.md` (mirrors, four-stage consistency, Doubt Resolution, Passing Evidence / Not Verified).
 
 ## License
 

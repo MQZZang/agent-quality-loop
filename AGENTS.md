@@ -67,7 +67,7 @@ If the user says **「帮我验收」** or **「review this」** → **`20`**, n
 | Read before edit | Open target files and related code before modifying |
 | Plan before multi-step work | 常/慎: internal plan (path + boundary + acceptance & QA standards) + gates; user sees prose on Pass unless ambiguous or high-risk (see `ask-plan-code-qa`) |
 | Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk |
-| Resolve own doubts | 穷尽求解 first; escalate only genuine, self-verified blockers — not mechanical or hallucinated asks |
+| Resolve own doubts | **Doubt Resolution（穷尽求解）** first; escalate only genuine, self-verified blockers — not mechanical or hallucinated asks |
 | Contract changes | Grep/search references when changing APIs, types, paths, components, configs, schemas |
 | Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template (judge against the original goal) — not user acceptance review |
 | Result-oriented | Deliver a real root-cause result; no half-product, no over-engineering (奥卡姆/Occam) |
