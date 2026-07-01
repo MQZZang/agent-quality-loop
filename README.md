@@ -57,7 +57,8 @@ Copy-Item f:\ai-agent-collaboration-assistant\AI_AGENT_WORKFLOW_README.md .
 Then customize:
 
 1. Copy `.ai/knowledge/project-context.template.md` → `.ai/knowledge/project-context.md` and fill in stack, commands, and architecture.
-2. Add verified lessons to `.ai/knowledge/lessons.md` over time.
+2. Copy `.ai/knowledge/collaboration-profile.template.md` → `.ai/knowledge/collaboration-profile.md` and fill in your collaboration preferences (output density, question threshold, risk tolerance, quality bar, decision habits) — or let the agent populate it incrementally.
+3. Add verified lessons to `.ai/knowledge/lessons.md` over time.
 
 ### Option B — Submodule
 
