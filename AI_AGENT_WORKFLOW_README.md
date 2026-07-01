@@ -533,15 +533,15 @@ Plan：
 【粘贴 Plan】
 
 检查重点：
-- Goal 是否明确
+- Goal 是否明确、是否与已确认的统一目标一致
 - Assumptions 是否完整
-- Non-goals 是否清晰
+- Execution Boundary 是否清晰（in/out-of-scope、不可触碰、硬限制）
 - 是否解决根因
-- 是否最小精准变更
-- Files to Inspect 是否足够
+- 是否最小精准变更、无过度设计
+- Files to Modify 是否足够
 - Cross-file Reference Checks 是否完整
 - Impact Scope 是否合理
-- QA Plan 是否可观测
+- Acceptance Standard 与 QA Standard 是否可观测
 - Pause Conditions 是否完整
 
 请输出：
@@ -565,12 +565,13 @@ Implementation Self-QA：
 
 检查重点：
 - Summary 是否有无证据成功声明
+- Goal Met? 是否对照最初统一目标 + 验收标准（达成 / 偏差及原因）
 - Changed Files 是否完整
 - Verification Performed 是否真实可追溯
 - Passing Evidence 是否支撑结论
 - Failing Evidence 是否被隐藏
 - Not Verified 是否明确
-- Remaining Risks 是否充分
+- Remaining Risks 是否充分（含半成品 / 过度设计）
 - 是否需要补充测试、lint、typecheck、手工验证
 
 请输出：
