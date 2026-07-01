@@ -24,6 +24,44 @@ Human-readable guide for Cursor, Codex, and other agents using this workflow.
 
 ---
 
+## Superpowers 插件共存（Cursor / Windows）
+
+本 workflow 与 Cursor 全局 **Superpowers** 插件**不建议同时启用**：
+
+| 冲突点 | 本仓库 | Superpowers |
+|--------|--------|-------------|
+| 流程入口 | `AGENTS.md` + 显式读 `.cursor/skills/` | `using-superpowers` 要求每次对话先 invoke skill |
+| SessionStart | 无 hook | 注入 `using-superpowers` 全文到 `additional_context` |
+| 阶段模型 | 对齐 → 规划 → 执行 → 验收 | brainstorming / TDD / subagent 等独立 skill 链 |
+
+**推荐：** 安装本仓库后，在 Cursor **Settings → Plugins** 中**禁用 Superpowers**（或仅在不使用本 workflow 的项目里启用）。
+
+### Windows：新开对话弹出「选择应用打开 session-start」
+
+若仍启用 Superpowers，Windows 上每次新开 Agent 对话可能弹出系统「打开方式」对话框。原因是插件 `hooks/hooks-cursor.json` 直接调用无扩展名的 bash 脚本 `session-start`，Windows 无法执行。
+
+**一键修复**（安装本仓库后运行一次，然后重启 Cursor）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/fix-superpowers-windows.ps1
+```
+
+脚本将所有 `~/.cursor/plugins/**/superpowers/**/hooks-cursor.json` 中的
+
+```json
+"command": "./hooks/session-start"
+```
+
+改为
+
+```json
+"command": "./hooks/run-hook.cmd session-start"
+```
+
+**手动修复：** 编辑上述文件，改一行后重启 Cursor。上游 issue：[obra/superpowers#871](https://github.com/obra/superpowers/issues/871)。
+
+---
+
 ## Workflow Overview
 
 ```text

@@ -45,8 +45,9 @@ When you change a skill, edit **`.cursor/skills/` only** — never edit `.agents
 
 1. **User's explicit instruction this turn** takes highest priority.
 2. **This repo's `AGENTS.md`, `.cursor/rules/`, and skills** (`.cursor/skills/` for Cursor, `.agents/skills/` for Codex) are the in-repo workflow baseline.
-3. **External user-level skills** (e.g. global `superpowers-*` skills) — if they conflict with this repo's workflow, follow the user's explicit instruction and this `AGENTS.md` unless the user explicitly asks to use the external skill; then **state how it differs** from the repo workflow.
-4. When unsure which workflow applies, ask before implementing.
+3. **External user-level skills** (e.g. global `superpowers-*` skills) — **prefer disabling Superpowers** when this repo is installed (workflow conflict; see `docs/guide.md` § Superpowers). If both are active, follow the user's explicit instruction and this `AGENTS.md` unless the user explicitly asks to use the external skill; then **state how it differs** from the repo workflow.
+4. **Windows popup fix:** If Superpowers stays enabled and new chats show “open session-start”, run `scripts/fix-superpowers-windows.ps1` once and restart Cursor.
+5. When unsure which workflow applies, ask before implementing.
 
 ## 10 vs 20 — QA vs Acceptance
 

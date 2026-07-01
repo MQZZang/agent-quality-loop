@@ -60,6 +60,14 @@ Then customize:
 2. Copy `.ai/knowledge/collaboration-profile.template.md` → `.ai/knowledge/collaboration-profile.md` and fill in your collaboration preferences (output density, question threshold, risk tolerance, quality bar, decision habits) — or let the agent populate it incrementally.
 3. Add verified lessons to `.ai/knowledge/lessons.md` over time.
 
+**Cursor + Superpowers on Windows:** This workflow conflicts with the global Superpowers plugin. Prefer disabling Superpowers when using this repo. If you keep both and see a **“Select an app to open session-start”** popup on every new chat, run once:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/fix-superpowers-windows.ps1
+```
+
+Then restart Cursor. Details → [docs/guide.md § Superpowers](docs/guide.md).
+
 ### Option B — Submodule
 
 ```bash
