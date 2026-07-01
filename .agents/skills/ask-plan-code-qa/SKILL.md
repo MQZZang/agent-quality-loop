@@ -31,7 +31,7 @@ This is a **思路 skill**, not a paperwork skill. The phases below are **mental
 
 Resolve your **own** doubts before escalating. Exhaust reasonable analysis (read, search, reason) to settle a question; escalate to the user **only** a genuine, self-verified blocker — **not** a reflexive "the process says ask." A question must rest on **full context and a real conclusion**, never a model hallucination or a perfunctory ask; and do not over-analyze beyond what the decision needs.
 
-**Risk dial** (see `AI_AGENT_WORKFLOW_README.md`; aliases: Compact = 快, Standard = 常, High-Risk = 慎):
+**Risk dial** (see `docs/guide.md`; aliases: Compact = 快, Standard = 常, High-Risk = 慎):
 
 | Dial | When | User-facing feel |
 |------|------|------------------|
@@ -94,7 +94,7 @@ User drives at four natural points:
 ```
 
 Read `.cursor/rules/10-ask-plan-code-qa.mdc` for triggers and contract summary.  
-Human guide: `AI_AGENT_WORKFLOW_README.md`.
+Human guide: `docs/guide.md`.
 
 ---
 

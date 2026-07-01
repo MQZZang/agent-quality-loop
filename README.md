@@ -2,9 +2,9 @@
 
 Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 
-**思路 skill** for implementation and review — **amplify the user's outcome through a shared goal**, not just avoid mistakes. Every task runs four stages: **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** — align one Unified Goal with the user before building, plan within explicit boundaries and standards, execute result-oriented (no half-product), and review against the original goal. Engineer judgment first; structured output only when ambiguity, risk, or blocked. Internal phases (Ask → Inspect → Plan → gates → Code → Self-QA) run agent-side; on **Pass**, default to **对话体** (conversational prose with evidence). Reliability is the guardrail, not the goal.
+**Unified Goal:** amplify the user's outcome through a **shared goal** — not merely avoid mistakes. Four stages: **对齐 → 规划 → 执行 → 验收**. On Pass, default to conversational prose with evidence (思路体). Reliability is the guardrail, not the goal.
 
-**Risk dial:** 快 (small/reversible) · 常 (default dev) · 慎 (production/contracts/security) — see [AI_AGENT_WORKFLOW_README.md](AI_AGENT_WORKFLOW_README.md).
+**Risk dial:** 快 · 常 · 慎 — see [docs/guide.md](docs/guide.md).
 
 ## Quick Route
 
@@ -15,18 +15,18 @@ Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 | 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
 | 只验收 | `Use review-gate only` |
 
-Full guide, training prompts (T0–T8), and mode details → **[AI_AGENT_WORKFLOW_README.md](AI_AGENT_WORKFLOW_README.md)**.
+Training prompts (T0–T8) and full workflow details → **[docs/guide.md](docs/guide.md)**.
 
 ## Contents
 
 | Path | Purpose |
 |------|---------|
 | `AGENTS.md` | Cross-tool entry point for agents |
-| `AI_AGENT_WORKFLOW_README.md` | Human-readable workflow guide + Quick Route |
+| `docs/guide.md` | Human-readable workflow guide + T0–T8 |
+| `AI_AGENT_WORKFLOW_README.md` | Redirect stub (backward compatibility) |
 | `.cursor/rules/` | Always-on and description-triggered rules |
 | `.cursor/skills/` | Full procedural skills (Cursor) |
-| `.agents/skills/` | Mirrored skills (Codex) |
-| `.cursor/skills/ask-plan-code-qa/examples.md` | 规则体 vs 思路体 output contrast |
+| `.agents/skills/` | Mirrored skills (Codex) — sync via `scripts/sync-skills.sh` |
 | `.ai/knowledge/` | Generic patterns + per-project templates |
 
 ## Install in a Project
@@ -38,6 +38,7 @@ Full guide, training prompts (T0–T8), and mode details → **[AI_AGENT_WORKFLO
 cp -r /path/to/cursor-agent-workflow/.cursor ./
 cp -r /path/to/cursor-agent-workflow/.agents ./
 cp -r /path/to/cursor-agent-workflow/.ai ./
+cp -r /path/to/cursor-agent-workflow/docs ./
 cp /path/to/cursor-agent-workflow/AGENTS.md ./
 cp /path/to/cursor-agent-workflow/AI_AGENT_WORKFLOW_README.md ./
 ```
@@ -48,13 +49,14 @@ Windows (PowerShell):
 Copy-Item -Recurse f:\cursor-agent-workflow\.cursor .
 Copy-Item -Recurse f:\cursor-agent-workflow\.agents .
 Copy-Item -Recurse f:\cursor-agent-workflow\.ai .
+Copy-Item -Recurse f:\cursor-agent-workflow\docs .
 Copy-Item f:\cursor-agent-workflow\AGENTS.md .
 Copy-Item f:\cursor-agent-workflow\AI_AGENT_WORKFLOW_README.md .
 ```
 
 Then customize:
 
-1. Copy `.ai/knowledge/project-context.template.md` → `.ai/knowledge/project-context.md` and fill in your stack, commands, and architecture.
+1. Copy `.ai/knowledge/project-context.template.md` → `.ai/knowledge/project-context.md` and fill in stack, commands, and architecture.
 2. Add verified lessons to `.ai/knowledge/lessons.md` over time.
 
 ### Option B — Submodule
@@ -63,7 +65,7 @@ Then customize:
 git submodule add git@github.com:YOUR_USER/cursor-agent-workflow.git .cursor-agent-workflow
 ```
 
-Symlink or copy `.cursor/`, `.ai/`, and entry files into the project root as needed.
+Symlink or copy `.cursor/`, `.agents/`, `.ai/`, `docs/`, and entry files into the project root as needed.
 
 ## Rules & Skills
 
@@ -74,27 +76,15 @@ Symlink or copy `.cursor/`, `.ai/`, and entry files into the project root as nee
 | `20-review-gate` | `review-gate` | Review / 验收 / audit completed work |
 | `30-skill-factory` | `skill-factory` | Create or evaluate skills and rules |
 
-`ask-plan-code-qa` ships with **`examples.md`** (规则体 vs 思路体) — read when calibrating output style.
-
-## Quick Prompts
-
-See **Quick Route** table at the top. Shorthand:
-
-```text
-小改 → Follow ask-plan-code-qa 快档
-常規 → Follow ask-plan-code-qa 常档，Pass 时保持对话体
-验收 → Use review-gate only
-```
+Read **`examples.md`** under `ask-plan-code-qa` when calibrating output style.
 
 ## Maintenance
 
 When changing workflow config:
 
-- [ ] Each triggered rule (`10`, `20`, `30`) has a matching skill under `.cursor/skills/<name>/`
-- [ ] Each skill has `name`, `description`, When to Use, When Not to Use, Failure Modes, Evaluation Cases (≥3)
-- [ ] `AGENTS.md` indexes all rules and skills
-- [ ] QA templates retain **Passing Evidence** and **Not Verified**
-- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `AI_AGENT_WORKFLOW_README.md`
+1. Edit skills under `.cursor/skills/`.
+2. Run `./scripts/sync-skills.sh` to update `.agents/skills/`.
+3. Verify checklist in `AGENTS.md` (mirrors, four-stage consistency, Passing Evidence / Not Verified).
 
 ## License
 
