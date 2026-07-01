@@ -315,15 +315,16 @@ Compact **never** skips: read-before-edit, Self-QA, Not Verified.
 2. For implement/fix tasks, **explicitly read** `.cursor/rules/10-ask-plan-code-qa.mdc` + `.cursor/skills/ask-plan-code-qa/SKILL.md` (description-triggered rules may not auto-load).
 3. Follow gate flow; keep gates concise on Pass.
 4. For review/acceptance → `review-gate` skill + rule `20`.
+5. After editing skills, run `./scripts/sync-skills.sh` before commit.
 
 ---
 
 ## Codex Usage
 
-1. Read `AGENTS.md` and this README.
+1. Read `AGENTS.md` and this guide (`docs/guide.md`).
 2. Use skills from **`.agents/skills/<name>/SKILL.md`** — do not default to `.cursor/skills/`.
 3. Optional: read matching `.cursor/rules/*.mdc` for trigger contract summary (rules are not mirrored).
-4. Same gate semantics as Cursor; skill content must stay in sync with `.cursor/skills/`.
+4. Same gate semantics as Cursor; after skill changes in `.cursor/skills/`, maintainers run `./scripts/sync-skills.sh`.
 
 ---
 

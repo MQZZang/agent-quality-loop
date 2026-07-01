@@ -42,7 +42,8 @@ Otherwise: use a rule (principle), knowledge file (facts), or inline chat (one-o
 3. **Body** — all required sections per schema below.
 4. **Eval cases** — minimum 3 (happy, ambiguous, boundary/failure).
 5. **Rule link** — if description-triggered, add or update `.cursor/rules/*.mdc`.
-6. **Review** — run `review-gate` mindset on the draft skill.
+6. **Sync mirror** — run `./scripts/sync-skills.sh` from repo root (updates `.agents/skills/`).
+7. **Review** — run `review-gate` mindset on the draft skill.
 
 Before authoring, gather: trigger phrases, inputs/outputs, failure modes, rule vs skill vs knowledge placement (see Input Requirements concepts in steps above).
 
@@ -136,6 +137,7 @@ Expected: Refuse or pause because ...
 
 ## Maintenance Notes
 
+- After editing `.cursor/skills/`, run `./scripts/sync-skills.sh` to update the Codex mirror.
 - Merge overlapping skills; delete unused ones.
 - Update eval cases when workflow changes.
 - Prefer editing `.ai/knowledge/lessons.md` for verified run lessons, not bloating SKILL.md.
