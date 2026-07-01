@@ -2,28 +2,34 @@
 description: >-
   Use when the user asks to implement, fix, refactor, debug, make multi-file
   changes, automate project workflows, or execute code based on an existing
-  plan. Flow: Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code →
-  implementation self-QA. For acceptance review of completed work, use
-  review-gate instead.
+  plan. Each task runs 对齐 → 规划 → 执行 → 验收 (Align → Plan → Execute →
+  Review): align one Unified Goal with the user before building. For acceptance
+  review of completed work, use review-gate instead.
 alwaysApply: false
 ---
 
-# Ask → Gates → Inspect → Plan → Code → Self-QA
+# 对齐 → 规划 → 执行 → 验收 (Align · Plan · Execute · Review)
 
 This rule defines **trigger behavior and output contract summary** only. Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`. Overview: `AI_AGENT_WORKFLOW_README.md`.
 
-**Flow:**
+**Purpose:** amplify the user's outcome via a **shared goal**; reliability is the guardrail, not the goal.
+
+**Flow (four stages):**
 
 ```text
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA
+对齐 Ask → Ask Gate → 规划 Inspect → Plan → Plan Gate → 执行 Code → 验收 Self-QA
 ```
 
 **Gates are lightweight — not long reviews.** Pass → conversational prose per Output Discipline; expand on Revise, Blocked, or Risk.
 
-- **Ask Gate** (after Ask): Status Pass | Pass with Risk | Revise | Blocked. Revise/Blocked → no Inspect/Plan.
-- **Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
+- **对齐 / Ask Gate** (after Ask): align one **Unified Goal** with the user; Status Pass | Pass with Risk | Revise | Blocked. **No Inspect/Plan until the goal is aligned.** Blocked must be a genuine, self-verified blocker — not reflexive.
+- **规划 / Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
+- **规划 / Plan** carries **Execution Boundary + Acceptance Standard + QA Standard** and no unresolved doubt.
 - **Plan Gate** (after Plan): Status Pass | Pass with Risk | Revise | Blocked. **Revise/Blocked → no Code.**
-- **Implementation Self-QA** (after Code): agent self-report — **not** user acceptance (→ `20-review-gate.mdc`).
+- **执行 / Code:** goal-aware and result-oriented — a real root-cause result, **never a half-product** or over-engineering.
+- **验收 / Implementation Self-QA** (after Code): judge **against the original goal**; agent self-report — **not** user acceptance (→ `20-review-gate.mdc`).
+
+**Doubt Resolution（穷尽求解）:** resolve your own doubts first; escalate only genuine, self-verified blockers — no mechanical or hallucinated asks; no over-analysis.
 
 User **验收 / review / inspect** of completed work → `20-review-gate.mdc`, not Plan Gate.
 

@@ -2,6 +2,8 @@
 
 Human-readable guide for Cursor, Codex, and other agents using this workflow.
 
+**Model:** every task runs four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review**. The point is to **amplify** the user's outcome through a shared goal; reliability is the guardrail, not the goal.
+
 **Full procedure (Cursor):** `.cursor/skills/ask-plan-code-qa/SKILL.md`  
 **Full procedure (Codex):** `.agents/skills/ask-plan-code-qa/SKILL.md`  
 **Entry point:** `AGENTS.md`  
@@ -25,23 +27,25 @@ Human-readable guide for Cursor, Codex, and other agents using this workflow.
 ## Workflow Overview
 
 ```text
-Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate → Code → Implementation Self-QA [→ Review Gate when high-risk]
+对齐 Ask → Ask Gate → 规划 Inspect → Plan → Plan Gate → 执行 Code → 验收 Self-QA [→ Review Gate when high-risk]
 ```
 
-**Core principle:** Gates must exist, but stay **concise by default**. Expand only on risk, ambiguity, failure, or high impact. Independent **Review Gate** is not required every time — use it for important / high-risk tasks.
+Four stages: **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review**.
+
+**Core principle:** Align one **Unified Goal** with the user before building — a wrong goal costs more than any bug. Gates must exist, but stay **concise by default**; expand only on risk, ambiguity, failure, or high impact. Resolve your own doubts (穷尽求解) and escalate only genuine, self-verified blockers. Independent **Review Gate** is not required every time — use it for important / high-risk tasks.
 
 **Ask Gate / Plan Gate are lightweight gates — not long review reports.**  
 Default to concise output; expand only on **Fail**, **Revise**, **Blocked**, or material **Risk**.
 
-| Phase | Purpose |
-|-------|---------|
-| **Ask** | Understand requirements; no code changes |
-| **Ask Gate** | Can we proceed to inspect/plan? |
-| **Read-only Inspect** | Gather facts from repo before Plan |
-| **Plan** | Approach based on inspect facts |
-| **Plan Gate** | Can we enter Code? |
-| **Code** | Minimal, root-cause edits |
-| **Implementation Self-QA** | Agent self-reports verification |
+| Phase | Stage | Purpose |
+|-------|-------|---------|
+| **Ask** | 对齐 | Reconstruct intent; co-build & confirm one Unified Goal; no code changes |
+| **Ask Gate** | 对齐 | Goal aligned? Can we proceed to inspect/plan? |
+| **Read-only Inspect** | 规划 | Gather facts from repo before Plan |
+| **Plan** | 规划 | Approach + path + execution boundary + acceptance & QA standards |
+| **Plan Gate** | 规划 | Can we enter Code? |
+| **Code** | 执行 | Goal-aware, minimal, root-cause edits; no half-product |
+| **Implementation Self-QA** | 验收 | Self-report verification against the original goal |
 
 **Review Gate** (separate skill): user asks to **review / 验收 / inspect** completed work, diffs, or existing QA reports — or **High-Risk Full Mode** after Self-QA.
 
@@ -85,25 +89,25 @@ The workflow is a **reliability mechanism**, not a paperwork generator.
 
 ---
 
-## Ask
+## Ask（对齐 · Intent & Goal Alignment）
 
-Requirements understanding only. **Do not modify code.**
+Requirements understanding only. **Do not modify code.** Act like a product manager: reconstruct the real intent and propose **one Unified Goal** for confirmation.
 
 ```markdown
 ## Ask
-
-### Goal
+### Real Need (intent / why)
+### Unified Goal (proposed for confirmation)
 ### Known Facts
 ### Assumptions
-### Ambiguities
-### Recommended Path
-### Blocking Questions
+### Open Doubts (self-resolved vs remaining genuine blockers)
+### Definition of Done (high-level acceptance)
+### Blocking Questions (genuine only)
 ```
 
+- Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** (trivial → one-line restatement).
 - Expose assumptions; do not silently pick among ambiguous requirements.
 - Challenge flawed user approaches with evidence.
-- Ask **blocking** questions only.
-- Safe, reversible assumptions that Read-only Inspect can verify may be stated explicitly to proceed.
+- Resolve your own doubts first; ask **genuine blocking** questions only — not reflexive ones.
 
 ---
 
@@ -117,11 +121,14 @@ Immediately after Ask. **Lightweight gate — not a full review.**
 ### Status
 Pass | Pass with Risk | Revise | Blocked
 
+### Goal Alignment
+<The Unified Goal — confirmed, or stated for confirmation>
+
 ### Key Risks
 <Only risks affecting the next phase>
 
-### Required Clarifications
-<Only blocking questions>
+### Genuine Blockers
+<Self-verified items that truly need the user — none if resolved>
 
 ### Decision
 Proceed to Read-only Inspect | Revise Ask | Ask User
@@ -129,10 +136,10 @@ Proceed to Read-only Inspect | Revise Ask | Ask User
 
 | Status | Action |
 |--------|--------|
-| **Pass** | Stay brief; proceed to Read-only Inspect |
+| **Pass** | Goal aligned; stay brief; proceed to Read-only Inspect |
 | **Pass with Risk** | State how risk will be handled in Inspect or Plan |
-| **Revise** | Fix Ask first — **no Plan** |
-| **Blocked** | Ask user — **no Plan** |
+| **Revise** | Goal not yet formed — fix Ask first, **no Plan** |
+| **Blocked** | Genuine blocker — ask user, **no Plan** (not a reflexive ask) |
 
 ---
 
@@ -158,29 +165,29 @@ After Ask Gate **Pass** or **Pass with Risk**. Required for **code tasks** befor
 
 ---
 
-## Plan
+## Plan（规划）
 
-After Read-only Inspect (or documented skip).
+After Read-only Inspect (or documented skip). First **shed any existing perspective bias** and stand in a real engineer / professional viewpoint.
 
 ```markdown
 ## Plan
-
-### Goal
+### Goal (restate the confirmed Unified Goal)
 ### Context
 ### Assumptions
-### Non-goals
-### Proposed Approach
-### Execution Steps
+### Approach & Path (approach + ordered iteration steps)
+### Execution Boundary (in-scope · out-of-scope/non-goals · do-not-touch · hard limits)
 ### Files to Modify
 ### Cross-file Reference Checks
 ### Impact Scope
-### QA Plan
+### Acceptance Standard (how we confirm the goal is met)
+### QA Standard (verification methods + quality bar)
 ### Pause Conditions
 ```
 
-- Each Execution Step needs an **observable verification** method.
-- Root-cause first; minimal precise change; no unrelated refactors or useless files.
+- Each step needs an **observable verification** method.
+- Root-cause first; minimal precise change; no unrelated refactors, useless files, or over-engineering (奥卡姆/Occam).
 - Contract/cross-file changes → list grep/search checks.
+- The plan itself carries **no unresolved doubt** (穷尽求解).
 
 ---
 
@@ -194,11 +201,12 @@ Immediately after Plan. **Code entry gate — not Review Gate.**
 ### Status
 Pass | Pass with Risk | Revise | Blocked
 
+### Goal-Alignment Check (plan serves the confirmed goal)
 ### Root-Cause Check
-### Scope Check
-### Context Check
+### Boundary / Scope Check
 ### Cross-file Check
-### QA Check
+### Acceptance & QA Check
+### Doubt Check (no self-resolvable doubts left; only genuine blockers escalated)
 
 ### Required Revisions
 <Only when Revise or Blocked>
@@ -241,6 +249,7 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 ### Summary
 <No fixed/done/passing/verified/已完成/已修复 without Passing Evidence>
 
+### Goal Met? (vs Unified Goal + Acceptance Standard: met / deviation & why)
 ### Changed Files
 ### Verification Performed
 ### Passing Evidence
@@ -250,6 +259,7 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 ### Next Step
 ```
 
+- Judge **against the original goal** — keep it simple, low-noise; do not over-test for ceremony.
 - No evidence → no success claims.
 - Skipped checks → **Not Verified**.
 - QA commands from `.ai/knowledge/project-context.md` when available.
@@ -367,13 +377,13 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 
 要求：
 
-1. Ask 阶段：
-   - 重述目标
+1. Ask 阶段（对齐）：
+   - 还原真实意图，提出待确认的统一目标（Unified Goal）
    - 列出 Known Facts
    - 暴露 Assumptions
-   - 列出 Ambiguities
-   - 给出 Recommended Path
-   - 只提出 blocking questions
+   - 列出 Open Doubts（已自解 / 仅剩真实阻塞）
+   - 给出 Definition of Done
+   - 先自行穷尽求解，只提出真实的 blocking questions
 
 2. Ask Gate：
    - Status 使用 Pass / Pass with Risk / Revise / Blocked
@@ -389,7 +399,7 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 
 4. Plan：
    - 必须基于 Read-only Inspect 的事实
-   - 包含 Goal、Context、Assumptions、Non-goals、Proposed Approach、Execution Steps、Files to Modify、Cross-file Reference Checks、Impact Scope、QA Plan、Pause Conditions
+   - 包含 Goal、Context、Assumptions、Approach & Path、Execution Boundary、Files to Modify、Cross-file Reference Checks、Impact Scope、Acceptance Standard、QA Standard、Pause Conditions
    - 每个 Execution Step 必须有可观测验证方法
    - 优先根因修复
    - 最小精准变更
@@ -434,6 +444,7 @@ Ask → Ask Gate → Read-only Inspect → Plan → Plan Gate
 
 4. 完成后输出 Implementation Self-QA：
    - Summary
+   - Goal Met?（对照统一目标 + 验收标准）
    - Changed Files
    - Verification Performed
    - Passing Evidence
@@ -522,15 +533,15 @@ Plan：
 【粘贴 Plan】
 
 检查重点：
-- Goal 是否明确
+- Goal 是否明确、是否与已确认的统一目标一致
 - Assumptions 是否完整
-- Non-goals 是否清晰
+- Execution Boundary 是否清晰（in/out-of-scope、不可触碰、硬限制）
 - 是否解决根因
-- 是否最小精准变更
-- Files to Inspect 是否足够
+- 是否最小精准变更、无过度设计
+- Files to Modify 是否足够
 - Cross-file Reference Checks 是否完整
 - Impact Scope 是否合理
-- QA Plan 是否可观测
+- Acceptance Standard 与 QA Standard 是否可观测
 - Pause Conditions 是否完整
 
 请输出：
@@ -554,12 +565,13 @@ Implementation Self-QA：
 
 检查重点：
 - Summary 是否有无证据成功声明
+- Goal Met? 是否对照最初统一目标 + 验收标准（达成 / 偏差及原因）
 - Changed Files 是否完整
 - Verification Performed 是否真实可追溯
 - Passing Evidence 是否支撑结论
 - Failing Evidence 是否被隐藏
 - Not Verified 是否明确
-- Remaining Risks 是否充分
+- Remaining Risks 是否充分（含半成品 / 过度设计）
 - 是否需要补充测试、lint、typecheck、手工验证
 
 请输出：
@@ -641,7 +653,11 @@ $review-gate
 
 ## Minimum Acceptance Criteria
 
-- [ ] Full flow documented in skill + this README
+- [ ] Four-stage model (对齐 / 规划 / 执行 / 验收) documented in skill + this README
+- [ ] Goal-first: Unified Goal aligned before building; Ask Gate carries Goal Alignment
+- [ ] Plan carries Execution Boundary + Acceptance Standard + QA Standard
+- [ ] Doubt Resolution (穷尽求解): escalate only genuine, self-verified blockers
+- [ ] Result-oriented: no half-product, no over-engineering (Occam); Self-QA judges against the original goal
 - [ ] Ask Gate + Plan Gate with Pass / Pass with Risk / Revise / Blocked
 - [ ] Read-only Inspect forbids file modification
 - [ ] Plan Gate failure blocks Code
