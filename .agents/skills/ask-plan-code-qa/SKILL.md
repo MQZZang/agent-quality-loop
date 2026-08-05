@@ -18,12 +18,12 @@ This is a **思路 skill**, not a paperwork skill. The phases below are **mental
 
 | Stage | Intent | Maps to |
 |-------|--------|---------|
-| **对齐 Align** | Reconstruct the real intent; co-build and **confirm** one Unified Goal; do not build until aligned | Ask · Ask Gate |
+| **对齐 Align** | Reconstruct the real intent and state one Unified Goal; on 常/慎 the **开工三行** is that statement — emit it and keep going, do not wait for a reply | Ask · Ask Gate |
 | **规划 Plan** | Turn the goal into a formal plan: path + **execution boundary** + acceptance & QA standards | Read-only Inspect · Semantic Scan (if risk) · Plan · Plan Gate |
 | **执行 Execute** | Build with goal-awareness; result-oriented — no half-products, no over-engineering | Code |
 | **验收 Review** | Judge the result **against the original goal**; keep it simple and low-noise | Implementation Self-QA |
 
-- **Goal-first:** before building, agent and user must share the same read of intent and goal. A wrong goal costs more than any bug. Trivial/reversible tasks: the goal is obvious — restate it in one line and proceed. Scale alignment effort with risk and ambiguity.
+- **Goal-first:** before building, agent and user must share the same read of intent and goal. A wrong goal costs more than any bug. 快档 / trivial reversible: restate the goal in one line and proceed; 常/慎: emit the **开工三行**, then proceed without waiting. Scale alignment effort with risk and ambiguity.
 - **Each stage subdivides** into sub-tasks with their own goal — iterate; do not dump one fixed step list and call it done.
 - **Model-agnostic:** stages may run on different models (e.g. a strong model plans, a cheaper model executes — *example only, never hardcoded*); whoever executes still understands the goal and may find a better path or catch gaps missed earlier.
 
@@ -65,7 +65,7 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 
 ## Output Discipline
 
-**Default:** talk like a trusted colleague — prose first, structure only when it helps the user decide.
+**Default:** talk like a trusted colleague — prose first, structure only when it helps the user decide. Exception: 常/慎 **开工三行** is a required artifact (not optional structure) — emit it first, then continue in prose.
 
 **Use structured phase headers** only when:
 
@@ -76,6 +76,7 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 
 **On Pass (normal path):**
 
+- **开工三行 first (常/慎):** open with 目标 / 边界 / 最可能误解 per `00-agent-constitution.mdc` §开工三行. This is a required **artifact**, not "structure" — the bullets below never suppress it. 快档 and pure read-only Q&A are exempt.
 - Do **not** emit empty `## Ask Gate` / `## Plan Gate` sections
 - Weave align → read → change → review into readable flow
 - Leave a **minimal reasoning trace** so internal gates are auditable without templates: 「读到 X → 判断 Y → 下一步 Z」 in one line
@@ -89,7 +90,7 @@ User drives at four natural points:
 
 | Point | When | Agent behavior |
 |-------|------|----------------|
-| **目标** | Start of a non-trivial task | Propose the Unified Goal for confirmation; **no Plan until aligned** |
+| **目标** | Start of a non-trivial task | Emit the **开工三行** and proceed; the user interrupts if a line is misread — do not stop to ask |
 | **歧义** | Multiple valid interpretations | Ask a genuine blocking question; do not silently choose |
 | **方案** | Non-trivial change or user said wait | One-sentence approach; proceed unless user objects |
 | **验收** | User says review / 验收 / 把关 | Switch to **review-gate** — not Plan Gate |
@@ -100,7 +101,7 @@ Pick the state, then act — this is how you avoid both over-asking and over-pro
 
 | State | When | Action |
 |-------|------|--------|
-| **直接执行** | Goal obvious / trivial / reversible, or answered by the profile | One-line restatement, then proceed |
+| **直接执行** | Goal obvious / trivial / reversible, or answered by the profile | 快档: one-line restatement, then proceed. 常/慎: emit the **开工三行**, then proceed — do not wait |
 | **带假设继续** (Pass with Risk) | Goal clear enough; remaining gaps are safe, reversible, Inspect-verifiable | State the assumptions, proceed; revisit if wrong |
 | **暂停确认** (Blocked) | A genuine, self-verified blocker that changes direction and cannot be derived from code/context/profile | Ask 1–2 real questions max |
 
@@ -133,6 +134,8 @@ Human guide: `docs/guide.md`.
 
 Requirements only. **No code changes.** Act like a product manager: reconstruct the **real intent** (including what the user could not phrase precisely), cover more angles, and propose **one Unified Goal** for the user to confirm.
 
+**Two tiers — do not confuse them.** The **default mandatory output** for a 常/慎 task is the **开工三行** (`00-agent-constitution.mdc` §开工三行): three lines, emitted in the first reply, then work continues without waiting. The full template below is the **expanded form** — use it only when requirements are genuinely ambiguous, when the user asks for a written spec, or on 慎档 risk. Field measurement: the expanded template executed 0 times in 212 sessions precisely because it was presented as the default. Three lines that actually ship beat seven sections that never do.
+
 ```markdown
 ## Ask
 ### Real Need (intent / why)
@@ -148,7 +151,7 @@ Requirements only. **No code changes.** Act like a product manager: reconstruct 
 - Expose assumptions; no silent choice on ambiguous requirements.
 - Flag flawed user proposals with evidence.
 - Blocking questions only; safe reversible assumptions may proceed to Inspect if stated.
-- **No Plan until the Unified Goal is aligned with the user** (a trivial task's one-line restatement counts as alignment).
+- **No Plan until the Unified Goal is aligned with the user** (快档: a one-line restatement counts; 常/慎: the **开工三行** counts — it is an artifact, not a request for approval, so alignment does not mean waiting for a reply).
 
 ---
 
@@ -295,8 +298,9 @@ After Code. **Not user acceptance** (→ `review-gate`). Judge the work **agains
 ## Implementation Self-QA
 ### Summary
 <No fixed/done/passing/verified/已完成/已修复 without Passing Evidence>
+<No goal met/达成/meets the goal (or equivalent) without quoting the 目标 line from 开工三行 verbatim; 快档: quote the one-line restatement>
 
-### Goal Met? (vs Unified Goal + Acceptance Standard: met / deviation & why)
+### Goal Met? (quote 目标 line from 开工三行 verbatim — 快档: one-line restatement; then vs Acceptance Standard: met / deviation & why)
 ### Changed Files
 ### Verification Performed
 ### Must-Hold Checks (semantic risk only)
@@ -309,6 +313,7 @@ After Code. **Not user acceptance** (→ `review-gate`). Judge the work **agains
 
 - Commands from `.ai/knowledge/project-context.md` when available.
 - Must-Hold Checks appear only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
+- Judging a goal never written down is a claim, not a verdict — the 目标 line is the input the goal-met verdict is computed against.
 - Unclear impact → smallest check first; broader checks → Not Verified. **Do not over-test for ceremony** — match verification to risk.
 - Reusable verified lesson → **propose** in Next Step for `.ai/knowledge/lessons.md`; write only if user confirms.
 
@@ -354,15 +359,17 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 
 **When structured:** Ask · Readiness (merged gates on Pass) · Read-only Inspect Summary · Plan · optional Must-Hold Checks (semantic risk only) · Implementation Self-QA · Compact Ask (快档)
 
-**Always after code:** what changed · verification performed · Passing Evidence or Not Verified · whether the original goal is met
+**Always after code:** what changed · verification performed · Passing Evidence or Not Verified · quoted 目标 line + whether the original goal is met
 
 ## Acceptance Criteria
 
-- [ ] Unified Goal aligned with user before building (trivial: one-line restatement)
+- [ ] Unified Goal aligned with user before building (快档: one-line restatement; 常/慎: 开工三行 emitted in the first reply)
+- [ ] 常/慎: 开工三行 present in the first reply, with line 1 quoting the user's own words and line 2 naming an explicit do-not-touch list
 - [ ] Gates executed in order; Plan Gate Pass/Pass with Risk before Code
 - [ ] Inspect completed or skip justified; Plan grounded in facts, with Execution Boundary + Acceptance & QA Standards
 - [ ] Semantic-risk tasks preserve user-confirmed meaning; source labels are not substituted for business/product concepts
 - [ ] Review judged against the original goal; no success claims without Passing Evidence; no half-product delivered
+- [ ] Goal-met verdict quotes the 目标 line verbatim (快档: its one-line restatement)
 - [ ] Cross-file contracts grep-checked when applicable
 - [ ] Review requests routed to `review-gate`, not Plan Gate
 
@@ -381,14 +388,18 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 | Confused Plan Gate with review-gate | User 验收 → review-gate |
 | Compact used when eligibility fails | Upgrade to full flow |
 | Self-QA success without evidence | Rewrite Summary; Not Verified |
+| 常/慎 first reply missing 开工三行 | Emit the three lines now, before any further work; treat as a visible defect on par with a success claim lacking Passing Evidence |
+| 开工三行 emitted then waited for user confirmation | The three lines are an artifact, not a question; resume immediately under §自主推进授权 — stopping costs a full round trip |
+| Goal-met verdict rendered without quoting the 目标 line | Quote it; if no 目标 line was emitted on a 常/慎 task, state that and re-derive the goal from the user's original words before claiming anything |
+| 开工三行 skipped and Self-QA then claimed 达成 | The claim is void — same class as a success claim without Passing Evidence |
 
 ## Evaluation Cases
 
 ### Happy path
 
 User: "Fix timeout in auth handler."  
-常档: reads handler + tests → one-line goal confirmation → Code → Self-QA with test output and goal-met check (思路体, no empty phase headers). See `examples.md`.  
-**Pass:** goal restated, evidence shown, no empty phase headers. **Fail (hollow):** "已修复" with no test output, or six empty gate headers.
+常档: emit 开工三行 (目标 quoting user → 边界 → 最可能误解) → read handler + tests → Code → Self-QA with test output and goal-met check (思路体, no empty phase headers). See `examples.md`.  
+**Pass:** 开工三行 present with line 1 quoting the user; evidence shown; no empty phase headers. **Fail (hollow):** missing 开工三行 on 常/慎; "已修复" with no test output; or six empty gate headers.
 
 ### Ambiguous case
 
@@ -415,3 +426,9 @@ After Code, no tests were actually run.
 User: "Document which customer-facing workflows use approval state." Source has fields named `status`, `approval_status`, and `workflow_state`.
 
 **Pass:** before Plan, agent identifies semantic risk and defines compact Must-Hold Checks such as: `approval_status` must be proven to mean customer-facing approval state; internal workflow states must not be counted as customer-facing approval; missing mappings are marked Not Verified. **Fail:** grep all `status` fields and conclude from labels alone.
+
+### Diagnostic — 开工三行
+
+User: "Refactor the billing retry queue across worker and API."  
+**Pass:** line 1 quotes the user's actual words (not a paraphrase); line 3 names the highest-variance inference (not a safe platitude); agent continues working in the same turn after emitting the three lines; later goal-met verdict quotes that 目标 line verbatim.  
+**Fail:** paraphrases the goal instead of quoting; line 3 is a vague filler; skips the three lines; emits the three lines then ended the turn asking whether to proceed; writes "达成"/"goal met" with no quoted 目标 line; or paraphrases the 目标 line instead of quoting it when rendering the verdict.

@@ -35,15 +35,42 @@ Create a skill only if **all** are true:
 
 Otherwise: use a rule (principle), knowledge file (facts), or inline chat (one-off).
 
+## Mechanism Survival Test（机制存活律）
+
+The Skill Necessity Test asks whether a mechanism should exist. This test asks whether it will ever execute. A mechanism that is never emitted has negative value: it costs tokens and creates false confidence that a risk is covered.
+
+| Check | Survives | Dies |
+|-------|----------|------|
+| Object of constraint | Constrains the **deliverable** (cannot produce an acceptable result without it) | Constrains the **process** (skippable; the work still ships) |
+| Tier | Resident `alwaysApply: true` | Description-triggered on-demand; on-demand loses to any resident text that contradicts it |
+| Size | A phrase or a few lines | A multi-section template |
+| Examples | Every worked example demonstrates the mechanism | Any example demonstrates the violation while marked correct |
+
+Measured evidence (same repo/author/user; string-frequency over **212 transcripts / 11,232 AI replies / 82 sessions / 3.5 months**):
+
+| Mechanism | Rounds | Sessions | Tier | Constrains |
+|-----------|-------:|---------:|------|------------|
+| Unified Goal | 0 | 0 | on-demand skill | process |
+| Real Need | 0 | 0 | on-demand skill | process |
+| Passing Evidence | 31 | 15 | resident always-on | deliverable |
+| Not Verified | 117 | 39 | resident always-on | deliverable |
+
+Confidence boundary: counts are string-frequency measurements, so zeros may partly reflect wording drift. The tier/object/size pattern is a strong correlational inference from within-repo contrast, not a controlled experiment — treat it as a design heuristic with this limit, not a law of nature.
+
+**Conversion rule.** If a mechanism fails this test, do not add it as written. Convert it: bind it to the deliverable so it cannot be skipped; move the trigger and the minimal required artifact to the resident tier while leaving the full procedure in the skill; shrink it to the smallest form still vetoable by a human; fix every example so none demonstrates the violation. If it cannot be converted, do not ship it.
+
+**Stop-loss.** If a newly added mechanism runs ~10 consecutive tasks and the user never once corrects or vetoes anything it produced, that is a **failure** signal — not success. It has decayed into a rubber stamp (skim-read on one side, performed on the other). Correct response: shorten or remove it; never strengthen it.
+
 ## Workflow (Operating Procedure)
 
 1. **Necessity test** — reject one-off skills (see Skill Necessity Test above).
-2. **Scaffold** — `.cursor/skills/<name>/SKILL.md` with YAML `name` and `description`.
-3. **Body** — all required sections per schema below.
-4. **Eval cases** — minimum 3 (happy, ambiguous, boundary/failure).
-5. **Rule link** — if description-triggered, add or update `.cursor/rules/*.mdc`.
-6. **Sync mirror** — run `./scripts/sync-skills.sh` from repo root (updates `.agents/skills/`).
-7. **Review** — run `review-gate` mindset on the draft skill.
+2. **Survival test** — will the mechanism execute in the field? (see Mechanism Survival Test above).
+3. **Scaffold** — `.cursor/skills/<name>/SKILL.md` with YAML `name` and `description`.
+4. **Body** — all required sections per schema below.
+5. **Eval cases** — minimum 3 (happy, ambiguous, boundary/failure).
+6. **Rule link** — if description-triggered, add or update `.cursor/rules/*.mdc`.
+7. **Sync mirror** — run `./scripts/sync-skills.sh` from repo root (updates `.agents/skills/`).
+8. **Review** — run `review-gate` mindset on the draft skill.
 
 Before authoring, gather: trigger phrases, inputs/outputs, failure modes, rule vs skill vs knowledge placement (see Input Requirements concepts in steps above).
 
@@ -83,6 +110,10 @@ New skills must declare expected outputs (templates, sections, verdicts). Rules 
 - [ ] Matching rule added or updated if description-triggered
 - [ ] No leaked/proprietary prompt text
 - [ ] Paths and commands exist or marked TODO
+- [ ] Passes Mechanism Survival Test, or records why exempt
+- [ ] Object of constraint is deliverable-bound where enforcement matters
+- [ ] No worked example demonstrates behavior the skill's own clauses forbid
+- [ ] Stop-loss signal defined for any newly added hard constraint
 
 ## Failure Modes
 
@@ -93,6 +124,10 @@ New skills must declare expected outputs (templates, sections, verdicts). Rules 
 | Schema missing sections | Add per Required SKILL.md Structure above |
 | Copied vendor system prompt | Remove; use abstract patterns in prompt-patterns.md |
 | Bloated SKILL.md (>500 lines) | Split to reference.md |
+| Mechanism authored as process constraint in on-demand tier | Bind to deliverable and move minimal artifact to resident tier, or drop it. |
+| Worked example demonstrates the violation while marked correct | Fix the example; examples defeat clauses. |
+| Resident-tier output rules silently suppress a mechanism the skill requires | Declare an explicit exception in the resident tier, placed above the suppressing text. |
+| Hard constraint shipped with no stop-loss signal | Define the failure signal before shipping. |
 
 ## Rule vs Skill vs Knowledge Decision
 
@@ -159,3 +194,9 @@ Factory: rejects; recommends constitution rule + project-context instead.
 
 User: "Copy Claude's system prompt into a skill."
 Factory: refuses; points to prompt-patterns.md for abstract patterns only.
+
+### Diagnostic — mechanism survival
+
+User: "Add a mandatory multi-section pre-flight template to this description-triggered skill."
+Pass: factory applies survival test, predicts non-execution, converts — deliverable-bound, minimal artifact in resident tier with full procedure in the skill, examples fixed, stop-loss defined.
+Fail: authors the template as requested and ships it, adding a second mechanism that never runs.

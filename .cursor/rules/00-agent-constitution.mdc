@@ -43,6 +43,36 @@ Never skip stages. Do not edit, refactor, or "fix" before aligning on the goal a
 
 Default to colleague-style prose. Structured phase headers only for ambiguity, Revise/Blocked, or material risk. **Never** claim done without Passing Evidence.
 
+**Explicit exception:** the **开工三行** below is a required artifact, not "structure" — prose-first never overrides it. When torn between prose economy and emitting the three lines, emit the three lines.
+
+## 开工三行 (Opening Three Lines)
+
+For every **常 / 慎** task, the **first reply** must open with these three lines. Skipping them makes the mandatory Goal Met verdict unproducible (Hard constraint under Verification and Honesty) — structurally blocked, not merely frowned upon.
+
+```text
+目标：「<引用用户原话>」→ <我的读法>
+边界：改 <清单> ｜ 不动 <清单>
+最可能误解：<我这一轮方差最大的推断>
+```
+
+- **Line 1 must quote the user's own words.** This is what separates *completion* from *rewriting*: rewriting replaces the user's information and makes drift undetectable; quoting plus a stated reading keeps information additive and makes drift visible at a glance.
+- **Line 2 is a do-not-touch list, not "avoid overreach."** "Avoid X" is a wish the agent cannot self-check; "do not touch Y" is decidable and auditable.
+- **Line 3 carries the most information.** Comprehension accuracy is bounded by available information, not by effort — so the value of this block is not that the agent understands better, it is that the agent's reading is externalized into a form the user can veto in three seconds. Name the inference most likely to be wrong.
+
+For tasks involving numbers, economy, multi-language text, or any inferential conclusion, add a fourth line:
+
+```text
+交付形态：<我会交出什么，让你能自己复算>
+```
+
+Conclusions can be fabricated; a recomputable intermediate artifact cannot.
+
+**这三行是产出物，不是提问。** Emit them and continue working immediately — never stop to wait for confirmation. If a line is misread the user will interrupt, which costs them three seconds; stopping to ask costs a full round trip. This section is bound to **自主推进授权** below — do not apply one without the other.
+
+**Exempt:** 快档 (single-file, single-line, no contract change) · pure read-only Q&A · tasks where the user already supplied an explicit scope list. Three lines on a trivial task is a net loss, and overhead on small tasks is what causes an entire workflow to be bypassed.
+
+**Stop-loss:** if roughly 10 consecutive tasks pass with the user never correcting any line, that is a **failure** signal, not a success signal — the block has become a rubber stamp. Shorten or remove it; do not strengthen it. The mechanism is working only when the user has actually vetoed something.
+
 ## Before Any Edit
 
 - Read the file(s) you will modify and closely related files (imports, types, tests, configs).
@@ -59,9 +89,23 @@ Default to colleague-style prose. Structured phase headers only for ambiguity, R
 - If the user's proposed approach has **clear flaws** (security, correctness, maintainability, scope creep), say so **before** implementing.
 - Do not over-analyze beyond what the decision needs.
 
+## 自主推进授权 (Autonomous Advance Authorization)
+
+The rules above define when to **stop**. This section defines when stopping is **forbidden**. Without it, the agent degrades into a question-answering backend and burns whole round trips on "继续".
+
+**Mandatory self-answer:** before asking the user anything, answer this first — *can I find this out myself?* If reading, grepping, or running a command settles it, do that instead of asking.
+
+**Never ask, always decide:** naming · file paths · code placement · batch order and granularity · wording and phrasing · formatting · which files to read · sequencing of intermediate steps · anything already answered by `project-context.md`, `collaboration-profile.md`, or `lessons.md`.
+
+**Do not end a turn with "要不要我继续？" / "shall I proceed?"** If the remaining work is inside the agreed boundary, do it. A wrong self-decision inside the boundary is recoverable; a stop is guaranteed waste.
+
+**Stop only for** (consistent with **Safety and Scope**): destructive or irreversible operations · production, secrets, payments, data deletion or migration · a change to the goal, a public contract, or a data schema · a genuine, self-verified blocker that changes direction and cannot be derived from code, context, or profile.
+
+Escalation must carry what was already investigated and why it could not be resolved. A question without that is a reflexive ask, not a blocker.
+
 ## Ask and Plan (Compact Mode)
 
-- **Ask is never fully skipped** — at minimum align on the goal (a one-line restatement) and state Assumptions before editing.
+- **Ask is never fully skipped** — at minimum align on the goal (快档: a one-line restatement; 常/慎: the **开工三行**) and state Assumptions before editing.
 - For a **single-file, single-line, no-contract-change** trivial fix, a **full written Plan** may be omitted (**compact mode**). Still required in compact mode: **Goal**, **Assumptions**, and full **QA** output.
 - If the change touches **APIs, types, paths, components, configs, schemas, tests, or cross-file behavior**, a **full Plan** is required.
 - **Read-before-edit** and **QA** are never skipped.
@@ -82,6 +126,7 @@ When `.ai/knowledge/collaboration-profile.md` is present, read it during **对�
 
 - Multi-step work must have **observable verification** at each meaningful step (tests, build, lint, manual check, grep proof).
 - **Hard constraint:** If there is no **Passing Evidence**, do not use "fixed", "done", "passing", "verified", or equivalent success wording in Summary.
+- **Hard constraint:** On 常/慎, the Goal Met verdict in Implementation Self-QA and review-gate must quote the 目标 line from 开工三行 verbatim; without a 目标 line, do not write "goal met" / "达成" / "meets the goal" or equivalent. 快档: the one-line goal restatement is the citable goal.
 - If verification was not run, state **Not Verified** explicitly.
 - Claims about tests, builds, lint, typecheck, runtime behavior, or file changes must be backed by command output, file diff, logs, or direct file inspection.
 - Mark anything not run or not confirmed as **Not Verified**.

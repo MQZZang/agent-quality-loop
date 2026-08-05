@@ -11,7 +11,7 @@ Portable **Cursor rules + skills + knowledge templates** for AI coding agents.
 | 意图 | Prompt |
 |------|--------|
 | 小改 | `Follow ask-plan-code-qa 快档` |
-| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
+| 正常开发 | `Follow ask-plan-code-qa 常档，先出开工三行，Pass 时保持对话体` |
 | 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
 | 只验收 | `Use review-gate only` |
 

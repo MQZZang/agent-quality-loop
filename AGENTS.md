@@ -10,7 +10,7 @@ Cross-tool compatibility pointer for Cursor and other coding agents working in a
 
 For reusable phase prompts, risk dial (快/常/慎), and output discipline, see **`docs/guide.md`**.
 
-**Quick Route (daily):** 小改 → `快档` · 正常开发 → `常档`（Pass 对话体）· 高风险 → 常档 + `review-gate` · 只验收 → `review-gate only`.
+**Quick Route (daily):** 小改 → `快档` · 正常开发 → `常档`（开工三行 + Pass 对话体）· 高风险 → 常档 + `review-gate` · 只验收 → `review-gate only`.
 
 **Description-triggered rules may not auto-load.** At task start, **read the matching rule and skill files explicitly** (do not rely on implicit injection alone):
 
@@ -58,21 +58,22 @@ When you change a skill, edit **`.cursor/skills/` only** — never edit `.agents
 
 If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
 
-**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `docs/guide.md`.
+**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass, except the 常/慎 **开工三行**, which is a required artifact prose-first never overrides (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `docs/guide.md`.
 
 ## Core Expectations
 
 | Principle | Requirement |
 |-----------|-------------|
-| Align goal first | Co-build and confirm one **Unified Goal** before building; never execute a misaligned goal |
+| Align goal first | On 常/慎 emit **开工三行** (`00-agent-constitution.mdc` §开工三行) as the opening artifact; never execute a misaligned goal |
+| Autonomous Advance（自主推进授权） | Self-answerable questions → research, don't ask; do not end with "要不要我继续？"; stop only for destructive/irreversible ops, production/secrets/payments/data, goal/contract/schema changes, or a genuine self-verified blocker |
 | Read before edit | Open target files and related code before modifying |
-| Plan before multi-step work | 常/慎: internal plan (path + boundary + acceptance & QA standards) + gates; user sees prose on Pass unless ambiguous or high-risk (see `ask-plan-code-qa`) |
-| Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk |
+| Plan before multi-step work | 常/慎: internal plan (path + boundary + acceptance & QA standards) + gates; user sees the 开工三行 plus prose on Pass — expanded structure only when ambiguous or high-risk (see `ask-plan-code-qa`) |
+| Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk; 开工三行 is a required artifact on 常/慎 (not optional structure — prose-first never overrides it); 快档 and pure read-only Q&A exempt |
 | Resolve own doubts | **Doubt Resolution（穷尽求解）** first; escalate only genuine, self-verified blockers — not mechanical or hallucinated asks |
 | Contract changes | Grep/search references when changing APIs, types, paths, components, configs, schemas |
-| Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template (judge against the original goal) — not user acceptance review |
+| Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template; Goal Met? must quote the 开工三行 目标 line (快档: one-line restatement) — not user acceptance review |
 | Result-oriented | Deliver a real root-cause result; no half-product, no over-engineering (奥卡姆/Occam) |
-| Honesty | No "fixed/done/passing/verified" in Summary without Passing Evidence |
+| Honesty | No "fixed/done/passing/verified" in Summary without Passing Evidence; on 常/慎 no "goal met"/"达成"/equivalent without quoting that task's 开工三行 目标 line verbatim (快档: its one-line restatement) |
 | Project context | Cite only **Verified** facts from `project-context.md`; never treat **Not Verified** as fact |
 | Prompt hygiene | Do not copy leaked or proprietary system prompt text |
 
@@ -119,3 +120,5 @@ When changing agent workflow config, verify:
 - [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
 - [ ] Run `./scripts/sync-skills.sh` after editing `.cursor/skills/`
 - [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), collaboration-profile (L2), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `docs/guide.md`
+- [ ] 开工三行 contract consistent across `00-agent-constitution.mdc`, `10-ask-plan-code-qa.mdc`, `ask-plan-code-qa/SKILL.md`, `examples.md`, `docs/guide.md`, `review-gate/SKILL.md`, and `20-review-gate.mdc`
+- [ ] Goal-met lexical gate consistent across `00-agent-constitution.mdc`, `10-ask-plan-code-qa.mdc` Self-QA constraints, `ask-plan-code-qa/SKILL.md` Self-QA template, and `review-gate`

@@ -16,7 +16,7 @@ Human-readable guide for Cursor, Codex, and other agents using this workflow.
 | 你的意图 | 说法 |
 |----------|------|
 | 改一个小地方 | `Follow ask-plan-code-qa 快档` |
-| 正常开发 | `Follow ask-plan-code-qa 常档，Pass 时保持对话体` |
+| 正常开发 | `Follow ask-plan-code-qa 常档，先出开工三行，Pass 时保持对话体` |
 | 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
 | 只验收不改代码 | `review-gate only` |
 
@@ -130,9 +130,37 @@ The workflow is a **reliability mechanism**, not a paperwork generator.
 
 ---
 
+### 开工三行 (Opening Three Lines)
+
+Required opening artifact on **常/慎**. **快档** and pure read-only Q&A are exempt. The three lines are an **artifact, not a question** — emit them and keep working in the same turn; never stop for confirmation. Canonical home: `00-agent-constitution.mdc` §开工三行; full procedure: `ask-plan-code-qa/SKILL.md`.
+
+```text
+目标：「<引用用户原话>」→ <我的读法>
+边界：改 <清单> ｜ 不动 <清单>
+最可能误解：<我这一轮方差最大的推断>
+```
+
+Optional 4th line for numeric / economic / multi-language / inferential tasks:
+
+```text
+交付形态：<我会交出什么，让你能自己复算>
+```
+
+Why these lines work:
+
+- **Line 1 quotes the user verbatim** — completion preserves information and makes drift detectable; rewriting replaces information and hides drift.
+- **Line 2 is a do-not-touch list**, not "avoid overreach" — decidable versus wishful.
+- **Line 3 is the highest-value line** — the payoff is the user's 3-second veto, not better AI introspection.
+
+**Goal-met lexical gate (why this one runs):** The three lines are not enforced by exhortation; they are enforced by a lexical gate on the goal-met verdict. On 常/慎, the `Goal Met?` verdict in Implementation Self-QA — and in `review-gate` acceptance — must quote the 目标 line **verbatim**; without it you may not write "goal met" / "达成" / "meets the goal" or equivalent, exactly as you may not write "fixed/done" without Passing Evidence (快档: the one-line restatement is the citable goal). That makes the three lines an unskippable **input** to a mandatory **deliverable** — the difference between mechanisms that survived field measurement and those that recorded zero. No waiting: the bind is after code, at Self-QA time. Canonical wording: `00-agent-constitution.mdc` §开工三行.
+
+**Stop-loss:** ~10 consecutive tasks with zero user corrections = failure signal (rubber stamp) → shorten or remove, do not strengthen.
+
+---
+
 ## Ask（对齐 · Intent & Goal Alignment）
 
-Requirements understanding only. **Do not modify code.** Act like a product manager: reconstruct the real intent and propose **one Unified Goal** for confirmation.
+Requirements understanding only. **Do not modify code.** On **常/慎**, the default required form is **开工三行** (above) — emit it and continue in the same turn. The 7-section written Ask below is the **expanded form** for genuine ambiguity, 慎 dial, or when the user explicitly asks for a written Ask. Act like a product manager: reconstruct the real intent and propose **one Unified Goal**.
 
 ```markdown
 ## Ask
@@ -146,7 +174,7 @@ Requirements understanding only. **Do not modify code.** Act like a product mana
 ```
 
 - Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (output density, question threshold, risk tolerance, quality bar, decision habits) by default.
-- Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** (trivial → one-line restatement).
+- Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** — on 常/慎, 开工三行 satisfies alignment without a user reply (快档 / trivial → one-line restatement).
 - Expose assumptions; do not silently pick among ambiguous requirements.
 - Challenge flawed user approaches with evidence.
 - Resolve your own doubts first; ask **genuine blocking** questions only — not reflexive ones (see Goal Handshake three states in the skill).
@@ -307,9 +335,9 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 ### Next Step
 ```
 
-- Judge **against the original goal** — keep it simple, low-noise; do not over-test for ceremony.
+- Judge **against the original goal** — keep it simple, low-noise; do not over-test for ceremony. On 常/慎, the `Goal Met?` verdict must quote the 目标 line from 开工三行 **verbatim** (快档: its one-line restatement); without that cite, "goal met" / "达成" / "meets the goal" is prohibited — sibling lexical gate to Passing Evidence.
 - Report Must-Hold Checks only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
-- No evidence → no success claims.
+- No evidence → no success claims. No 目标 cite on 常/慎 → no goal-met wording.
 - Skipped checks → **Not Verified**.
 - QA commands from `.ai/knowledge/project-context.md` when available.
 
@@ -325,6 +353,8 @@ After Code. **Not user acceptance** — use **review-gate** for 验收.
 | **Review Gate** | User-driven acceptance / review of existing artifacts |
 
 User says 「帮我验收」, 「review this diff」, 「检查 QA 是否可信」, 「有没有幻觉」, 「检查遗漏」 → **`review-gate`**, not this workflow.
+
+On 常/慎, acceptance judges against the 目标 line of 开工三行 (expanded written Ask's `Unified Goal`, or 快档's one-line restatement otherwise); verifies the 边界 `不动` list was respected; and checks whether the 最可能误解 inference was resolved or remains open.
 
 ---
 
@@ -428,6 +458,7 @@ Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → 
 要求：
 
 1. Ask 阶段（对齐）：
+   - 首轮回复开头先写出开工三行（常/慎必做；快档可豁免）：目标 / 边界 / 最可能误解（必要时加交付形态）；写出后同轮继续推进，不因确认而停
    - 还原真实意图，提出待确认的统一目标（Unified Goal）
    - 列出 Known Facts
    - 暴露 Assumptions
@@ -507,6 +538,7 @@ Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → 
 
 硬约束：
 如果没有 Passing Evidence，不得使用 fixed / done / passing / verified / 已完成 / 已修复 等成功措辞。
+常/慎下 Goal Met? 裁决必须逐字引用开工三行的「目标」行（快档：一句复述）；没有该引用则不得写「goal met」/「达成」/「meets the goal」——与 Passing Evidence 门同形。
 ```
 
 ### T3 — 独立 Review Gate
@@ -706,7 +738,7 @@ $review-gate
 ## Minimum Acceptance Criteria
 
 - [ ] Four-stage model (对齐 / 规划 / 执行 / 验收) documented in skill + this guide
-- [ ] Goal-first: Unified Goal aligned before building; Ask Gate carries Goal Alignment
+- [ ] Goal-first: on 常/慎, 开工三行 emitted at reply open (satisfies alignment); 快档 may use a one-line goal restatement; Ask Gate carries Goal Alignment
 - [ ] Plan carries Execution Boundary + Acceptance Standard + QA Standard
 - [ ] Semantic-risk tasks carry compact Must-Hold Checks and preserve user-confirmed business/product meaning
 - [ ] Doubt Resolution (穷尽求解): escalate only genuine, self-verified blockers
@@ -717,6 +749,7 @@ $review-gate
 - [ ] Plan Gate failure blocks Code
 - [ ] Compact Eligibility triple-check present
 - [ ] Self-QA: no success wording without Passing Evidence
+- [ ] Self-QA / review-gate: goal-met verdict quotes the 目标 line (快档: its one-line restatement)
 - [ ] Review Gate documented as separate from Plan Gate
 - [ ] Risk-Based Usage Modes and Overengineering Guard documented
 - [ ] Phase Prompt Templates T0–T8 available in this guide

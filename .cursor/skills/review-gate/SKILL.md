@@ -10,7 +10,7 @@ description: >-
 
 ## Purpose
 
-Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the **original Unified Goal**: a real result, no half-products, no over-engineering.
+Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the goal of record: on 常/慎, the **目标** line of the task's **开工三行** (canonical form: `00-agent-constitution.mdc` §开工三行); when an expanded written Ask exists, its **Unified Goal** section is the alternative form; on 快档, the one-line goal restatement. A real result, no half-products, no over-engineering.
 
 **思路 skill:** run only the review types relevant to the artifact; default to readable findings, not empty review-type chapter headings.
 
@@ -19,7 +19,7 @@ Evidence-based review thinking — catch hallucinations, missing context, false 
 - User asks to **review / 验收 / inspect / audit / validate**
 - **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports**
 - Hallucination check, risk check, omission check on artifacts (not on in-progress implement unless reviewing a prior report)
-- **Goal-Achievement / 目标达成** check: does the result meet the original Unified Goal within its boundary?
+- **Goal-Achievement / 目标达成** check: does the result meet the goal of record (常/慎: **目标** line of 开工三行; expanded Ask's **Unified Goal** when present; 快档: one-line restatement) within its **边界**?
 - User asks to verify "done" claims or review before merge
 
 ## Review Types
@@ -89,7 +89,9 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 
 ## Goal-Achievement Review（目标 + 协作达成复核）
 
-- Does the delivered result meet the **original Unified Goal** and its Acceptance Standard?
+- Does the delivered result meet the goal of record — on 常/慎, the **目标** line of the task's 开工三行 (expanded Ask's **Unified Goal** when one exists; 快档: one-line restatement) — and its Acceptance Standard?
+- **边界** check: did the delivered change stay within the 改 list and leave the 不动 list untouched? Files outside 改, or any touch of 不动, is a finding.
+- **最可能误解** follow-through: was the line-3 highest-variance inference later resolved, confirmed, or still open and unreported? An unresolved line 3 never revisited is a finding.
 - Any deviation from the agreed goal or execution boundary — and why?
 - Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
 - **Preference drift:** does it respect the user's collaboration profile (output density, question threshold, risk tolerance, quality bar, decision habits)?
@@ -132,6 +134,7 @@ If a section has zero issues, state what was examined — do not paste unused re
 - Do not say "looks good" without listing checked evidence.
 - Do not invent file contents, test passes, or user intent.
 - Do not approve QA that lacks Passing Evidence for critical claims.
+- Do not write "goal met" / "达成" / "meets the goal" or equivalent without quoting the **目标** line of the task's 开工三行 verbatim (快档: the one-line goal restatement). Judging a goal you never wrote down is a claim, not a verdict.
 - Do not force all review types when the artifact only needs one (e.g. QA-only → QA Review + Scope).
 
 ## Acceptance Criteria
@@ -141,6 +144,9 @@ If a section has zero issues, state what was examined — do not paste unused re
 - [ ] Verdict is Proceed / Proceed with fixes / Block — not vague approval
 - [ ] No invented file contents, test results, or user intent
 - [ ] Context Review respects project-context Verified vs Not Verified
+- [ ] Acceptance verdict quotes the **目标** line (or 快档 one-line restatement) verbatim
+- [ ] Delivered change respected the 边界 改 / 不动 lists
+- [ ] 最可能误解 was resolved, confirmed, or reported still open
 
 ## Failure Modes
 
@@ -150,6 +156,8 @@ If a section has zero issues, state what was examined — do not paste unused re
 | Review from memory without reading diff | Open actual files; re-review |
 | Used for implement/fix task | Redirect to ask-plan-code-qa |
 | Approved QA without Passing Evidence | QA Review → Block or Proceed with fixes |
+| Acceptance approved without quoting the 目标 line | Block until verdict cites 开工三行 目标 (or 快档 restatement) verbatim |
+| Delivered result touched something on the 不动 list | Block or Proceed with fixes; cite the 边界 breach |
 
 ## Evaluation Cases
 

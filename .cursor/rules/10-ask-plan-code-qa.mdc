@@ -22,7 +22,8 @@ This rule defines **trigger behavior and output contract summary** only. Full pr
 
 **Gates are lightweight — not long reviews.** Pass → conversational prose per Output Discipline; expand on Revise, Blocked, or Risk.
 
-- **对齐 / Ask Gate** (after Ask): align one **Unified Goal** with the user; Status Pass | Pass with Risk | Revise | Blocked. **No Inspect/Plan until the goal is aligned.** Blocked must be a genuine, self-verified blocker — not reflexive.
+- **开工三行** (常/慎): required as the opening of the first reply; 快档 and pure read-only Q&A exempt. Artifact, not a question — emit and keep working; do not wait for confirmation. Canonical form: `00-agent-constitution.mdc` §开工三行.
+- **对齐 / Ask Gate** (after Ask): align one **Unified Goal** with the user; Status Pass | Pass with Risk | Revise | Blocked. **No Inspect/Plan until the goal is aligned** — on 常/慎, emitting 开工三行 satisfies alignment without a user reply; only a genuine self-verified blocker justifies stopping. Blocked must be a genuine, self-verified blocker — not reflexive.
 - **规划 / Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
 - **Semantic Invariant Guardrail** (semantic-risk tasks only): before final Plan, protect the user's intended meaning with 3–7 Must-Hold Checks when source labels, schema names, UI text, categories, or default technical terms may differ from business/product concepts. Skip when no real semantic risk exists.
 - **规划 / Plan** carries **Execution Boundary + Acceptance Standard + QA Standard** and no unresolved doubt.
@@ -36,11 +37,12 @@ User **验收 / review / inspect** of completed work → `20-review-gate.mdc`, n
 
 ## Compact Mode
 
-Only **single-file + single-line + no contract change**. Output Compact Ask (Goal, Assumptions, Compact Eligibility, QA). Any eligibility **no** → full flow above. Never skip read-before-edit or Self-QA.
+Only **single-file + single-line + no contract change**. Output Compact Ask (Goal, Assumptions, Compact Eligibility, QA). Any eligibility **no** → full flow above. Compact Mode is **exempt** from 开工三行 (a one-line goal restatement is sufficient). Never skip read-before-edit or Self-QA.
 
 ## Self-QA Hard Constraints
 
 - No Passing Evidence → no "fixed/done/passing/verified" in Summary.
+- No quoted 目标 line → no "goal met"/"达成" wording (常/慎; 快档 uses one-line restatement).
 - Semantic-risk conclusions → report compact Must-Hold Check evidence, or mark Not Verified / Cannot Infer.
 - Commands from `.ai/knowledge/project-context.md` when available.
 - Skipped checks → **Not Verified** (mandatory).

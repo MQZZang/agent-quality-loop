@@ -64,11 +64,13 @@ Verify: Passing Evidence exists, Not Verified is honest, failures not hidden.
 
 ### 6. Goal-Achievement Review（目标 + 协作达成复核）
 
-Check the result against the **original Unified Goal**, not just the diff.
+Check the result against the goal of record — 常/慎: **目标** line of 开工三行 (`00-agent-constitution.mdc` §开工三行); else expanded Ask's **Unified Goal** or 快档's one-line restatement — not just the diff.
 
 **Per finding output:** 问题 / 证据 / 风险 / 修正建议
 
 Verify: meets goal + Acceptance Standard, no deviation from boundary, no half-product / scope creep / over-engineering (奥卡姆/Occam); **preference drift** (respects collaboration profile); **process bloat** (over-asking, over-planning, mechanical output, formalistic evidence).
+Acceptance verdict must quote that 目标 line verbatim; without it, no "goal met" / "达成" / equivalent.
+Verify the 边界 **不动** list was respected.
 
 ## Required Behavior
 
