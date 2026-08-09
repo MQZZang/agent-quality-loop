@@ -1,0 +1,22 @@
+---
+description: >-
+  Public workflow router for non-trivial agent tasks that need goal alignment,
+  root-cause evidence, scoped implementation, independent acceptance, release
+  preparation, or safe resume. Use this instead of invoking implementation and
+  review workflows in parallel.
+alwaysApply: false
+---
+
+# Agent Quality Loop
+
+Use `.cursor/skills/agent-quality-loop/SKILL.md` as the single public workflow entry.
+
+Route three axes independently:
+
+- intent: align / diagnose / implement / accept / release / resume;
+- assurance: fast / standard / formal;
+- authority: read / local-write / exact current-turn external action.
+
+Select `ask-plan-code-qa` only as the bounded code implementation adapter and `review-gate` only as the read-only independent review adapter. Reuse the parent contract and emit one user-facing summary.
+
+Never let an adapter claim `ACCEPTED`, enter release, or raise authority. Never let `full` publish/deploy. Inspect every dry-run side-effect path before execution.

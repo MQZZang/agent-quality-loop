@@ -1,12 +1,14 @@
 ---
 name: ask-plan-code-qa
 description: >-
-  当用户需要实现、修复、重构、调试、多文件修改时使用。每个任务按
-  对齐 → 规划 → 执行 → 验收 (Align → Plan → Execute → Review) 闭环，
-  先与用户对齐统一目标再动手。用户主动验收审查请用 review-gate。
+  Code implementation adapter for implementing, fixing, refactoring, debugging, or
+  multi-file changes through alignment, planning, execution, and implementation self-QA.
+  Use standalone only when explicitly invoked; when called by agent-quality-loop, consume
+  its aligned/evidenced contract in embedded profile and return at most BUILT. Formal
+  acceptance belongs to agent-quality-loop, which may use review-gate as an independent adapter; never this skill.
 ---
 
-# 对齐 → 规划 → 执行 → 验收 (Align · Plan · Execute · Review)
+# 对齐 → 规划 → 执行 → 实现自检 (Align · Plan · Execute · Self-QA)
 
 ## Purpose
 
@@ -18,14 +20,23 @@ This is a **思路 skill**, not a paperwork skill. The phases below are **mental
 
 | Stage | Intent | Maps to |
 |-------|--------|---------|
-| **对齐 Align** | Reconstruct the real intent and state one Unified Goal; on 常/慎 the **开工三行** is that statement — emit it and keep going, do not wait for a reply | Ask · Ask Gate |
+| **对齐 Align** | Standalone reconstructs one Unified Goal; embedded verifies and consumes the parent goal | Ask · Ask Gate or parent contract |
 | **规划 Plan** | Turn the goal into a formal plan: path + **execution boundary** + acceptance & QA standards | Read-only Inspect · Semantic Scan (if risk) · Plan · Plan Gate |
 | **执行 Execute** | Build with goal-awareness; result-oriented — no half-products, no over-engineering | Code |
-| **验收 Review** | Judge the result **against the original goal**; keep it simple and low-noise | Implementation Self-QA |
+| **实现自检 Self-QA** | Check the implementation against the original goal without claiming independent acceptance | Implementation Self-QA |
 
-- **Goal-first:** before building, agent and user must share the same read of intent and goal. A wrong goal costs more than any bug. 快档 / trivial reversible: restate the goal in one line and proceed; 常/慎: emit the **开工三行**, then proceed without waiting. Scale alignment effort with risk and ambiguity.
+- **Goal-first:** before building, require a durable goal anchor. Standalone creates it in one/three lines; embedded consumes it from the parent contract. Scale alignment effort with risk and ambiguity.
 - **Each stage subdivides** into sub-tasks with their own goal — iterate; do not dump one fixed step list and call it done.
 - **Model-agnostic:** stages may run on different models (e.g. a strong model plans, a cheaper model executes — *example only, never hardcoded*); whoever executes still understands the goal and may find a better path or catch gaps missed earlier.
+
+### Invocation Profiles
+
+- `standalone`: only for explicit `$ask-plan-code-qa` use. Run Align → Inspect → Plan Gate → Code → Self-QA.
+- `embedded`: default when invoked by `agent-quality-loop`. Consume its `ALIGNED`/`EVIDENCED` contract, assurance, authority, baseline, scope, and must-hold checks. Skip Ask, Ask Gate, and duplicate opening lines unless the supplied contract is incomplete or has drifted. Run Inspect → Plan Gate → Code → Self-QA and return the implementation receipt defined by `agent-quality-loop`; never emit a second lifecycle summary.
+
+In either profile, the maximum lifecycle result is `BUILT`. Self-QA is not independent acceptance, release readiness, deployment, or production verification.
+
+Use one goal anchor throughout implementation: the standalone opening `目标` line, or `first_principles_goal` from the embedded parent contract. Self-QA quotes that anchor; embedded mode never invents a replacement opening line.
 
 ### Doubt Resolution（穷尽求解）
 
@@ -49,13 +60,15 @@ Use these categories as prompts, not a template to fill every time: concept mapp
 
 Carry Must-Hold Checks through Plan, Code, and Self-QA. In final QA, report only checks that materially protect the conclusion, with compact pass/fail evidence. If no real semantic risk exists, skip silently or state briefly: "No additional semantic invariants needed." Do not turn this into audit engineering.
 
-**Risk dial** (see `docs/guide.md`; aliases: Compact = 快, Standard = 常, High-Risk = 慎):
+**Assurance dial** (standalone aliases: Compact = 快, Standard = 常, High-Risk = 慎):
 
 | Dial | When | User-facing feel |
 |------|------|------------------|
 | **快** Fast | single-file + single-line + no contract change, reversible | Pair-programmer pace; evidence still required |
 | **常** Normal | default implement / fix / refactor / debug | Read code → align briefly → change → show evidence |
-| **慎** Careful | production, contracts, security, data, deploy | 常 + user-driven **review-gate** when asked |
+| **慎** Careful | production, contracts, security, data, deploy | 常 + independent acceptance through **agent-quality-loop** when asked |
+
+In embedded profile, inherit `fast | standard | formal` from `agent-quality-loop`; do not reclassify or raise authority. `formal` increases evidence rigor but this adapter still ends at `BUILT`.
 
 **Hard invariants** (non-negotiable): align goal before building · read before edit · root cause · minimal change · result-oriented (no half-product) · preserve semantic boundaries when risk exists · no success claims without Passing Evidence · pause on destructive/production/secrets.
 
@@ -65,7 +78,7 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 
 ## Output Discipline
 
-**Default:** talk like a trusted colleague — prose first, structure only when it helps the user decide. Exception: 常/慎 **开工三行** is a required artifact (not optional structure) — emit it first, then continue in prose.
+**Default:** talk like a trusted colleague — prose first, structure only when it helps the user decide. In standalone 常/慎, **开工三行** is a required artifact; embedded mode reuses its parent contract and emits no duplicate opening.
 
 **Use structured phase headers** only when:
 
@@ -76,13 +89,13 @@ See `examples.md` for 规则体 vs 思路体 contrast.
 
 **On Pass (normal path):**
 
-- **开工三行 first (常/慎):** open with 目标 / 边界 / 最可能误解 per `00-agent-constitution.mdc` §开工三行. This is a required **artifact**, not "structure" — the bullets below never suppress it. 快档 and pure read-only Q&A are exempt.
+- **开工三行 first (standalone 常/慎 only):** open with 目标 / 边界 / 最可能误解 as defined below. This is a required **artifact**, not "structure" — the bullets below never suppress it. 快档, embedded profile, and pure read-only Q&A are exempt.
 - Do **not** emit empty `## Ask Gate` / `## Plan Gate` sections
 - Weave align → read → change → review into readable flow
 - Leave a **minimal reasoning trace** so internal gates are auditable without templates: 「读到 X → 判断 Y → 下一步 Z」 in one line
 - Self-QA: state what was checked and whether the goal was met; use evidence bullets — not a template with empty sections
 
-**Internal work still happens:** Agent still runs Align → Plan → Execute → Review checks; output discipline controls **what the user sees**. Doubt Resolution *reduces* noise — do not dump unresolved doubts on the user.
+**Internal work still happens:** Agent still runs the checks required by its invocation profile; output discipline controls **what the user sees**. Doubt Resolution *reduces* noise — do not dump unresolved doubts on the user.
 
 ## User Handshake
 
@@ -90,10 +103,10 @@ User drives at four natural points:
 
 | Point | When | Agent behavior |
 |-------|------|----------------|
-| **目标** | Start of a non-trivial task | Emit the **开工三行** and proceed; the user interrupts if a line is misread — do not stop to ask |
+| **目标** | Start of a standalone non-trivial task | Emit the **开工三行** and proceed; embedded mode reuses the parent goal anchor |
 | **歧义** | Multiple valid interpretations | Ask a genuine blocking question; do not silently choose |
 | **方案** | Non-trivial change or user said wait | One-sentence approach; proceed unless user objects |
-| **验收** | User says review / 验收 / 把关 | Switch to **review-gate** — not Plan Gate |
+| **验收** | User says review / 验收 / 把关 | Switch to **agent-quality-loop accept** — not Plan Gate; it may invoke `review-gate` |
 
 ### Goal Handshake — three states（目标握手三态）
 
@@ -101,7 +114,7 @@ Pick the state, then act — this is how you avoid both over-asking and over-pro
 
 | State | When | Action |
 |-------|------|--------|
-| **直接执行** | Goal obvious / trivial / reversible, or answered by the profile | 快档: one-line restatement, then proceed. 常/慎: emit the **开工三行**, then proceed — do not wait |
+| **直接执行** | Goal obvious / trivial / reversible, or answered by the profile | Standalone 快档: one-line restatement; standalone 常/慎: emit the **开工三行**. Embedded: use the supplied goal anchor |
 | **带假设继续** (Pass with Risk) | Goal clear enough; remaining gaps are safe, reversible, Inspect-verifiable | State the assumptions, proceed; revisit if wrong |
 | **暂停确认** (Blocked) | A genuine, self-verified blocker that changes direction and cannot be derived from code/context/profile | Ask 1–2 real questions max |
 
@@ -114,19 +127,17 @@ Escalate (暂停确认) only after Doubt Resolution — never reflexively.
 
 ## When Not to Use
 
-- User wants **acceptance review / 验收 / review / inspect** of completed work or existing QA → **`review-gate`**
+- User wants **acceptance review / 验收 / review / inspect** of completed work or existing QA → **`agent-quality-loop` accept path**; it may invoke `review-gate`
 - Pure Q&A with no code (answer directly; optional brief Ask only)
 
 ## Workflow (Operating Procedure)
 
 ```text
-对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 验收 Self-QA
+Standalone: 对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 实现自检 Self-QA
+Embedded:  consume ALIGNED/EVIDENCED contract → Inspect → Plan Gate → Code → Self-QA → BUILT receipt
               ↑               ↑                                ↑
        未对齐 → 抛回      skip w/ reason                 Revise/Blocked → no Code
 ```
-
-Read `.cursor/rules/10-ask-plan-code-qa.mdc` for triggers and contract summary.  
-Human guide: `docs/guide.md`.
 
 ---
 
@@ -134,7 +145,7 @@ Human guide: `docs/guide.md`.
 
 Requirements only. **No code changes.** Act like a product manager: reconstruct the **real intent** (including what the user could not phrase precisely), cover more angles, and propose **one Unified Goal** for the user to confirm.
 
-**Two tiers — do not confuse them.** The **default mandatory output** for a 常/慎 task is the **开工三行** (`00-agent-constitution.mdc` §开工三行): three lines, emitted in the first reply, then work continues without waiting. The full template below is the **expanded form** — use it only when requirements are genuinely ambiguous, when the user asks for a written spec, or on 慎档 risk. Field measurement: the expanded template executed 0 times in 212 sessions precisely because it was presented as the default. Three lines that actually ship beat seven sections that never do.
+**Two tiers — do not confuse them.** In standalone profile, the default mandatory output for a 常/慎 task is three lines—目标 / 边界 / 最可能误解—emitted in the first reply, then work continues without waiting. Embedded profile reuses the parent contract and emits none of them again. The full template below is the expanded standalone form; use it only for genuine ambiguity, an explicit written-spec request, or 慎档 risk.
 
 ```markdown
 ## Ask
@@ -151,7 +162,7 @@ Requirements only. **No code changes.** Act like a product manager: reconstruct 
 - Expose assumptions; no silent choice on ambiguous requirements.
 - Flag flawed user proposals with evidence.
 - Blocking questions only; safe reversible assumptions may proceed to Inspect if stated.
-- **No Plan until the Unified Goal is aligned with the user** (快档: a one-line restatement counts; 常/慎: the **开工三行** counts — it is an artifact, not a request for approval, so alignment does not mean waiting for a reply).
+- **No Plan until the Unified Goal is aligned** (standalone uses its one-line/three-line anchor; embedded requires a valid parent `ALIGNED`/`EVIDENCED` contract).
 
 ---
 
@@ -290,17 +301,17 @@ Proceed to 执行 (Code) | Revise Plan | Ask User
 
 ---
 
-## 验收 · Implementation Self-QA Phase
+## 实现自检 · Implementation Self-QA Phase
 
-After Code. **Not user acceptance** (→ `review-gate`). Judge the work **against the original Unified Goal**; keep it simple, low-noise, judgment-driven.
+After Code. **Not user acceptance** (→ `agent-quality-loop` accept path). Judge the work **against the original Unified Goal**; keep it simple, low-noise, judgment-driven.
 
 ```markdown
 ## Implementation Self-QA
 ### Summary
 <No fixed/done/passing/verified/已完成/已修复 without Passing Evidence>
-<No goal met/达成/meets the goal (or equivalent) without quoting the 目标 line from 开工三行 verbatim; 快档: quote the one-line restatement>
+<No goal met/达成/meets the goal without quoting the profile's goal anchor verbatim>
 
-### Goal Met? (quote 目标 line from 开工三行 verbatim — 快档: one-line restatement; then vs Acceptance Standard: met / deviation & why)
+### Goal Met? (quote the standalone goal line or embedded first_principles_goal; then compare with Acceptance Standard)
 ### Changed Files
 ### Verification Performed
 ### Must-Hold Checks (semantic risk only)
@@ -313,7 +324,7 @@ After Code. **Not user acceptance** (→ `review-gate`). Judge the work **agains
 
 - Commands from `.ai/knowledge/project-context.md` when available.
 - Must-Hold Checks appear only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
-- Judging a goal never written down is a claim, not a verdict — the 目标 line is the input the goal-met verdict is computed against.
+- Judging a goal without a durable anchor is a claim, not a verdict; use the standalone goal line or embedded parent `first_principles_goal`.
 - Unclear impact → smallest check first; broader checks → Not Verified. **Do not over-test for ceremony** — match verification to risk.
 - Reusable verified lesson → **propose** in Next Step for `.ai/knowledge/lessons.md`; write only if user confirms.
 
@@ -349,7 +360,7 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 | | Plan Gate | Review Gate |
 |---|-----------|-------------|
 | When | Before Code (internal) | User asks to review/验收 existing work |
-| Skill | (this skill) | `review-gate` |
+| Skill | (this skill) | `agent-quality-loop` accept path (`review-gate` may serve as its adapter) |
 
 ---
 
@@ -357,21 +368,25 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 
 **Default:** conversational flow with evidence; phase headers on-demand per **Output Discipline**.
 
-**When structured:** Ask · Readiness (merged gates on Pass) · Read-only Inspect Summary · Plan · optional Must-Hold Checks (semantic risk only) · Implementation Self-QA · Compact Ask (快档)
+**Standalone when structured:** Ask · Readiness (merged gates on Pass) · Read-only Inspect Summary · Plan · optional Must-Hold Checks (semantic risk only) · Implementation Self-QA · Compact Ask (快档)
+
+**Embedded:** return only an implementation receipt containing adapter/source identity, input contract/baseline, changed artifacts, verification performed, passing/failing/not-run evidence, scope deviations, remaining risks, and `result_phase: BUILT`. Do not repeat goal/scope/lifecycle output already owned by `agent-quality-loop`.
 
 **Always after code:** what changed · verification performed · Passing Evidence or Not Verified · quoted 目标 line + whether the original goal is met
 
 ## Acceptance Criteria
 
-- [ ] Unified Goal aligned with user before building (快档: one-line restatement; 常/慎: 开工三行 emitted in the first reply)
-- [ ] 常/慎: 开工三行 present in the first reply, with line 1 quoting the user's own words and line 2 naming an explicit do-not-touch list
+- [ ] Unified Goal aligned before building: standalone uses its opening anchor; embedded verifies the parent contract
+- [ ] Embedded profile consumes the parent contract, skips duplicate alignment output, and preserves its assurance and authority.
+- [ ] Standalone 常/慎: 开工三行 present in the first reply; embedded profile reuses the parent alignment without duplicating it
 - [ ] Gates executed in order; Plan Gate Pass/Pass with Risk before Code
 - [ ] Inspect completed or skip justified; Plan grounded in facts, with Execution Boundary + Acceptance & QA Standards
 - [ ] Semantic-risk tasks preserve user-confirmed meaning; source labels are not substituted for business/product concepts
 - [ ] Review judged against the original goal; no success claims without Passing Evidence; no half-product delivered
-- [ ] Goal-met verdict quotes the 目标 line verbatim (快档: its one-line restatement)
+- [ ] Goal-met verdict quotes the applicable standalone or embedded goal anchor verbatim
 - [ ] Cross-file contracts grep-checked when applicable
-- [ ] Review requests routed to `review-gate`, not Plan Gate
+- [ ] Review requests routed to `agent-quality-loop` accept path, not Plan Gate
+- [ ] Implementation Self-QA reports at most `BUILT`; it never grants independent acceptance or release state.
 
 ## Failure Modes
 
@@ -385,21 +400,24 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 | Gate output essay / empty headers on Pass | Shorten; use 思路体 per examples.md |
 | Source traversal correct but user concepts collapsed into source labels | Add or revise Must-Hold Checks; verify concept mapping, scope, exclusivity, counts, missing data, and evidence binding as needed |
 | Half-product / over-engineering / show-off code | Return to result-oriented; Occam; finish to a real root-cause result |
-| Confused Plan Gate with review-gate | User 验收 → review-gate |
+| Confused Plan Gate with acceptance | User 验收 → `agent-quality-loop` accept path |
+| Embedded adapter repeats the parent alignment/summary | Reuse the parent contract and return only the implementation receipt |
+| Self-QA claims `ACCEPTED` or release state | Downgrade to `BUILT`; route formal acceptance through the parent lifecycle |
+| Missing optional standalone reference | Use the self-contained rules in this file; do not claim an unread dependency |
 | Compact used when eligibility fails | Upgrade to full flow |
 | Self-QA success without evidence | Rewrite Summary; Not Verified |
-| 常/慎 first reply missing 开工三行 | Emit the three lines now, before any further work; treat as a visible defect on par with a success claim lacking Passing Evidence |
-| 开工三行 emitted then waited for user confirmation | The three lines are an artifact, not a question; resume immediately under §自主推进授权 — stopping costs a full round trip |
-| Goal-met verdict rendered without quoting the 目标 line | Quote it; if no 目标 line was emitted on a 常/慎 task, state that and re-derive the goal from the user's original words before claiming anything |
-| 开工三行 skipped and Self-QA then claimed 达成 | The claim is void — same class as a success claim without Passing Evidence |
+| Standalone 常/慎 first reply missing 开工三行 | Emit the three lines now before further standalone work; embedded mode must not add them |
+| Standalone 开工三行 emitted then waited for confirmation | The lines are an artifact, not a question; continue unless a genuine blocker remains |
+| Goal-met verdict lacks the profile's goal anchor | Quote the standalone goal line or embedded `first_principles_goal`; without either, the claim is void |
+| Standalone opening or embedded parent goal is missing, then Self-QA claims 达成 | The claim is void — same class as a success claim without Passing Evidence |
 
 ## Evaluation Cases
 
 ### Happy path
 
 User: "Fix timeout in auth handler."  
-常档: emit 开工三行 (目标 quoting user → 边界 → 最可能误解) → read handler + tests → Code → Self-QA with test output and goal-met check (思路体, no empty phase headers). See `examples.md`.  
-**Pass:** 开工三行 present with line 1 quoting the user; evidence shown; no empty phase headers. **Fail (hollow):** missing 开工三行 on 常/慎; "已修复" with no test output; or six empty gate headers.
+Standalone 常档: emit 开工三行 (目标 quoting user → 边界 → 最可能误解) → read handler + tests → Code → Self-QA with test output and goal-met check. See `examples.md`.
+**Pass:** standalone opening present, evidence shown, and no empty phase headers. **Fail:** missing standalone anchor, "已修复" with no test output, or six empty gate headers.
 
 ### Ambiguous case
 
@@ -409,7 +427,7 @@ Ask reconstructs intent and proposes a Unified Goal; Doubt Resolution first, the
 
 ### Boundary / failure
 
-Agent tries Code with Plan Gate Revise → **stop**, revise Plan. User says 「帮我验收」 → switch to **review-gate**, not Plan Gate.
+Agent tries Code with Plan Gate Revise → **stop**, revise Plan. User says 「帮我验收」 → switch to **agent-quality-loop accept**, not Plan Gate.
 
 ### Diagnostic — flawed user approach
 
@@ -432,3 +450,9 @@ User: "Document which customer-facing workflows use approval state." Source has 
 User: "Refactor the billing retry queue across worker and API."  
 **Pass:** line 1 quotes the user's actual words (not a paraphrase); line 3 names the highest-variance inference (not a safe platitude); agent continues working in the same turn after emitting the three lines; later goal-met verdict quotes that 目标 line verbatim.  
 **Fail:** paraphrases the goal instead of quoting; line 3 is a vague filler; skips the three lines; emits the three lines then ended the turn asking whether to proceed; writes "达成"/"goal met" with no quoted 目标 line; or paraphrases the 目标 line instead of quoting it when rendering the verdict.
+
+### Integration — embedded adapter
+
+Parent input: an `ALIGNED`/`EVIDENCED` contract with `intent: implement`, declared assurance/authority, scope, baseline, and must-hold checks.
+
+**Pass:** skip Ask/Ask Gate/opening lines; inspect, plan, code, self-QA; return one implementation receipt with `result_phase: BUILT`. **Fail:** emit a second lifecycle summary, alter authority, wait for an acceptor, or claim `ACCEPTED`/release state.

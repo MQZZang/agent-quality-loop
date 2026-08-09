@@ -1,25 +1,34 @@
 ---
 name: review-gate
 description: >-
-  当用户需要验收审查、检查需求/计划/代码/已有 QA 结果、风险、遗漏、幻觉时使用。
-  Acceptance review of completed work or existing QA reports. Not for
-  post-implement self-QA — use ask-plan-code-qa for that unless user asks to review.
+  Independent acceptance adapter for reviewing requirements, plans, code, artifacts,
+  or existing QA evidence for risks, omissions, hallucinations, and goal drift.
+  Use standalone only when explicitly invoked; when called by agent-quality-loop,
+  return evidence-based review findings and a conservative verdict without repairing
+  the artifact or duplicating lifecycle output. Never use for implementation self-QA.
 ---
 
 # Review Gate
 
 ## Purpose
 
-Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the goal of record: on 常/慎, the **目标** line of the task's **开工三行** (canonical form: `00-agent-constitution.mdc` §开工三行); when an expanded written Ask exists, its **Unified Goal** section is the alternative form; on 快档, the one-line goal restatement. A real result, no half-products, no over-engineering.
+Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the **original Unified Goal**: a real result, no half-products, no over-engineering.
 
 **思路 skill:** run only the review types relevant to the artifact; default to readable findings, not empty review-type chapter headings.
+
+Invocation profiles:
+
+- `standalone`: only for explicit `$review-gate` use. Reconstruct the original goal and scope from raw artifacts before reviewing.
+- `embedded`: when invoked by `agent-quality-loop`. Consume its contract, frozen artifact/baseline, required dimensions, and raw evidence. Return only this skill's review report; the parent owns lifecycle mapping and the user-facing combined summary.
+
+In either profile, review is read-only. Do not edit, repair, deploy, publish, or grant authority.
 
 ## When to Use
 
 - User asks to **review / 验收 / inspect / audit / validate**
 - **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports**
 - Hallucination check, risk check, omission check on artifacts (not on in-progress implement unless reviewing a prior report)
-- **Goal-Achievement / 目标达成** check: does the result meet the goal of record (常/慎: **目标** line of 开工三行; expanded Ask's **Unified Goal** when present; 快档: one-line restatement) within its **边界**?
+- **Goal-Achievement / 目标达成** check: does the result meet the original Unified Goal within its boundary?
 - User asks to verify "done" claims or review before merge
 
 ## Review Types
@@ -37,17 +46,18 @@ Run only the types relevant to the artifact under review.
 
 ## When Not to Use
 
-- User wants to **implement, fix, refactor, or debug** → use **`ask-plan-code-qa`** (then self-QA via `10`)
-- Agent's own **post-implement self-QA reporting** → **`ask-plan-code-qa`**, not this skill, unless user asks to **review / 验收** that report
+- User wants to **implement, fix, refactor, or debug** → use **`agent-quality-loop`**; it may select `ask-plan-code-qa` as its implementation adapter
+- Agent's own **post-implement self-QA reporting** → implementation adapter, not this skill, unless a distinct context is asked to **review / 验收** that report
 - Trivial praise or "LGTM" without reading artifacts
-- User only wants a plan written, not a review of existing work → use ask-plan-code-qa Plan phase
+- User only wants a plan written, not a review of existing work → use `agent-quality-loop` or explicit `$ask-plan-code-qa`
 
 ## Workflow (Operating Procedure)
 
-1. Read `.cursor/rules/20-review-gate.mdc` and identify applicable review types.
-2. Gather artifacts (requirements, plan, diff, QA report) from repo — not memory.
-3. For each finding: 问题 · 证据 · 风险 · 修正建议.
-4. End with Verdict + What Was Checked.
+1. Identify the original goal, scope, acceptance standard, frozen baseline, and applicable review types from the supplied contract and raw artifacts. If any decision-changing input is absent, report it; do not invent it.
+2. Gather requirements, plan, diff, artifacts, commands, and raw QA evidence from source — not memory or the implementer's narrative alone.
+3. When formal acceptance is requested, require a distinct fresh context or role and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
+4. For each finding: 问题 · 证据 · 风险 · 修正建议.
+5. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.
 
 ## Assumption Review
 
@@ -63,7 +73,7 @@ Run only the types relevant to the artifact under review.
 
 ## Plan Review
 
-Check against the plan template in `ask-plan-code-qa`:
+Check the plan against the supplied goal/contract:
 
 - Missing non-goals, files, risks, acceptance criteria, or QA plan?
 - Steps ordered and testable?
@@ -89,9 +99,7 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 
 ## Goal-Achievement Review（目标 + 协作达成复核）
 
-- Does the delivered result meet the goal of record — on 常/慎, the **目标** line of the task's 开工三行 (expanded Ask's **Unified Goal** when one exists; 快档: one-line restatement) — and its Acceptance Standard?
-- **边界** check: did the delivered change stay within the 改 list and leave the 不动 list untouched? Files outside 改, or any touch of 不动, is a finding.
-- **最可能误解** follow-through: was the line-3 highest-variance inference later resolved, confirmed, or still open and unreported? An unresolved line 3 never revisited is a finding.
+- Does the delivered result meet the **original Unified Goal** and its Acceptance Standard?
 - Any deviation from the agreed goal or execution boundary — and why?
 - Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
 - **Preference drift:** does it respect the user's collaboration profile (output density, question threshold, risk tolerance, quality bar, decision habits)?
@@ -134,7 +142,6 @@ If a section has zero issues, state what was examined — do not paste unused re
 - Do not say "looks good" without listing checked evidence.
 - Do not invent file contents, test passes, or user intent.
 - Do not approve QA that lacks Passing Evidence for critical claims.
-- Do not write "goal met" / "达成" / "meets the goal" or equivalent without quoting the **目标** line of the task's 开工三行 verbatim (快档: the one-line goal restatement). Judging a goal you never wrote down is a claim, not a verdict.
 - Do not force all review types when the artifact only needs one (e.g. QA-only → QA Review + Scope).
 
 ## Acceptance Criteria
@@ -144,9 +151,6 @@ If a section has zero issues, state what was examined — do not paste unused re
 - [ ] Verdict is Proceed / Proceed with fixes / Block — not vague approval
 - [ ] No invented file contents, test results, or user intent
 - [ ] Context Review respects project-context Verified vs Not Verified
-- [ ] Acceptance verdict quotes the **目标** line (or 快档 one-line restatement) verbatim
-- [ ] Delivered change respected the 边界 改 / 不动 lists
-- [ ] 最可能误解 was resolved, confirmed, or reported still open
 
 ## Failure Modes
 
@@ -154,16 +158,16 @@ If a section has zero issues, state what was examined — do not paste unused re
 |---------|----------|
 | Blanket "looks good" | List What Was Checked with file/command evidence |
 | Review from memory without reading diff | Open actual files; re-review |
-| Used for implement/fix task | Redirect to ask-plan-code-qa |
+| Used for implement/fix task | Redirect to `agent-quality-loop`; it selects an implementation adapter |
 | Approved QA without Passing Evidence | QA Review → Block or Proceed with fixes |
-| Acceptance approved without quoting the 目标 line | Block until verdict cites 开工三行 目标 (or 快档 restatement) verbatim |
-| Delivered result touched something on the 不动 list | Block or Proceed with fixes; cite the 边界 breach |
+| Embedded review duplicates lifecycle summary | Return this review report only; parent maps the result |
+| Same-context review claims independence | Mark non-independent and do not grant formal acceptance |
 
 ## Evaluation Cases
 
 ### Happy path
 
-Reviewer reads plan + diff + test log; lists checks; verdict Proceed with minor suggestions.
+Reviewer reads plan + diff + test log; lists checks; verdict `Proceed` when no decision-changing finding remains.
 
 ### Ambiguous case
 

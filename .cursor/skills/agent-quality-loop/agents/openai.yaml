@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent Quality Loop"
+  short_description: "Route goals into proportionate, verified agent work"
+  default_prompt: "Use $agent-quality-loop to infer the goal, assurance, and authority, then complete the safest sufficient workflow."
+policy:
+  allow_implicit_invocation: true

@@ -1,6 +1,6 @@
 # ask-plan-code-qa Examples
 
-Contrast **规则体** (over-structured) vs **思路体** (target). Same tasks; internal checks (对齐 → 规划 → 执行 → 验收) still run — only **output** differs. **思路体** governs prose density; for 常/慎 the **开工三行** is still mandatory regardless of density — it is an artifact, not structure to strip; the goal-met verdict must quote the 目标 line, so the three lines are an input to 验收, not just an opening flourish.
+Contrast **规则体** (over-structured) vs **思路体** (target). In standalone profile the internal checks (对齐 → 规划 → 执行 → 实现自检) still run; embedded profile reuses the parent alignment and returns only a `BUILT` receipt. **思路体** governs prose density; for standalone 常/慎 the **开工三行** remains mandatory, and Self-QA quotes the original goal without claiming independent acceptance.
 
 ---
 
@@ -111,7 +111,7 @@ Pass
 
 → 开工三行已发出；此处因方向依赖业务容忍度而升为暂停确认 — 只抛这一个真实问题后才进规划；其余细节不机械追问。
 
-**验收（Code 后，对照最初目标）：**  
+**实现自检（Code 后，对照最初目标）：**
 **目标达成？** 对照「目标：「给导出功能加个缓存。」→ 你要的是"导出更快、不卡"，缓存只是手段之一」——同集合二次导出 1.2s→80ms；改版本后回源——达成。  
 **改了：** `export/service.ts`　**验证：** `npm test -- export` — 9 passed　**非半成品检查：** 无 TODO、无半接线的失效路径。
 
@@ -141,4 +141,4 @@ grep 所有 `status` / `workflow_state` / `approval_status`，把命中的字段
 
 **做法：** 先以客户可见配置限定范围，再映射审批状态字段。
 
-**验收：** 对照「目标：「统计哪些客户可见流程用了审批状态。」→ 在客户可见流程范围内统计审批状态用法」——清单总数与客户可见流程数可对账；未配置可见性的 2 个流程列入 Not Verified；没有把内部流转状态混入审批状态。
+**实现自检：** 对照「目标：「统计哪些客户可见流程用了审批状态。」→ 在客户可见流程范围内统计审批状态用法」——清单总数与客户可见流程数可对账；未配置可见性的 2 个流程列入 Not Verified；没有把内部流转状态混入审批状态。

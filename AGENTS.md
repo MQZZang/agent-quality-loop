@@ -1,124 +1,103 @@
-# AI Agents — Project Entry
+# AI Agent Collaboration Assistant
 
-Cross-tool compatibility pointer for Cursor and other coding agents working in a repository that installs AI Agent Collaboration Assistant.
+This repository packages one public workflow entry and two bounded adapters for Cursor, Codex, and compatible coding agents.
 
-## Read First
+## Canonical Architecture
 
-1. **`.cursor/rules/00-agent-constitution.mdc`** — always-on behavior baseline (`alwaysApply: true`).
-2. **`.ai/knowledge/project-context.md`** — project facts; treat **Not Verified** items as non-facts until confirmed.
-3. **`.ai/knowledge/lessons.md`** — verified past lessons.
+| Component | Responsibility | Maximum authority/result |
+|---|---|---|
+| `agent-quality-loop` | Compile intent, assurance, scope, evidence, lifecycle, and authority; route domain work; own acceptance/release state | Only component that may map to `ACCEPTED` or release phases |
+| `ask-plan-code-qa` | Code inspect/plan/implement/self-QA adapter | `local_write`, result at most `BUILT` |
+| `review-gate` | Read-only independent review adapter | Findings/verdict only; never repairs or grants authority |
+| `skill-factory` | Explicit workflow-maintenance helper | Skill/rule authoring only |
 
-For reusable phase prompts, risk dial (快/常/慎), and output discipline, see **`docs/guide.md`**.
+`agent-quality-loop` is the single default entry. The other skills are explicit compatibility entry points or embedded adapters. Do not run parallel lifecycle templates.
 
-**Quick Route (daily):** 小改 → `快档` · 正常开发 → `常档`（开工三行 + Pass 对话体）· 高风险 → 常档 + `review-gate` · 只验收 → `review-gate only`.
+Trivial factual Q&A and casual brainstorming do not need this workflow.
 
-**Description-triggered rules may not auto-load.** At task start, **read the matching rule and skill files explicitly** (do not rely on implicit injection alone):
+## Quick Use
 
-### Cursor
+Natural language is enough:
 
-| Task type | Read |
-|-----------|------|
-| Implement / fix / refactor / debug / multi-file change / project automation | `.cursor/rules/10-ask-plan-code-qa.mdc` + `.cursor/skills/ask-plan-code-qa/SKILL.md` (+ `examples.md` for output style) |
-| Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.cursor/rules/20-review-gate.mdc` + `.cursor/skills/review-gate/SKILL.md` |
-| Create / evaluate / refactor skill, rule, or prompt template | `.cursor/rules/30-skill-factory.mdc` + `.cursor/skills/skill-factory/SKILL.md` |
+- `修复本地超时，不部署。`
+- `只诊断根因，不改文件。`
+- `修复并做独立正式验收，不发布。`
+- `只检查是否可发布，先不要发布。`
 
-### Codex
+Explicit invocation is optional:
 
-| Task type | Read |
-|-----------|------|
-| Implement / fix / refactor / debug / multi-file change / project automation | `.agents/skills/ask-plan-code-qa/SKILL.md` (+ `examples.md`; + `.cursor/rules/10-ask-plan-code-qa.mdc` for contract summary) |
-| Review / inspect / audit / validate / **acceptance review** / hallucination / risk / omission check | `.agents/skills/review-gate/SKILL.md` (+ `.cursor/rules/20-review-gate.mdc` for contract summary) |
-| Create / evaluate / refactor skill, rule, or prompt template | `.agents/skills/skill-factory/SKILL.md` (+ `.cursor/rules/30-skill-factory.mdc` for contract summary) |
+```text
+$agent-quality-loop full：修复这个本地问题并独立验收，不发布。
+```
 
-**Do not rely on Codex reading `.cursor/skills/`** — use `.agents/skills/` as the Codex skill source. Rules remain under `.cursor/rules/`.
+Use `$ask-plan-code-qa` or `$review-gate` directly only when deliberately bypassing the public router for compatibility/testing. Direct ask-plan self-QA is not independent acceptance.
 
-## Skill Paths (Cursor ↔ Codex)
+## Tool Paths
 
-| Tool | Skills location |
-|------|-----------------|
-| **Cursor** | `.cursor/skills/<name>/SKILL.md` |
-| **Codex** | `.agents/skills/<name>/SKILL.md` |
+| Tool | Skill source |
+|---|---|
+| Cursor | `.cursor/skills/<name>/SKILL.md` |
+| Codex | `.agents/skills/<name>/SKILL.md` |
 
-When you change a skill, edit **`.cursor/skills/` only** — never edit `.agents/skills/` directly — then run `./scripts/sync-skills.sh` from repo root to update the Codex mirror. Cursor rules (`.cursor/rules/*.mdc`) are shared; only skill procedure files are mirrored.
+Edit `.cursor/skills/` only, then run `./scripts/sync-skills.sh` to replace the Codex mirror. Never hand-edit `.agents/skills/`.
 
-## Instruction Priority / Conflict Handling
+Cursor routing summaries live in `.cursor/rules/`:
 
-1. **User's explicit instruction this turn** takes highest priority.
-2. **This repo's `AGENTS.md`, `.cursor/rules/`, and skills** (`.cursor/skills/` for Cursor, `.agents/skills/` for Codex) are the in-repo workflow baseline.
-3. **External user-level skills** (e.g. global `superpowers-*` skills) — **prefer disabling Superpowers** when this repo is installed (workflow conflict; see `docs/guide.md` § Superpowers). If both are active, follow the user's explicit instruction and this `AGENTS.md` unless the user explicitly asks to use the external skill; then **state how it differs** from the repo workflow.
-4. **Windows popup fix:** If Superpowers stays enabled and new chats show “open session-start”, run `scripts/fix-superpowers-windows.ps1` once and restart Cursor.
-5. When unsure which workflow applies, ask before implementing.
+- `00-agent-constitution.mdc`: always-on minimal invariants
+- `05-agent-quality-loop.mdc`: public workflow router
+- `10-ask-plan-code-qa.mdc`: explicit/embedded implementation adapter
+- `20-review-gate.mdc`: explicit/embedded review adapter
+- `30-skill-factory.mdc`: workflow authoring helper
 
-## 10 vs 20 — QA vs Acceptance
+## Non-Negotiable Boundaries
 
-| Workflow | Use for |
-|----------|---------|
-| **`10` / `ask-plan-code-qa`** | Implement, fix, refactor, debug, multi-file work; after Code → **implementation self-QA reporting** (agent reports its own verification) |
-| **`20` / `review-gate`** | User asks to **review / 验收 / inspect**; **acceptance review** of completed work, plans, code, or **existing QA reports**; risk / hallucination / omission checks |
+- Translate requests into a user-observable goal, scope allowlist, preserved non-goals, and falsifiable success evidence.
+- Read before editing; prefer the smallest root-cause change; do not refactor unrelated surfaces.
+- Keep intent, assurance, and action authority independent. More rigor never grants more permission.
+- `align`, `evidence`, and `accept` are read-only. `execute` and `full` are at most local-write. `full` never publishes or deploys.
+- External writes, destructive actions, deploys, uploads, and publication require a separate explicit current-turn release request with exact target, effects, role, rollback, checks, and side-effect-path evidence.
+- Treat dry-run as scoped simulation only after every reachable side-effect path is inspected and proven short-circuited.
+- Implementation self-QA may report `BUILT`; only a fresh/different-role acceptor reading raw evidence first may grant formal acceptance.
+- `ACCEPTED`, `RELEASE_READY`, `DEPLOYED`, and `PRODUCTION_VERIFIED` are different states.
+- Stop/scope/revoke invalidates external authority. Incomplete resume remains read-only and cannot authorize implementation.
+- Never copy leaked/proprietary system prompts, secrets, tokens, private keys, or machine-local configuration into this repository.
 
-If the user says **「帮我验收」** or **「review this」** → **`20`**, not `10`. If the user says **「fix / implement / debug」** → **`10`**, then self-QA via `10`'s template when done.
+## Project Knowledge
 
-**`ask-plan-code-qa`:** Thinking workflow in four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review** (internal Ask → Gate → Inspect → Plan → Gate → Code → Self-QA). Align one **Unified Goal** with the user before building; resolve your own doubts (穷尽求解) and escalate only genuine blockers; deliver a result-oriented outcome (no half-product). **User-facing output** defaults to conversational prose on Pass, except the 常/慎 **开工三行**, which is a required artifact prose-first never overrides (see Output Discipline + `examples.md`). Risk dial: 快 / 常 / 慎. Details: `docs/guide.md`.
+If installed into a project, read these when present:
 
-## Core Expectations
+1. The target project's `AGENTS.md` and scoped instructions.
+2. `.ai/knowledge/project-context.md`; treat `Not Verified` as unknown.
+3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win.
+4. `.ai/knowledge/lessons.md`; cite only verified lessons.
 
-| Principle | Requirement |
-|-----------|-------------|
-| Align goal first | On 常/慎 emit **开工三行** (`00-agent-constitution.mdc` §开工三行) as the opening artifact; never execute a misaligned goal |
-| Autonomous Advance（自主推进授权） | Self-answerable questions → research, don't ask; do not end with "要不要我继续？"; stop only for destructive/irreversible ops, production/secrets/payments/data, goal/contract/schema changes, or a genuine self-verified blocker |
-| Read before edit | Open target files and related code before modifying |
-| Plan before multi-step work | 常/慎: internal plan (path + boundary + acceptance & QA standards) + gates; user sees the 开工三行 plus prose on Pass — expanded structure only when ambiguous or high-risk (see `ask-plan-code-qa`) |
-| Output discipline | Default colleague-style prose; structured headers only for ambiguity, blocked, or material risk; 开工三行 is a required artifact on 常/慎 (not optional structure — prose-first never overrides it); 快档 and pure read-only Q&A exempt |
-| Resolve own doubts | **Doubt Resolution（穷尽求解）** first; escalate only genuine, self-verified blockers — not mechanical or hallucinated asks |
-| Contract changes | Grep/search references when changing APIs, types, paths, components, configs, schemas |
-| Finish with self-QA | After implement/fix, use `10`'s **implementation self-QA** template; Goal Met? must quote the 开工三行 目标 line (快档: one-line restatement) — not user acceptance review |
-| Result-oriented | Deliver a real root-cause result; no half-product, no over-engineering (奥卡姆/Occam) |
-| Honesty | No "fixed/done/passing/verified" in Summary without Passing Evidence; on 常/慎 no "goal met"/"达成"/equivalent without quoting that task's 开工三行 目标 line verbatim (快档: its one-line restatement) |
-| Project context | Cite only **Verified** facts from `project-context.md`; never treat **Not Verified** as fact |
-| Prompt hygiene | Do not copy leaked or proprietary system prompt text |
+Project facts belong in knowledge files, not in the generic skills.
 
-## Workflows (Skills)
+## Instruction Priority
 
-| Skill | Use when |
-|-------|----------|
-| `ask-plan-code-qa` | Implement, fix, refactor, debug, multi-file work; post-implement **self-QA reporting** |
-| `review-gate` | **Acceptance review**; review plans, code, existing QA reports; risks, gaps, hallucination checks |
-| `skill-factory` | Create or evaluate skills, rules, templates |
+1. Platform/system safety and the user's explicit current-turn instruction.
+2. Target-project scoped instructions and authority boundaries.
+3. `agent-quality-loop` lifecycle contract.
+4. Selected embedded adapter contract.
+5. Generic examples and templates.
 
-## Pause — Confirm With User
+When a lower layer conflicts, preserve the higher layer and disclose the conflict.
 
-Stop and ask before:
+## Maintenance and Acceptance
 
-- Destructive operations (force push, hard reset, mass delete)
-- Production deploy or live data mutation
-- Secrets, credentials, payments, billing
+After changing workflow files:
 
-## Knowledge
+1. Edit `.cursor/skills/` and any matching `.cursor/rules/`/human docs.
+2. Run `./scripts/sync-skills.sh`.
+3. Run the Agent Quality Loop validator from its actual skill root:
 
-- **Patterns:** `.ai/knowledge/prompt-patterns.md` — generic agent design patterns only.
-- **Context:** `.ai/knowledge/project-context.md` — stack, commands, architecture; see **Not Verified** section before citing.
-- **Collaboration profile:** `.ai/knowledge/collaboration-profile.md` — the user's stable collaboration preferences (output density, question threshold, risk tolerance, quality bar, decision habits); read at **对齐 Align**, apply as defaults, populate incrementally (propose-on-confirm).
-- **Lessons:** `.ai/knowledge/lessons.md` — propose entries after verified work; write only when user confirms or asks.
+   ```bash
+   node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
+   ```
 
-## Rules Index
+4. Run `node scripts/validate-workflow.js` when present.
+5. Inspect `git diff --check` and the exact changed-file allowlist.
+6. Forward-test at least: a normal local fix, independent acceptance, and `full + publish` boundary.
+7. Use a fresh/different-role independent reviewer before declaring formal acceptance.
 
-| Rule | Apply | Trigger |
-|------|-------|---------|
-| `00-agent-constitution` | **always** | Every task |
-| `10-ask-plan-code-qa` | on-request / description-triggered | Implement / fix / refactor / debug / multi-file / automation |
-| `20-review-gate` | on-request / description-triggered | Review / inspect / audit / validate / acceptance / risk / hallucination / omission |
-| `30-skill-factory` | on-request / description-triggered | New or refactored skill / rule / template |
-
-## AI Workflow Maintenance Checklist
-
-When changing agent workflow config, verify:
-
-- [ ] Each triggered rule (`10`, `20`, `30`) has matching skills under **both** `.cursor/skills/<name>/` and `.agents/skills/<name>/` (keep in sync)
-- [ ] Each skill has `name`, `description`, When to Use, When Not to Use, Failure Modes, Evaluation Cases (≥3)
-- [ ] `AGENTS.md` indexes all rules and skills (Cursor + Codex paths)
-- [ ] QA templates retain **Passing Evidence** and **Not Verified**
-- [ ] No leaked or proprietary system prompt text copied into rules/skills/knowledge
-- [ ] Run `./scripts/sync-skills.sh` after editing `.cursor/skills/`
-- [ ] Four-stage model (对齐/规划/执行/验收), goal-first alignment, Doubt Resolution (穷尽求解), collaboration-profile (L2), Ask / Plan gates, **快/常/慎** risk dial, and output discipline consistent across `00`, `10`, skill, `examples.md`, and `docs/guide.md`
-- [ ] 开工三行 contract consistent across `00-agent-constitution.mdc`, `10-ask-plan-code-qa.mdc`, `ask-plan-code-qa/SKILL.md`, `examples.md`, `docs/guide.md`, `review-gate/SKILL.md`, and `20-review-gate.mdc`
-- [ ] Goal-met lexical gate consistent across `00-agent-constitution.mdc`, `10-ask-plan-code-qa.mdc` Self-QA constraints, `ask-plan-code-qa/SKILL.md` Self-QA template, and `review-gate`
+Production/external actions remain human-controlled even when all local checks pass.

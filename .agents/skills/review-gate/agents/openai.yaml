@@ -1,0 +1,6 @@
+interface:
+  display_name: "Independent Review Gate"
+  short_description: "Review evidence without implementing or self-approving"
+  default_prompt: "Use $review-gate explicitly to independently review this artifact and return evidence-based findings and a conservative verdict."
+policy:
+  allow_implicit_invocation: false

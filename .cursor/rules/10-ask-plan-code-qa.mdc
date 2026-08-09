@@ -1,48 +1,20 @@
 ---
 description: >-
-  Use when the user asks to implement, fix, refactor, debug, make multi-file
-  changes, automate project workflows, or execute code based on an existing
-  plan. Each task runs 对齐 → 规划 → 执行 → 验收 (Align → Plan → Execute →
-  Review): align one Unified Goal with the user before building. For acceptance
-  review of completed work, use review-gate instead.
+  Compatibility rule for ask-plan-code-qa. Apply only when the user explicitly
+  invokes ask-plan-code-qa or agent-quality-loop selects it as the embedded code
+  implementation adapter. Do not use it as the default lifecycle router.
 alwaysApply: false
 ---
 
-# 对齐 → 规划 → 执行 → 验收 (Align · Plan · Execute · Review)
+# Code Implementation Adapter
 
-This rule defines **trigger behavior and output contract summary** only. Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`. Overview: `docs/guide.md`.
+Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`.
 
-**Purpose:** amplify the user's outcome via a **shared goal**; reliability is the guardrail, not the goal.
+- Standalone: explicit invocation only.
+- Embedded: consume the parent `ALIGNED`/`EVIDENCED` contract; do not repeat alignment or lifecycle output.
+- Inspect → plan gate → minimal code change → implementation self-QA.
+- Preserve parent goal, scope, assurance, authority, baseline, and must-hold checks.
+- Return an implementation receipt with `result_phase: BUILT`.
+- Never grant independent acceptance, release readiness, deployment, or new authority.
 
-**Flow (four stages):**
-
-```text
-对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 验收 Self-QA
-```
-
-**Gates are lightweight — not long reviews.** Pass → conversational prose per Output Discipline; expand on Revise, Blocked, or Risk.
-
-- **开工三行** (常/慎): required as the opening of the first reply; 快档 and pure read-only Q&A exempt. Artifact, not a question — emit and keep working; do not wait for confirmation. Canonical form: `00-agent-constitution.mdc` §开工三行.
-- **对齐 / Ask Gate** (after Ask): align one **Unified Goal** with the user; Status Pass | Pass with Risk | Revise | Blocked. **No Inspect/Plan until the goal is aligned** — on 常/慎, emitting 开工三行 satisfies alignment without a user reply; only a genuine self-verified blocker justifies stopping. Blocked must be a genuine, self-verified blocker — not reflexive.
-- **规划 / Read-only Inspect** (after Ask Gate Pass): read/grep only — **no file changes**. Plan must use inspect facts.
-- **Semantic Invariant Guardrail** (semantic-risk tasks only): before final Plan, protect the user's intended meaning with 3–7 Must-Hold Checks when source labels, schema names, UI text, categories, or default technical terms may differ from business/product concepts. Skip when no real semantic risk exists.
-- **规划 / Plan** carries **Execution Boundary + Acceptance Standard + QA Standard** and no unresolved doubt.
-- **Plan Gate** (after Plan): Status Pass | Pass with Risk | Revise | Blocked. **Revise/Blocked → no Code.**
-- **执行 / Code:** goal-aware and result-oriented — a real root-cause result, **never a half-product** or over-engineering.
-- **验收 / Implementation Self-QA** (after Code): judge **against the original goal**; agent self-report — **not** user acceptance (→ `20-review-gate.mdc`).
-
-**Doubt Resolution（穷尽求解）:** resolve your own doubts first; escalate only genuine, self-verified blockers — no mechanical or hallucinated asks; no over-analysis.
-
-User **验收 / review / inspect** of completed work → `20-review-gate.mdc`, not Plan Gate.
-
-## Compact Mode
-
-Only **single-file + single-line + no contract change**. Output Compact Ask (Goal, Assumptions, Compact Eligibility, QA). Any eligibility **no** → full flow above. Compact Mode is **exempt** from 开工三行 (a one-line goal restatement is sufficient). Never skip read-before-edit or Self-QA.
-
-## Self-QA Hard Constraints
-
-- No Passing Evidence → no "fixed/done/passing/verified" in Summary.
-- No quoted 目标 line → no "goal met"/"达成" wording (常/慎; 快档 uses one-line restatement).
-- Semantic-risk conclusions → report compact Must-Hold Check evidence, or mark Not Verified / Cannot Infer.
-- Commands from `.ai/knowledge/project-context.md` when available.
-- Skipped checks → **Not Verified** (mandatory).
+Review/验收 requests route back through `agent-quality-loop` accept, which may invoke `review-gate`.

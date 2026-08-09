@@ -1,755 +1,144 @@
-# AI Agent Collaboration Assistant
+# Agent Quality Loop Guide
 
-Human-readable guide for Cursor, Codex, and other agents using this workflow.
+## First-Principles Goal
 
-**Model:** every task runs four stages — **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review**. The point is to **amplify** the user's outcome through a shared goal; reliability is the guardrail, not the goal.
+The workflow exists to produce the user's observable outcome with the smallest sufficient scope, evidence, and authority. It is not a ritual checklist and does not require users to learn lifecycle YAML.
 
-**Full procedure (Cursor):** `.cursor/skills/ask-plan-code-qa/SKILL.md`  
-**Full procedure (Codex):** `.agents/skills/ask-plan-code-qa/SKILL.md`  
-**Entry point:** `AGENTS.md`  
-**User acceptance review:** `review-gate` skill (`.cursor/skills/` or `.agents/skills/` — same semantics; not Plan Gate)
-
----
-
-## Quick Route（一行选档）
-
-| 你的意图 | 说法 |
-|----------|------|
-| 改一个小地方 | `Follow ask-plan-code-qa 快档` |
-| 正常开发 | `Follow ask-plan-code-qa 常档，先出开工三行，Pass 时保持对话体` |
-| 上生产 / 高风险 | 常档 + 完成后 `review-gate 验收` |
-| 只验收不改代码 | `review-gate only` |
-
-日常用上一行即可。下文为完整说明；**T0–T8 模板仅用于培训 / onboarding**。
-
----
-
-## Superpowers 插件共存（Cursor / Windows）
-
-本 workflow 与 Cursor 全局 **Superpowers** 插件**不建议同时启用**：
-
-| 冲突点 | 本仓库 | Superpowers |
-|--------|--------|-------------|
-| 流程入口 | `AGENTS.md` + 显式读 `.cursor/skills/` | `using-superpowers` 要求每次对话先 invoke skill |
-| SessionStart | 无 hook | 注入 `using-superpowers` 全文到 `additional_context` |
-| 阶段模型 | 对齐 → 规划 → 执行 → 验收 | brainstorming / TDD / subagent 等独立 skill 链 |
-
-**推荐：** 安装本仓库后，在 Cursor **Settings → Plugins** 中**禁用 Superpowers**（或仅在不使用本 workflow 的项目里启用）。
-
-### Windows：新开对话弹出「选择应用打开 session-start」
-
-若仍启用 Superpowers，Windows 上每次新开 Agent 对话可能弹出系统「打开方式」对话框。原因是插件 `hooks/hooks-cursor.json` 直接调用无扩展名的 bash 脚本 `session-start`，Windows 无法执行。
-
-**一键修复**（安装本仓库后运行一次，然后重启 Cursor）：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/fix-superpowers-windows.ps1
-```
-
-脚本将所有 `~/.cursor/plugins/**/superpowers/**/hooks-cursor.json` 中的
-
-```json
-"command": "./hooks/session-start"
-```
-
-改为
-
-```json
-"command": "./hooks/run-hook.cmd session-start"
-```
-
-**手动修复：** 编辑上述文件，改一行后重启 Cursor。上游 issue：[obra/superpowers#871](https://github.com/obra/superpowers/issues/871)。
-
----
-
-## Workflow Overview
+## Architecture
 
 ```text
-对齐 Ask → Ask Gate → 规划 Inspect → Semantic Scan (if risk) → Plan → Plan Gate → 执行 Code → 验收 Self-QA [→ Review Gate when high-risk]
+Natural-language request
+        ↓
+agent-quality-loop
+  ├─ align/evidence
+  ├─ execute → ask-plan-code-qa adapter → BUILT receipt
+  ├─ accept  → review-gate adapter → independent verdict
+  └─ release → read-only preflight → separately authorized action
 ```
 
-Four stages: **对齐 Align → 规划 Plan → 执行 Execute → 验收 Review**.
+`agent-quality-loop` owns the goal, scope, evidence hierarchy, assurance, lifecycle, and authority. Adapters consume that contract and return bounded receipts; they do not create a second workflow.
 
-**Core principle:** Align one **Unified Goal** with the user before building — a wrong goal costs more than any bug. Gates must exist, but stay **concise by default**; expand only on risk, ambiguity, failure, or high impact. Resolve your own doubts (穷尽求解) and escalate only genuine, self-verified blockers. Independent **Review Gate** is not required every time — use it for important / high-risk tasks.
+## Three Independent Axes
 
-**Semantic Invariant Guardrail:** for complex analysis, extraction, classification, documentation, or code tasks where source labels may not equal the user's business/product concepts, define 3–7 compact **Must-Hold Checks** before final Plan. Checks protect meaning, scope, hierarchy, exclusivity, count integrity, missing data, or evidence binding. Skip this silently when there is no real semantic risk.
+| Axis | Values | Question answered |
+|---|---|---|
+| Intent | align / diagnose / implement / accept / release / resume | What outcome is requested? |
+| Assurance | fast / standard / formal | How much evidence is proportionate? |
+| Authority | read / local write / explicit external action | What side effects are allowed now? |
 
-**Ask Gate / Plan Gate are lightweight gates — not long review reports.**  
-Default to concise output; expand only on **Fail**, **Revise**, **Blocked**, or material **Risk**.
+Formal assurance never raises authority. Credentials being available never grant permission.
 
-| Phase | Stage | Purpose |
-|-------|-------|---------|
-| **Ask** | 对齐 | Reconstruct intent; co-build & confirm one Unified Goal; no code changes |
-| **Ask Gate** | 对齐 | Goal aligned? Can we proceed to inspect/plan? |
-| **Read-only Inspect** | 规划 | Gather facts from repo before Plan |
-| **Semantic Scan** | 规划 | If concept mapping can change the conclusion, define minimal Must-Hold Checks |
-| **Plan** | 规划 | Approach + path + execution boundary + acceptance & QA standards |
-| **Plan Gate** | 规划 | Can we enter Code? |
-| **Code** | 执行 | Goal-aware, minimal, root-cause edits; no half-product |
-| **Implementation Self-QA** | 验收 | Self-report verification against the original goal |
-
-**Review Gate** (separate skill): user asks to **review / 验收 / inspect** completed work, diffs, or existing QA reports — or **High-Risk Full Mode** after Self-QA.
-
----
-
-## Risk-Based Usage Modes（快 / 常 / 慎）
-
-Three dials aligned with how developers actually work. Not every task needs the full long form.
-
-| Mode | 档 | Use When | Required Flow |
-|------|-----|----------|---------------|
-| **Compact / 快档** | 快 | single-file + single-line + no contract change | Compact Ask → Code → Self-QA (对话体) |
-| **Standard / 常档** | 常 | normal implement / fix / refactor / debug | Internal Ask → Inspect → Semantic Scan (if risk) → Plan → gates; **user sees 思路体 on Pass** |
-| **High-Risk / 慎档** | 慎 | multi-file, unclear root cause, contract change, production / data / security / deploy | 常档 + independent **review-gate** when user asks |
-
-**Gate conduct (all non-trivial modes):**
-
-> Ask Gate and Plan Gate are mandatory for non-trivial tasks, but concise by default. Expand them only when there is risk, ambiguity, failure, or high impact.
-
-> Ask Gate 和 Plan Gate 必须存在，但默认应简洁；只有出现风险、歧义、失败或高影响变更时才展开。
-
-| Mode | Ask Gate | Read-only Inspect | Plan Gate | Review Gate |
-|------|----------|-------------------|-----------|-------------|
-| 快 | Optional (brief) | Skip if eligibility confirmed | Skip | No |
-| 常 | Yes (internal; prose on Pass) | Yes | Yes (internal; prose on Pass) | Only if user asks or residual risk |
-| 慎 | Yes | Yes | Yes | **Yes** when user asks to 验收 |
-
----
-
-## Overengineering Guard
-
-The workflow is a **reliability mechanism**, not a paperwork generator.
-
-1. Do not expand every gate into a long review report.
-2. If Gate status is **Pass**, keep it short.
-3. If the task qualifies for **Compact Mode**, do not force the full workflow.
-4. Do not run independent **Review Gate** for every tiny task.
-5. Use independent **Review Gate** for high-risk, multi-file, unclear, or user-facing changes.
-6. Do not add CI/hooks/scripts for workflow enforcement until repeated real failures justify them.
-7. Prefer real task feedback and `lessons.md` updates over speculative rule expansion.
-
----
-
-### 开工三行 (Opening Three Lines)
-
-Required opening artifact on **常/慎**. **快档** and pure read-only Q&A are exempt. The three lines are an **artifact, not a question** — emit them and keep working in the same turn; never stop for confirmation. Canonical home: `00-agent-constitution.mdc` §开工三行; full procedure: `ask-plan-code-qa/SKILL.md`.
+## Lifecycle
 
 ```text
-目标：「<引用用户原话>」→ <我的读法>
-边界：改 <清单> ｜ 不动 <清单>
-最可能误解：<我这一轮方差最大的推断>
+RAW → ALIGNED → EVIDENCED → BUILT → ACCEPTED
+                                      ↓
+                               RELEASE_READY
+                                      ↓
+                                  DEPLOYED
+                                      ↓
+                           PRODUCTION_VERIFIED
 ```
 
-Optional 4th line for numeric / economic / multi-language / inferential tasks:
+- Diagnosis may end at `EVIDENCED`.
+- Implementation self-QA ends at `BUILT`.
+- Formal acceptance requires a fresh/different-role reviewer reading raw evidence first.
+- `RELEASE_READY` is not deployment permission.
+- After deployment, active release authority is cleared; only historical evidence remains.
+
+## User Experience
+
+The default output is plain language:
+
+1. Result or current blocker.
+2. Scope changed and preserved surfaces.
+3. Decision-changing evidence.
+4. Required checks not run.
+5. Smallest next action.
+
+Internal phase/envelope details appear only for blockers, handoffs, resume, release, audit, or an explicit request.
+
+Ask at most two questions, and only when the answer changes the outcome or authority and cannot be discovered safely from context.
+
+## Common Requests
+
+| User says | Expected route |
+|---|---|
+| `修复这个本地问题，不部署` | standard local execute; ask-plan embedded; stop at BUILT |
+| `只诊断根因，不改文件` | read-only evidence; may end at EVIDENCED |
+| `修复并独立正式验收，不发布` | safe local full; execute then independent accept; maximum ACCEPTED |
+| `独立验收这个改动，不修复` | read-only accept; review-gate embedded |
+| `只检查是否可发布，先别发布` | read-only release preflight |
+| `full：修复、验收并直接发布` | explain full cap; no publish; produce separate release handoff |
+| `停，缩小范围并撤销发布权限` | stop new actions; invalidate external authority; rebuild alignment |
+| `继续上次任务` | locate/validate envelope; incomplete reconstruction remains read-only |
+
+## Semantic Safety
+
+Words such as “删除、去掉、上线、完成、当前、正式” are ambiguous. Choose the narrowest evidenced change class:
+
+- `display_only`: presentation changes; preserve data/capability.
+- `data`: stored values/schema; do not imply UI/capability removal.
+- `capability`: behavior/availability.
+- `rollout/release`: audience exposure or external publication.
+
+Example: “remove the overview marker but keep it in detail” means display-only unless evidence proves otherwise.
+
+## Evidence Discipline
+
+Separate:
 
 ```text
-交付形态：<我会交出什么，让你能自己复算>
+source/static
+generated artifact/receipt
+simulation/mock/dry-run
+local runtime
+native/device/real environment
+deployment fact
+human release authority
+production verification
 ```
 
-Why these lines work:
+Tests and hashes are supporting evidence, not automatic proof of the user outcome. Required missing evidence is `BLOCKED` or `NOT_RUN`, never silently ignored.
 
-- **Line 1 quotes the user verbatim** — completion preserves information and makes drift detectable; rewriting replaces information and hides drift.
-- **Line 2 is a do-not-touch list**, not "avoid overreach" — decidable versus wishful.
-- **Line 3 is the highest-value line** — the payoff is the user's 3-second veto, not better AI introspection.
+## External Actions
 
-**Goal-met lexical gate (why this one runs):** The three lines are not enforced by exhortation; they are enforced by a lexical gate on the goal-met verdict. On 常/慎, the `Goal Met?` verdict in Implementation Self-QA — and in `review-gate` acceptance — must quote the 目标 line **verbatim**; without it you may not write "goal met" / "达成" / "meets the goal" or equivalent, exactly as you may not write "fixed/done" without Passing Evidence (快档: the one-line restatement is the citable goal). That makes the three lines an unskippable **input** to a mandatory **deliverable** — the difference between mechanisms that survived field measurement and those that recorded zero. No waiting: the bind is after code, at Self-QA time. Canonical wording: `00-agent-constitution.mdc` §开工三行.
+Release preflight is read-only. An external action requires a new current-turn request naming:
 
-**Stop-loss:** ~10 consecutive tasks with zero user corrections = failure signal (rubber stamp) → shorten or remove, do not strengthen.
+- exact environment/account/project;
+- operation and targets;
+- expected effects;
+- authorizing principal/role;
+- rollback procedure;
+- manual-check status;
+- expiry/drift conditions;
+- every reachable side-effect path.
 
----
+Inspect dry-run implementation path by path. A flag is not proof that initialization, deploy, publish, or remote-call paths are disabled.
 
-## Ask（对齐 · Intent & Goal Alignment）
+## Adapter Boundaries
 
-Requirements understanding only. **Do not modify code.** On **常/慎**, the default required form is **开工三行** (above) — emit it and continue in the same turn. The 7-section written Ask below is the **expanded form** for genuine ambiguity, 慎 dial, or when the user explicitly asks for a written Ask. Act like a product manager: reconstruct the real intent and propose **one Unified Goal**.
+### ask-plan-code-qa
 
-```markdown
-## Ask
-### Real Need (intent / why)
-### Unified Goal (proposed for confirmation)
-### Known Facts
-### Assumptions
-### Open Doubts (self-resolved vs remaining genuine blockers)
-### Definition of Done (high-level acceptance)
-### Blocking Questions (genuine only)
-```
+- Standalone only when explicitly invoked.
+- Embedded by agent-quality-loop for code implementation.
+- Reuses parent alignment; no duplicate opening/template.
+- Returns changed artifacts, checks, gaps, risks, and `result_phase: BUILT`.
+- Never grants acceptance or release.
 
-- Consult `.ai/knowledge/collaboration-profile.md` (if present); apply the user's known preferences (output density, question threshold, risk tolerance, quality bar, decision habits) by default.
-- Reconstruct intent; propose the Unified Goal; **no Plan until the goal is aligned** — on 常/慎, 开工三行 satisfies alignment without a user reply (快档 / trivial → one-line restatement).
-- Expose assumptions; do not silently pick among ambiguous requirements.
-- Challenge flawed user approaches with evidence.
-- Resolve your own doubts first; ask **genuine blocking** questions only — not reflexive ones (see Goal Handshake three states in the skill).
+### review-gate
 
----
+- Standalone only when explicitly invoked.
+- Embedded by agent-quality-loop for independent acceptance.
+- Read-only; reports Review Scope, evidence-backed findings, Verdict, and What Was Checked.
+- Does not repair reviewed work or duplicate the parent's lifecycle summary.
 
-## Ask Gate
+## Maintenance
 
-Immediately after Ask. **Lightweight gate — not a full review.**
+1. Edit `.cursor/skills/` only.
+2. Sync to `.agents/skills/`.
+3. Run structural validators.
+4. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
+5. Obtain an independent review before declaring formal acceptance.
 
-```markdown
-## Ask Gate
-
-### Status
-Pass | Pass with Risk | Revise | Blocked
-
-### Goal Alignment
-<The Unified Goal — confirmed, or stated for confirmation>
-
-### Key Risks
-<Only risks affecting the next phase>
-
-### Genuine Blockers
-<Self-verified items that truly need the user — none if resolved>
-
-### Decision
-Proceed to Read-only Inspect | Revise Ask | Ask User
-```
-
-| Status | Action |
-|--------|--------|
-| **Pass** | Goal aligned; stay brief; proceed to Read-only Inspect |
-| **Pass with Risk** | State how risk will be handled in Inspect or Plan |
-| **Revise** | Goal not yet formed — fix Ask first, **no Plan** |
-| **Blocked** | Genuine blocker — ask user, **no Plan** (not a reflexive ask) |
-
----
-
-## Read-only Inspect
-
-After Ask Gate **Pass** or **Pass with Risk**. Required for **code tasks** before Plan.
-
-**Allowed:** read files, callers, tests, config, docs; grep/search references; git diff; read `.ai/knowledge/project-context.md`.
-
-**Forbidden:** modify/create/delete files; change deps; deploy; migrate data; destructive commands; write business code.
-
-```markdown
-## Read-only Inspect Summary
-
-### Files Read
-### References Searched
-### Relevant Existing Patterns
-### Not Verified
-```
-
-- Plan must cite **Inspect facts**; unverified items → Assumptions or Not Verified in Plan.
-- Pure concept / doc / discussion tasks may skip Inspect — **state why**.
-
----
-
-## Plan（规划）
-
-After Read-only Inspect (or documented skip). First **shed any existing perspective bias** and stand in a real engineer / professional viewpoint.
-
-```markdown
-## Plan
-### Goal (restate the confirmed Unified Goal)
-### Context
-### Assumptions
-### Approach & Path (approach + ordered iteration steps)
-### Execution Boundary (in-scope · out-of-scope/non-goals · do-not-touch · hard limits)
-### Must-Hold Checks (semantic risk only)
-### Files to Modify
-### Cross-file Reference Checks
-### Impact Scope
-### Acceptance Standard (how we confirm the goal is met)
-### QA Standard (verification methods + quality bar)
-### Pause Conditions
-```
-
-- Each step needs an **observable verification** method.
-- If semantic risk exists, include 3–7 Must-Hold Checks with simple verification paths; if none exists, do not invent them.
-- Root-cause first; minimal precise change; no unrelated refactors, useless files, or over-engineering (奥卡姆/Occam).
-- Contract/cross-file changes → list grep/search checks.
-- The plan itself carries **no unresolved doubt** (穷尽求解).
-
----
-
-## Plan Gate
-
-Immediately after Plan. **Code entry gate — not Review Gate.**
-
-```markdown
-## Plan Gate
-
-### Status
-Pass | Pass with Risk | Revise | Blocked
-
-### Goal-Alignment Check (plan serves the confirmed goal)
-### Root-Cause Check
-### Boundary / Scope Check
-### Semantic Boundary Check (if risk)
-### Cross-file Check
-### Acceptance & QA Check
-### Doubt Check (no self-resolvable doubts left; only genuine blockers escalated)
-
-### Required Revisions
-<Only when Revise or Blocked>
-
-### Decision
-Proceed to Code | Revise Plan | Ask User
-```
-
-| Status | Action |
-|--------|--------|
-| **Pass** | Stay brief; may enter Code |
-| **Pass with Risk** | State how risk is handled in Code or Self-QA |
-| **Revise** | Fix Plan — **no Code** |
-| **Blocked** | Ask user — **no Code** |
-
-**Semantic Boundary Check:** if semantic risk exists, Must-Hold Checks must protect the user-confirmed meaning; if no semantic risk exists, do not force extra checks.
-
-**Plan Gate not Pass / Pass with Risk → do not enter Code.**
-
----
-
-## Code
-
-Enter only when:
-
-- Ask Gate = **Pass** or **Pass with Risk**
-- Plan Gate = **Pass** or **Pass with Risk**
-- No unresolved **blocking** questions
-- No unconfirmed destructive / production / secrets / payment / data-deletion ops
-
-Rules: read before edit; fix root cause; minimal diff; update references/tests/types as needed; stop when goal met.
-
----
-
-## Implementation Self-QA
-
-After Code. **Not user acceptance** — use **review-gate** for 验收.
-
-```markdown
-## Implementation Self-QA
-
-### Summary
-<No fixed/done/passing/verified/已完成/已修复 without Passing Evidence>
-
-### Goal Met? (vs Unified Goal + Acceptance Standard: met / deviation & why)
-### Changed Files
-### Verification Performed
-### Must-Hold Checks (semantic risk only)
-### Passing Evidence
-### Failing Evidence
-### Not Verified
-### Remaining Risks
-### Next Step
-```
-
-- Judge **against the original goal** — keep it simple, low-noise; do not over-test for ceremony. On 常/慎, the `Goal Met?` verdict must quote the 目标 line from 开工三行 **verbatim** (快档: its one-line restatement); without that cite, "goal met" / "达成" / "meets the goal" is prohibited — sibling lexical gate to Passing Evidence.
-- Report Must-Hold Checks only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
-- No evidence → no success claims. No 目标 cite on 常/慎 → no goal-met wording.
-- Skipped checks → **Not Verified**.
-- QA commands from `.ai/knowledge/project-context.md` when available.
-
----
-
-## Review Gate Boundary
-
-| Artifact | Role |
-|----------|------|
-| **Ask Gate** | After Ask; proceed to Inspect? |
-| **Plan Gate** | Before Code; plan executable? |
-| **Implementation Self-QA** | Implementer reports own checks |
-| **Review Gate** | User-driven acceptance / review of existing artifacts |
-
-User says 「帮我验收」, 「review this diff」, 「检查 QA 是否可信」, 「有没有幻觉」, 「检查遗漏」 → **`review-gate`**, not this workflow.
-
-On 常/慎, acceptance judges against the 目标 line of 开工三行 (expanded written Ask's `Unified Goal`, or 快档's one-line restatement otherwise); verifies the 边界 `不动` list was respected; and checks whether the 最可能误解 inference was resolved or remains open.
-
----
-
-## Compact Mode
-
-**Only** when **all** true: single-file, single-line, no contract change.
-
-```markdown
-## Compact Ask
-
-### Goal
-### Assumptions
-### Compact Eligibility
-- single-file: yes/no
-- single-line: yes/no
-- no contract change: yes/no
-
-### QA
-<Full Implementation Self-QA after Code>
-```
-
-If **any** eligibility = **no** → full flow:
-
-```text
-Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate → Code → Implementation Self-QA
-```
-
-Compact **never** skips: read-before-edit, Self-QA, Not Verified.
-
-**Compact forbidden for:** API/type/path/component/config/schema/test changes, cross-file or user-visible behavior, multi-file/multi-line, unknown root cause.
-
----
-
-## Cursor Usage
-
-1. Read `AGENTS.md` and `.cursor/rules/00-agent-constitution.mdc`.
-2. For implement/fix tasks, **explicitly read** `.cursor/rules/10-ask-plan-code-qa.mdc` + `.cursor/skills/ask-plan-code-qa/SKILL.md` (description-triggered rules may not auto-load).
-3. Follow gate flow; keep gates concise on Pass.
-4. For review/acceptance → `review-gate` skill + rule `20`.
-5. After editing skills, run `./scripts/sync-skills.sh` before commit.
-
----
-
-## Codex Usage
-
-1. Read `AGENTS.md` and this guide (`docs/guide.md`).
-2. Use skills from **`.agents/skills/<name>/SKILL.md`** — do not default to `.cursor/skills/`.
-3. Optional: read matching `.cursor/rules/*.mdc` for trigger contract summary (rules are not mirrored).
-4. Same gate semantics as Cursor; after skill changes in `.cursor/skills/`, maintainers run `./scripts/sync-skills.sh`.
-
----
-
-## Phase Prompt Templates（培训 / onboarding）
-
-Copy-paste prompts for learning the full workflow. **Daily use: see Quick Route above.** Pick 快 / 常 / 慎 before using.
-
-### T0 — 任务分级
-
-```text
-请先不要修改代码。
-
-请根据 AGENTS.md 和 ask-plan-code-qa 判断这个任务应该使用哪种执行模式：
-
-1. 快档 (Compact)
-2. 常档 (Standard)
-3. 慎档 (High-Risk)
-
-判断标准：
-- 是否 single-file
-- 是否 single-line
-- 是否 no contract change
-- 是否涉及 API / 类型 / 路径 / 配置 / schema / 测试 / 跨文件行为
-- 是否需要读多个文件
-- 是否根因不明确
-- 是否有生产 / 数据 / 密钥 / 部署风险
-
-请输出：
-- 推荐模式
-- 理由
-- 是否需要 Ask Gate
-- 是否需要 Read-only Inspect
-- 是否需要 Plan Gate
-- 是否需要独立 review-gate
-```
-
-### T1 — 启动任务：Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
-
-```text
-使用 ask-plan-code-qa。
-
-请先读取 AGENTS.md、对应 rule 和 skill。
-先不要修改代码。
-
-请按以下流程执行：
-
-Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
-
-任务是：
-【在这里写任务】
-
-要求：
-
-1. Ask 阶段（对齐）：
-   - 首轮回复开头先写出开工三行（常/慎必做；快档可豁免）：目标 / 边界 / 最可能误解（必要时加交付形态）；写出后同轮继续推进，不因确认而停
-   - 还原真实意图，提出待确认的统一目标（Unified Goal）
-   - 列出 Known Facts
-   - 暴露 Assumptions
-   - 列出 Open Doubts（已自解 / 仅剩真实阻塞）
-   - 给出 Definition of Done
-   - 先自行穷尽求解，只提出真实的 blocking questions
-
-2. Ask Gate：
-   - Status 使用 Pass / Pass with Risk / Revise / Blocked
-   - 如果 Pass，保持简洁
-   - 如果有风险，说明风险会在 Inspect 或 Plan 中如何处理
-   - 如果 Blocked，不得进入 Plan
-
-3. Read-only Inspect：
-   - 只读文件，不修改文件
-   - 读取目标文件、关联文件、调用方、测试、配置、文档
-   - 必要时 grep / search 引用
-   - 输出 Files Read、References Searched、Relevant Existing Patterns、Not Verified
-
-4. Plan：
-   - 必须基于 Read-only Inspect 的事实
-   - 包含 Goal、Context、Assumptions、Approach & Path、Execution Boundary、Must-Hold Checks（仅语义风险任务）、Files to Modify、Cross-file Reference Checks、Impact Scope、Acceptance Standard、QA Standard、Pause Conditions
-   - 如存在语义风险，加入 3–7 条 Must-Hold Checks；如不存在，不要硬凑
-   - 每个 Execution Step 必须有可观测验证方法
-   - 优先根因修复
-   - 最小精准变更
-   - 不做无关重构
-
-5. Plan Gate：
-   - Status 使用 Pass / Pass with Risk / Revise / Blocked
-   - 检查 Root-Cause、Scope、Semantic Boundary（如有风险）、Context、Cross-file、QA
-   - 如果 Plan Gate 未通过，不得进入 Code
-
-不要修改代码。
-不要声称已修复。
-```
-
-### T2 — 执行已通过 Plan
-
-```text
-使用 ask-plan-code-qa。
-
-按刚才已经通过 Plan Gate 的 Plan 执行。
-
-执行要求：
-
-1. 进入 Code 前，再确认：
-   - Ask Gate = Pass 或 Pass with Risk
-   - Plan Gate = Pass 或 Pass with Risk
-   - 没有 unresolved blocking questions
-   - 没有未确认的破坏性 / 生产 / 密钥 / 支付 / 删除数据操作
-
-2. 修改前：
-   - 先读目标文件
-   - 读关联文件、调用方、测试、配置
-   - 涉及 API、类型、路径、组件、配置、schema、测试、跨文件行为时，必须 grep / search 引用方
-
-3. 修改时：
-   - 修根因，不做下游补丁
-   - 做最小精准变更
-   - 不做无关重构
-   - 不创建无用文件
-   - 更新必要引用、测试、文档、类型
-   - 目标达成即停
-
-4. 完成后输出 Implementation Self-QA：
-   - Summary
-   - Goal Met?（对照统一目标 + 验收标准）
-   - Changed Files
-   - Verification Performed
-   - Must-Hold Checks（仅语义风险任务）
-   - Passing Evidence
-   - Failing Evidence
-   - Not Verified
-   - Remaining Risks
-   - Next Step
-
-硬约束：
-如果没有 Passing Evidence，不得使用 fixed / done / passing / verified / 已完成 / 已修复 等成功措辞。
-常/慎下 Goal Met? 裁决必须逐字引用开工三行的「目标」行（快档：一句复述）；没有该引用则不得写「goal met」/「达成」/「meets the goal」——与 Passing Evidence 门同形。
-```
-
-### T3 — 独立 Review Gate
-
-```text
-使用 review-gate。
-
-请先读取 AGENTS.md、对应 rule 和 skill。
-不要修改代码。
-
-请审查：
-【粘贴 Plan / diff 摘要 / Implementation Self-QA / 任务描述】
-
-只运行与审查对象相关的 review types（不必五段全出）。重点检查：
-
-- 假设是否暴露；是否把 Not Verified 当事实
-- 是否读够目标文件、调用方、测试、配置
-- 根因、范围、跨文件引用（若审查代码/plan）
-- Passing Evidence 是否支撑结论；Not Verified 是否诚实
-
-请输出：
-- Review Scope（含启用的 review types）
-- 仅相关 review 段的 Findings（问题/证据/风险/修正建议）
-- Verdict: Proceed | Proceed with fixes | Block
-- What Was Checked
-
-不要泛泛而谈。每个问题必须给出证据。
-```
-
-### T4 — Compact Mode
-
-```text
-使用 ask-plan-code-qa。
-
-请先判断是否可以使用 Compact Mode。
-不要直接修改。
-
-Compact Mode 只有同时满足以下条件才允许：
-
-- single-file
-- single-line
-- no contract change
-
-请输出：
-
-## Compact Ask
-
-### Goal
-
-### Assumptions
-
-### Compact Eligibility
-- single-file: yes/no
-- single-line: yes/no
-- no contract change: yes/no
-
-### QA
-
-如果任一条件为 no，请升级为完整流程：
-Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
-
-任务是：
-【在这里写任务】
-```
-
-### T5 — 仅 Plan 审查
-
-```text
-使用 review-gate。
-
-不要修改代码。
-
-请只审查下面这份 Plan 是否可以进入 Code。
-
-Plan：
-【粘贴 Plan】
-
-检查重点：
-- Goal 是否明确、是否与已确认的统一目标一致
-- Assumptions 是否完整
-- Execution Boundary 是否清晰（in/out-of-scope、不可触碰、硬限制）
-- 是否解决根因
-- 是否最小精准变更、无过度设计
-- Files to Modify 是否足够
-- Cross-file Reference Checks 是否完整
-- Impact Scope 是否合理
-- Acceptance Standard 与 QA Standard 是否可观测
-- Pause Conditions 是否完整
-
-请输出：
-- Pass / Fail / Pass with Risk / Proceed with Fixes
-- Evidence
-- Required Revisions
-- Not Verified
-```
-
-### T6 — 仅 QA 审查
-
-```text
-使用 review-gate。
-
-不要修改代码。
-
-请只审查下面这份 Implementation Self-QA 是否可信。
-
-Implementation Self-QA：
-【粘贴 QA 结果】
-
-检查重点：
-- Summary 是否有无证据成功声明
-- Goal Met? 是否对照最初统一目标 + 验收标准（达成 / 偏差及原因）
-- Changed Files 是否完整
-- Verification Performed 是否真实可追溯
-- Passing Evidence 是否支撑结论
-- Failing Evidence 是否被隐藏
-- Not Verified 是否明确
-- Remaining Risks 是否充分（含半成品 / 过度设计）
-- 是否需要补充测试、lint、typecheck、手工验证
-
-请输出：
-- QA Verdict: Pass / Pass with Risk / Fail
-- Unsupported Claims
-- Missing Evidence
-- Required Verification
-- Not Verified
-```
-
-### T7 — 经验沉淀建议
-
-```text
-请不要直接写入 lessons.md。
-
-请根据本次任务结果判断是否有值得沉淀的经验。
-
-只允许建议写入满足以下条件的 lesson：
-- 已被验证
-- 后续会复用
-- 不是聊天废话
-- 不重复项目已有文档
-- 不包含敏感信息
-- 不包含泄露或专有 system prompt 原文
-
-请输出：
-- 是否建议写入 lessons.md
-- 建议条目
-- 证据来源
-- 为什么可复用
-- 是否需要用户确认
-
-未经我确认，不要修改 lessons.md。
-```
-
-### T8 — Codex 用法
-
-```text
-$ask-plan-code-qa
-
-请读取 AGENTS.md 和 .agents/skills/ask-plan-code-qa/SKILL.md。
-先不要修改代码。
-
-请按以下流程输出：
-Ask → Ask Gate → Read-only Inspect → Semantic Scan (if risk) → Plan → Plan Gate
-
-任务是：
-【在这里写任务】
-
-要求：
-- Plan 前必须做 Read-only Inspect
-- Plan Gate 未通过不得进入 Code
-- 不要声称已修复
-```
-
-Codex review:
-
-```text
-$review-gate
-
-请读取 AGENTS.md 和 .agents/skills/review-gate/SKILL.md。
-不要修改文件。
-
-请审查当前 diff / Plan / QA 结果。
-重点检查假设、上下文、根因、跨文件引用、QA 证据和 Not Verified。
-```
-
----
-
-## Maintenance Rules
-
-- **Skill (Cursor):** `.cursor/skills/<name>/SKILL.md` — full procedure for Cursor; **edit here only**.
-- **Skill (Codex):** `.agents/skills/<name>/SKILL.md` — mirror of Cursor skill; run **`./scripts/sync-skills.sh`** after every skill change — **never edit `.agents/skills/` directly**.
-- **Rule** (`.cursor/rules/*.mdc`): triggers + output contract summary only.
-- Keep `.cursor/skills/` and `.agents/skills/` **semantically identical**.
-- Do not copy leaked or proprietary system prompts.
-
----
-
-## Minimum Acceptance Criteria
-
-- [ ] Four-stage model (对齐 / 规划 / 执行 / 验收) documented in skill + this guide
-- [ ] Goal-first: on 常/慎, 开工三行 emitted at reply open (satisfies alignment); 快档 may use a one-line goal restatement; Ask Gate carries Goal Alignment
-- [ ] Plan carries Execution Boundary + Acceptance Standard + QA Standard
-- [ ] Semantic-risk tasks carry compact Must-Hold Checks and preserve user-confirmed business/product meaning
-- [ ] Doubt Resolution (穷尽求解): escalate only genuine, self-verified blockers
-- [ ] Collaboration profile (L2): read at 对齐 Align; apply defaults; propose-on-confirm population
-- [ ] Result-oriented: no half-product, no over-engineering (Occam); Self-QA judges against the original goal
-- [ ] Ask Gate + Plan Gate with Pass / Pass with Risk / Revise / Blocked
-- [ ] Read-only Inspect forbids file modification
-- [ ] Plan Gate failure blocks Code
-- [ ] Compact Eligibility triple-check present
-- [ ] Self-QA: no success wording without Passing Evidence
-- [ ] Self-QA / review-gate: goal-met verdict quotes the 目标 line (快档: its one-line restatement)
-- [ ] Review Gate documented as separate from Plan Gate
-- [ ] Risk-Based Usage Modes and Overengineering Guard documented
-- [ ] Phase Prompt Templates T0–T8 available in this guide
+See [AGENTS.md](../AGENTS.md) for repository-level invariants and [README.md](../README.md) for installation.

@@ -1,86 +1,20 @@
 ---
 description: >-
-  Use when the user asks to review, inspect, audit, or validate requirements,
-  plans, code, or QA results; or for acceptance QA, hallucination check, risk
-  check, or omission check — including plan review, code review, and QA review
-  of existing reports. Use for acceptance review of completed work or existing
-  QA results. Prefer this rule over ask-plan-code-qa when the primary intent is
-  check/inspect/accept/review, not implement. Requires evidence-backed findings —
-  no vague "looks fine" conclusions.
+  Compatibility rule for review-gate. Apply only when the user explicitly
+  invokes review-gate or agent-quality-loop selects it as the embedded read-only
+  independent acceptance adapter. Do not use it for implementation self-QA.
 alwaysApply: false
 ---
 
-# Review Gate
+# Independent Review Adapter
 
-This rule defines trigger behavior and output contract only. Detailed workflow lives in the matching `.cursor/skills/review-gate/SKILL.md`.
+Full procedure: `.cursor/skills/review-gate/SKILL.md`.
 
-When the user's primary intent is **检查 / 审查 / 验收 / review / audit / validate** (not implement or fix), use this rule — not `10-ask-plan-code-qa.mdc`.
+- Review is read-only; do not repair, deploy, publish, or raise authority.
+- Read the original goal/contract, frozen artifacts, diff, and raw evidence before the implementer's narrative.
+- Formal acceptance requires a fresh context or different role.
+- Run only relevant review types; every finding includes problem, evidence, risk, and correction.
+- Output Review Scope, relevant Findings, `Proceed | Proceed with fixes | Block`, and What Was Checked.
+- Return the report to `agent-quality-loop`; the parent maps lifecycle dimensions and emits the combined user-facing summary.
 
-**Scope:** **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports** produced by others or earlier turns. **Not** the agent's own post-implement self-QA step — that belongs to rule `10` unless the user explicitly asks you to **review / 验收** that report.
-
-Run the review types **relevant** to the artifact (requirement, plan, code, or QA report). Omit unused review-type sections in output. Each finding must cite **evidence** from the repo or stated facts — not memory alone.
-
-## Review Types
-
-### 1. Assumption Review
-
-Check whether unstated assumptions could invalidate the work.
-
-**Per finding output:**
-- **问题** — What assumption is risky or unstated?
-- **证据** — Quote, file path, or missing proof.
-- **风险** — Impact if wrong.
-- **修正建议** — How to validate or correct.
-
-### 2. Context Review
-
-Check whether the agent understood the real environment (stack, conventions, constraints).
-
-**Per finding output:** 问题 / 证据 / 风险 / 修正建议
-
-### 3. Plan Review
-
-Check plan completeness, ordering, scope, and testability.
-
-**Per finding output:** 问题 / 证据 / 风险 / 修正建议
-
-Verify: Goal, non-goals, files list, impact scope, risks, acceptance criteria, QA plan, pause conditions.
-
-### 4. Code Review
-
-Check correctness, scope, references, root-cause fix, and over-engineering.
-
-**Per finding output:** 问题 / 证据 / 风险 / 修正建议
-
-Verify: cross-file references updated, no unrelated changes, matches project patterns.
-
-### 5. QA Review
-
-Check whether "done" claims are supported; flag false confidence.
-
-**Per finding output:** 问题 / 证据 / 风险 / 修正建议
-
-Verify: Passing Evidence exists, Not Verified is honest, failures not hidden.
-
-### 6. Goal-Achievement Review（目标 + 协作达成复核）
-
-Check the result against the goal of record — 常/慎: **目标** line of 开工三行 (`00-agent-constitution.mdc` §开工三行); else expanded Ask's **Unified Goal** or 快档's one-line restatement — not just the diff.
-
-**Per finding output:** 问题 / 证据 / 风险 / 修正建议
-
-Verify: meets goal + Acceptance Standard, no deviation from boundary, no half-product / scope creep / over-engineering (奥卡姆/Occam); **preference drift** (respects collaboration profile); **process bloat** (over-asking, over-planning, mechanical output, formalistic evidence).
-Acceptance verdict must quote that 目标 line verbatim; without it, no "goal met" / "达成" / equivalent.
-Verify the 边界 **不动** list was respected.
-
-## Required Behavior
-
-- If no issues found in a category, state **what was checked** and **what evidence was reviewed** — not only "no problems."
-- Separate **confirmed issues** from **suggestions**.
-- End with a short **verdict**: Proceed / Proceed with fixes / Block until resolved.
-- Output only review-type sections you actually ran — not empty unused headings.
-
-## Must Not
-
-- Give blanket approval without citing reviewed artifacts.
-- Invent file contents or test results.
-- Skip QA Review when the user asks to accept completed work.
+Implementation/fix requests route through `agent-quality-loop`, which may select `ask-plan-code-qa`.
