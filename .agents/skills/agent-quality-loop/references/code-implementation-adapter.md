@@ -13,7 +13,35 @@ Require an `ALIGNED` and `EVIDENCED` parent contract containing:
 
 If any conclusion-changing input is absent or stale, return to the parent lifecycle for read-only reconstruction. Do not create a second goal contract.
 
+## Dispatch Brief
+
+When dispatching a sub-executor (including a zero-context or weaker model), hand off a **Dispatch Brief**. The parent contract remains the single source of truth; the Brief is its executable projection for that leaf—not a second form or dual ritual. Compatible with host orchestration rules (for example user model-routing): if the parent contract already carries the fields below, project them into the Brief rather than re-authoring a parallel checklist.
+
+Minimal field set:
+
+| Field | Purpose |
+|---|---|
+| **goal anchor** | One-sentence outcome the executor must optimize for |
+| **scope allowlist / non-goals** | Exact paths or surfaces allowed; what must not change |
+| **baseline** | Workspace/baseline identity and dirty-state caveat |
+| **must-holds** | Semantic or behavioral invariants that must remain true |
+| **verification commands** | Exact commands/checks the leaf must run, with exit-code evidence |
+| **escalation triggers** | When to stop and report upward (see list below) |
+| **receipt format** | Point at the Output receipt schema; do not duplicate its YAML |
+
+Escalation triggers (generic; stop and report, do not self-dispose):
+
+- Brief is self-contradictory
+- Goal or architecture must change
+- Public contract must change
+- The plan is fundamentally wrong
+- Verification fails and cannot be fixed inside scope
+- Security, payment, or data-migration concerns
+- User product decision required
+
 ## Procedure
+
+When dispatching a sub-executor, use a Dispatch Brief (above).
 
 1. **Inspect** — re-read target files, callers, tests, configuration, and related contracts. Protect unrelated dirty work.
 2. **Plan Gate** — choose the smallest root-cause change. Confirm scope, semantics, cross-file impact, acceptance method, and pause conditions. Only `Pass` or `Pass with Risk` permits editing.

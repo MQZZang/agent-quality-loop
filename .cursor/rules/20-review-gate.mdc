@@ -14,6 +14,7 @@ Full procedure: `.cursor/skills/review-gate/SKILL.md`.
 - Read the original goal/contract, frozen artifacts, diff, and raw evidence before the implementer's narrative.
 - Formal acceptance requires a fresh context or different role.
 - Run only relevant review types; every finding includes problem, evidence, risk, and correction.
+- Experience-type artifacts: run Experience Review; at acceptance, check active `.ai/knowledge/lessons.md` entries for recidivism.
 - Output Review Scope, relevant Findings, `Proceed | Proceed with fixes | Block`, and What Was Checked.
 - Return the report to `agent-quality-loop`; the parent maps lifecycle dimensions and emits the combined user-facing summary.
 

@@ -25,6 +25,8 @@ The bundled adapters have narrow jobs:
 
 This separation prevents duplicate alignment, implementer self-approval, and acceptance being mistaken for release.
 
+Lightweight hooks (details in the skills/`docs/guide.md`): post-ACCEPT RETRO lesson harvest (not a phase); `.ai/knowledge/lessons.md` active retrieve on ALIGN and recidivism check on ACCEPT; final-consumer framing plus experiential consumer probe; self-contained Dispatch Briefs; multi-agent divergence/blind-consumer probes with honest single-agent degradation.
+
 ## Install
 
 Private-repository access is required.

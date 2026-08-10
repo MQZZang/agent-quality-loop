@@ -41,6 +41,7 @@ In either profile, review is read-only. Do not edit, repair, deploy, publish, or
 | Code Review | Correctness, references, minimalism |
 | QA Review | Evidence vs claims |
 | Goal-Achievement Review | Result vs original goal; deviation, half-product, over-engineering; preference & process drift |
+| Experience Review | Cold-consume from the contract's declared perspective; experience breaks, confusion, polish gap — experience-type artifacts only |
 
 Run only the types relevant to the artifact under review.
 
@@ -56,8 +57,9 @@ Run only the types relevant to the artifact under review.
 1. Identify the original goal, scope, acceptance standard, frozen baseline, and applicable review types from the supplied contract and raw artifacts. If any decision-changing input is absent, report it; do not invent it.
 2. Gather requirements, plan, diff, artifacts, commands, and raw QA evidence from source — not memory or the implementer's narrative alone.
 3. When formal acceptance is requested, require a distinct fresh context or role and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
-4. For each finding: 问题 · 证据 · 风险 · 修正建议.
-5. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.
+4. For experience-type artifacts, run Experience Review; at acceptance, check `.ai/knowledge/lessons.md` **active** lessons for recidivism (重犯检测).
+5. For each finding: 问题 · 证据 · 风险 · 修正建议.
+6. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.
 
 ## Assumption Review
 
@@ -104,6 +106,13 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 - Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
 - **Preference drift:** does it respect the user's collaboration profile (output density, question threshold, risk tolerance, quality bar, decision habits)?
 - **Process bloat:** over-asking, over-planning, mechanical/templated output, or evidence that only proves "a command ran" without proving the goal?
+- **Lesson recidivism (重犯检测):** does the work violate any **active** lesson in `.ai/knowledge/lessons.md`?
+
+Output per finding: 问题 · 证据 · 风险 · 修正建议
+
+## Experience Review
+
+Cold-consume the artifact from the **declared perspective** in the contract (not the author's). Report experience breaks, confusion points, and polish/finished-feel gaps. Run only for experience-type artifacts.
 
 Output per finding: 问题 · 证据 · 风险 · 修正建议
 
@@ -176,3 +185,7 @@ QA says "tests pass" but no command output — QA Review flags Failing Evidence 
 ### Boundary / failure
 
 Plan omits rollback for migration — Plan Review cites missing Pause Conditions; verdict Proceed with fixes.
+
+### Experience / lesson recidivism
+
+Experience artifact → Experience Review finds a cold-consume break; or work re-breaks an **active** lesson → Block / Proceed with fixes.

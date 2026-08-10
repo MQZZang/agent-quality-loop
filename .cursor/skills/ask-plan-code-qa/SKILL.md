@@ -203,7 +203,7 @@ Proceed to 规划 (Inspect) | Revise Ask | Ask User
 
 After Ask Gate **Pass** or **Pass with Risk**. Required before Plan for **code tasks**.
 
-**Allowed:** read target/related files, callers, tests, config, docs; grep/search; git diff; `.ai/knowledge/project-context.md`.
+**Allowed:** read target/related files, callers, tests, config, docs; grep/search; git diff; `.ai/knowledge/project-context.md`; `.ai/knowledge/lessons.md`.
 
 **Forbidden:** modify/create/delete files; deps; deploy; data migration; destructive commands; business code.
 
@@ -218,6 +218,7 @@ After Ask Gate **Pass** or **Pass with Risk**. Required before Plan for **code t
 - **Plan must use Inspect facts**; unread areas → Assumptions or Not Verified in Plan.
 - Concept/doc/discussion-only tasks: skip Inspect with stated reason.
 - For semantic-risk tasks, inspect source labels/schema/UI/category evidence enough to decide whether Must-Hold Checks are needed.
+- Retrieve **active** entries in `.ai/knowledge/lessons.md` whose Applies when match the task; inject into Plan Assumptions / Pause Conditions.
 
 ---
 
@@ -326,7 +327,7 @@ After Code. **Not user acceptance** (→ `agent-quality-loop` accept path). Judg
 - Must-Hold Checks appear only when they materially protect the conclusion; otherwise omit or mark no additional semantic invariants needed.
 - Judging a goal without a durable anchor is a claim, not a verdict; use the standalone goal line or embedded parent `first_principles_goal`.
 - Unclear impact → smallest check first; broader checks → Not Verified. **Do not over-test for ceremony** — match verification to risk.
-- Reusable verified lesson → **propose** in Next Step for `.ai/knowledge/lessons.md`; write only if user confirms.
+- Reusable verified lesson → project-level + local_write: write `.ai/knowledge/lessons.md` and disclose the diff in the summary (revocable); global or read-only: output a candidate for confirmation.
 
 ---
 

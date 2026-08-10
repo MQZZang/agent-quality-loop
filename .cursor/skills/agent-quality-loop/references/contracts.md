@@ -45,6 +45,8 @@ pause_conditions: conditions that prohibit the next phase
 
 Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
 
+`target_user_or_system` means the **final consumer of the artifact plus the consumption medium** (e.g. end user in the shipped UI, reader of the published doc, player in the build)—not merely the requester or implementer. For experiential work (narrative, design, UI, games, docs), write `success_observables` and `counterexamples` in that consumer's perceptible terms.
+
 Identifier, request, goal, target, problem, workspace, reconstruction, and expiry fields are non-empty scalar strings; do not serialize one-item arrays in their place. Collection fields are explicitly named as lists in the full envelope.
 
 Keep the three routing axes independent:
@@ -150,6 +152,10 @@ Translate recurring natural-language quality phrases into operations:
 | 避免过度工程 | Run a falsification probe and vertical slice before scaling |
 | 避免半成品 | Use phase-specific exit criteria; never hide required NOT_RUN or BLOCKED items |
 | 玩家/用户视角 | Test decisions and observable behavior, not only internal structure |
+| 写小说 | Compile `target_user_or_system` and observables from the **reader** perspective |
+| 写大纲 | Compile from the **author-as-user** perspective (outline as working tool) |
+| UI/UX | Compile from the **operator/user** interaction perspective |
+| 游戏体验 | Compile from **player + designer** dual perspectives |
 | 正式质量 | Require independent conjunctive acceptance and the necessary real-world evidence |
 
 ## Lifecycle Semantics and Legal Transitions
@@ -353,6 +359,8 @@ reproducibility
 ```
 
 `goal_fidelity`, `semantic_invariants`, `user_observable_result`, and `reproducibility` are always required. Classify every other canonical dimension as `required` or `not_applicable`; the latter needs a task-specific rationale and evidence reference. Missing evidence is `NOT_RUN` or `BLOCKED`, never `not_applicable`.
+
+`user_observable_result`: when the artifact is consumable in its native medium, require a cold-consumption probe from the declared `target_user_or_system` perspective (see [domain-profiles.md](domain-profiles.md) for domain methods). A `PASS` must bind probe process evidence; if a probe is infeasible, use `NOT_RUN` and disclose why. Text self-check must not substitute for cold consumption.
 
 Canonical release-readiness dimensions are:
 

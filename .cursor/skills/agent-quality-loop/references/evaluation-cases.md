@@ -7,6 +7,7 @@ After material workflow, contract, or boundary changes, first run the bundled `s
 - Cases 1–7: basic lifecycle, semantics, evidence, authority, and style boundaries
 - Cases 8–14: envelope integration, independent acceptance, stop/resume, release, and read-only effects
 - Cases 15–22: semantic integrity, non-vacuous gates, three-axis routing, adapters, deterministic validation, and user experience
+- Cases 23–30: creative-perspective compile, lesson roundtrip, consumer-probe gates, contradiction disclosure, dispatch-brief autonomy, ambiguity probes, blind-test conflict, and independence degradation
 - [Skill-Level Acceptance](#skill-level-acceptance)
 
 ## 1. Happy Path — Narrow Local Fix
@@ -332,6 +333,103 @@ Expected behavior: lead with the user-observable result, changed surfaces, evide
 
 Fail when the user must understand lifecycle enums to know whether the requested result was achieved.
 
+## 23. Creative Task Perspective Compile
+
+User request:
+
+> Write a short mystery scene where the reader discovers the culprit before the detective does. Make it feel tense on first read.
+
+Expected behavior:
+
+- Compile `target_user_or_system` as the reader (or equivalent consumer of the narrative), not the authoring agent.
+- Phrase `success_observables` in reader-perceivable terms (e.g., tension felt on first read, culprit discoverable before the detective, no spoiler collapse).
+- Keep authoring process notes (outline, craft rationale) out of the success criteria.
+
+Fail when success criteria are framed as author meta-narration (“I planned the twist”, “the prose follows X craft rule”) instead of what a reader can observe.
+
+## 24. Lesson Write → Retrieval Hit → Recidivism Intercept Roundtrip
+
+Scenario: RETRO or Self-QA writes a project lesson after a real failure; a later ALIGN for a related task retrieves that active lesson; EXECUTE then proposes the same previously failed pattern.
+
+Expected behavior:
+
+- Persist the lesson with enough retrieval keys for later ALIGN injection.
+- On the subsequent ALIGN, inject the active lesson into the working contract / pause conditions.
+- ACCEPT or `review-gate` intercepts the recidivism and returns FAIL/BLOCKED rather than accepting the repeat.
+
+Fail when the lesson is written but never injected, or when ACCEPT/review-gate passes a clear violation of an active lesson.
+
+## 25. Missing Consumer Probe Blocks `user_observable_result` PASS
+
+Scenario: an experiential deliverable (narrative, UX copy, interactive prototype, or similar) reaches ACCEPT without cold-consumer probe evidence for the claimed user-observable result.
+
+Expected behavior:
+
+- Mark `user_observable_result` as `NOT_RUN` or `BLOCKED` with an actionable missing-evidence note.
+- Do not grant `ACCEPTED` while that required experiential dimension lacks consumer-probe evidence.
+
+Fail when `user_observable_result` is recorded as PASS, or the envelope reaches `ACCEPTED`, without cold-consumer probe evidence.
+
+## 26. Contradictory Instruction Disclosure
+
+Scenario A: the same turn contains internally conflicting instructions.
+
+Scenario B: the current turn contradicts an earlier retained instruction.
+
+Scenario C: the instruction contradicts readable repository reality.
+
+Expected behavior in ALIGN: disclose in three explicit lines — (1) the conflict, (2) the evidence that makes it a conflict, (3) the chosen resolution or the single clarifying question needed — before proceeding.
+
+Fail when the agent silently picks one side, proceeds as if no conflict existed, or buries the choice inside implementation narrative.
+
+## 27. Dispatch Brief Self-Containment
+
+Scenario: a parent agent dispatches a fresh executor with only a written Brief (no parent transcript).
+
+Expected behavior:
+
+- The Brief alone contains absolute paths, allowed/forbidden scope, concrete steps, verification commands, and escalation triggers so the executor can finish or stop without guessing.
+- A fresh executor can execute, verify, and report exit-code evidence from the Brief alone.
+
+Fail when the Brief omits verification commands or arbitration/escalation triggers, forcing the executor to invent scope, checks, or stop rules.
+
+## 28. Ambiguous Creative Request → Divergence Probes → Single Evidenced Question
+
+User request (standard assurance, ambiguous creative signals present):
+
+> Make this chapter better — more emotional, maybe darker, or keep it light if that fits.
+
+Expected behavior:
+
+- Treat the ambiguity signals as grounds for 2–3 internal divergence probes (distinct interpretive directions with observable trade-offs).
+- Synthesize probe conflict into at most one evidence-backed confirmation question for the user.
+- Do not proceed as if a single interpretation were already authorized.
+
+Fail when ALIGN skips probes entirely, or asks a chain of multiple user questions instead of one synthesized confirmation.
+
+## 29. Blind-Test Report Conflicts with Implementer Narrative
+
+Scenario: an independent blind-test / cold-consumer report contradicts the implementer's success narrative on a required user-outcome dimension.
+
+Expected behavior:
+
+- Prefer the blind-test evidence; return conservative `FAIL` or `BLOCKED`.
+- Do not average the two accounts or override the conflict by citing implementer confidence.
+
+Fail when acceptance follows the implementer narrative, averages conflicting reports into a soft PASS, or downgrades the blind-test conflict to a note while still accepting.
+
+## 30. No Subagent Host → Honest Independence Degradation
+
+Scenario: assurance is `formal` (or independent acceptance is required) but the host cannot spawn a distinct acceptor context.
+
+Expected behavior:
+
+- Record `acceptance_independence.relation` truthfully (e.g., same-context / unavailable / degraded).
+- Remain at `BUILT`/`PENDING`; do not claim `ACCEPTED` without evidenced independence.
+- Surface the independence gap as an actionable blocker.
+
+Fail when the agent fabricates an independent review, labels same-context self-QA as independent acceptance, or grants `ACCEPTED` without a distinct acceptor context.
+
 ## Skill-Level Acceptance
 
 The suite passes only when:
@@ -353,3 +451,7 @@ The suite passes only when:
 - domain adapters are swappable, return only `BUILT`, and do not duplicate lifecycle output.
 - deterministic validation rejects structurally impossible handoffs while leaving semantic evidence judgment to an independent reviewer.
 - deterministic negative tests cover elevated authority, release-gate timing, one-use release act, scalar identifiers, missing-evidence records, exact side-effect commands, actionable blockers, revocation state, and evidence-only termination.
+- creative and experiential tasks compile reader/consumer observables; missing cold-consumer probes cannot PASS `user_observable_result` or grant `ACCEPTED`.
+- active project lessons inject on later ALIGN and intercept recidivism at ACCEPT/review-gate.
+- contradictory instructions are disclosed with chosen resolution; dispatch Briefs remain executable by a fresh agent without guessing.
+- formal acceptance without a distinct host context records honest independence degradation and stays `BUILT`/`PENDING`.

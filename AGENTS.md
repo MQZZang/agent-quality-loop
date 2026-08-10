@@ -69,9 +69,11 @@ If installed into a project, read these when present:
 1. The target project's `AGENTS.md` and scoped instructions.
 2. `.ai/knowledge/project-context.md`; treat `Not Verified` as unknown.
 3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win.
-4. `.ai/knowledge/lessons.md`; cite only verified lessons.
+4. `.ai/knowledge/lessons.md`; cite only verified/active lessons. ALIGN injects matching active lessons; ACCEPT checks recidivism. At `project` + local write, write verified lessons and disclose the diff; global/read-only yields candidates for confirmation.
 
 Project facts belong in knowledge files, not in the generic skills.
+
+After ACCEPT (or a FAIL/BLOCKED stop), a lightweight RETRO may harvest 0–3 lesson candidates; RETRO is not a lifecycle phase. Compile goals from the final consumer + medium; experiential work needs a declared-perspective consumer probe (or honest `NOT_RUN`) before `user_observable_result` can PASS. Subagent outputs are evidence, not acceptance; without host subagents, degrade honestly (acceptor cold-consumes; skip blind/divergence probes). On `formal` or high-ambiguity creative work, wait for explicit ALIGN OK; disclose contradictions rather than silently resolving them.
 
 ## Instruction Priority
 

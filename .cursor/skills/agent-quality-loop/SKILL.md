@@ -78,7 +78,7 @@ When `full` and publish/deploy language conflict, explain the local-only cap in 
 Select an executor only after ALIGN and EVIDENCE. The lifecycle contract stays owned here; the adapter owns domain execution only.
 
 - Code implementation: read [code-implementation-adapter.md](references/code-implementation-adapter.md); an installed `ask-plan-code-qa` may implement the same contract in `embedded` profile.
-- Documents, data, design, cloud, or other domains: use the narrowest applicable domain skill and require the same adapter receipt.
+- Documents, data, design, cloud, or other domains: use the narrowest applicable domain skill and require the same adapter receipt; pick domain probes via [domain-profiles.md](references/domain-profiles.md).
 - No suitable adapter: use the minimal generic plan/execute/self-QA loop; do not pretend a missing domain capability exists.
 
 Every adapter consumes the aligned/evidenced contract and returns: changed artifacts, verification performed, passing/failing/not-run evidence, scope deviations, remaining risks, and a maximum lifecycle result of `BUILT`. An adapter must not grant `ACCEPTED`, `RELEASE_READY`, or external authority.
@@ -96,6 +96,14 @@ Restate three lines before non-trivial work and continue unless a genuine blocke
 ```
 
 Produce the compact contract defined in [contracts.md](references/contracts.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
+
+**Lessons：** Read `.ai/knowledge/lessons.md`; inject **active** entries whose Applies when matches this task into contract `assumptions` / `pause_conditions`.
+
+**分歧探针：** On ambiguity, `assurance=formal`, or high-ambiguity creative work, run the divergence probe per [multi-agent-leverage.md](references/multi-agent-leverage.md) (`standard`: open when an ambiguity signal hits).
+
+**认知同步：** `assurance=formal` or high-ambiguity creative tasks end ALIGN with a falsifiable contract summary (perspectives + non-goals) and **wait for explicit OK** before heavy execution; otherwise proceed-by-default.
+
+**矛盾披露：** On internal, cross-turn, or profile/repo contradictions, disclose the conflict and chosen resolution in the three alignment lines; never silently pick one. Pure prose—no new schema fields.
 
 Do not treat style words as permission, scope, evidence, or acceptance.
 
@@ -118,9 +126,11 @@ Stop when authority conflicts, evidence cannot support the conclusion, a live wr
 
 For an evidence-only request, `phase: EVIDENCED` is a valid terminal result. Use `verdict: PASS` when the requested diagnosis is answered, `PASS_WITH_RISK` only for disclosed non-required uncertainty, or `BLOCKED` when a required conclusion remains unsupported; set `next_allowed_phase: null` and record the stop reason.
 
+When the host supports it, parallelize read-only probe leaves per [multi-agent-leverage.md](references/multi-agent-leverage.md); model choice stays at the host layer.
+
 ### 3. EXECUTE — Make the smallest authorized local change
 
-Require `ALIGNED` and `EVIDENCED`, either supplied or reconstructed. For code, follow [code-implementation-adapter.md](references/code-implementation-adapter.md); if `ask-plan-code-qa` is available, use its compatible `embedded` profile. The adapter consumes the existing contract, skips duplicate alignment output, and returns only its implementation receipt. This skill owns lifecycle phase, assurance, evidence authority, and external-authority boundaries. Emit one combined user-facing summary, not parallel templates.
+Require `ALIGNED` and `EVIDENCED`, either supplied or reconstructed. For code, follow [code-implementation-adapter.md](references/code-implementation-adapter.md); if `ask-plan-code-qa` is available, use its compatible `embedded` profile. The adapter consumes the existing contract, skips duplicate alignment output, and returns only its implementation receipt. This skill owns lifecycle phase, assurance, evidence authority, and external-authority boundaries. Emit one combined user-facing summary, not parallel templates. When dispatching sub-executors, use that adapter's Dispatch Brief with the contract as the single source of truth.
 
 Before editing:
 
@@ -157,7 +167,21 @@ Start from the canonical acceptance dimensions in [contracts.md](references/cont
 
 Report release readiness in a separate `release_gate`; never overwrite `acceptance_gate` or add release dimensions to it. Use a conjunctive acceptance gate: incomplete applicability classification, an empty required set, missing/unknown PASS evidence, or any required `FAIL`, `BLOCKED`, or `NOT_RUN` blocks formal acceptance. Do not average away blockers or mark a dimension not applicable merely because evidence is unavailable. The acceptor reports findings by default and does not repair them unless a new execute authorization is given.
 
-### 5. RELEASE — Separate readiness from external action
+**Consumer probe：** When the artifact is consumable in its native medium, the acceptor cold-consumes once from the declared perspective (run/use, cold-read full text, or walk the flow); PASS evidence must include probe results, else record honest `NOT_RUN`. With host subagents, a blind consumer owns the probe ([multi-agent-leverage.md](references/multi-agent-leverage.md)); otherwise the acceptor cold-consumes before reading the implementer narrative. Keep process evidence in both paths. Choose domain probe methods from [domain-profiles.md](references/domain-profiles.md). The `user_observable_result` dimension depends on that probe—no probe, no PASS on that dimension (see [contracts.md](references/contracts.md)). For `formal` or experiential artifacts, use a blind consumer per [multi-agent-leverage.md](references/multi-agent-leverage.md); conflict with review-gate → conservative `FAIL`/`BLOCKED`.
+
+### 5. RETRO — Harvest lessons
+
+Lightweight post-ACCEPT harvest; not a lifecycle phase and not part of the envelope.
+
+**Trigger：** ACCEPT ends (including FAIL); the task stops as FAIL/BLOCKED; or the user explicitly asks for a retro.
+
+**Sources (priority)：** review-gate findings > mid-task user corrections > `scope_deviations` > failing/`NOT_RUN` patterns.
+
+**Output：** 0–3 candidates (`trigger` / root cause / rule / evidence / `scope: project|global`). If none, one sentence—no ceremony.
+
+**Write：** `project` + `local_write` → write `.ai/knowledge/lessons.md` and disclose the diff; `global` or read-only → candidates pending confirmation. Follow that file's lesson rules.
+
+### 6. RELEASE — Separate readiness from external action
 
 Enter only through an explicit `release` request after acceptance. Default to read-only `preflight` and handoff, not mutation. Preflight preserves the completed `acceptance_gate`, starts a distinct `release_gate` for the frozen `ACCEPTED` artifact, classifies every canonical release-readiness dimension, and may reach `RELEASE_READY` without mutation authority only when its non-empty required set has evidence-bound PASS results; this still does not authorize an external action. `release_intent: act` may start only from that exact `RELEASE_READY` artifact and target plan.
 
@@ -167,7 +191,7 @@ Persist those exact fields in `release_authorization` from [contracts.md](refere
 
 Report readiness by dimension. `RELEASE_READY` does not mean `DEPLOYED`. After an authorized action, verify the real target before reporting `DEPLOYED` or `PRODUCTION_VERIFIED`.
 
-### 6. Maintain a resumable envelope
+### 7. Maintain a resumable envelope
 
 Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. In normal user-facing output, lead with a plain-language result: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
 
@@ -229,6 +253,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 - [ ] Execution adapters return at most `BUILT`; formal acceptance and release remain owned by this lifecycle.
 - [ ] Full envelopes pass the deterministic structural validator when available.
 - [ ] Full handoff envelopes pass field, enum, reference, mode-phase, and release-authorization consistency checks.
+- [ ] Native-medium artifacts get a declared-perspective consumer probe before `user_observable_result` can PASS; contradictions are disclosed in ALIGN, not silently resolved.
 
 ## Failure Modes
 
@@ -249,6 +274,9 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Uses formal assurance for every task | Select the lowest sufficient assurance; reserve independent acceptance for explicit or high-consequence needs |
 | Treats a code workflow as the universal executor | Route to the narrowest domain adapter and require the common implementation receipt |
 | Trusts prose alone for structural gates | Run the bundled envelope validator; block invalid handoffs or release states |
+| Marks `user_observable_result` PASS without cold consumption | Run or honestly NOT_RUN the consumer probe; keep process evidence |
+| Silently picks one side of a contradictory instruction | Disclose conflict and chosen resolution in the ALIGN three lines |
+| Ritualizes empty RETRO after every ACCEPT | Emit 0–3 lesson candidates only when harvest sources exist; otherwise one sentence |
 
 ## Evaluation Cases
 

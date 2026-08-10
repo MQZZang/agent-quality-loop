@@ -43,6 +43,7 @@ RAW → ALIGNED → EVIDENCED → BUILT → ACCEPTED
 - Diagnosis may end at `EVIDENCED`.
 - Implementation self-QA ends at `BUILT`.
 - Formal acceptance requires a fresh/different-role reviewer reading raw evidence first.
+- After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest 0–3 lesson candidates; not a new phase.
 - `RELEASE_READY` is not deployment permission.
 - After deployment, active release authority is cleared; only historical evidence remains.
 
@@ -59,6 +60,8 @@ The default output is plain language:
 Internal phase/envelope details appear only for blockers, handoffs, resume, release, audit, or an explicit request.
 
 Ask at most two questions, and only when the answer changes the outcome or authority and cannot be discovered safely from context.
+
+Compile `target_user_or_system` as the final consumer + medium. Native-medium / experiential artifacts need a declared-perspective consumer probe before `user_observable_result` can PASS (else honest `NOT_RUN`). On ambiguity, `formal`, or high-ambiguity creative work, open a divergence probe when the host supports subagents; ACCEPT may use a blind consumer—otherwise the acceptor cold-consumes and records the degradation. Subagent receipts are evidence, not verdicts. `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved.
 
 ## Common Requests
 
@@ -123,6 +126,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 - Standalone only when explicitly invoked.
 - Embedded by agent-quality-loop for code implementation.
 - Reuses parent alignment; no duplicate opening/template.
+- Sub-executor handoff uses a self-contained Dispatch Brief projected from the parent contract.
 - Returns changed artifacts, checks, gaps, risks, and `result_phase: BUILT`.
 - Never grants acceptance or release.
 

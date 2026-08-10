@@ -14,6 +14,7 @@ Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`.
 - Embedded: consume the parent `ALIGNED`/`EVIDENCED` contract; do not repeat alignment or lifecycle output.
 - Inspect → plan gate → minimal code change → implementation self-QA.
 - Preserve parent goal, scope, assurance, authority, baseline, and must-hold checks.
+- Retrieve matching active `.ai/knowledge/lessons.md` on inspect/plan; project-level + local_write may write verified lessons with disclosed diff; Dispatch Briefs are projections of the parent contract, not a second ritual.
 - Return an implementation receipt with `result_phase: BUILT`.
 - Never grant independent acceptance, release readiness, deployment, or new authority.
 
