@@ -51,6 +51,16 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-10 — Point user Cursor skill junctions at `.cursor/skills`, not `.agents`
+
+**Trigger:** Refreshing local Cursor/Codex installs of this package on Windows
+**Root cause:** User-level `~/.cursor/skills/<name>` junctions previously targeted the Codex mirror `.agents/skills/`; after editing the authoritative `.cursor/skills/` without an immediate mirror sync, Cursor kept reading stale files and new `references/*.md` links looked like blind spots
+**Rule:** Keep junctions on `F:\MySkill\ai-agent-collaboration-assistant\.cursor\skills\<name>`; after skill edits run `.cursor` → `.agents` sync, then refresh `~/.codex/skills` real copies from `.agents`; never hand-edit `.agents` or leave Cursor pointed at the mirror
+**Evidence:** 2026-08-10 sync prep: junctions retargeted `.agents` → `.cursor`; validators PASS; `domain-profiles.md` / `multi-agent-leverage.md` present on Cursor junction, `.cursor`, `.agents`, and Codex copies
+**Scope:** project
+**Status:** active
+**Applies when:** Installing or refreshing this repo's skills into user-level Cursor/Codex on Windows, or diagnosing “Cursor not seeing skill edits”
+
 ### 2026-08-10 — Forward-test skill changes across the executor model matrix
 
 **Trigger:** Behavioral forward-testing after changing SKILL/reference text
