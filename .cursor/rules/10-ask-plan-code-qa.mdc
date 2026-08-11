@@ -18,4 +18,4 @@ Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`.
 - Return an implementation receipt with `result_phase: BUILT`.
 - Never grant independent acceptance, release readiness, deployment, or new authority.
 
-Review/验收 requests route back through `agent-quality-loop` accept, which may invoke `review-gate`.
+Review / 验收 requests route back through `agent-quality-loop` accept, which may invoke `review-gate`.

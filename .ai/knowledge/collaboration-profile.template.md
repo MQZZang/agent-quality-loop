@@ -9,7 +9,7 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 
 **How the agent uses it:**
 
-- Read it during **对齐 Align** (before proposing the Unified Goal). Apply known preferences **by default**; do **not** re-ask what the profile already answers.
+- Read it during **Align** (before proposing the Unified Goal). Apply known preferences **by default**; do **not** re-ask what the profile already answers.
 - Keep it **lightweight and incremental** — populate via **propose-on-confirm** (like `lessons.md`), **never** a big upfront questionnaire.
 - Preferences are **defaults, not overrides** — the user's explicit instruction this turn always wins.
 - Anything under **To Confirm** is not yet a settled preference — do not treat it as one.
@@ -20,16 +20,16 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 
 | Preference | Value |
 |------------|-------|
-| Language for conclusions | <e.g. 结论用中文> |
+| Language for conclusions | <e.g. write conclusions in Chinese> |
 | Output density | <terse one-liners / balanced / detailed> |
 | Structure vs prose | <prose by default / tables when deciding> |
 
-## Question Threshold（提问阈值）
+## Question Threshold
 
 - When to **decide and proceed** vs **ask first**: <e.g. resolve your own doubts first; only ask a genuine blocker that changes direction>
 - Max questions per turn on ambiguous tasks: <e.g. 1–2>
 
-## Risk Tolerance（风险偏好）
+## Risk Tolerance
 
 | Area | Preference |
 |------|------------|
@@ -37,24 +37,24 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 | Production / data / security | <e.g. extra caution; pause and confirm> |
 | Refactors / scope | <e.g. minimal change; ask before broadening> |
 
-## Quality Bar（质量标准）
+## Quality Bar
 
 - Definition of "good" for this user: <e.g. root-cause fix, no half-products, evidence-backed, Occam>
 - Non-negotiables: <e.g. no success claims without Passing Evidence>
 
-## Decision Habits（判断习惯）
+## Decision Habits
 
 - How this user weighs trade-offs: <e.g. correctness > speed; strong consistency over cache staleness>
 - Recurring criteria: <e.g. prefers fewer dependencies; prefers standard-library solutions>
 
-## Good vs Bad Responses（样例）
+## Good vs Bad Responses
 
 - 👍 Liked: <an answer/behavior the user valued, and why>
 - 👎 Disliked: <an answer/behavior the user rejected, and why>
 
 ---
 
-## To Confirm（未确认，勿当偏好）
+## To Confirm (unconfirmed — do not treat as a preference)
 
 <!-- Candidate preferences observed but not yet confirmed by the user. Move an item up only after the user confirms it. -->
 

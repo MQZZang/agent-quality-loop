@@ -14,7 +14,7 @@ description: >-
 
 Evidence-based review thinking — catch hallucinations, missing context, false QA confidence, and **goal drift** before merge or sign-off. Acceptance is judged against the **original Unified Goal**: a real result, no half-products, no over-engineering.
 
-**思路 skill:** run only the review types relevant to the artifact; default to readable findings, not empty review-type chapter headings.
+**reasoning skill:** run only the review types relevant to the artifact; default to readable findings, not empty review-type chapter headings.
 
 Invocation profiles:
 
@@ -28,7 +28,7 @@ In either profile, review is read-only. Do not edit, repair, deploy, publish, or
 - User asks to **review / 验收 / inspect / audit / validate**
 - **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports**
 - Hallucination check, risk check, omission check on artifacts (not on in-progress implement unless reviewing a prior report)
-- **Goal-Achievement / 目标达成** check: does the result meet the original Unified Goal within its boundary?
+- **Goal-Achievement** check: does the result meet the original Unified Goal within its boundary?
 - User asks to verify "done" claims or review before merge
 
 ## Review Types
@@ -69,21 +69,21 @@ Every finding carries one severity: `blocker` | `warning` | `advisory`.
 1. Identify the original goal, scope, acceptance standard, frozen baseline, and applicable review types from the supplied contract and raw artifacts. If any decision-changing input is absent, report it; do not invent it.
 2. Gather requirements, plan, diff, artifacts, commands, and raw QA evidence from source — not memory or the implementer's narrative alone.
 3. When formal acceptance is requested, require a distinct fresh context or role and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
-4. For experience-type artifacts, run Experience Review; at acceptance, check `.ai/knowledge/lessons.md` **active** lessons for recidivism (重犯检测).
-5. For each finding: 问题 · 证据 · 风险 · 修正建议.
+4. For experience-type artifacts, run Experience Review; at acceptance, check `.ai/knowledge/lessons.md` **active** lessons for recidivism.
+5. For each finding: Issue · Evidence · Risk · Suggested fix.
 6. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.
 
 ## Assumption Review
 
 - List assumptions the author relied on.
 - Mark each: validated / unvalidated / contradicted.
-- For each issue: 问题 · 证据 · 风险 · 修正建议
+- For each issue: Issue · Evidence · Risk · Suggested fix
 
 ## Context Review
 
 - Tech stack, directories, conventions — match `AGENTS.md` and `.ai/knowledge/project-context.md` when filled.
 - Flag invented paths, commands, or dependencies.
-- Output per finding: 问题 · 证据 · 风险 · 修正建议
+- Output per finding: Issue · Evidence · Risk · Suggested fix
 
 ## Plan Review
 
@@ -93,7 +93,7 @@ Check the plan against the supplied goal/contract:
 - Steps ordered and testable?
 - Pause conditions for destructive work?
 
-Output per finding: 问题 · 证据 · 风险 · 修正建议
+Output per finding: Issue · Evidence · Risk · Suggested fix
 
 ## Code Review
 
@@ -101,39 +101,39 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 - Cross-file contract changes: grep evidence required.
 - Root cause vs symptom patch; scope creep; over-engineering.
 
-Output per finding: 问题 · 证据 · 风险 · 修正建议
+Output per finding: Issue · Evidence · Risk · Suggested fix
 
 ## QA Review
 
 - Does Passing Evidence support the Summary?
 - Is Not Verified complete and honest?
 - Failures hidden or minimized?
-- **标尺完整性：** Check whether the measured party moved the ruler — tests, fixtures, goldens, or scoring hooks edited by the implementer; or acceptance criteria / `success_observables` / DoD rewritten to fit the artifact. The baseline is the post-ALIGN frozen contract, not the session's first sentence; mid-task user clarifications disclosed in ALIGN or recorded in the envelope are legitimate and must not be filed as defects. Record a `blocker` only when such a change lacks an independent authorization record.
+- **Ruler integrity:** Check whether the measured party moved the ruler — tests, fixtures, goldens, or scoring hooks edited by the implementer; or acceptance criteria / `success_observables` / DoD rewritten to fit the artifact. The baseline is the post-ALIGN frozen contract, not the session's first sentence; mid-task user clarifications disclosed in ALIGN or recorded in the envelope are legitimate and must not be filed as defects. Record a `blocker` only when such a change lacks an independent authorization record.
 
-Output per finding: 问题 · 证据 · 风险 · 修正建议
+Output per finding: Issue · Evidence · Risk · Suggested fix
 
-## Goal-Achievement Review（目标 + 协作达成复核）
+## Goal-Achievement Review (goal and collaboration outcomes)
 
 - Does the delivered result meet the **original Unified Goal** and its Acceptance Standard?
 - Any deviation from the agreed goal or execution boundary — and why?
-- Half-product, scope creep, or over-engineering (奥卡姆/Occam)?
+- Half-product, scope creep, or over-engineering (Occam)?
 - **Preference drift:** does it respect the user's collaboration profile (output density, question threshold, risk tolerance, quality bar, decision habits)?
 - **Process bloat:** over-asking, over-planning, mechanical/templated output, or evidence that only proves "a command ran" without proving the goal?
-- **Lesson recidivism (重犯检测):** does the work violate any **active** lesson in `.ai/knowledge/lessons.md`?
+- **Lesson recidivism:** does the work violate any **active** lesson in `.ai/knowledge/lessons.md`?
 
-Output per finding: 问题 · 证据 · 风险 · 修正建议
+Output per finding: Issue · Evidence · Risk · Suggested fix
 
 ## Experience Review
 
 Cold-consume the artifact from the **declared perspective** in the contract (not the author's). Report experience breaks, confusion points, and polish/finished-feel gaps. Run only for experience-type artifacts.
 
-Output per finding: 问题 · 证据 · 风险 · 修正建议
+Output per finding: Issue · Evidence · Risk · Suggested fix
 
 ## Output Contract
 
 **Default:** prose findings with evidence. **Structured sections** only for review types you actually ran.
 
-Every finding needs 问题 / 证据 / 风险 / 修正建议. Verdict required.
+Every finding needs Issue / Evidence / Risk / Suggested fix. Verdict required.
 
 ## Required Output Format
 
@@ -145,11 +145,11 @@ Every finding needs 问题 / 证据 / 风险 / 修正建议. Verdict required.
 
 ## <Relevant Review Type(s)>
 ### Findings
-- **问题:** ...
-  **严重度:** blocker | warning | advisory
-  **证据:** ...
-  **风险:** ...
-  **修正建议:** ...
+- **Issue:** ...
+  **Severity:** blocker | warning | advisory
+  **Evidence:** ...
+  **Risk:** ...
+  **Suggested fix:** ...
 
 ## Verdict
 Proceed | Proceed with fixes | Block

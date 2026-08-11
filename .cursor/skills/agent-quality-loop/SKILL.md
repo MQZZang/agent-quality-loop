@@ -1,6 +1,6 @@
 ---
 name: agent-quality-loop
-description: Use when a user wants an AI coding or workspace agent to turn a natural-language objective into a scoped first-principles task, diagnose evidence, implement through the appropriate domain adapter, independently verify formal completion, prepare a release, or resume work without goal drift. Routes task intent, assurance level, and action authority separately; supports align, evidence, execute, accept, release, and safe local full workflows. Trigger on phrases such as 完整闭环、全面根因分析、转化为清晰目标、正式质量、独立验收、继续上个任务、准备发布, or explicit $agent-quality-loop use. Do not use for trivial factual Q&A or casual brainstorming with no execution or acceptance workflow.
+description: Use when a user wants an AI coding or workspace agent to turn a natural-language objective into a scoped first-principles task, diagnose evidence, implement through the appropriate domain adapter, independently verify formal completion, prepare a release, or resume work without goal drift. Routes task intent, assurance level, and action authority separately; supports align, evidence, execute, accept, release, and safe local full workflows. Trigger on phrases such as end-to-end, full root-cause analysis, turn this into a clear goal, production quality, independently accept this, resume the last task, prepare a release — or their equivalent in any language, for example 完整闭环、全面根因分析、转化为清晰目标、正式质量、独立验收、继续上个任务、准备发布 — or explicit $agent-quality-loop use. Do not use for trivial factual Q&A or casual brainstorming with no execution or acceptance workflow.
 ---
 
 # Agent Quality Loop
@@ -87,25 +87,25 @@ Every adapter consumes the aligned/evidenced contract and returns: changed artif
 
 ### 1. ALIGN — Compile the first-principles contract
 
-Restate three lines before non-trivial work and continue unless a genuine blocker remains:
+Restate three lines before non-trivial work and continue unless a genuine blocker remains. Write the labels in the user's language:
 
 ```text
-目标：quote the user's words, then state the user-observable outcome.
-边界：name in-scope and explicit do-not-touch surfaces.
-最可能误解：name the highest-variance semantic or authority interpretation.
+Goal: quote the user's words, then state the user-observable outcome.
+Boundary: name in-scope and explicit do-not-touch surfaces.
+Most likely misunderstanding: name the highest-variance semantic or authority interpretation.
 ```
 
 Produce the compact contract defined in [contracts.md](references/contracts.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
 
-**Lessons：** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
+**Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
 
-**Observability gate：** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
+**Observability gate:** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
 
-**分歧探针：** On ambiguity, `assurance=formal`, or high-ambiguity creative work, run the divergence probe per [multi-agent-leverage.md](references/multi-agent-leverage.md) (`standard`: open when an ambiguity signal hits).
+**Divergence probe:** On ambiguity, `assurance=formal`, or high-ambiguity creative work, run the divergence probe per [multi-agent-leverage.md](references/multi-agent-leverage.md) (`standard`: open when an ambiguity signal hits).
 
-**认知同步：** `assurance=formal` or high-ambiguity creative tasks end ALIGN with a falsifiable contract summary (perspectives + non-goals) and **wait for explicit OK** before heavy execution; otherwise proceed-by-default.
+**Cognitive sync:** `assurance=formal` or high-ambiguity creative tasks end ALIGN with a falsifiable contract summary (perspectives + non-goals) and **wait for explicit OK** before heavy execution; otherwise proceed-by-default.
 
-**矛盾披露：** On internal, cross-turn, or profile/repo contradictions, disclose the conflict and chosen resolution in the three alignment lines; never silently pick one. Pure prose—no new schema fields.
+**Contradiction disclosure:** On internal, cross-turn, or profile/repo contradictions, disclose the conflict and chosen resolution in the three alignment lines; never silently pick one. Pure prose—no new schema fields.
 
 Do not treat style words as permission, scope, evidence, or acceptance.
 
@@ -143,9 +143,9 @@ Before editing:
 
 Implement the smallest root-cause change, match existing architecture, and verify in proportion to risk. Report `BUILT` with passing, failing, and not-run evidence. Self-QA never grants `ACCEPTED`.
 
-**Path change：** When evidence shows the chosen route cannot reach the aligned goal, switching routes inside the existing scope and authority needs no new authorization, but must disclose three lines — original assumption / observed reality / what was kept · changed · stopped. Changing the goal, non-goals, semantic change class, or authority is not a path change; return to ALIGN.
+**Path change:** When evidence shows the chosen route cannot reach the aligned goal, switching routes inside the existing scope and authority needs no new authorization, but must disclose three lines — original assumption / observed reality / what was kept · changed · stopped. Changing the goal, non-goals, semantic change class, or authority is not a path change; return to ALIGN.
 
-**Same-shape thrash unlock：** If the same failure shape repeats ≥2 times (same probe fails twice, same file yields empty churn twice, same environment blocker retried), stop isomorphic retries and emit a user-visible unlock pack: where stuck, what was tried, and the minimum user/environment action needed. Distinct from Path change (which requires the route be falsified); this covers “theoretically retryable but already spinning.” A claimed fix with no observable actionable delta for the next taker stays under **Repair delta** — do not substitute this rule for that.
+**Same-shape thrash unlock:** If the same failure shape repeats ≥2 times (same probe fails twice, same file yields empty churn twice, same environment blocker retried), stop isomorphic retries and emit a user-visible unlock pack: where stuck, what was tried, and the minimum user/environment action needed. Distinct from Path change (which requires the route be falsified); this covers “theoretically retryable but already spinning.” A claimed fix with no observable actionable delta for the next taker stays under **Repair delta** — do not substitute this rule for that.
 
 Pause on scope expansion, dirty-file collision, generated-source ambiguity, missing secrets, destructive action, external write, or production effect.
 
@@ -171,25 +171,25 @@ Start from the canonical acceptance dimensions in [contracts.md](references/cont
 - privacy, security, and permission boundaries;
 - reproducibility from the declared baseline.
 
-**Firsthand evidence：** A `PASS` reference must be something this acceptor opened, ran, or observed itself. An implementer's account of evidence — a reported exit code, “12 passed”, “screenshots archived” — is a claim about evidence, not evidence. When the artifact or raw output is unreachable, record `NOT_RUN` or `BLOCKED` and name what would make it readable.
+**Firsthand evidence:** A `PASS` reference must be something this acceptor opened, ran, or observed itself. An implementer's account of evidence — a reported exit code, “12 passed”, “screenshots archived” — is a claim about evidence, not evidence. When the artifact or raw output is unreachable, record `NOT_RUN` or `BLOCKED` and name what would make it readable.
 
 Report release readiness in a separate `release_gate`; never overwrite `acceptance_gate` or add release dimensions to it. Use a conjunctive acceptance gate: incomplete applicability classification, an empty required set, missing/unknown PASS evidence, or any required `FAIL`, `BLOCKED`, or `NOT_RUN` blocks formal acceptance. Do not average away blockers or mark a dimension not applicable merely because evidence is unavailable. The acceptor reports findings by default and does not repair them unless a new execute authorization is given.
 
-**Consumer probe：** When the artifact is consumable in its native medium, the acceptor cold-consumes once from the declared perspective (run/use, cold-read full text, or walk the flow); PASS evidence must include probe results, else record honest `NOT_RUN`. A blind consumer owns the probe only when `assurance: formal` or the artifact is experiential, **and** the host can isolate a subagent ([multi-agent-leverage.md](references/multi-agent-leverage.md)); otherwise the acceptor cold-consumes before reading the implementer narrative. Keep process evidence in both paths. Choose domain probe methods from [domain-profiles.md](references/domain-profiles.md). The `user_observable_result` dimension depends on that probe—no probe, no PASS on that dimension (see [contracts.md](references/contracts.md)). Conflict with review-gate → conservative `FAIL`/`BLOCKED`.
+**Consumer probe:** When the artifact is consumable in its native medium, the acceptor cold-consumes once from the declared perspective (run/use, cold-read full text, or walk the flow); PASS evidence must include probe results, else record honest `NOT_RUN`. A blind consumer owns the probe only when `assurance: formal` or the artifact is experiential, **and** the host can isolate a subagent ([multi-agent-leverage.md](references/multi-agent-leverage.md)); otherwise the acceptor cold-consumes before reading the implementer narrative. Keep process evidence in both paths. Choose domain probe methods from [domain-profiles.md](references/domain-profiles.md). The `user_observable_result` dimension depends on that probe—no probe, no PASS on that dimension (see [contracts.md](references/contracts.md)). Conflict with review-gate → conservative `FAIL`/`BLOCKED`.
 
-**Counterexamples must run：** When the contract declares decision-changing `counterexamples` and `user_observable_result` needs `PASS`, at least one counterexample path must be actually observed. Positive-only demos cannot `PASS`; unrun → `NOT_RUN`; counterexample appears → `FAIL`. If a listed counterexample is non-decidable (e.g. “fail if the user is unhappy”), that dimension cannot `PASS` — return to ALIGN for observable counterexamples. Do not bind this rule to Consumer-probe assurance-tier gates.
+**Counterexamples must run:** When the contract declares decision-changing `counterexamples` and `user_observable_result` needs `PASS`, at least one counterexample path must be actually observed. Positive-only demos cannot `PASS`; unrun → `NOT_RUN`; counterexample appears → `FAIL`. If a listed counterexample is non-decidable (e.g. “fail if the user is unhappy”), that dimension cannot `PASS` — return to ALIGN for observable counterexamples. Do not bind this rule to Consumer-probe assurance-tier gates.
 
 ### 5. RETRO — Harvest lessons
 
 Lightweight post-ACCEPT harvest; not a lifecycle phase and not part of the envelope.
 
-**Trigger：** ACCEPT ends (including FAIL); the task stops as FAIL/BLOCKED; or the user explicitly asks for a retro.
+**Trigger:** ACCEPT ends (including FAIL); the task stops as FAIL/BLOCKED; or the user explicitly asks for a retro.
 
-**Sources (priority)：** review-gate findings > mid-task user corrections > `scope_deviations` > failing/`NOT_RUN` patterns.
+**Sources (priority):** review-gate findings > mid-task user corrections > `scope_deviations` > failing/`NOT_RUN` patterns.
 
-**Output：** 0–3 candidates (`trigger` / root cause / rule / evidence / `scope: project|global`). If none, one sentence—no ceremony.
+**Output:** 0–3 candidates (`trigger` / root cause / rule / evidence / `scope: project|global`). If none, one sentence—no ceremony.
 
-**Write：** `project` + `local_write` → write `.ai/knowledge/lessons.md` and disclose the diff; `global` or read-only → candidates pending confirmation. Follow that file's lesson rules. Harvested lessons follow the Output Contract **Repair delta** rule.
+**Write:** `project` + `local_write` → write `.ai/knowledge/lessons.md` and disclose the diff; `global` or read-only → candidates pending confirmation. Follow that file's lesson rules. Harvested lessons follow the Output Contract **Repair delta** rule.
 
 ### 6. RELEASE — Separate readiness from external action
 
@@ -205,11 +205,11 @@ Report readiness by dimension. `RELEASE_READY` does not mean `DEPLOYED`. After a
 
 Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. In normal user-facing output, lead with a plain-language result: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
 
-For resume, let the user say `继续 <resume_ref>`; locate the latest valid envelope and artifact references automatically from the current task, workspace artifact, or available host persistence. Never require the user to copy YAML. For bare “继续上次任务”, use the sole unambiguous candidate; if multiple candidates exist, show at most three compact references and ask one choice. If no durable envelope is available or it has drifted, reconstruct read-only and ask only for missing outcome-changing information. An incomplete reconstruction stays read-only at or before `EVIDENCED`, reports `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize implementation, acceptance, or release.
+For resume, let the user say `continue <resume_ref>` in any language (for example `继续 <resume_ref>`); locate the latest valid envelope and artifact references automatically from the current task, workspace artifact, or available host persistence. Never require the user to copy YAML. For bare “继续上次任务”, use the sole unambiguous candidate; if multiple candidates exist, show at most three compact references and ask one choice. If no durable envelope is available or it has drifted, reconstruct read-only and ask only for missing outcome-changing information. An incomplete reconstruction stays read-only at or before `EVIDENCED`, reports `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize implementation, acceptance, or release.
 
-**Resume trust order：** Prefer reconstructible present reality — workspace/repo state, diff, file contents, validator or test exit codes, and durable knowledge files. Serialized envelopes, transcripts, plan files, and prior summaries are clues that need corroboration, not authority. When a remembered claim conflicts with present reality, keep reality, discard the claim, and disclose.
+**Resume trust order:** Prefer reconstructible present reality — workspace/repo state, diff, file contents, validator or test exit codes, and durable knowledge files. Serialized envelopes, transcripts, plan files, and prior summaries are clues that need corroboration, not authority. When a remembered claim conflicts with present reality, keep reality, discard the claim, and disclose.
 
-**Minimal persistence surface：** The only facts that cannot be rebuilt from artifacts are negotiated agreements: first-principles goal, non-goals, options the user explicitly rejected, and disclosed contradiction resolutions. When work spans sessions and local write is authorized, persist that compact agreement in a host/project carrier already in use (for example a plan/todo artifact or a file under `.ai/knowledge/`), small enough that staleness is obvious. Do not create a parallel state store, event ledger, or authority protocol — unverified durable state is durable misinformation.
+**Minimal persistence surface:** The only facts that cannot be rebuilt from artifacts are negotiated agreements: first-principles goal, non-goals, options the user explicitly rejected, and disclosed contradiction resolutions. When work spans sessions and local write is authorized, persist that compact agreement in a host/project carrier already in use (for example a plan/todo artifact or a file under `.ai/knowledge/`), small enough that staleness is obvious. Do not create a parallel state store, event ledger, or authority protocol — unverified durable state is durable misinformation.
 
 On “stop”, “pause”, scope correction, or revoked authority, stop scheduling new actions immediately and, when control returns, persist the structured stop action state: completed, still in flight, cancelled before start, external authority invalidation, and local-edit disposition. Return `PENDING` or `BLOCKED`, never PASS. Invalidate external authorization, clear active release intent/authorization, reduce effective authority to at most local write, preserve the last valid phase, and rebuild from the earliest changed phase before resuming. Never claim that an already completed side effect was cancelled. Keep completed local edits unless the user authorizes a revert; when they conflict with the narrowed scope, ask one explicit keep-or-revert question before further edits.
 
@@ -243,7 +243,7 @@ Always maintain internally, and expose in plain language when decision-relevant:
 
 For every `BLOCKED` or `PENDING` result, make the next step executable: state the observable reason, missing evidence/input/authority, who or what can unlock it, the minimum unlock action, and external side effects that were not taken.
 
-**Repair delta：** A correction, fix, lesson write, or replan counts as done only when the next taker can observe a different actionable state — changed artifacts, a changed contract or pause condition, a written lesson, or a named blocker with an unlock action. Reporting “noted / recorded / will handle later” is not completion. When a required correction produces no observable change, report it unresolved, not handled.
+**Repair delta:** A correction, fix, lesson write, or replan counts as done only when the next taker can observe a different actionable state — changed artifacts, a changed contract or pause condition, a written lesson, or a named blocker with an unlock action. Reporting “noted / recorded / will handle later” is not completion. When a required correction produces no observable change, report it unresolved, not handled.
 
 For `full`, proceed through safe local phases without asking for ritual approval. Stop only on a genuine goal-changing ambiguity, the ALIGN cognitive-sync OK that `formal` or high-ambiguity work requires, unsafe workspace state, missing evidence, failed acceptance, or external/production authority boundary.
 

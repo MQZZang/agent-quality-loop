@@ -1,14 +1,14 @@
 # ask-plan-code-qa Examples
 
-Contrast **规则体** (over-structured) vs **思路体** (target). In standalone profile the internal checks (对齐 → 规划 → 执行 → 实现自检) still run; embedded profile reuses the parent alignment and returns only a `BUILT` receipt. **思路体** governs prose density; for standalone 常/慎 the **开工三行** remains mandatory, and Self-QA quotes the original goal without claiming independent acceptance.
+Contrast **template-dump style** (over-structured) vs **reasoning style** (the target). In standalone profile the internal checks (Align → Plan → Execute → Self-QA) still run; embedded profile reuses the parent alignment and returns only a `BUILT` receipt. **Reasoning style** governs prose density; for standalone Normal/Careful tiers the **three opening lines** remain mandatory, and Self-QA quotes the original goal without claiming independent acceptance.
 
 ---
 
-## Example 1 — Auth handler timeout（常档）
+## Example 1 — Auth handler timeout (Normal tier)
 
 **User:** Fix the timeout in the auth handler.
 
-### ❌ 规则体
+### ❌ template-dump style
 
 ```markdown
 ## Ask
@@ -40,28 +40,28 @@ Pass
 [finally code and evidence buried under six headers]
 ```
 
-### ✅ 思路体
+### ✅ reasoning style
 
-目标：「Fix the timeout in the auth handler.」→ 修 auth handler 的超时行为  
-边界：改 `auth/handler.ts` ｜ 不动 `auth/handler.test.ts`、无关 auth 逻辑  
-最可能误解：做成可配置超时（`AUTH_TIMEOUT_MS`）还是只把硬编码 5s 调高
+Goal: "Fix the timeout in the auth handler." → fix the auth handler's timeout behavior  
+Boundary: change `auth/handler.ts` | leave alone `auth/handler.test.ts` and unrelated auth logic  
+Most likely misunderstanding: make timeout configurable (`AUTH_TIMEOUT_MS`) vs just raise the hardcoded 5s
 
-读过 `auth/handler.ts` 和 `auth/handler.test.ts`：超时来自硬编码 5s，测试期望 30s。
+Read `auth/handler.ts` and `auth/handler.test.ts`: timeout comes from a hardcoded 5s; tests expect 30s.
 
-**做法：** 常量改为读取 `AUTH_TIMEOUT_MS`，默认 30000。
+**Approach:** constant now reads `AUTH_TIMEOUT_MS`, default 30000.
 
-**改了：** `auth/handler.ts`  
-**验证：** `npm test -- auth/handler` — 12 passed  
-**未验：** staging 实际网络延迟  
-**目标达成？** 对照「目标：「Fix the timeout in the auth handler.」→ 修 auth handler 的超时行为」——达成。
+**Changed:** `auth/handler.ts`  
+**Verified:** `npm test -- auth/handler` — 12 passed  
+**Not verified:** actual network latency in staging  
+**Goal met?** Against the recorded goal line — `Goal: "Fix the timeout in the auth handler." → fix the auth handler's timeout behavior` — met.
 
 ---
 
-## Example 2 — README typo（快档）
+## Example 2 — README typo (Fast tier)
 
 **User:** Fix typo "recieve" → "receive" in README line 42.
 
-### ❌ 规则体
+### ❌ template-dump style
 
 ```markdown
 ## Compact Ask
@@ -80,24 +80,26 @@ Pass
 [eight subsections for a one-character fix]
 ```
 
-### ✅ 思路体
+### ✅ reasoning style
 
-单文件单行拼写，快档 — 免开工三行（勿给此例补三行，否则快档豁免失效）。已改 `README.md` L42。
+Single-file, single-line typo — Fast tier — skip the three opening lines (do not add them to this example, or the Fast-tier exemption collapses). Changed `README.md` L42.
 
-**证据：** `git diff` — 1 line changed (`recieve` → `receive`).
+**Evidence:** `git diff` — 1 line changed (`recieve` → `receive`).
 
 ---
 
-## Example 3 — 对齐 + 穷尽求解（常档）
+## Example 3 — Align before executing (Chinese input, Normal tier)
+
+> Why this example stays in Chinese: routing reads meaning, not keywords — a Chinese request gets the same Align discipline, with labels in the user's language. Teaching point: align on the real goal before coding; resolve what you can yourself; escalate only the one genuine blocker (here: consistency vs TTL), then Pause for confirmation — do not dump a questionnaire or jump straight to a cache.
 
 **User:** 给导出功能加个缓存。
 
-### ❌ 规则体 / 错误做法
+### ❌ template-dump style / wrong approach
 
 - 要么直接动手写一个缓存（没对齐"为什么"就执行）；
 - 要么甩出 6 个澄清问题（机械上抛，把没消化的疑问倒给用户）。
 
-### ✅ 思路体（对齐先行 + 只抛真实疑问）
+### ✅ reasoning style (align first, escalate only a real doubt)
 
 目标：「给导出功能加个缓存。」→ 你要的是"导出更快、不卡"，缓存只是手段之一  
 边界：改 `export/service.ts` ｜ 不动 无关导出路径与无关缓存基础设施  
@@ -117,28 +119,28 @@ Pass
 
 ---
 
-## Example 4 — Semantic Invariant Guardrail（常档）
+## Example 4 — Semantic Invariant Guardrail (Normal tier)
 
-**User:** 统计哪些客户可见流程用了审批状态。
+**User:** Document which customer-facing workflows use approval state.
 
-### ❌ 错误做法
+### ❌ wrong approach
 
-grep 所有 `status` / `workflow_state` / `approval_status`，把命中的字段都算作"审批状态"，最后给出一个看似完整的清单。
+grep every `status` / `workflow_state` / `approval_status`, treat every hit as "approval state," and ship a list that looks complete.
 
-### ✅ 思路体（只在语义风险存在时加 Must-Hold Checks）
+### ✅ reasoning style (add Must-Hold Checks only when semantic risk exists)
 
-目标：「统计哪些客户可见流程用了审批状态。」→ 在客户可见流程范围内统计审批状态用法  
-边界：改 结论/清单 ｜ 不动 源数据模型与无关字段归类  
-最可能误解：把内部 `workflow_state` 当成客户可见"审批状态"
-交付形态：可对账的「客户可见流程 → 审批状态字段/证据」映射表（含 Not Verified）
+Goal: "Document which customer-facing workflows use approval state." → tally approval-state usage within customer-facing workflows  
+Boundary: change the conclusion/list | leave alone source data models and unrelated field classification  
+Most likely misunderstanding: treat internal `workflow_state` as customer-visible "approval state"  
+Delivery shape: an auditable map of customer-facing workflow → approval-state field/evidence, including Not Verified
 
-读到 `workflow_state` 同时用于内部流转，`approval_status` 才出现在客户可见流程配置里；字段名存在语义风险。
+Read that `workflow_state` is also used for internal transitions; only `approval_status` appears in customer-facing workflow config — field names carry semantic risk.
 
-**Must-Hold Checks（保护结论）：**
-- `approval_status` 必须有证据表明对应用户说的"审批状态"，不能仅凭字段名。
-- 内部 `workflow_state` 不计入"客户可见流程"。
-- 如果某流程缺少可见性配置，结论里标为 Not Verified，不静默归类。
+**Must-Hold Checks (protect the conclusion):**
+- `approval_status` must have evidence it matches what the user meant by "approval state"; the field name alone is not enough.
+- Internal `workflow_state` does not count toward "customer-facing workflows."
+- If a workflow lacks a visibility config, mark it Not Verified in the conclusion — do not silently classify it.
 
-**做法：** 先以客户可见配置限定范围，再映射审批状态字段。
+**Approach:** first scope by customer-facing config, then map approval-state fields.
 
-**实现自检：** 对照「目标：「统计哪些客户可见流程用了审批状态。」→ 在客户可见流程范围内统计审批状态用法」——清单总数与客户可见流程数可对账；未配置可见性的 2 个流程列入 Not Verified；没有把内部流转状态混入审批状态。
+**Self-QA:** Against the recorded goal line — `Goal: "Document which customer-facing workflows use approval state." → tally approval-state usage within customer-facing workflows` — list totals reconcile with the customer-facing workflow count; 2 workflows without visibility config are listed as Not Verified; internal transition state was not mixed into approval state.

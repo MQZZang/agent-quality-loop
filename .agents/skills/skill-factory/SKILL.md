@@ -1,8 +1,8 @@
 ---
 name: skill-factory
 description: >-
-  当用户需要创建、审查、重构、精简或评估 Agent Skill / Cursor Rule /
-  prompt template 时使用。
+  Use when the user needs to create, review, refactor, streamline, or evaluate
+  an Agent Skill, a Cursor Rule, or a prompt template.
 ---
 
 # Skill Factory
@@ -35,7 +35,7 @@ Create a skill only if **all** are true:
 
 Otherwise: use a rule (principle), knowledge file (facts), or inline chat (one-off).
 
-## Mechanism Survival Test（机制存活律）
+## Mechanism Survival Test
 
 The Skill Necessity Test asks whether a mechanism should exist. This test asks whether it will ever execute. A mechanism that is never emitted has negative value: it costs tokens and creates false confidence that a risk is covered.
 
