@@ -6,7 +6,7 @@
 # Upstream: https://github.com/obra/superpowers/issues/871
 #
 # Usage (from any directory):
-#   powershell -ExecutionPolicy Bypass -File path/to/ai-agent-collaboration-assistant/scripts/fix-superpowers-windows.ps1
+#   powershell -ExecutionPolicy Bypass -File path/to/agent-quality-loop/scripts/fix-superpowers-windows.ps1
 
 $ErrorActionPreference = 'Stop'
 

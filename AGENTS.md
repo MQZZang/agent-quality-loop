@@ -1,4 +1,4 @@
-# AI Agent Collaboration Assistant
+# Agent Quality Loop
 
 This repository packages one public workflow entry and two bounded adapters for Cursor, Codex, and compatible coding agents.
 

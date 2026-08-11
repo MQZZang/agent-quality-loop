@@ -1,8 +1,10 @@
-# AI Agent Collaboration Assistant
+# Agent Quality Loop
 
-[![validate](https://github.com/MQZZang/ai-agent-collaboration-assistant/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/ai-agent-collaboration-assistant/actions/workflows/validate.yml)
+[![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-Coding agents made producing a change far cheaper than reviewing one, and they made the output polished enough that the cheap signals reviewers used to triage by no longer separate good work from plausible work. The verification cost did not disappear; it moved onto whoever reads the result. Most responses to this operate downstream, filtering after the fact — triage bots, stricter merge gates, contribution limits. This package works upstream instead: it constrains what an agent is allowed to claim, so that “done” arrives with evidence attached rather than leaving you to re-derive the truth.
+Coding agents made producing a change far cheaper than reviewing one, and they made the output polished enough that the cheap signals reviewers used to triage by no longer separate good work from plausible work. The verification cost did not disappear; it moved onto whoever reads the result.
+
+A growing set of tools answers this with a mechanical gate: declare a check, run it, and refuse to let the agent stop until it passes. Those work, and where a command can settle the question you should use one. This package covers the part a command cannot settle — whether the goal was the right goal, whether the evidence actually bears on the claim, whether “hide it” meant delete it. It constrains what the agent is allowed to claim, so that “done” arrives with evidence attached rather than leaving you to re-derive the truth.
 
 Concretely, it is a portable workflow package for Cursor and for the Codex CLI agent. It does not add a new panel or button to the IDE. After you install it into a project, the agent’s **default working habits** change for non-trivial tasks.
 
@@ -166,7 +168,7 @@ Two things should happen: the agent restates goal, boundary, and most likely mis
 
 This path installs the four skills into your Codex user skill area via **skill-installer** — a separate tool **not shipped in this repository**. Use it only if you already have skill-installer available; otherwise use §1, which needs nothing beyond a file copy.
 
-Ask Codex to use `$skill-installer` with repository `MQZZang/ai-agent-collaboration-assistant`, ref `master`, and these paths:
+Ask Codex to use `$skill-installer` with repository `MQZZang/agent-quality-loop`, ref `master`, and these paths:
 
 ```text
 .agents/skills/agent-quality-loop
@@ -179,7 +181,7 @@ The equivalent installer command is:
 
 ```bash
 python <skill-installer>/scripts/install-skill-from-github.py \
-  --repo MQZZang/ai-agent-collaboration-assistant \
+  --repo MQZZang/agent-quality-loop \
   --ref master \
   --path .agents/skills/agent-quality-loop \
          .agents/skills/ask-plan-code-qa \
