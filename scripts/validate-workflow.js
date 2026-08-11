@@ -68,7 +68,7 @@ for (const rule of [
   if (!fs.existsSync(path.join(root, ".cursor", "rules", rule))) errors.push(`missing routing rule: ${rule}`);
 }
 
-const publicDocs = ["AGENTS.md", "README.md", "docs/guide.md", "AI_AGENT_WORKFLOW_README.md"];
+const publicDocs = ["AGENTS.md", "README.md", "docs/guide.md"];
 for (const relativePath of publicDocs) {
   const content = fs.readFileSync(path.join(root, relativePath), "utf8");
   if (!content.includes("agent-quality-loop")) errors.push(`${relativePath} does not name the public entry`);

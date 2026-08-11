@@ -1,37 +1,125 @@
 # AI Agent Collaboration Assistant
 
-A private, portable workflow package for turning natural-language goals into scoped, evidence-backed agent work without repeated prompt templates.
+A portable workflow package for Cursor and for the Codex CLI agent. It does not add a new panel or button to the IDE. After you install it into a project, the agent’s **default working habits** change for non-trivial tasks.
 
-## One Entry, Two Adapters
+## Why install this
 
-Use `$agent-quality-loop` as the public entry:
+**Before:** You ask the agent to fix a bug. It says “done.” You still have to check whether it ran the tests, whether “done” means only local edits, and whether it treated its own self-check as a formal sign-off.
+
+**After:** For the same request, the agent is expected to:
+
+1. Restate the goal, the edit boundary, and the most likely misunderstanding in three short lines before it starts changing things.
+2. Treat “I checked my own work” and “an independent review role checked it” as different claims.
+3. Refuse to call something passing unless it personally ran or inspected the evidence for that claim.
+4. Refuse deploy / publish / other external side effects unless you authorize that exact action in the **current** turn.
+5. After a real acceptance stop (pass or fail), write reusable lessons into `.ai/knowledge/lessons.md` when policy allows, and read matching lessons on later tasks.
+
+Trivial Q&A and casual brainstorming stay direct; this package is for diagnosis, implementation, acceptance, release checks, and resume work.
+
+## What changes in Cursor / Codex
+
+| Surface | What you get |
+|---|---|
+| Cursor project rules (`.cursor/rules/`) | Always-on minimal boundaries (`00-agent-constitution.mdc`), plus routing summaries that point at the skills |
+| Cursor skills (`.cursor/skills/`) | The agent can load `agent-quality-loop`, `ask-plan-code-qa`, and `review-gate` when the task matches |
+| Codex skills (`.agents/skills/`) | Same three skills, mirrored for Codex |
+| Chat UI | No new chrome. You keep typing in the same chat box. |
+
+How you invoke it day to day:
+
+- **Usually:** plain language is enough (examples below). Cursor / Codex match the request to the skill descriptions and project rules.
+- **Optionally:** name the skill explicitly when you want to force the entry. In Cursor the skill appears in the chat skill list as `/agent-quality-loop`; the `$agent-quality-loop` spelling used throughout this package's skill descriptions is the Codex-side form. Either way it is **not** required for every turn.
+
+## How the pieces fit
+
+One public workflow owner, two narrow helpers:
+
+| Piece | Plain job | Ceiling |
+|---|---|---|
+| `agent-quality-loop` | Turns your request into a scoped contract, picks how much evidence is enough, and owns acceptance / release-state language | May map work to independent acceptance or release-prep states |
+| `ask-plan-code-qa` | Code inspect → plan → implement → **self-QA** | Stops at “built locally with self-QA” (`BUILT`). Cannot grant formal acceptance |
+| `review-gate` | Read-only independent review of existing work or claims | Findings and a verdict only. Does not repair code |
+
+That split is the point: the implementer does not rubber-stamp its own work, and “accepted” is never silently treated as “published.”
+
+You do not need to name Intent / Assurance / Authority. The router infers three separate questions from your words: what outcome you want now, how much evidence the risk warrants, and what side effects are allowed. More rigor never grants more permission.
+
+## Habits you will notice
+
+Pick these up in chat; deeper mechanics live in [docs/guide.md](docs/guide.md).
+
+1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
+2. **Self-QA ≠ independent acceptance** — “I ran the checks I claim” can justify a local `BUILT` result. Formal acceptance needs a fresh / different-role review that reads raw evidence first (`review-gate` when used).
+3. **No evidence, no pass** — missing required checks are reported as not run or blocked, not waved through.
+4. **Publish needs a separate current-turn ask** — a `full` local fix+accept path stops at independent acceptance. Deploy/publish needs its own exact authorization that turn.
+5. **Lessons stick around** — failures and acceptance stops can update `.ai/knowledge/lessons.md`; later alignments read matching active entries so the same mistake is less likely to repeat.
+
+## Everyday use
+
+Natural language is enough. Say what you want and what you do not want:
 
 ```text
-$agent-quality-loop full：修复这个本地问题并独立验收，不部署。
+Fix the local timeout. Do not deploy.
+Diagnose the root cause only. Do not change files.
+Fix it, then have it independently accepted. Do not publish.
+Check whether this is releasable. Do not release yet.
 ```
 
-It routes three independent decisions:
+Routing reads meaning, not keywords, so any language works:
 
-- **Intent:** align, diagnose, implement, accept, release, or resume.
-- **Assurance:** fast, standard, or formal.
-- **Authority:** read, local write, or an explicitly authorized external action.
+```text
+修复本地超时，不部署。
+只诊断根因，不改文件。
+修复并独立正式验收，不发布。
+只检查是否可发布，先别发布。
+```
 
-The bundled adapters have narrow jobs:
+Naming the skill explicitly is optional:
 
-| Skill | Job | Hard ceiling |
-|---|---|---|
-| `ask-plan-code-qa` | Inspect, plan, implement, self-QA code changes | `BUILT` |
-| `review-gate` | Read-only independent acceptance review | Findings/verdict; no repair |
+```text
+/agent-quality-loop full: fix this locally and have it independently accepted; do not deploy.
+/agent-quality-loop evidence: root-cause audit only.
+/agent-quality-loop accept: independently review the existing change; do not repair it.
+/agent-quality-loop release: preflight only; do not release.
+```
 
-This separation prevents duplicate alignment, implementer self-approval, and acceptance being mistaken for release.
+`full` stops at most at independent acceptance. Publishing or deploying always needs a separate, exact current-turn release request.
 
-Lightweight hooks (details in the skills/`docs/guide.md`): post-ACCEPT RETRO lesson harvest (not a phase); `.ai/knowledge/lessons.md` active retrieve on ALIGN and recidivism check on ACCEPT; final-consumer framing plus experiential consumer probe; self-contained Dispatch Briefs; multi-agent divergence/blind-consumer probes with honest single-agent degradation; finding severity tiers; source-align before probe consensus; observable repair delta; disclosed in-scope Path change; observability gate + run-counterexample PASS rule; ruler-integrity QA; Applies-when lesson match; same-shape thrash unlock.
+## Status language
+
+Agents in this package use a strict ladder. Do not collapse neighboring rows.
+
+| State | What it means in practice |
+|---|---|
+| Implemented with self-QA (`BUILT`) | Local changes exist and the implementer ran its own checks. Not independently accepted. Not releasable. |
+| Independently accepted (`ACCEPTED`) | A separate review role passed the required acceptance evidence. Still not permission to deploy. |
+| Release-ready (`RELEASE_READY`) | A frozen accepted artifact passed read-only release preflight (the “is this package fit to ship?” check). Still not a deploy. |
+| Deployed (`DEPLOYED`) | A named external target was actually changed under an authorized release action. |
+| Production-verified (`PRODUCTION_VERIFIED`) | Required outcomes were observed on the real target after deploy. |
 
 ## Install
 
-Private-repository access is required.
+Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are optional Node validators used when you edit the package itself.
 
-### Codex user-level skills
+### 1. Project-level install (recommended, self-contained)
+
+Works for Cursor and Codex inside a single repo. No external installer.
+
+1. Clone this repository.
+2. Copy these paths into your target project:
+   - `.cursor/` (rules + skills) — required for Cursor
+   - `.agents/` (Codex skill mirror) — skip this if you only use Cursor
+   - `AGENTS.md`
+   - optionally `.ai/knowledge/` templates for project context / lessons
+
+   If the target project already has `.cursor/rules/` or `.cursor/skills/`, copy file by file rather than replacing the directory, and keep your existing files. The rule files here are numbered (`00-`, `05-`, `10-`, `20-`, `30-`) so they sort predictably; skills are directories named after the skill. A name clash means you must decide which version wins, not merge them line by line.
+3. Customize only project knowledge under `.ai/knowledge/`. Keep the generic lifecycle rules and skills unchanged unless you are deliberately maintaining this package.
+
+After copy, open the target project in Cursor (or use Codex against that tree). Non-trivial agent turns should pick up the rules and skills above.
+
+### 2. Codex user-level skills (optional; needs a separate installer)
+
+This path installs the three skills into your Codex user skill area via **skill-installer** — a separate tool **not shipped in this repository**. Use it only if you already have skill-installer available.
 
 Ask Codex to use `$skill-installer` with repository `MQZZang/ai-agent-collaboration-assistant`, ref `master`, and these paths:
 
@@ -52,44 +140,11 @@ python <skill-installer>/scripts/install-skill-from-github.py \
          .agents/skills/review-gate
 ```
 
-The installer does not overwrite existing skill directories. Remove or back up an older installation deliberately before reinstalling.
+Replace `<skill-installer>` with the local checkout of skill-installer on your machine. The installer does not overwrite existing skill directories; remove or back up an older installation deliberately before reinstalling.
 
-### Project-level Cursor + Codex workflow
+If you do not have skill-installer, use **§1 Project-level install** instead.
 
-Clone the repository, then copy `.cursor`, `.agents`, `AGENTS.md`, and optional `.ai/knowledge` templates into the target project. Customize only project knowledge; keep generic lifecycle rules unchanged.
-
-## Everyday Use
-
-No macro syntax is required:
-
-```text
-修复本地超时，不部署。
-只诊断根因，不改文件。
-修复并独立正式验收，不发布。
-只检查是否可发布，先别发布。
-```
-
-Explicit modes remain available when useful:
-
-```text
-$agent-quality-loop evidence：只做根因审计。
-$agent-quality-loop accept：独立验收现有改动，不修复。
-$agent-quality-loop release：只做发布前检查，不发布。
-```
-
-`full` stops at most at independent acceptance. Publishing/deploying always requires a separate exact current-turn release request.
-
-## Status Language
-
-| State | Meaning |
-|---|---|
-| Implemented with self-QA | Built locally; not independently accepted |
-| Independently accepted | Required acceptance evidence passed |
-| Release-ready | Frozen accepted artifact passed preflight |
-| Deployed | Named external target changed |
-| Production-verified | Required real-target outcomes were observed |
-
-## Repository Layout
+## Repository layout
 
 | Path | Purpose |
 |---|---|
@@ -98,9 +153,13 @@ $agent-quality-loop release：只做发布前检查，不发布。
 | `.cursor/skills/` | Authoritative skill sources |
 | `.agents/skills/` | Codex mirror generated by `scripts/sync-skills.sh` |
 | `docs/guide.md` | Compact user/agent guide |
-| `.ai/knowledge/` | Optional project-context/profile/lesson templates |
+| `.ai/knowledge/` | Optional project-context / profile / lesson templates |
 
-## Validate Changes
+When maintaining this package: edit `.cursor/skills/` only, then run `./scripts/sync-skills.sh` so `.agents/skills/` stays a mirror. Do not hand-edit the Codex mirror.
+
+## Validate changes
+
+If you change the packaged skills or rules in this repository:
 
 ```bash
 ./scripts/sync-skills.sh
@@ -114,3 +173,8 @@ The structural validator does not replace independent semantic review or real-en
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Deeper reading
+
+- Day-to-day routing examples and boundary details: [docs/guide.md](docs/guide.md)
+- Repository invariants for agents working *in this package*: [AGENTS.md](AGENTS.md)

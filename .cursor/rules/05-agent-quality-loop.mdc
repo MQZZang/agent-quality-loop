@@ -20,7 +20,7 @@ Route three axes independently:
 Select `ask-plan-code-qa` only as the bounded code implementation adapter and `review-gate` only as the read-only independent review adapter. Reuse the parent contract and emit one user-facing summary.
 
 - After ACCEPT/FAIL stop: lightweight RETRO may write project `lessons.md` (disclose diff); ALIGN injects active lessons; ACCEPT checks recidivism.
-- Experiential artifacts: final-consumer framing + consumer probe (blind when subagents exist; else acceptor cold-consumes / honest `NOT_RUN`).
+- Native-medium artifacts (incl. code via behavior replay): final-consumer framing + cold consumer probe required for `user_observable_result` PASS; blind consumer only when (`formal` or experiential) and host has subagents; else acceptor cold-consumes before implementer narrative / honest `NOT_RUN`.
 - Multi-agent: divergence probe / blind consumer per host support; subagent output = evidence, not acceptance. `formal`/high-ambiguity creative: explicit ALIGN OK; disclose contradictions.
 - Repair delta: a fix/lesson/replan is done only when the next taker sees a different actionable state — not “noted.”
 - Resume: prefer inspectable reality over envelope/transcript memory; persist only negotiated agreements on the minimal carrier already in use.

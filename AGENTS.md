@@ -73,7 +73,25 @@ If installed into a project, read these when present:
 
 Project facts belong in knowledge files, not in the generic skills.
 
-After ACCEPT (or a FAIL/BLOCKED stop), a lightweight RETRO may harvest 0–3 lesson candidates; RETRO is not a lifecycle phase. Compile goals from the final consumer + medium; experiential work needs a declared-perspective consumer probe (or honest `NOT_RUN`) before `user_observable_result` can PASS. Subagent outputs are evidence, not acceptance; without host subagents, degrade honestly (acceptor cold-consumes; skip blind/divergence probes). On `formal` or high-ambiguity creative work, wait for explicit ALIGN OK; disclose contradictions rather than silently resolving them. Review findings use severity (`blocker`/`warning`/`advisory`); source-align outranks probe consensus; required corrections need an observable repair delta; in-scope route switches disclose a Path change. Formal/high-ambiguity ALIGN needs observable success/counterexample forms; decision-changing counterexamples must be observed before PASS; QA checks ruler integrity; mismatched lessons are not injected; same-shape thrash ≥2 yields an unlock pack.
+After ACCEPT (or a FAIL/BLOCKED stop), a lightweight RETRO may harvest 0–3 lesson candidates; RETRO is not a lifecycle phase.
+
+Goal compile and consumer probe:
+- Compile goals from the final consumer + medium.
+- Any native-medium-consumable artifact (code uses behavior replay as its probe) needs acceptor cold consumption before `user_observable_result` can PASS; else honest `NOT_RUN`.
+- Blind consumer only when (`assurance: formal` or experiential: docs/UI/game-design/narrative) and the host supports subagents; otherwise the acceptor cold-consumes before reading the implementer narrative.
+- Subagent outputs are evidence, not acceptance; without host subagents, degrade honestly (acceptor cold-consumes; skip blind/divergence probes).
+
+ALIGN and contradiction:
+- On `formal` or high-ambiguity creative work, wait for explicit ALIGN OK; disclose contradictions rather than silently resolving them.
+- Formal/high-ambiguity ALIGN needs observable success/counterexample forms; decision-changing counterexamples must be observed before PASS.
+- Mismatched lessons are not injected.
+
+Review, repair, and path:
+- Review findings use severity (`blocker`/`warning`/`advisory`); source-align outranks probe consensus.
+- Required corrections need an observable repair delta.
+- In-scope route switches disclose a Path change.
+- QA checks ruler integrity.
+- Same-shape thrash ≥2 yields an unlock pack.
 
 ## Instruction Priority
 

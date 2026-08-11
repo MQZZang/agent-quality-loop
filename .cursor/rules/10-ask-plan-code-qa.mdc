@@ -14,7 +14,7 @@ Full procedure: `.cursor/skills/ask-plan-code-qa/SKILL.md`.
 - Embedded: consume the parent `ALIGNED`/`EVIDENCED` contract; do not repeat alignment or lifecycle output.
 - Inspect → plan gate → minimal code change → implementation self-QA.
 - Preserve parent goal, scope, assurance, authority, baseline, and must-hold checks.
-- Retrieve matching active `.ai/knowledge/lessons.md` on inspect/plan; project-level + local_write may write verified lessons with disclosed diff; Dispatch Briefs are projections of the parent contract, not a second ritual.
+- Retrieve matching active `.ai/knowledge/lessons.md` on inspect/plan; project-level + local_write may write verified lessons with disclosed diff. Sub-executor Dispatch Brief is defined by `agent-quality-loop` in `.cursor/skills/agent-quality-loop/references/code-implementation-adapter.md` (projection of the parent contract, not a second ritual; not owned by this adapter).
 - Return an implementation receipt with `result_phase: BUILT`.
 - Never grant independent acceptance, release readiness, deployment, or new authority.
 

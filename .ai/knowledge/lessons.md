@@ -56,6 +56,17 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-11 — Deterministic hooks cannot enforce a semantic gate; that branch is closed
+
+**Trigger:** Proposing runtime hooks (Cursor/Codex) to turn this suite's quality gates from convention into enforcement
+**Root cause:** A hook is a semantics-blind script fired on an event. It can enforce that a procedure happened; it can never enforce that a judgment was right. Every first-principles goal of this suite — intent fidelity, directive compilation, denoising, non-mechanical execution, goal-anchored acceptance, failure harvest — is a judgment-quality goal, so hook coverage of them is ~zero. Enforcing procedure on a semantic gate is worse than neutral: it manufactures ritual compliance, because the model optimizes for the check rather than the goal.
+**Rule:** Do not build hooks to harden ALIGN / EXECUTE / ACCEPT / RETRO gates. Reopen only for mechanically decidable, irreversible environment hazards, and only on a trigger: a junction reappears among the Codex-side real copies, or agents begin routinely editing the deploy tree. Even then, weigh that a single-host safety net is worse than none for a two-host workflow — it lowers vigilance on the unprotected host.
+**Evidence:** 2026-08-11 blind probes on one executor tier: two scenarios with near-identical mechanical signatures (both edited `list.test.js` and `docs/acceptance/order-list.md`) required opposite verdicts — `blocker` for ruler movement vs. legitimate contract sync. The only discriminator was a disclosed mid-task user clarification, which no hook can read; the model judged both correctly after one paragraph of rule text. Separately, `scripts/fix-superpowers-windows.ps1` exists because another plugin's hooks would not execute on Windows without a `.cmd` shim — the one time hooks touched this environment, the cost was a dedicated patch script.
+**Evidence to read:** Read cases 37 and 38 in `.cursor/skills/agent-quality-loop/references/evaluation-cases.md` side by side — any proposed enforcement mechanism that cannot separate those two cannot serve as a quality gate; then `scripts/fix-superpowers-windows.ps1` for the Windows hook-execution cost already paid
+**Scope:** project
+**Status:** active
+**Applies when:** Evaluating runtime hooks, harness-level enforcement, or any deterministic pre/post-action gate as a way to strengthen this suite's quality loop
+
 ### 2026-08-11 — Reconcile external research against this repo before it becomes a plan item
 
 **Trigger:** Turning market research, papers, or competitor teardowns into an iteration plan for these skills

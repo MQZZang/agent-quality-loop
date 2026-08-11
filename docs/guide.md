@@ -61,7 +61,23 @@ Internal phase/envelope details appear only for blockers, handoffs, resume, rele
 
 Ask at most two questions, and only when the answer changes the outcome or authority and cannot be discovered safely from context.
 
-Compile `target_user_or_system` as the final consumer + medium. Native-medium / experiential artifacts need a declared-perspective consumer probe before `user_observable_result` can PASS (else honest `NOT_RUN`). On ambiguity, `formal`, or high-ambiguity creative work, open a divergence probe when the host supports subagents; ACCEPT may use a blind consumer—otherwise the acceptor cold-consumes and records the degradation. Subagent receipts are evidence, not verdicts. `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved. Finding severity (`blocker`/`warning`/`advisory`) binds verdict mapping; source-align outranks probe agreement; repairs need an observable delta; in-scope path changes disclose assumption / observation / kept·changed·stopped. Formal/high-ambiguity ALIGN also needs who/medium/sees-what `success_observables` and decidable `counterexamples`; decision-changing counterexamples must be run before PASS; same-shape thrash ≥2 surfaces an unlock pack.
+Compile `target_user_or_system` as the final consumer + medium.
+
+Consumer probe and multi-agent:
+- Any native-medium-consumable artifact (code uses behavior replay as its probe) needs acceptor cold consumption before `user_observable_result` can PASS; else honest `NOT_RUN`.
+- Blind consumer only when (`assurance: formal` or experiential: docs/UI/game-design/narrative) and the host supports subagents; otherwise the acceptor cold-consumes before reading the implementer narrative and records the degradation.
+- On ambiguity, `formal`, or high-ambiguity creative work, open a divergence probe when the host supports subagents.
+- Subagent receipts are evidence, not verdicts.
+
+ALIGN and contradiction:
+- `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved.
+- Formal/high-ambiguity ALIGN also needs who/medium/sees-what `success_observables` and decidable `counterexamples`; decision-changing counterexamples must be run before PASS.
+
+Review, repair, and path:
+- Finding severity (`blocker`/`warning`/`advisory`) binds verdict mapping; source-align outranks probe agreement.
+- Repairs need an observable delta.
+- In-scope path changes disclose assumption / observation / kept·changed·stopped.
+- Same-shape thrash ≥2 surfaces an unlock pack.
 
 ## Common Requests
 
@@ -126,7 +142,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 - Standalone only when explicitly invoked.
 - Embedded by agent-quality-loop for code implementation.
 - Reuses parent alignment; no duplicate opening/template.
-- Sub-executor handoff uses a self-contained Dispatch Brief projected from the parent contract.
+- Sub-executor handoff uses a self-contained Dispatch Brief projected from the parent contract; definition lives in `.cursor/skills/agent-quality-loop/references/code-implementation-adapter.md` (not in ask-plan-code-qa).
 - Returns changed artifacts, checks, gaps, risks, and `result_phase: BUILT`.
 - Never grants acceptance or release.
 
