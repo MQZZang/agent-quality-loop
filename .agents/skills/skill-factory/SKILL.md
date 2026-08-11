@@ -46,7 +46,7 @@ The Skill Necessity Test asks whether a mechanism should exist. This test asks w
 | Size | A phrase or a few lines | A multi-section template |
 | Examples | Every worked example demonstrates the mechanism | Any example demonstrates the violation while marked correct |
 
-Measured evidence (same repo/author/user; string-frequency over **212 transcripts / 11,232 AI replies / 82 sessions / 3.5 months**):
+One author's measurement over a private working corpus that is **not shipped with this package** (same repo/author/user; string-frequency over **212 transcripts / 11,232 AI replies / 82 sessions / 3.5 months**):
 
 | Mechanism | Rounds | Sessions | Tier | Constrains |
 |-----------|-------:|---------:|------|------------|
@@ -55,7 +55,7 @@ Measured evidence (same repo/author/user; string-frequency over **212 transcript
 | Passing Evidence | 31 | 15 | resident always-on | deliverable |
 | Not Verified | 117 | 39 | resident always-on | deliverable |
 
-Confidence boundary: counts are string-frequency measurements, so zeros may partly reflect wording drift. The tier/object/size pattern is a strong correlational inference from within-repo contrast, not a controlled experiment — treat it as a design heuristic with this limit, not a law of nature.
+Confidence boundary: counts are string-frequency measurements, so zeros may partly reflect wording drift. The corpus is private working transcripts and cannot be published, so **you cannot reproduce these numbers** — read them as one author's report, not as a result you can check. The tier/object/size pattern is a strong correlational inference from within-repo contrast, not a controlled experiment — treat it as a design heuristic with this limit, not a law of nature.
 
 **Conversion rule.** If a mechanism fails this test, do not add it as written. Convert it: bind it to the deliverable so it cannot be skipped; move the trigger and the minimal required artifact to the resident tier while leaving the full procedure in the skill; shrink it to the smallest form still vetoable by a human; fix every example so none demonstrates the violation. If it cannot be converted, do not ship it.
 

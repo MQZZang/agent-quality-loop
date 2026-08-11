@@ -31,7 +31,7 @@ foreach ($pattern in $roots) {
 $targets = $targets | Sort-Object FullName -Unique
 if (-not $targets) {
     Write-Host 'No Superpowers hooks-cursor.json found under ~/.cursor/plugins/.'
-    Write-Host 'If the popup persists, disable the Superpowers plugin in Cursor (see docs/guide.md).'
+    Write-Host 'If the popup persists, disable the Superpowers plugin from the Cursor plugin panel, or see https://github.com/obra/superpowers/issues/871'
     exit 0
 }
 
