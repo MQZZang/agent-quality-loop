@@ -56,6 +56,17 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-11 — A repository's publishable surface is larger than its working tree
+
+**Trigger:** Auditing a repository for private content before making it public, or before any handoff that exposes history
+**Root cause:** A content scan targets the artifact you picture — files. But git publishes several surfaces that hold no file content and are therefore invisible to that scan: commit messages, author and committer name/email, branch and tag names, and, on a forge, the issue and pull-request threads attached to the repo. Each is written casually, by different actors, at different times, which is exactly why private context settles there.
+**Rule:** Enumerate publishable surfaces before scanning, then scan each one: blob content across all refs, commit messages, author/committer identity, ref names, and forge-side issues and pull requests. A clean file scan is evidence about files only — do not report it as evidence about the repository.
+**Evidence:** 2026-08-11 a full-object scan of 177 blobs across all refs reported no private-project references; an independent read then found `Reasonix`, a prior private product name, in commit message `fa4a30d` ("Strip all Reasonix-specific references"). The same scan had also missed that four commits carried personal emails in author metadata rather than in any file.
+**Evidence to read:** `git log --all --format='%s%n%b'` and `git log --all --format='%an <%ae>|%cn <%ce>' | sort -u`, then the forge's issue and pull-request list — run these alongside, never instead of, the blob scan
+**Scope:** project
+**Status:** active
+**Applies when:** Preparing any repository for publication, open-sourcing, external handoff, or a visibility change from private to public
+
 ### 2026-08-11 — Correcting an inventory means re-deriving it, not patching the row you were told about
 
 **Trigger:** Fixing a document that enumerates things — a layout table, a file list, a field or option list — after a reviewer names one wrong item
