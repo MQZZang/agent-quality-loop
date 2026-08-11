@@ -1,0 +1,28 @@
+name: validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Skill package structure and envelope regression cases
+        run: node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
+
+      - name: Routing, adapter policies, and public docs
+        run: node scripts/validate-workflow.js
+
+      # scripts/sync-skills.sh rewrites the mirror, so CI compares instead of syncing:
+      # a drifted mirror must fail the build, not be silently repaired.
+      - name: Codex mirror matches the Cursor source
+        run: diff -qr .cursor/skills .agents/skills

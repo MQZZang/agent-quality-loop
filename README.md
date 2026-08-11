@@ -1,5 +1,7 @@
 # AI Agent Collaboration Assistant
 
+[![validate](https://github.com/MQZZang/ai-agent-collaboration-assistant/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/ai-agent-collaboration-assistant/actions/workflows/validate.yml)
+
 A portable workflow package for Cursor and for the Codex CLI agent. It does not add a new panel or button to the IDE. After you install it into a project, the agent’s **default working habits** change for non-trivial tasks.
 
 ## Why install this
@@ -167,6 +169,8 @@ node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
 node scripts/validate-workflow.js
 git diff --check
 ```
+
+GitHub Actions runs the same two validators on every push and pull request, and additionally fails the build if the Codex mirror has drifted from the Cursor source.
 
 The structural validator does not replace independent semantic review or real-environment verification.
 
