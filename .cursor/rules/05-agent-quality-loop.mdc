@@ -22,5 +22,9 @@ Select `ask-plan-code-qa` only as the bounded code implementation adapter and `r
 - After ACCEPT/FAIL stop: lightweight RETRO may write project `lessons.md` (disclose diff); ALIGN injects active lessons; ACCEPT checks recidivism.
 - Experiential artifacts: final-consumer framing + consumer probe (blind when subagents exist; else acceptor cold-consumes / honest `NOT_RUN`).
 - Multi-agent: divergence probe / blind consumer per host support; subagent output = evidence, not acceptance. `formal`/high-ambiguity creative: explicit ALIGN OK; disclose contradictions.
+- Repair delta: a fix/lesson/replan is done only when the next taker sees a different actionable state — not “noted.”
+- Resume: prefer inspectable reality over envelope/transcript memory; persist only negotiated agreements on the minimal carrier already in use.
+- Path change: in-scope route switches need three-line disclosure (assumption / observation / kept·changed·stopped); goal or authority changes return to ALIGN.
+- Formal/high-ambiguity ALIGN needs observable `success_observables` + decidable `counterexamples`; decision-changing counterexamples must be run before `user_observable_result` PASS; same-shape thrash ≥2 emits an unlock pack; inject lessons only when `Applies when` matches.
 
 Never let an adapter claim `ACCEPTED`, enter release, or raise authority. Never let `full` publish/deploy. Inspect every dry-run side-effect path before execution.

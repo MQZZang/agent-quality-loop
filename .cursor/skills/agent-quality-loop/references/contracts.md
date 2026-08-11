@@ -8,6 +8,7 @@ Use this reference when compiling a new request, handing work to another task, o
 - [Semantic Change Classes](#semantic-change-classes)
 - [Evidence Labels and Levels](#evidence-labels-and-levels)
 - [Phrase Translation](#phrase-translation)
+- [Observability Gate (ALIGN)](#observability-gate-align)
 - [Lifecycle Semantics and Legal Transitions](#lifecycle-semantics-and-legal-transitions)
 - [Phase Summary and Full Envelope](#phase-summary-and-full-envelope)
 - [Envelope Consistency Check](#envelope-consistency-check)
@@ -157,6 +158,17 @@ Translate recurring natural-language quality phrases into operations:
 | UI/UX | Compile from the **operator/user** interaction perspective |
 | 游戏体验 | Compile from **player + designer** dual perspectives |
 | 正式质量 | Require independent conjunctive acceptance and the necessary real-world evidence |
+
+## Observability Gate (ALIGN)
+
+For `assurance: formal` and high-ambiguity tasks, ALIGN must produce at least one observable `success_observables` item and at least one decidable `counterexamples` item. Write each as **who / on what medium / sees what**.
+
+| Form | Reject (not observable/decidable) | Accept |
+|---|---|---|
+| success | “用户满意” / “质量看起来不错” | “结算页上，60 元订单显示运费 ¥8” |
+| counterexample | “用户不满意即失败” / “体验不对就算失败” | “读者读完第 1 章前已在第 12 页前知道凶手姓名” |
+
+If either cannot be produced in that form, record it under `unknowns` and treat it as blocking completion judgment.
 
 ## Lifecycle Semantics and Legal Transitions
 

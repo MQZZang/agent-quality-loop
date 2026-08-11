@@ -45,6 +45,18 @@ In either profile, review is read-only. Do not edit, repair, deploy, publish, or
 
 Run only the types relevant to the artifact under review.
 
+## Finding Severity
+
+Every finding carries one severity: `blocker` | `warning` | `advisory`.
+
+- **blocker** — only for evidence-backed concrete defects in correctness, security, privacy/permissions, contract/interface, semantic invariants, or required verification failure. Style preference, taste calls, and speculative refactors are **advisory** and must never be `blocker`.
+- **warning** — material risk or gap that should be fixed before acceptance, but is not a proven hard defect under the blocker criteria.
+- **advisory** — optional improvement; never blocks Proceed by itself.
+
+**Sparsity:** write a finding only when a concrete risk triggers; do not pad one line per review type for coverage. When a type has zero issues, state what was checked.
+
+**Verdict derivation:** any `blocker` → `Block`; no blocker but ≥1 `warning` → `Proceed with fixes`; only advisory or no findings → `Proceed`, disclosing advisories.
+
 ## When Not to Use
 
 - User wants to **implement, fix, refactor, or debug** → use **`agent-quality-loop`**; it may select `ask-plan-code-qa` as its implementation adapter
@@ -96,6 +108,7 @@ Output per finding: 问题 · 证据 · 风险 · 修正建议
 - Does Passing Evidence support the Summary?
 - Is Not Verified complete and honest?
 - Failures hidden or minimized?
+- **标尺完整性：** Check whether the measured party moved the ruler — tests, fixtures, goldens, or scoring hooks edited by the implementer; or acceptance criteria / `success_observables` / DoD rewritten to fit the artifact. The baseline is the post-ALIGN frozen contract, not the session's first sentence; mid-task user clarifications disclosed in ALIGN or recorded in the envelope are legitimate and must not be filed as defects. Record a `blocker` only when such a change lacks an independent authorization record.
 
 Output per finding: 问题 · 证据 · 风险 · 修正建议
 
@@ -133,6 +146,7 @@ Every finding needs 问题 / 证据 / 风险 / 修正建议. Verdict required.
 ## <Relevant Review Type(s)>
 ### Findings
 - **问题:** ...
+  **严重度:** blocker | warning | advisory
   **证据:** ...
   **风险:** ...
   **修正建议:** ...
@@ -158,6 +172,7 @@ If a section has zero issues, state what was examined — do not paste unused re
 - [ ] Review Scope states artifacts examined
 - [ ] Each applicable review type has findings or "what was checked"
 - [ ] Verdict is Proceed / Proceed with fixes / Block — not vague approval
+- [ ] Every finding has a severity, and every `blocker` meets the hard criteria in Finding Severity
 - [ ] No invented file contents, test results, or user intent
 - [ ] Context Review respects project-context Verified vs Not Verified
 
@@ -171,6 +186,7 @@ If a section has zero issues, state what was examined — do not paste unused re
 | Approved QA without Passing Evidence | QA Review → Block or Proceed with fixes |
 | Embedded review duplicates lifecycle summary | Return this review report only; parent maps the result |
 | Same-context review claims independence | Mark non-independent and do not grant formal acceptance |
+| Style/taste opinion labeled `blocker` | Downgrade to `advisory` and recompute the verdict per Finding Severity |
 
 ## Evaluation Cases
 

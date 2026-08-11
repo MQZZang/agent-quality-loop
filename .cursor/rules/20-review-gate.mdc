@@ -13,7 +13,9 @@ Full procedure: `.cursor/skills/review-gate/SKILL.md`.
 - Review is read-only; do not repair, deploy, publish, or raise authority.
 - Read the original goal/contract, frozen artifacts, diff, and raw evidence before the implementer's narrative.
 - Formal acceptance requires a fresh context or different role.
-- Run only relevant review types; every finding includes problem, evidence, risk, and correction.
+- Run only relevant review types; every finding includes problem, severity (`blocker`/`warning`/`advisory`), evidence, risk, and correction.
+- Severity: `blocker` only for evidence-backed defects in correctness, security, privacy/permissions, contract/interface, semantic invariants, or required verification failure — never style/taste; derive verdict per Finding Severity in the skill.
+- QA Review also checks ruler integrity against the post-ALIGN frozen contract (unauthorized test/fixture/criteria moves → `blocker`; disclosed mid-task realign is legitimate).
 - Experience-type artifacts: run Experience Review; at acceptance, check active `.ai/knowledge/lessons.md` entries for recidivism.
 - Output Review Scope, relevant Findings, `Proceed | Proceed with fixes | Block`, and What Was Checked.
 - Return the report to `agent-quality-loop`; the parent maps lifecycle dimensions and emits the combined user-facing summary.

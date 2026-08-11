@@ -39,9 +39,11 @@ Do not fan out for ritual coverage, consensus theater, or averaging opinions.
 
 **Procedure:**
 
-1. Dispatch 2-3 zero-context readers. Each receives only `raw_request` + minimal project context (repo identity, domain hint, hard constraints). No draft contract, no prior alignment lines, no implementer speculation.
+1. Dispatch 2–3 zero-context compilers whose **objective functions differ** — not N samples of one prompt. Default pick 2–3 from: **literal compiler** (strict user wording), **consumer-perspective compiler** (declared final consumer needs), **falsifier** (given the leading reading, construct the strongest alternate reading that still fits the user's words but would make delivery fail). Two heterogeneous roles beat three homogeneous ones. Each receives only `raw_request` + minimal project context (repo identity, domain hint, hard constraints). No draft contract, no prior alignment lines, no implementer speculation. **Falsifier admission:** adopt a falsifier objection only when it names a falsifiable observation or a concrete counterexample; discard pure rhetoric — never escalate it into a user question.
 2. Each returns exactly the three ALIGN lines: 目标 / 边界 / 最可能误解.
-3. Main context diffs the set: convergent items -> adopt; divergent items -> proven true ambiguity. Synthesize **at most one** evidence-backed confirmation question; show the divergence itself as the asking basis.
+3. Two-phase aggregation — **source-align before any cross-probe compare:**
+   - **Phase 1 (per probe, before compare):** bidirectional source check — (a) every hard constraint in the user's words appears in that probe's compile; (b) every compiled item traces to the user's words or readable repo evidence, else must be labeled inference. Fail either direction → drop that probe before compare.
+   - **Phase 2 (compare survivors):** divergence = proven true ambiguity; synthesize **at most one** evidence-backed confirmation question. **Agreement ≠ validation:** shared omission of a hard constraint, or shared addition of an untraceable constraint, is shared-prior risk — disclose in ALIGN; never silently adopt.
 4. Probe Briefs reuse the **Dispatch Brief** format in [code-implementation-adapter.md](code-implementation-adapter.md) (goal anchor, scope allowlist/non-goals, baseline, must-holds, verification, escalation triggers, receipt). Do not duplicate that field set here.
 
 ### ACCEPT blind consumer
@@ -69,6 +71,8 @@ Model choice and quota policy stay at the host orchestration layer (e.g. Cursor 
 - Default **single round**; no multi-round debate loops (avoids multi-agent text-self-consistency).
 - ACCEPT prefers acceptor context/model-family distinct from the implementer when the host can supply it; record actual `acceptance_independence` honestly.
 - Main context owns diffs, question synthesis, dimension status, and lifecycle mapping.
+- Probe agreement is not correctness evidence; source-alignment outranks consensus.
+- Prefer executable/observable external evidence over inter-agent textual cross-examination; textual adversarial exchange supplements only when no external observation surface exists.
 
 ## Degradation Ladder
 

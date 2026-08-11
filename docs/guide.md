@@ -61,7 +61,7 @@ Internal phase/envelope details appear only for blockers, handoffs, resume, rele
 
 Ask at most two questions, and only when the answer changes the outcome or authority and cannot be discovered safely from context.
 
-Compile `target_user_or_system` as the final consumer + medium. Native-medium / experiential artifacts need a declared-perspective consumer probe before `user_observable_result` can PASS (else honest `NOT_RUN`). On ambiguity, `formal`, or high-ambiguity creative work, open a divergence probe when the host supports subagents; ACCEPT may use a blind consumer—otherwise the acceptor cold-consumes and records the degradation. Subagent receipts are evidence, not verdicts. `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved.
+Compile `target_user_or_system` as the final consumer + medium. Native-medium / experiential artifacts need a declared-perspective consumer probe before `user_observable_result` can PASS (else honest `NOT_RUN`). On ambiguity, `formal`, or high-ambiguity creative work, open a divergence probe when the host supports subagents; ACCEPT may use a blind consumer—otherwise the acceptor cold-consumes and records the degradation. Subagent receipts are evidence, not verdicts. `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved. Finding severity (`blocker`/`warning`/`advisory`) binds verdict mapping; source-align outranks probe agreement; repairs need an observable delta; in-scope path changes disclose assumption / observation / kept·changed·stopped. Formal/high-ambiguity ALIGN also needs who/medium/sees-what `success_observables` and decidable `counterexamples`; decision-changing counterexamples must be run before PASS; same-shape thrash ≥2 surfaces an unlock pack.
 
 ## Common Requests
 
@@ -134,7 +134,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 
 - Standalone only when explicitly invoked.
 - Embedded by agent-quality-loop for independent acceptance.
-- Read-only; reports Review Scope, evidence-backed findings, Verdict, and What Was Checked.
+- Read-only; reports Review Scope, evidence-backed findings with severity, Verdict, and What Was Checked. QA Review checks ruler integrity against the post-ALIGN frozen contract.
 - Does not repair reviewed work or duplicate the parent's lifecycle summary.
 
 ## Maintenance

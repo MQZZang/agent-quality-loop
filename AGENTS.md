@@ -73,7 +73,7 @@ If installed into a project, read these when present:
 
 Project facts belong in knowledge files, not in the generic skills.
 
-After ACCEPT (or a FAIL/BLOCKED stop), a lightweight RETRO may harvest 0–3 lesson candidates; RETRO is not a lifecycle phase. Compile goals from the final consumer + medium; experiential work needs a declared-perspective consumer probe (or honest `NOT_RUN`) before `user_observable_result` can PASS. Subagent outputs are evidence, not acceptance; without host subagents, degrade honestly (acceptor cold-consumes; skip blind/divergence probes). On `formal` or high-ambiguity creative work, wait for explicit ALIGN OK; disclose contradictions rather than silently resolving them.
+After ACCEPT (or a FAIL/BLOCKED stop), a lightweight RETRO may harvest 0–3 lesson candidates; RETRO is not a lifecycle phase. Compile goals from the final consumer + medium; experiential work needs a declared-perspective consumer probe (or honest `NOT_RUN`) before `user_observable_result` can PASS. Subagent outputs are evidence, not acceptance; without host subagents, degrade honestly (acceptor cold-consumes; skip blind/divergence probes). On `formal` or high-ambiguity creative work, wait for explicit ALIGN OK; disclose contradictions rather than silently resolving them. Review findings use severity (`blocker`/`warning`/`advisory`); source-align outranks probe consensus; required corrections need an observable repair delta; in-scope route switches disclose a Path change. Formal/high-ambiguity ALIGN needs observable success/counterexample forms; decision-changing counterexamples must be observed before PASS; QA checks ruler integrity; mismatched lessons are not injected; same-shape thrash ≥2 yields an unlock pack.
 
 ## Instruction Priority
 
