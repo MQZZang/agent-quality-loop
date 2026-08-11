@@ -42,6 +42,7 @@ All of these must pass. CI runs the same validators and additionally fails if th
 
 - **English is canonical.** Chinese appears in two places on purpose: quoted example user input, which demonstrates that routing reads meaning rather than keywords, and tables that map Chinese phrasing to concrete controls. Do not introduce Chinese as a skill's own vocabulary.
 - Use ASCII punctuation in English sentences. Full-width colons, quotes, and pipes belong only inside Chinese text.
+- **Do not let your editor strip trailing whitespace in `.md` and `.mdc` files.** Two trailing spaces are a Markdown hard line break and several rules depend on them. `.gitattributes` turns off the trailing-space check for these files, so a stripping editor will silently reflow them and `git diff --check` will not warn you.
 - Rules are prose, not ceremony. If a sentence does not change what an agent would do, it does not belong.
 - Keep additions small. This package's usefulness depends on an agent actually reading it, and every added paragraph competes for attention with the rules already there.
 

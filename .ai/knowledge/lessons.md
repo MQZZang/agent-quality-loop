@@ -56,6 +56,17 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-11 — Correcting an inventory means re-deriving it, not patching the row you were told about
+
+**Trigger:** Fixing a document that enumerates things — a layout table, a file list, a field or option list — after a reviewer names one wrong item
+**Root cause:** A named defect silently redefines the scope of the repair. The reviewer reported the row they happened to check, not the set of rows that are wrong, so accepting their report as the boundary inherits their sampling. An inventory is also the one kind of claim whose correctness turns on what is *absent*, and absence is unreadable from inside the artifact — it surfaces only when the artifact is compared against an independently enumerated source.
+**Rule:** When a correction targets an inventory, re-enumerate from the source of truth and diff that against the document, then repair the whole delta in one pass. Never edit only the row that was named.
+**Evidence:** 2026-08-11 commit `9c61daa` ("Describe the knowledge directory's actual contents in the layout table") fixed the single `.ai/knowledge/` row a blind read had flagged and shipped a README layout table still missing `scripts/`, `CONTRIBUTING.md`, and `.github/` — the last created two commits earlier in the same session. A later probe that enumerated `git ls-files` *before* opening the README found all three.
+**Evidence to read:** `git ls-files | ForEach-Object { ($_ -split '/')[0] } | Sort-Object -Unique`, diffed against the `## Repository layout` table in `README.md` — every tracked top-level path must appear there or be excluded on purpose
+**Scope:** project
+**Status:** active
+**Applies when:** Correcting any document that enumerates files, directories, fields, options, or steps — especially when the correction request named exactly one wrong item
+
 ### 2026-08-11 — Deterministic hooks cannot enforce a semantic gate; that branch is closed
 
 **Trigger:** Proposing runtime hooks (Cursor/Codex) to turn this suite's quality gates from convention into enforcement
