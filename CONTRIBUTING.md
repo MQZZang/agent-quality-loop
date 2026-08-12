@@ -49,6 +49,8 @@ Models improve, and a mechanism that earns its keep today can be pure ceremony a
 - Deletions get the same review bar as additions, but shrinking is a success, not a regression. The ceremony budget and the proactive assurance downgrade are the runtime half of this policy; this section is the maintenance half.
 - `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project) into phase, verdict, and acceptance-dimension counts and distributions. Use it as the measurement input when deciding what to demote, instead of anecdote.
 
+Open design proposals live in `docs/` and are not adopted behavior. [proposal-invocation-and-flywheel.md](docs/proposal-invocation-and-flywheel.md) diagnoses why that aggregator currently has no input and what it would take to close the invocation, lesson, and personalization loops; disagreement with it is a normal issue, not a bug report.
+
 ## First contributions
 
 Three entry points that need no prior context, in rising order of effort:
