@@ -36,7 +36,7 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge: `[AQL 2.3.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+Example trust badge: `[AQL 2.4.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
 
 For routine tasks, start from the prefilled snippets in `.cursor/skills/agent-quality-loop/references/contract-presets.md` (data, not new modes) to keep ALIGN short.
 
@@ -88,6 +88,7 @@ Consumer probe and multi-agent:
 ALIGN and contradiction:
 - `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved.
 - Formal/high-ambiguity ALIGN also needs who/medium/sees-what `success_observables` and decidable `counterexamples`; decision-changing counterexamples must be run before PASS.
+- ALIGN grounds the compile before the freeze: load-bearing referents verified read-only against the environment, external conventions against authoritative sources (source and date recorded), premises contradicted by observation disclosed before any edit — never a fabricated referent. A requested mechanism compiles as outcome + hypothesis; depth per the ladder tiers (fast: touched referents; standard: plus named referents; formal: every conclusion-changing referent).
 
 Review, repair, and path:
 - Finding severity (`blocker`/`warning`/`advisory`) binds verdict mapping; source-align outranks probe agreement.

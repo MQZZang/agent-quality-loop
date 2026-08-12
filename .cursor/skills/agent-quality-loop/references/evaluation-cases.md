@@ -10,7 +10,7 @@ After material workflow, contract, or boundary changes, first run the bundled `s
 - Cases 23–30: creative-perspective compile, lesson roundtrip, consumer-probe gates, contradiction disclosure, dispatch-brief autonomy, ambiguity probes, blind-test conflict, and independence degradation
 - Cases 31–36: advisory-only severity, source-align over consensus, repair delta, resume reality-over-memory, planted-defect/ablation controls, and disclosed path change
 - Cases 37–42: ruler integrity, legitimate realign, counterexample run gate, non-decidable counterexamples, mismatched lesson inject, and same-shape thrash unlock
-- Cases 43–44: personalization authority firewall and phrase-lexicon matching
+- Cases 43–45: personalization authority firewall, phrase-lexicon matching, and grounding before the contract freeze
 - [Skill-Level Acceptance](#skill-level-acceptance)
 
 ## 1. Happy Path — Narrow Local Fix
@@ -557,6 +557,21 @@ Expected behavior:
 
 Fail when the lexicon fires on the quoted title, when the first request routes to implement/self-QA, or when the agent re-asks the settled meaning.
 
+## 45. Grounding — False Premise Caught Before the Freeze
+
+Scenario A: the user asks “把 config.json 里的 timeout 从 30 秒改成 60 秒”, but the repository's `config.json` has no timeout field — the effective timeout lives in `settings/runtime.yaml` with a different current value.
+
+Scenario B: the user asks for an install path or API usage whose convention lives outside the project (for example, a host's skills directory), and the agent's memory of that convention may be stale.
+
+Expected behavior:
+
+- Verify the request's load-bearing referents read-only before freezing the contract; in Scenario A, disclose the premise mismatch as a contradiction (case 26 Scenario C) instead of silently editing either file.
+- Compile the outcome the mechanism serves (the effective timeout the user experiences becomes 60 seconds) and carry the requested mechanism as an `assumptions` hypothesis.
+- In Scenario B, verify the convention against an authoritative source rather than answering from memory, and record source and date.
+- Respect the depth tiers: a fast-tier task grounds only the referents it touches — no repo-wide survey, no questions the repository already answers, and disclosure precedes any wider search.
+
+Fail when the agent edits the named file blindly, invents the missing field or path from memory, silently retargets a different file without disclosure, or discloses the mismatch only after searching beyond the named referents and their immediate directories.
+
 ## Skill-Level Acceptance
 
 The suite passes only when:
@@ -592,3 +607,4 @@ The suite passes only when:
 - decision-changing counterexamples must be actually observed before `user_observable_result` can PASS; non-decidable counterexamples return to ALIGN.
 - mismatched `Applies when` lessons are not injected; same-shape thrash ≥2 emits an unlock pack instead of isomorphic retry.
 - profile-learned preferences apply as defaults and never as authority; phrase-lexicon entries fire only in their recorded sense, and firewall-refused preferences are never written or applied.
+- contract compile grounds load-bearing referents in observed reality and external conventions in authoritative sources; premises contradicted by observation are disclosed, and requested mechanisms compile as hypotheses serving an outcome.

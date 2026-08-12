@@ -53,6 +53,19 @@ Do not force the user to fill this schema. Infer from the request, repository, a
 
 Identifier, request, goal, target, problem, workspace, reconstruction, and expiry fields are non-empty scalar strings; do not serialize one-item arrays in their place. Collection fields are explicitly named as lists in the full envelope.
 
+### Grounding Ladder
+
+Compile facts from the cheapest sufficient rung, in order; every rung is read-only:
+
+1. The request and retained conversation context.
+2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents here before the contract freezes; a premise the environment contradicts is a contradiction to disclose before any edit, never to silently resolve toward either side. Never fabricate a missing referent to satisfy the letter of the request — a mechanical edit that cannot produce the user-observable outcome is a miscompile, not a resolution.
+3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
+4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
+
+A mechanism named in the request compiles as the outcome it serves plus a hypothesis entry, with the inferred outcome stated in the alignment lines.
+
+Depth by tier: `fast` verifies only referents the task already touches; `standard` adds every referent the request names; `formal` verifies every conclusion-changing referent. After a mismatch, disclosure comes first: at most one bounded pass over the named referents and their immediate directories before disclosing — disclosure precedes any wider search.
+
 Keep the three routing axes independent:
 
 - `intent` chooses the requested outcome; map it to the smallest compatible `mode`.
@@ -358,13 +371,13 @@ Allowed `state` values (mapped from lifecycle phase / stop condition):
 English example:
 
 ```text
-[AQL 2.3.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+[AQL 2.4.0 | independently accepted | evidence: all required dimensions PASS | next: none]
 ```
 
 Chinese-scenario example (state words may be localized; syntax unchanged):
 
 ```text
-[AQL 2.3.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+[AQL 2.4.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
 ```
 
 ## Envelope Consistency Check
