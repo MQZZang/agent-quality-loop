@@ -1,18 +1,22 @@
 {
   "name": "agent-quality-loop",
-  "version": "2.5.0",
-  "generated_at": "2026-08-12T08:09:49.123Z",
+  "version": "2.6.0",
+  "generated_at": "2026-08-12T13:21:56.717Z",
   "files": {
-    "SKILL.md": "33901fe2a7504cc0f278d82c7c624307e444c976e18769f01c6209373b72d0a4",
+    "SKILL.md": "b2e47ac36f3524d0056dfb906ced96ece5a855c08ab73da033d2f592171f70c9",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
+    "references/alignment-compiler.md": "d77e218fb825331357a80d16ccf8ad9839213a5668b863fb9877623eb546dd11",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "c574097c7a1a4cf26302c596799367c49172473beed3a4f043839d1c87194744",
+    "references/contracts.md": "991df75a5332e6f930ce2a3905ac91fa30660b89606fa5a53afe443d71d7e776",
     "references/domain-profiles.md": "e9db2120b42295e7aca8716415759fd1d441d68e8df81e70d9e6fb0cb891e248",
-    "references/evaluation-cases.md": "a0da074f4113beed1e92b53de5ee730478893ad358c48007ccb5fa94763822a0",
+    "references/evaluation-cases.md": "22dce267d679187565f630b22aa6abe150302e088afe10c8c1d0ee1de87c3332",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
-    "references/personalization.md": "4ef06f00c16d77f5328a83ae33efe0e79af96e8b87c83cbb46fa4bad90628100",
-    "scripts/validate-envelope.js": "207bc450b19aebc36e7a1ffc06f58bbc37d890878feb4c62e648773d646f783a",
-    "scripts/validate-skill.js": "92b719a3b00a417a1017378293e7deac9607bc99e583ac833aa378f28db322aa"
+    "references/personalization.md": "ae621565023e75888a47d24099f1c795fcf226b41a84fff9206ff5b135b98415",
+    "scripts/aql-envelope.js": "9d9d2f0883d1ff28fbdb42ffa4c13a506bc7252f80e24d704f72f3b1abadabd9",
+    "scripts/aql-stats.js": "72992b6bbb7bc0e2b287bae2466f23705a352a80d901d0cdf7d6bf703b6185ea",
+    "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
+    "scripts/validate-envelope.js": "1ee3cb423b93c56f5de16be5e8f52116e745ae46bef3c9488eb68de082edafcd",
+    "scripts/validate-skill.js": "3aa7ef318adc9e7321e551f5f666b98f1d6e896de3494f858ff1224020ba675d"
   }
 }

@@ -20,27 +20,5 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Manifest generation safety regression cases
-        run: node scripts/gen-manifest.js --self-test
-
-      - name: Installer routing and atomic-preflight regression cases
-        run: node scripts/install.js --self-test
-
-      - name: Envelope statistics aggregation cases
-        run: node scripts/aql-stats.js --self-test
-
-      - name: Probe fixture generator cases
-        run: node probes/make-fixtures.js --self-test
-
-      - name: Skill package structure and envelope regression cases
-        run: node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
-
-      - name: Routing, adapter policies, and public docs
-        run: node scripts/validate-workflow.js
-
-      - name: Cursor hooks protocol tests
-        run: node integrations/cursor-hooks/test.js
-
-      # sync-skills.js --check compares mirrors and manifest hashes without rewriting.
-      - name: Generated mirrors match the Cursor source
-        run: node scripts/sync-skills.js --check
+      - name: Run full validation suite
+        run: node scripts/validate-all.js

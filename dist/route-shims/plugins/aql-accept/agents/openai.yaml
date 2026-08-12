@@ -1,0 +1,12 @@
+interface:
+
+  display_name: "AQL Accept"
+
+  short_description: "Independent acceptance review without repair"
+
+  default_prompt: "Use $aql-accept to independently review this work in a fresh acceptor context and return a conservative verdict."
+
+policy:
+
+  allow_implicit_invocation: false
+

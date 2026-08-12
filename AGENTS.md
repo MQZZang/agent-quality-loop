@@ -13,6 +13,10 @@ This repository packages one public workflow entry and two bounded adapters for 
 
 `agent-quality-loop` is the single default entry. The other skills are explicit compatibility entry points or embedded adapters. Do not run parallel lifecycle templates.
 
+Optional explicit route packages (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) are generated under `dist/route-shims/` and installed only via `--suite routes` (with the compatible `agent-quality-loop` parent). **Uninstall manually** by deleting installed folders. `aql-accept` does not by itself create independence on every host. Codex uses `$aql-…`; Cursor/Claude use `/aql-…`.
+
+Local envelope cache writes go through packaged `scripts/aql-envelope.js` (invoke via `SKILL_ROOT` when installed); `.agent-quality-loop/` is optional.
+
 Trivial factual Q&A and casual brainstorming do not need this workflow.
 
 ## Quick Use
@@ -64,7 +68,7 @@ Cursor routing summaries live in `.cursor/rules/`:
 - `align`, `evidence`, and `accept` are read-only. `execute` and `full` are at most local-write. `full` never publishes or deploys.
 - External writes, destructive actions, deploys, uploads, and publication require a separate explicit current-turn release request with exact target, effects, role, rollback, checks, and side-effect-path evidence.
 - Treat dry-run as scoped simulation only after every reachable side-effect path is inspected and proven short-circuited.
-- Implementation self-QA may report `BUILT`; only a fresh/different-role acceptor reading raw evidence first may grant formal acceptance.
+- Implementation self-QA may report `BUILT`; only a fresh-context acceptor with separation evidence, reading raw evidence first, may grant formal acceptance — a different role alone does not qualify.
 - `ACCEPTED`, `RELEASE_READY`, `DEPLOYED`, and `PRODUCTION_VERIFIED` are different states.
 - Stop/scope/revoke invalidates external authority. Incomplete resume remains read-only and cannot authorize implementation.
 - Never copy leaked/proprietary system prompts, secrets, tokens, private keys, or machine-local configuration into this repository.
@@ -75,7 +79,7 @@ If installed into a project, read these when present:
 
 1. The target project's `AGENTS.md` and scoped instructions.
 2. `.ai/knowledge/project-context.md`; treat `Not Verified` as unknown.
-3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win. ALIGN applies matching phrase-lexicon and preference defaults, and RETRO may sediment 0–2 observed candidates per the skill's personalization reference; learned preferences never raise authority.
+3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win. ALIGN applies matching **active** phrase-lexicon and preference defaults; To Confirm candidates are not applied. Missing-profile bootstrap writes candidates only. User-level knowledge is explicit opt-in. RETRO may sediment 0–2 observed candidates per the skill's personalization reference; learned preferences never raise authority.
 4. `.ai/knowledge/lessons.md`; cite only verified/active lessons. ALIGN injects matching active lessons; ACCEPT checks recidivism. At `project` + local write, write verified lessons and disclose the diff; global/read-only yields candidates for confirmation.
 
 Project facts belong in knowledge files, not in the generic skills.
@@ -125,6 +129,6 @@ After changing workflow files:
 4. Run `node scripts/validate-workflow.js` when present.
 5. Inspect `git diff --check` and the exact changed-file allowlist.
 6. Forward-test at least: a normal local fix, independent acceptance, and `full + publish` boundary.
-7. Use a fresh/different-role independent reviewer before declaring formal acceptance.
+7. Use a fresh-context independent reviewer with separation evidence before declaring formal acceptance; a different role alone does not qualify.
 
 Production/external actions remain human-controlled even when all local checks pass.

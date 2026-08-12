@@ -1,0 +1,12 @@
+{
+  "name": "aql-accept",
+  "version": "2.6.0",
+  "generated_at": "2026-08-12T13:21:57.144Z",
+  "files": {
+    "SKILL.md": "a82a77c91b26f51ba8269a43aa6f1aab635611df4fcc00f3f51420ead4b1fa92",
+    "agents/openai.yaml": "bc73914fa1f09cc654d05dc4a391fae0e801459436ce69a3ed1fdf9aab191105"
+  },
+  "depends_on": [
+    "agent-quality-loop"
+  ]
+}

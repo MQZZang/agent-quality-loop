@@ -4,6 +4,19 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+## 2.6.0 — 2026-08-12
+
+- Unified validation entry: `node scripts/validate-all.js` runs the full maintainer/CI suite sequentially; GitHub Actions now invokes only this script on Ubuntu and Windows.
+- Acceptance independence: `ACCEPTED` requires `fresh_context` plus `separation_evidence_ref`; `different_role` is audit-only and does not qualify.
+- User-facing copy aligned: README, AGENTS.md, review-gate, and `20-review-gate.mdc` no longer imply that a different role alone can grant formal acceptance.
+- Authority gate rework: external write-class commands never auto-`allow` from the AQL hook. A bound `release_authorization.execution_plan` (exact command + `cwd_realpath` + mechanical ISO TTL ≤15m) may yield host-native **`ask` only**. Envelope fields such as `authorized_this_turn` are not current tool authorization. The hook does not perform full shell semantic analysis. See `integrations/cursor-hooks/README.md`.
+- Validity chain: `validate-envelope.js` rejects `ACCEPTED`/`RELEASE_READY` with non-success verdicts or failed required dimensions; `injected_refs` require fixed kind→class mapping and `content_sha256` (absence of the field remains measurement unknown).
+- Writer-owned snapshot ordering: `aql-envelope.js` injects `snapshot.{id,recorded_at,sequence,previous_digest,writer}`; callers cannot forge sequence. Legacy unordered snapshots are not qualified outcomes. Canonical ordered-chain validation refuses append on forged/gap/fork history (`EORDER`).
+- Stats rework: workspace-scoped identity (`workspace_key` + `contract_id`); qualified associations use only valid, ordered snapshots; exposures are the contract timeline union; current phase follows max **sequence** (not highest historical phase). Descriptive association only — **observable and falsifiable, not causally proven**.
+- Envelope writer: packaged `scripts/aql-envelope.js` (canonical under the skill package; repo-root wrapper). Under `local_write` or higher it may write optional `.agent-quality-loop/`; invoke via `SKILL_ROOT`.
+- Alignment-compiler reference (`references/alignment-compiler.md`): compile discipline for existing Task Contract fields — not a second workflow. External `goal-prompt` is design/eval inspiration only; not vendored; not a runtime dependency. Goal Compiler / profile runtime host sessions remain separately evidenced (evaluation cases 46–65 exist; cross-host live sessions may be `NOT_RUN`).
+- Collaboration-profile candidate bootstrap: first qualifying observation → To Confirm only; route aliases and stable rejected options require **explicit confirm** (no second-hit auto-promote); authority-shaped prefs forever refused.
+- Optional `--suite routes` (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) generated under `dist/route-shims/` (not default discovery); installer also places compatible `agent-quality-loop` parent. **Uninstall is manual** folder deletion. `aql-accept` does not by itself create independence on every host. Codex `$…` vs Cursor/Claude `/…`. See `integrations/route-shims/README.md`. Ships `dist/route-shims/` and `integrations/route-shims/` as release bytes so clones can install routes without a prior generate step.
 - Distribution facts verified after the v2.5.0 release: the skills.sh CLI (`npx skills add MQZZang/agent-quality-loop`) discovers all four skills and installs from the cross-client `.agents/skills/` tree; the top-level `skills/` tree remains the Agent Plugins component root. Install docs now lead with the one-command path and state which tree each standard reads.
 - Maintainer-instruction lesson recorded: commands handed to another executor need verified flags — the skills CLI has no `--dry-run`; `-l` is the list-only form.
 

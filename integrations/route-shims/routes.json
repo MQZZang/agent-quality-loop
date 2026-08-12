@@ -1,0 +1,81 @@
+{
+  "version": "1.0.0",
+  "suite": "routes",
+  "routes": [
+    {
+      "name": "aql-diagnose",
+      "description": "Explicit diagnose route: evidence-first read-only investigation with an EVIDENCED terminal ceiling. No local implementation writes.",
+      "axes": {
+        "intent": "diagnose",
+        "mode": "evidence",
+        "action_authority": "read",
+        "terminal_ceiling": "EVIDENCED"
+      },
+      "permissions": {
+        "local_implementation_writes": false
+      },
+      "handoff": "Return evidence-backed findings only. Hand off to agent-quality-loop for implement, accept, or release when the user asks.",
+      "openai": {
+        "display_name": "AQL Diagnose",
+        "short_description": "Evidence-first diagnosis without implementation writes",
+        "default_prompt": "Use $aql-diagnose to investigate this task read-only and return evidence-backed findings up to EVIDENCED."
+      }
+    },
+    {
+      "name": "aql-accept",
+      "description": "Explicit accept route: independent acceptance review in a fresh acceptor context. Read-only; no repair.",
+      "axes": {
+        "intent": "accept",
+        "mode": "accept",
+        "action_authority": "read"
+      },
+      "permissions": {
+        "repair": false,
+        "fresh_acceptor_context": true
+      },
+      "handoff": "Return review findings and a conservative verdict. Do not edit artifacts; hand back to agent-quality-loop if repair is requested.",
+      "openai": {
+        "display_name": "AQL Accept",
+        "short_description": "Independent acceptance review without repair",
+        "default_prompt": "Use $aql-accept to independently review this work in a fresh acceptor context and return a conservative verdict."
+      }
+    },
+    {
+      "name": "aql-release-check",
+      "description": "Explicit release preflight route: readiness check only. Read-only; no release act.",
+      "axes": {
+        "intent": "release",
+        "mode": "release",
+        "release_intent": "preflight",
+        "action_authority": "read"
+      },
+      "permissions": {
+        "release_act": false
+      },
+      "handoff": "Return release-readiness findings only. Any publish, deploy, or external release act requires explicit user authority via agent-quality-loop.",
+      "openai": {
+        "display_name": "AQL Release Check",
+        "short_description": "Release readiness check without performing release",
+        "default_prompt": "Use $aql-release-check to assess release readiness read-only and report blockers without performing a release act."
+      }
+    },
+    {
+      "name": "aql-resume",
+      "description": "Explicit resume route: reconstruction-first continuation from artifacts. Initial authority is read; do not inherit prior external or release authority.",
+      "axes": {
+        "intent": "resume",
+        "reconstruction": "first",
+        "initial_action_authority": "read"
+      },
+      "permissions": {
+        "inherit_elevated_authority": false
+      },
+      "handoff": "Reconstruct goal, scope, and evidence from artifacts, then propose the next safe step. Re-derive authority before any write or external act.",
+      "openai": {
+        "display_name": "AQL Resume",
+        "short_description": "Resume work from artifacts without inherited release authority",
+        "default_prompt": "Use $aql-resume to reconstruct this task from artifacts and continue with read-only authority until scope is reconfirmed."
+      }
+    }
+  ]
+}

@@ -99,9 +99,22 @@ release_authorization:
   rollback: tested or reviewable recovery procedure
   manual_checks: required checks and current statuses
   expires_on: scope, target, environment, baseline, or turn change
+  execution_plan: null or structured fields below
 ```
 
-Any missing field, `authorized_this_turn: false`, or expired scope blocks the external action. Never infer this authority from an earlier turn, a task envelope, credentials being available, a dry-run, or an acceptance PASS.
+When release hooks or other mechanical gates bind a shell command, populate:
+
+```yaml
+execution_plan:
+  host: cursor | other host key the gate validates
+  cwd_realpath: absolute canonical working directory
+  command: exact UTF-8 command string (no shell normalization)
+  command_sha256: 64 lowercase hex of command UTF-8 bytes
+  issued_at: mechanical ISO-8601 instant
+  expires_at: mechanical ISO-8601 instant (max TTL 15 minutes after issued_at)
+```
+
+Any missing field, `authorized_this_turn: false`, expired `execution_plan`, or expired scope blocks the external action. Never infer this authority from an earlier turn, a task envelope, credentials being available, a dry-run, or an acceptance PASS.
 
 `release_intent: preflight` is read-only, uses `intent: release`, `mode: release`, `action_authority: read`, and keeps `release_authorization: null`. `release_intent: act` is a pre-action envelope: it uses the same explicit release route and requires `phase: RELEASE_READY`, `action_authority: release`, and the full structure above. After the authorized action finishes, emit a new `DEPLOYED` envelope with active authority and intent cleared; preserve what happened through evidence/artifact references rather than leaving a reusable act authorization. In `mode: full`, effective authority is never higher than `local_write`; release details cannot be consumed as permission.
 
@@ -326,10 +339,11 @@ acceptance_independence:
   implementer_context_ref: task/thread/agent reference
   acceptor_context_ref: distinct task/thread/agent reference
   relation: fresh_context | different_role | same_context | unknown
+  separation_evidence_ref: concrete reference proving fresh acceptor context
   raw_evidence_before_implementer_narrative: true | false | unknown
 ```
 
-Formal acceptance requires distinct non-empty context references, `relation` equal to `fresh_context` or `different_role`, and raw evidence first. Otherwise remain `phase: BUILT`, `verdict: PENDING`.
+Qualified independent acceptance for `ACCEPTED` requires distinct non-empty context references, `relation: fresh_context`, non-empty `separation_evidence_ref`, and raw evidence first. Record `different_role` only as a downgrade/audit note — it does not qualify for `ACCEPTED`. Otherwise remain `phase: BUILT`, `verdict: PENDING`.
 
 Rebuild the envelope after a baseline change, conflicting concurrent edit, evidence expiry, goal/scope change, or failed acceptance. Do not infer authority from an old envelope.
 
@@ -371,13 +385,13 @@ Allowed `state` values (mapped from lifecycle phase / stop condition):
 English example:
 
 ```text
-[AQL 2.5.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+[AQL 2.6.0 | independently accepted | evidence: all required dimensions PASS | next: none]
 ```
 
 Chinese-scenario example (state words may be localized; syntax unchanged):
 
 ```text
-[AQL 2.5.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+[AQL 2.6.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
 ```
 
 ## Envelope Consistency Check

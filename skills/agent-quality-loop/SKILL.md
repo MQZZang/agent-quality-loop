@@ -4,7 +4,7 @@ description: Use when a user wants an AI coding or workspace agent to turn a nat
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.5.0"
+  version: "2.6.0"
 ---
 
 # Agent Quality Loop
@@ -108,11 +108,15 @@ Most likely misunderstanding: name the highest-variance semantic or authority in
 
 Produce the compact contract defined in [contracts.md](references/contracts.md). For routine task presets, see [contract-presets.md](references/contract-presets.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
 
+**Alignment compiler:** For non-trivial goals, follow [alignment-compiler.md](references/alignment-compiler.md) — observable after-state (not activity verbs alone), current-to-target gap, full-scope evidence coverage, grounded context without fabrication, and material questions only. Ordinary Q&A / low-risk execute / plan-only stays on normal AQL routing; ALIGN still emits only the existing contract fields (no parallel goal ceremony).
+
 **Grounding:** The request's description of the system is itself a hypothesis — users often cannot name the real need. Verify its load-bearing referents (named files, behaviors, terms) read-only before the contract freezes, per the [grounding ladder](references/contracts.md#grounding-ladder): environment first, authoritative sources over model memory for external facts (record source and date), the user last; depth per the ladder's tier rule. A premise contradicted by observation is a contradiction: disclose it **before any edit** — never fabricate the missing referent, and resolve in the open toward the user-observable outcome (silently retargeting a different file is still a silent resolution). A requested mechanism compiles as that outcome plus an `assumptions` entry, never as the goal itself.
 
-**Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
+**Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`). Recurrence first chooses a mechanism type — prose/rule clarification, deterministic script/check, route/tier/adapter change, accepted residual risk, or retire/merge — and marks `promoted` only after an observable absorbing diff exists; otherwise keep `active`.
 
-**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching phrase-lexicon and preference defaults per [personalization.md](references/personalization.md). The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority.
+**ALIGN note:** When a lesson, profile, preset, domain profile, probe, or route is actually applied, record stable version-bound refs in envelope `injected_refs`.
+
+**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching **active** phrase-lexicon and preference defaults per [personalization.md](references/personalization.md); To Confirm candidates are not applied. The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority.
 
 **Observability gate:** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
 
@@ -166,7 +170,7 @@ Pause on scope expansion, dirty-file collision, generated-source ambiguity, miss
 
 ### 4. ACCEPT — Run an independent goal-achievement review
 
-Use `review-gate` when its skill and required references are readable. The acceptor must be a fresh context or different role and must read the original contract, artifacts, diff, and raw evidence before the implementer's narrative. Record distinct implementer/acceptor context references and the evidence-reading order. If review-gate is unavailable or incomplete, record the dependency gap and use **built-in conjunctive review** (first-class path, not a downgrade excuse) in the independent context; do not imitate or claim a review-gate run. If independence cannot be evidenced, keep `phase: BUILT`, return `verdict: PENDING`, and never self-certify. Acceptance output must disclose `acceptance_path` ∈ {`review-gate`, `built-in-conjunctive`, `none→PENDING`}.
+Use `review-gate` when its skill and required references are readable. The acceptor must be a fresh context with recorded separation evidence and must read the original contract, artifacts, diff, and raw evidence before the implementer's narrative. Record distinct implementer/acceptor context references and the evidence-reading order. If review-gate is unavailable or incomplete, record the dependency gap and use **built-in conjunctive review** (first-class path, not a downgrade excuse) in the independent context; do not imitate or claim a review-gate run. Renaming the role (`different_role` alone) is not qualified independence. If independence cannot be evidenced, keep `phase: BUILT`, return `verdict: PENDING`, and never self-certify. Acceptance output must disclose `acceptance_path` ∈ {`review-gate`, `built-in-conjunctive`, `none→PENDING`}.
 
 When `review-gate` is invoked, its output contract governs the review report. Use this skill only to map that verdict and evidence into lifecycle phase and dimension statuses; do not replace or duplicate `Review Scope`, applicable findings, `Verdict`, or `What Was Checked`.
 

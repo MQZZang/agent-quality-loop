@@ -9,11 +9,11 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 
 **How the agent uses it:**
 
-- Read it during **Align** (before proposing the Unified Goal). Apply known preferences **by default**; do **not** re-ask what the profile already answers.
-- Keep it **lightweight and incremental** — populate per the tiers in the skill's `references/personalization.md`: auto-observed entries (lexicon, communication) write directly with a one-line disclosed diff, decision-changing habits are propose-on-confirm, and it is **never** a big upfront questionnaire.
+- Read it during **Align** (before proposing the Unified Goal). Apply known **active** preferences **by default**; do **not** re-ask what the profile already answers.
+- Populate per the tiers in the skill's `references/personalization.md`: first qualifying observations land under **To Confirm** as candidates. **Communication** and **low-risk collaboration** preferences may become active after a second independent task or explicit confirm; **rejected options** and **route aliases** require **explicit confirm only** (repeated mentions do not auto-promote). It is **never** a big upfront questionnaire.
 - Preferences are **defaults, not overrides** — the user's explicit instruction this turn always wins.
-- Anything under **To Confirm** is not yet a settled preference — do not treat it as one.
-- Triggers, write tiers, and the authority firewall (what may sediment automatically, what needs confirmation, and what must never be learned) are defined in the skill package's `references/personalization.md`; this file is the data carrier. Learned preferences never raise authority.
+- Anything under **To Confirm** is a **candidate, not an active preference** — do not apply it until promoted.
+- Triggers, write tiers, rejected-options / route-alias lanes, and the authority firewall (what may sediment, what needs confirmation, and what must never be learned) are defined in the skill package's `references/personalization.md`; this file is the data carrier. Learned preferences never raise authority.
 
 ---
 
@@ -61,10 +61,26 @@ Recurring user phrases mapped to the operational meaning both sides settled on. 
 |---|---|---|---|---|
 | <e.g. “验收”> | <independent accept mode, read-only> | observed \| confirmed | active | never |
 
+## Rejected Options (project-scoped, confirm-first)
+
+Stable rejections the user does not want re-proposed in this project. Single-task non-goals stay in the task envelope — only explicit long-term / project-boundary rejections belong here. **Explicit confirm only** to promote; never infer from one non-choice; never store standing release/push authority.
+
+| Rejected option | Scope | Source | Status | Notes |
+|---|---|---|---|---|
+| <e.g. Redis for local cache> | project | observed \| confirmed | candidate \| active | <why / when stated> |
+
+## Route Aliases (diagnose \| accept \| release-check \| resume only)
+
+Confirm-first phrase → fixed route id. No new physical skills. Must not raise authority or lower assurance floors. Title quotes / unrelated context do not fire; current-turn explicit instruction wins. **Explicit confirm only** to promote — repeated mentions without confirm do not auto-promote.
+
+| Phrase (user's words) | Route id | Source | Status | Last fired |
+|---|---|---|---|---|
+| <e.g. “帮我过一遍”> | accept | observed \| confirmed | candidate \| active | never |
+
 ---
 
-## To Confirm (unconfirmed — do not treat as a preference)
+## To Confirm (candidates — not active preferences)
 
-<!-- Candidate preferences observed but not yet confirmed by the user. Move an item up only after the user confirms it. -->
+<!-- Observed candidates awaiting a second independent task hit or explicit user confirmation. Do not apply these as defaults until promoted to an active section above. -->
 
 - *(none yet)*

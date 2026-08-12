@@ -87,6 +87,10 @@ That split is the point: the implementer does not rubber-stamp its own work, and
 
 A fourth skill, `skill-factory`, ships in the same package but sits outside that loop. It is an authoring tool — use it when you want to write, review, or trim a skill, a Cursor rule, or a prompt template, including the ones in this repository. You can ignore it entirely if you only want the quality loop.
 
+**Alignment compile (not a second workflow).** For non-trivial goals, ALIGN follows [alignment-compiler.md](.cursor/skills/agent-quality-loop/references/alignment-compiler.md) — observable after-state, current-to-target gap, evidence coverage — and still emits only the existing contract fields. Ordinary Q&A and low-risk execute stay on normal routing. External `goal-prompt` material is design/eval inspiration only; it is not vendored and is not a runtime dependency of this package.
+
+**Optional explicit routes.** Independently of `core`/`full`, `--suite routes` installs thin explicit-only shims (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) plus the compatible `agent-quality-loop` parent. Generated sources live in `dist/route-shims/` (not in default skill discovery trees). Invocation spelling differs by host: Codex `$aql-diagnose …`; Cursor and Claude Code `/aql-diagnose …`. **Uninstall manually** by deleting the installed folders from each user skill tree. Details: [integrations/route-shims/README.md](integrations/route-shims/README.md).
+
 Underneath, the package tracks three things separately, and you never have to name any of them:
 
 - **intent** — what outcome you want right now (diagnose? implement? review? release?)
@@ -100,11 +104,11 @@ The agent infers all three from your ordinary wording by following the routing r
 Pick these up in chat; deeper mechanics live in [docs/guide.md](docs/guide.md).
 
 1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. The goal is compiled from your project's observable reality, not only from your words: files and behaviors you name get a cheap read-only check first, so a mistaken premise can surface before anything is edited. The evaluation suite tests exactly this discipline; cheaper models are likelier to slip it, which is one reason acceptance re-checks the outcome instead of trusting the edit. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
-2. **Self-QA ≠ independent acceptance** — “I ran the checks I claim” can justify a local `BUILT` result. Formal acceptance needs a fresh / different-role review that reads raw evidence first (`review-gate` when used).
+2. **Self-QA ≠ independent acceptance** — “I ran the checks I claim” can justify a local `BUILT` result. Formal acceptance needs a fresh-context review with separation evidence that reads raw evidence first; a different role alone does not qualify (`review-gate` when used).
 3. **No evidence, no pass** — missing required checks are reported as not run or blocked, not waved through.
 4. **Publish needs a separate current-turn ask** — a `full` local fix+accept path stops at independent acceptance. Deploy/publish needs its own exact authorization that turn.
 5. **Lessons stick around** — failures and acceptance stops can update `.ai/knowledge/lessons.md`; later alignments read matching active entries so the same mistake is less likely to repeat.
-6. **It adapts to you** — recurring phrases and stable preferences sediment into `.ai/knowledge/collaboration-profile.md` under a strict firewall: observed defaults are disclosed in one line and revocable, decision-changing habits need your confirmation, and anything permission-like is refused. Later alignments read the profile, so the compile gets closer to what you meant with less back-and-forth.
+6. **It adapts to you** — recurring phrases and stable preferences sediment into `.ai/knowledge/collaboration-profile.md` under a strict firewall: observed defaults are disclosed in one line and revocable, decision-changing habits need your confirmation, and anything permission-like is refused. A missing profile may be bootstrapped with a **first candidate** under To Confirm only — that candidate is not standing authority and is not applied the same turn. User-level knowledge paths (`~/.ai/knowledge/…`) are **explicit opt-in**; the installer never seeds them. Later alignments read active profile entries, so the compile gets closer to what you meant with less back-and-forth.
 
 ## How this package is tested
 
@@ -112,7 +116,7 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 
 | Check | What it covers |
 |---|---|
-| 45 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
+| 61 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, alignment compile, profile bootstrap, contradictory instructions, and the failure modes each rule exists to prevent. |
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. The procedure is packaged as a reproducible protocol in [probes/PROBES.md](probes/PROBES.md), and results — including failures — land in [MATRIX.md](MATRIX.md). |
 
@@ -122,7 +126,7 @@ Blind testing is what catches the rules that read well and do nothing. One examp
 
 The same suite is also the package's retirement mechanism. Every behavioral rule names the failure mode it exists to counter, and when blind probes show that a failure mode no longer reproduces on current models, the rule becomes a removal candidate — the policy is written down in [CONTRIBUTING.md](CONTRIBUTING.md). A package like this earns trust by shrinking as models improve, not by accumulating ceremony.
 
-**What you can check, and what you cannot.** The evaluation cases, both validators, the probe protocol, and the result matrix are all in this repository — read them, run them, disagree with them, and reproduce any matrix row on your own models with `probes/make-fixtures.js`. The seed rows were run by the maintainer's own agents, so treat them as falsifiable starting data rather than third-party audit; the protocol exists precisely so you do not have to take them on faith. And none of it measures whether the package improves outcomes on a real project over time. It has not been deployed at that scale, and no such claim is made here.
+**What you can check, and what you cannot.** The evaluation cases, both validators, the probe protocol, and the result matrix are all in this repository — read them, run them, disagree with them, and reproduce any matrix row on your own models with `probes/make-fixtures.js`. The seed rows were run by the maintainer's own agents, so treat them as falsifiable starting data rather than third-party audit; the protocol exists precisely so you do not have to take them on faith. Envelope statistics (`scripts/aql-stats.js`) and `injected_refs` associations are **observable and falsifiable, not causally proven** — they describe what was recorded, not a growth flywheel. Absence of `injected_refs` means measurement unknown, not “nothing was injected.” Read-only tasks may leave no local envelope; stats must still report coverage. And none of it measures whether the package improves outcomes on a real project over time. It has not been deployed at that scale, and no such claim is made here.
 
 ## Everyday use
 
@@ -171,7 +175,7 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 中文用户：一页速览见 [docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)（规范文本以英文为准）。
 
-Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, an envelope-statistics aggregator, and the probe fixture generator).
+Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, the envelope writer, an envelope-statistics aggregator, and the probe fixture generator).
 
 ### Fastest: via the skills.sh CLI
 
@@ -189,7 +193,7 @@ From a clone of this repository:
 node scripts/install.js --suite core --to agents
 ```
 
-- `core` installs the three-piece suite (`agent-quality-loop`, `ask-plan-code-qa`, `review-gate`); `--suite full` adds `skill-factory`.
+- `core` installs the three-piece suite (`agent-quality-loop`, `ask-plan-code-qa`, `review-gate`); `--suite full` adds `skill-factory`; `--suite routes` installs the four explicit route shims plus the compatible `agent-quality-loop` parent from `dist/route-shims/` (not part of `core`/`full`; **uninstall manually** by deleting installed folders).
 - `--to` picks the user-level destination(s):
 
 | `--to` | Destination | Host |
@@ -211,7 +215,21 @@ The repository is also a valid [Agent Plugin](https://agent-plugins.org): the ro
 
 Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 
-If a consumer deliberately enables the optional local envelope cache, it should add `.agent-quality-loop/` to `.gitignore`; host/output handoff remains valid when no local write is authorized.
+### Optional local envelope cache and writer
+
+The compact lifecycle **envelope** can travel in host persistence or the turn handoff. When `action_authority` is `local_write` or higher, the packaged writer may also cache it under `.agent-quality-loop/`:
+
+```bash
+# From a clone (thin wrapper → skill package)
+node scripts/aql-envelope.js --workspace <project-dir> --input envelope.json
+
+# From an installed skill: resolve SKILL_ROOT to the directory that contains that skill's SKILL.md
+node <SKILL_ROOT>/scripts/aql-envelope.js --workspace <project-dir> --input envelope.json
+```
+
+Whether to gitignore `.agent-quality-loop/` is the consumer's choice; if you keep the cache local-only, add it to `.gitignore`. Host/output handoff remains valid when no local write is authorized. Envelope `injected_refs` records what was actually applied this turn (each item needs `content_sha256`; field absence = measurement unknown); `harvest_candidates` carries RETRO harvest. Writer-owned `snapshot.sequence` orders history. `node scripts/aql-stats.js` aggregates **valid, ordered** snapshots: exposures are the contract timeline union; current phase follows max sequence (not the highest historical phase); legacy unordered files are not qualified outcomes — see the testing caveats above.
+
+Optional Cursor hooks (`integrations/cursor-hooks/`): an envelope `execution_plan` is **not** current tool authorization. External write-class commands that match the plan exactly may receive host-native **`ask` only** — the AQL hook never auto-`allow`s them, and it does not understand full shell semantics.
 
 ### Maintainer deployment topology
 
@@ -300,8 +318,8 @@ If you do not have skill-installer, use **§1 Project-level install** instead.
 | `CHANGELOG.md` | Versioned release notes |
 | `docs/guide.md` | Compact user/agent guide; `docs/quickstart.zh-CN.md` is the one-page Chinese quickstart |
 | `.ai/knowledge/` | Two templates you copy into your own project and fill in there, plus this package's own maintenance lessons and prompt-pattern notes — those last two stay here |
-| `integrations/` | Optional Cursor hook templates and protocol tests; hooks never provide semantic acceptance |
-| `scripts/` | Node sync, manifest, installer, envelope statistics, validators, and compatibility helpers |
+| `integrations/` | Optional Cursor hook templates, protocol tests, and generated route-shim catalog; hooks never provide semantic acceptance |
+| `scripts/` | Node sync, manifest, installer, envelope writer wrapper, envelope statistics, route-shim generator, validators, and compatibility helpers |
 | `.github/workflows/` | CI that runs the validators and checks mirror parity |
 | `.gitattributes`, `.gitignore`, `LICENSE` | Repository metadata, ignored-path policy, and license |
 
@@ -313,12 +331,12 @@ If you change the packaged skills or rules in this repository:
 
 ```bash
 node scripts/sync-skills.js
-node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
-node scripts/validate-workflow.js
+node scripts/gen-route-shims.js
+node scripts/validate-all.js
 git diff --check
 ```
 
-GitHub Actions runs the same two validators on every push and pull request, and additionally fails the build if either generated mirror (`.agents/skills/` or `skills/`) has drifted from the Cursor source.
+GitHub Actions runs `node scripts/validate-all.js` on every push and pull request (Ubuntu and Windows), including mirror parity and route-shim drift checks.
 
 The structural validator does not replace independent semantic review or real-environment verification.
 

@@ -9,7 +9,7 @@ description: >-
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.5.0"
+  version: "2.6.0"
 ---
 
 # Review Gate
@@ -72,7 +72,7 @@ Every finding carries one severity: `blocker` | `warning` | `advisory`.
 
 1. Identify the original goal, scope, acceptance standard, frozen baseline, and applicable review types from the supplied contract and raw artifacts. If any decision-changing input is absent, report it; do not invent it.
 2. Gather requirements, plan, diff, artifacts, commands, and raw QA evidence from source — not memory or the implementer's narrative alone.
-3. When formal acceptance is requested, require a distinct fresh context or role and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
+3. When formal acceptance is requested, require a distinct fresh context with separation evidence — not a role rename alone — and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
 4. For experience-type artifacts, run Experience Review; at acceptance, check `.ai/knowledge/lessons.md` **active** lessons for recidivism.
 5. For each finding: Issue · Evidence · Risk · Suggested fix.
 6. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.

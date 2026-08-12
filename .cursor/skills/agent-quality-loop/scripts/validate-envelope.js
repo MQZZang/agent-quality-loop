@@ -2,10 +2,15 @@
 
 "use strict";
 
+const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
+
+const MAX_EXECUTION_PLAN_TTL_MS = 15 * 60 * 1000;
+const CONTENT_SHA256_RE_LOCAL = /^[a-f0-9]{64}$/;
+const INDEPENDENCE_RELATIONS = ["fresh_context", "different_role", "same_context", "unknown"];
 
 const SCHEMA_VERSION = "agent-quality-loop/v2";
 const PHASES = [
@@ -94,6 +99,28 @@ const BARE_PATH_BASENAMES = new Set([
   ".npmrc",
   ".editorconfig",
 ]);
+const INJECTED_REF_KINDS = ["lesson", "profile", "preset", "domain_profile", "probe", "route"];
+const INJECTED_REF_CLASSES = ["learned", "structural"];
+const INJECTED_REF_KIND_CLASS = {
+  lesson: "learned",
+  profile: "learned",
+  preset: "structural",
+  domain_profile: "structural",
+  probe: "structural",
+  route: "structural",
+};
+const SUCCESS_VERDICTS = ["PASS", "PASS_WITH_RISK"];
+const CONTENT_SHA256_RE = /^[a-f0-9]{64}$/;
+const SNAPSHOT_WRITER_RE = /^aql-envelope@\d+\.\d+\.\d+$/;
+const HARVEST_KINDS = [
+  "user_correction",
+  "path_change",
+  "scope_deviation",
+  "contradiction",
+  "thrash_unlock",
+  "rejected_option",
+];
+const HARVEST_LANES = ["lesson", "profile", "rejected_option"];
 
 function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -231,6 +258,452 @@ function validateCoverage(coverage, errors) {
   }
 }
 
+function isOneLine(value) {
+  return nonEmptyString(value) && !/[\r\n]/.test(value);
+}
+
+function validateInjectedRefs(injectedRefs, errors = []) {
+  // Absent field = measurement unknown (OK). Present [] = empty measurement.
+  if (injectedRefs === undefined) return errors;
+  if (!Array.isArray(injectedRefs)) {
+    errors.push("injected_refs must be an array when present");
+    return errors;
+  }
+  if (injectedRefs.length > 8) {
+    errors.push("injected_refs total max is 8");
+  }
+  let learned = 0;
+  let structural = 0;
+  let learnedLesson = 0;
+  let learnedProfile = 0;
+  const seen = new Set();
+  for (const [index, entry] of injectedRefs.entries()) {
+    const label = `injected_refs[${index}]`;
+    if (!isObject(entry)) {
+      errors.push(`${label} must be an object`);
+      continue;
+    }
+    if (!INJECTED_REF_KINDS.includes(entry.kind)) {
+      errors.push(`${label}.kind is invalid`);
+    }
+    const expectedClass = INJECTED_REF_KIND_CLASS[entry.kind];
+    if (!INJECTED_REF_CLASSES.includes(entry.class)) {
+      errors.push(`${label}.class is invalid`);
+    } else if (expectedClass && entry.class !== expectedClass) {
+      errors.push(`${label}.class must be ${expectedClass} for kind ${entry.kind}`);
+    }
+    if (!nonEmptyString(entry.ref)) {
+      errors.push(`${label}.ref must be a non-empty version-bound string`);
+    }
+    if (!isOneLine(entry.reason)) {
+      errors.push(`${label}.reason must be a non-empty one-line string`);
+    }
+    if (typeof entry.content_sha256 !== "string" || !CONTENT_SHA256_RE.test(entry.content_sha256)) {
+      errors.push(`${label}.content_sha256 must be 64 lowercase hex`);
+    }
+    if (
+      nonEmptyString(entry.kind) &&
+      nonEmptyString(entry.ref) &&
+      typeof entry.content_sha256 === "string" &&
+      CONTENT_SHA256_RE.test(entry.content_sha256)
+    ) {
+      const key = `${entry.kind}\0${entry.ref}\0${entry.content_sha256}`;
+      if (seen.has(key)) {
+        errors.push(`${label} duplicates kind+ref+content_sha256`);
+      }
+      seen.add(key);
+    }
+    if (entry.class === "learned") {
+      learned += 1;
+      if (entry.kind === "lesson") learnedLesson += 1;
+      if (entry.kind === "profile") learnedProfile += 1;
+    }
+    if (entry.class === "structural") structural += 1;
+  }
+  if (learned > 5) errors.push("injected_refs learned max is 5");
+  if (learnedLesson > 3) errors.push("injected_refs learned lesson max is 3");
+  if (learnedProfile > 2) errors.push("injected_refs learned profile max is 2");
+  if (structural > 3) errors.push("injected_refs structural max is 3");
+  return errors;
+}
+
+function validateAcceptanceIndependenceShape(independence) {
+  return (
+    isObject(independence) &&
+    nonEmptyString(independence.implementer_context_ref) &&
+    nonEmptyString(independence.acceptor_context_ref) &&
+    INDEPENDENCE_RELATIONS.includes(independence.relation) &&
+    typeof independence.raw_evidence_before_implementer_narrative === "boolean"
+  );
+}
+
+/** Qualified independent acceptance: fresh context only, with separation evidence. */
+function isQualifiedAcceptanceIndependence(independence) {
+  return (
+    isObject(independence) &&
+    independence.relation === "fresh_context" &&
+    nonEmptyString(independence.implementer_context_ref) &&
+    nonEmptyString(independence.acceptor_context_ref) &&
+    independence.implementer_context_ref !== independence.acceptor_context_ref &&
+    nonEmptyString(independence.separation_evidence_ref) &&
+    independence.raw_evidence_before_implementer_narrative === true
+  );
+}
+
+/** ACCEPTED gate alias — never treat different_role as qualified. */
+function isValidAcceptanceIndependence(independence) {
+  return isQualifiedAcceptanceIndependence(independence);
+}
+
+function commandSha256(command) {
+  return crypto.createHash("sha256").update(String(command), "utf8").digest("hex");
+}
+
+function parseMechanicalIsoMs(value) {
+  if (typeof value !== "string" || !value.trim()) return NaN;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+/**
+ * Canonical execution_plan validator. Hook must call this — no second rule set.
+ * @param {object} plan
+ * @param {string[]} errors
+ * @param {{ command?: string, cwdRealpath?: string, now?: number, maxTtlMs?: number, requireHost?: string }} context
+ */
+function validateExecutionPlan(plan, errors = [], context = {}) {
+  if (!isObject(plan)) {
+    errors.push("execution_plan must be an object");
+    return errors;
+  }
+  const requireHost = context.requireHost || "cursor";
+  if (!nonEmptyString(plan.host)) {
+    errors.push("execution_plan.host is required");
+  } else if (plan.host !== requireHost) {
+    errors.push(`execution_plan.host must be "${requireHost}"`);
+  }
+  if (!nonEmptyString(plan.command)) {
+    errors.push("execution_plan.command is required");
+  }
+  if (typeof plan.command_sha256 !== "string" || !CONTENT_SHA256_RE_LOCAL.test(plan.command_sha256)) {
+    errors.push("execution_plan.command_sha256 must be 64 lowercase hex");
+  } else if (nonEmptyString(plan.command) && plan.command_sha256 !== commandSha256(plan.command)) {
+    errors.push("execution_plan.command_sha256 does not match command UTF-8 sha256");
+  }
+  if (!nonEmptyString(plan.cwd_realpath) || !path.isAbsolute(plan.cwd_realpath)) {
+    errors.push("execution_plan.cwd_realpath must be an absolute canonical path");
+  }
+  const issuedAt = parseMechanicalIsoMs(plan.issued_at);
+  const expiresAt = parseMechanicalIsoMs(plan.expires_at);
+  if (Number.isNaN(issuedAt)) {
+    errors.push("execution_plan.issued_at must be a mechanical ISO-8601 instant");
+  }
+  if (Number.isNaN(expiresAt)) {
+    errors.push("execution_plan.expires_at must be a mechanical ISO-8601 instant");
+  }
+  if (!Number.isNaN(issuedAt) && !Number.isNaN(expiresAt)) {
+    if (!(expiresAt > issuedAt)) {
+      errors.push("execution_plan.expires_at must be after issued_at");
+    }
+    const maxTtl = Number.isFinite(context.maxTtlMs) ? context.maxTtlMs : MAX_EXECUTION_PLAN_TTL_MS;
+    if (expiresAt - issuedAt > maxTtl) {
+      errors.push("execution_plan TTL exceeds maximum 15 minutes");
+    }
+    const now = Number.isFinite(context.now) ? context.now : Date.now();
+    if (expiresAt <= now) {
+      errors.push("execution_plan expired");
+    }
+  }
+  if (typeof context.command === "string") {
+    if (plan.command !== context.command) {
+      errors.push("execution_plan.command does not match live command");
+    }
+  }
+  if (typeof context.cwdRealpath === "string" && context.cwdRealpath) {
+    let planCwd = plan.cwd_realpath;
+    let liveCwd = context.cwdRealpath;
+    try {
+      planCwd = fs.realpathSync(plan.cwd_realpath);
+    } catch (_err) {
+      /* keep absolute string */
+    }
+    try {
+      liveCwd = fs.realpathSync(context.cwdRealpath);
+    } catch (_err) {
+      /* keep */
+    }
+    if (path.normalize(planCwd) !== path.normalize(liveCwd)) {
+      errors.push("execution_plan.cwd_realpath does not match live cwd");
+    }
+  }
+  return errors;
+}
+
+/**
+ * Combined release-act gate: full envelope + refs + exact plan match.
+ */
+function validateReleaseActEnvelope(envelope, context = {}) {
+  const errors = validateEnvelope(envelope);
+  if (!isObject(envelope)) return errors;
+  if (envelope.intent !== "release") errors.push("release act requires intent release");
+  if (envelope.mode !== "release") errors.push("release act requires mode release");
+  if (envelope.phase !== "RELEASE_READY") errors.push("release act requires phase RELEASE_READY");
+  if (envelope.action_authority !== "release") errors.push("release act requires action_authority release");
+  if (envelope.release_intent !== "act") errors.push("release act requires release_intent act");
+  if (!isQualifiedAcceptanceIndependence(envelope.acceptance_independence)) {
+    errors.push("release act requires qualified fresh_context acceptance independence");
+  }
+  if (context.workspaceRoot) {
+    for (const err of validateRefPaths(envelope, context.workspaceRoot)) {
+      errors.push(err);
+    }
+  }
+  const authorization = envelope.release_authorization;
+  if (!isObject(authorization) || authorization.authorized_this_turn !== true) {
+    errors.push("release act requires current-turn release_authorization");
+  } else {
+    validateExecutionPlan(authorization.execution_plan, errors, {
+      command: context.command,
+      cwdRealpath: context.cwdRealpath,
+      now: context.now,
+      maxTtlMs: context.maxTtlMs,
+      requireHost: context.requireHost || "cursor",
+    });
+  }
+  return errors;
+}
+
+function phaseIndexOf(phase) {
+  return PHASES.indexOf(phase);
+}
+
+function isAcceptedOrHigher(phase) {
+  const index = phaseIndexOf(phase);
+  return index >= 0 && index >= phaseIndexOf("ACCEPTED");
+}
+
+function isReleaseReadyOrHigher(phase) {
+  const index = phaseIndexOf(phase);
+  return index >= 0 && index >= phaseIndexOf("RELEASE_READY");
+}
+
+function validatePhaseVerdictConsistency(envelope, errors = []) {
+  if (!isObject(envelope)) {
+    errors.push("envelope must be a JSON object");
+    return errors;
+  }
+  const phase = envelope.phase;
+  const verdict = envelope.verdict;
+  if (isAcceptedOrHigher(phase)) {
+    if (!SUCCESS_VERDICTS.includes(verdict)) {
+      errors.push(`phase ${phase} requires verdict in success set (PASS or PASS_WITH_RISK)`);
+    }
+  }
+  if (["FAIL", "BLOCKED", "PENDING"].includes(verdict)) {
+    if (phase === "ACCEPTED" || phase === "RELEASE_READY") {
+      errors.push(`verdict ${verdict} forbids phase ${phase}`);
+    }
+  }
+  return errors;
+}
+
+function validateAcceptanceSemantics(envelope, errors = []) {
+  if (!isObject(envelope)) {
+    errors.push("envelope must be a JSON object");
+    return errors;
+  }
+  const requiresAcceptance = isAcceptedOrHigher(envelope.phase);
+  if (envelope.acceptance_gate !== null || requiresAcceptance) {
+    validateGate(envelope.acceptance_gate, "acceptance", requiresAcceptance, errors);
+  }
+  if (requiresAcceptance) {
+    if (!isValidAcceptanceIndependence(envelope.acceptance_independence)) {
+      errors.push("ACCEPTED or later requires evidenced independent acceptance");
+    }
+  }
+  return errors;
+}
+
+function validateReleaseSemantics(envelope, errors = []) {
+  if (!isObject(envelope)) {
+    errors.push("envelope must be a JSON object");
+    return errors;
+  }
+  const phaseIndex = phaseIndexOf(envelope.phase);
+  const requiresReleaseGate = isReleaseReadyOrHigher(envelope.phase);
+  if (envelope.release_gate !== null && envelope.release_gate !== undefined) {
+    if (phaseIndex < phaseIndexOf("ACCEPTED")) {
+      errors.push("release_gate must remain null until release preflight begins from ACCEPTED");
+    }
+    if (envelope.phase === "ACCEPTED" && envelope.release_intent !== "preflight") {
+      errors.push("release_gate at ACCEPTED requires release_intent preflight");
+    }
+  }
+  if (envelope.release_gate !== null || requiresReleaseGate) {
+    validateGate(envelope.release_gate, "release", requiresReleaseGate, errors);
+  }
+  return errors;
+}
+
+function isIsoWithMilliseconds(value) {
+  if (typeof value !== "string") return false;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed);
+}
+
+function validateSnapshotMetadata(snapshot, errors = [], label = "snapshot") {
+  if (snapshot === undefined || snapshot === null) return errors;
+  if (!isObject(snapshot)) {
+    errors.push(`${label} must be an object when present`);
+    return errors;
+  }
+  if (!nonEmptyString(snapshot.id)) {
+    errors.push(`${label}.id must be a non-empty string`);
+  }
+  if (!isIsoWithMilliseconds(snapshot.recorded_at)) {
+    errors.push(`${label}.recorded_at must be ISO-8601 UTC with milliseconds`);
+  }
+  if (!Number.isInteger(snapshot.sequence) || snapshot.sequence < 1) {
+    errors.push(`${label}.sequence must be an integer >= 1`);
+  }
+  if (
+    snapshot.previous_digest !== null &&
+    (typeof snapshot.previous_digest !== "string" || !CONTENT_SHA256_RE.test(snapshot.previous_digest))
+  ) {
+    errors.push(`${label}.previous_digest must be null or 64 lowercase hex`);
+  }
+  if (typeof snapshot.writer !== "string" || !SNAPSHOT_WRITER_RE.test(snapshot.writer)) {
+    errors.push(`${label}.writer must match aql-envelope@<semver>`);
+  }
+  return errors;
+}
+
+function validateSnapshotOrdering(entries) {
+  const errors = [];
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return { status: "legacy_unordered", errors };
+  }
+  const withMeta = [];
+  const withoutMeta = [];
+  for (const [index, entry] of entries.entries()) {
+    if (!entry || !isObject(entry.envelope)) {
+      errors.push(`entries[${index}] must include envelope object`);
+      continue;
+    }
+    const snapshot = entry.envelope.snapshot;
+    if (snapshot === undefined || snapshot === null) {
+      withoutMeta.push(entry);
+      continue;
+    }
+    validateSnapshotMetadata(snapshot, errors, `entries[${index}].snapshot`);
+    withMeta.push(entry);
+  }
+  if (errors.length > 0 && withMeta.length === 0 && withoutMeta.length === entries.length) {
+    return { status: "legacy_unordered", errors: [] };
+  }
+  if (withoutMeta.length > 0 && withMeta.length > 0) {
+    errors.push("mixed writer snapshot metadata and legacy envelopes");
+    return { status: "invalid", errors };
+  }
+  if (withMeta.length === 0) {
+    return { status: "legacy_unordered", errors: [] };
+  }
+
+  const bySequence = new Map();
+  const ids = new Set();
+  for (const entry of withMeta) {
+    const snapshot = entry.envelope.snapshot;
+    if (ids.has(snapshot.id)) {
+      errors.push(`duplicate snapshot.id ${snapshot.id}`);
+    }
+    ids.add(snapshot.id);
+    if (bySequence.has(snapshot.sequence)) {
+      errors.push(`duplicate sequence ${snapshot.sequence}`);
+    } else {
+      bySequence.set(snapshot.sequence, entry);
+    }
+  }
+
+  const sequences = [...bySequence.keys()].sort((a, b) => a - b);
+  if (sequences.filter((value) => value === 1).length > 1) {
+    errors.push("multiple sequence=1 snapshots");
+  }
+  if (sequences.length > 0 && sequences[0] !== 1) {
+    errors.push("sequence chain must start at 1");
+  }
+  for (let index = 0; index < sequences.length; index += 1) {
+    const expected = index + 1;
+    if (sequences[index] !== expected) {
+      errors.push(`sequence gap near ${sequences[index]}`);
+      break;
+    }
+  }
+
+  for (const sequence of sequences) {
+    const entry = bySequence.get(sequence);
+    const snapshot = entry.envelope.snapshot;
+    if (sequence === 1) {
+      if (snapshot.previous_digest !== null) {
+        errors.push("sequence 1 previous_digest must be null");
+      }
+      continue;
+    }
+    const previous = bySequence.get(sequence - 1);
+    if (!previous) continue;
+    const previousDigest =
+      typeof entry.previous_digest_expected === "string"
+        ? entry.previous_digest_expected
+        : previous.digest;
+    if (typeof previousDigest !== "string" || snapshot.previous_digest !== previousDigest) {
+      errors.push(`previous_digest mismatch at sequence ${sequence}`);
+    }
+    if (
+      typeof previous.envelope.snapshot.recorded_at === "string" &&
+      typeof snapshot.recorded_at === "string" &&
+      Date.parse(snapshot.recorded_at) < Date.parse(previous.envelope.snapshot.recorded_at)
+    ) {
+      errors.push(`recorded_at regresses at sequence ${sequence}`);
+    }
+  }
+
+  return { status: errors.length === 0 ? "valid" : "invalid", errors };
+}
+
+function validateHarvestCandidates(harvestCandidates, errors) {
+  // Absent field remains valid for older envelopes.
+  if (harvestCandidates === undefined) return;
+  if (!Array.isArray(harvestCandidates)) {
+    errors.push("harvest_candidates must be an array when present");
+    return;
+  }
+  if (harvestCandidates.length > 3) {
+    errors.push("harvest_candidates max is 3 when present");
+  }
+  for (const [index, entry] of harvestCandidates.entries()) {
+    const label = `harvest_candidates[${index}]`;
+    if (!isObject(entry)) {
+      errors.push(`${label} must be an object`);
+      continue;
+    }
+    if (!HARVEST_KINDS.includes(entry.kind)) {
+      errors.push(`${label}.kind is invalid`);
+    }
+    if (!HARVEST_LANES.includes(entry.lane)) {
+      errors.push(`${label}.lane is invalid`);
+    }
+    if (entry.status !== "candidate") {
+      errors.push(`${label}.status must be candidate`);
+    }
+    if (!nonEmptyString(entry.source_ref)) {
+      errors.push(`${label}.source_ref is required`);
+    }
+    if (!nonEmptyString(entry.summary)) {
+      errors.push(`${label}.summary is required`);
+    }
+  }
+}
+
 function validateAuthorization(envelope, errors) {
   validateCoverage(envelope.side_effect_coverage, errors);
   const authorization = envelope.release_authorization;
@@ -285,6 +758,13 @@ function validateAuthorization(envelope, errors) {
   }
   if (!isObject(envelope.side_effect_coverage) || envelope.side_effect_coverage.mode !== "actual_action") {
     errors.push("release act requires actual_action side_effect_coverage");
+  }
+  if (validAuthorization) {
+    if (!isObject(authorization.execution_plan)) {
+      errors.push("release act requires release_authorization.execution_plan");
+    } else {
+      validateExecutionPlan(authorization.execution_plan, errors, { requireHost: "cursor" });
+    }
   }
 }
 
@@ -474,37 +954,15 @@ function validateEnvelope(envelope) {
     }
   }
 
-  const requiresAcceptance = phaseIndex >= PHASES.indexOf("ACCEPTED");
-  if (envelope.acceptance_gate !== null || requiresAcceptance) {
-    validateGate(envelope.acceptance_gate, "acceptance", requiresAcceptance, errors);
-  }
-  if (requiresAcceptance) {
-    const independence = envelope.acceptance_independence;
-    if (
-      !isObject(independence) ||
-      !nonEmptyString(independence.implementer_context_ref) ||
-      !nonEmptyString(independence.acceptor_context_ref) ||
-      independence.implementer_context_ref === independence.acceptor_context_ref ||
-      !["fresh_context", "different_role"].includes(independence.relation) ||
-      independence.raw_evidence_before_implementer_narrative !== true
-    ) {
-      errors.push("ACCEPTED or later requires evidenced independent acceptance");
-    }
-  }
-
-  const requiresReleaseGate = phaseIndex >= PHASES.indexOf("RELEASE_READY");
-  if (envelope.release_gate !== null && envelope.release_gate !== undefined) {
-    if (phaseIndex < PHASES.indexOf("ACCEPTED")) {
-      errors.push("release_gate must remain null until release preflight begins from ACCEPTED");
-    }
-    if (envelope.phase === "ACCEPTED" && envelope.release_intent !== "preflight") {
-      errors.push("release_gate at ACCEPTED requires release_intent preflight");
-    }
-  }
-  if (envelope.release_gate !== null || requiresReleaseGate) {
-    validateGate(envelope.release_gate, "release", requiresReleaseGate, errors);
-  }
+  validatePhaseVerdictConsistency(envelope, errors);
+  validateAcceptanceSemantics(envelope, errors);
+  validateReleaseSemantics(envelope, errors);
   validateAuthorization(envelope, errors);
+  validateInjectedRefs(envelope.injected_refs, errors);
+  validateHarvestCandidates(envelope.harvest_candidates, errors);
+  if (Object.prototype.hasOwnProperty.call(envelope, "snapshot")) {
+    validateSnapshotMetadata(envelope.snapshot, errors);
+  }
 
   if (["BLOCKED", "PENDING"].includes(envelope.verdict)) {
     if (!isObject(envelope.blocker)) {
@@ -685,6 +1143,13 @@ function validateRefPaths(envelope, baseDir) {
       }
     }
   }
+  const independence = envelope.acceptance_independence;
+  if (isObject(independence) && looksLikeFilePath(independence.separation_evidence_ref)) {
+    const resolved = resolveRefPath(independence.separation_evidence_ref, baseDir);
+    if (!fs.existsSync(resolved)) {
+      missing.push(`acceptance_independence.separation_evidence_ref=${independence.separation_evidence_ref}`);
+    }
+  }
   if (missing.length > 0) {
     errors.push(`missing path refs: ${missing.join("; ")}`);
   }
@@ -713,12 +1178,37 @@ function runCheckRefs(envelopePath, baseDir) {
   return 0;
 }
 
+
+function fixtureExecutionPlan(command) {
+  const cmd = command || "git push origin HEAD";
+  const issued = new Date();
+  const expires = new Date(issued.getTime() + 10 * 60 * 1000);
+  return {
+    host: "cursor",
+    cwd_realpath: path.resolve(os.tmpdir(), "aql-fixture-workspace"),
+    command: cmd,
+    command_sha256: commandSha256(cmd),
+    issued_at: issued.toISOString(),
+    expires_at: expires.toISOString(),
+  };
+}
+
+function qualifiedIndependence() {
+  return {
+    implementer_context_ref: "implementer-task",
+    acceptor_context_ref: "acceptor-task",
+    relation: "fresh_context",
+    separation_evidence_ref: "source:fresh-acceptor-handoff",
+    raw_evidence_before_implementer_narrative: true,
+  };
+}
+
 function runSelfTest() {
   const cases = [];
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
 
   const withSkillVersion = baseEnvelope();
-  withSkillVersion.skill_version = "2.5.0";
+  withSkillVersion.skill_version = "2.6.0";
   cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
 
   const emptySkillVersion = baseEnvelope();
@@ -835,6 +1325,7 @@ function runSelfTest() {
     rollback: "revert commit",
     manual_checks: ["private repository confirmed"],
     expires_on: "target or turn change",
+    execution_plan: fixtureExecutionPlan(),
   };
   repeatedReleaseAct.side_effect_coverage = {
     command: "publish release",
@@ -853,12 +1344,7 @@ function runSelfTest() {
   };
   repeatedReleaseAct.acceptance_gate = passingGate("acceptance");
   repeatedReleaseAct.release_gate = passingGate("release");
-  repeatedReleaseAct.acceptance_independence = {
-    implementer_context_ref: "implementer-task",
-    acceptor_context_ref: "acceptor-task",
-    relation: "different_role",
-    raw_evidence_before_implementer_narrative: true,
-  };
+  repeatedReleaseAct.acceptance_independence = qualifiedIndependence();
   cases.push({ name: "release act starts only from release-ready", envelope: repeatedReleaseAct, valid: false, expectedError: "release_intent act requires phase exactly RELEASE_READY" });
 
   const incompleteResume = baseEnvelope();
@@ -896,6 +1382,65 @@ function runSelfTest() {
   deployedAfterAct.release_intent = null;
   deployedAfterAct.action_authority = "read";
   deployedAfterAct.release_authorization = null;
+
+  const differentRoleAccepted = baseEnvelope();
+  differentRoleAccepted.intent = "accept";
+  differentRoleAccepted.mode = "accept";
+  differentRoleAccepted.phase = "ACCEPTED";
+  differentRoleAccepted.verdict = "PASS";
+  differentRoleAccepted.action_authority = "read";
+  differentRoleAccepted.next_allowed_phase = "RELEASE_READY";
+  differentRoleAccepted.acceptance_gate = passingGate("acceptance");
+  differentRoleAccepted.acceptance_independence = {
+    implementer_context_ref: "implementer-task",
+    acceptor_context_ref: "acceptor-task",
+    relation: "different_role",
+    separation_evidence_ref: "source:role-switch",
+    raw_evidence_before_implementer_narrative: true,
+  };
+  cases.push({
+    name: "different_role cannot ACCEPTED",
+    envelope: differentRoleAccepted,
+    valid: false,
+    expectedError: "ACCEPTED or later requires evidenced independent acceptance",
+  });
+
+  const freshMissingSeparation = baseEnvelope();
+  freshMissingSeparation.intent = "accept";
+  freshMissingSeparation.mode = "accept";
+  freshMissingSeparation.phase = "ACCEPTED";
+  freshMissingSeparation.verdict = "PASS";
+  freshMissingSeparation.action_authority = "read";
+  freshMissingSeparation.next_allowed_phase = "RELEASE_READY";
+  freshMissingSeparation.acceptance_gate = passingGate("acceptance");
+  freshMissingSeparation.acceptance_independence = {
+    implementer_context_ref: "implementer-task",
+    acceptor_context_ref: "acceptor-task",
+    relation: "fresh_context",
+    raw_evidence_before_implementer_narrative: true,
+  };
+  cases.push({
+    name: "fresh_context without separation evidence cannot ACCEPTED",
+    envelope: freshMissingSeparation,
+    valid: false,
+    expectedError: "ACCEPTED or later requires evidenced independent acceptance",
+  });
+
+  const freshQualified = baseEnvelope();
+  freshQualified.intent = "accept";
+  freshQualified.mode = "accept";
+  freshQualified.phase = "ACCEPTED";
+  freshQualified.verdict = "PASS";
+  freshQualified.action_authority = "read";
+  freshQualified.next_allowed_phase = "RELEASE_READY";
+  freshQualified.acceptance_gate = passingGate("acceptance");
+  freshQualified.acceptance_independence = qualifiedIndependence();
+  cases.push({
+    name: "fresh_context with separation evidence can ACCEPTED",
+    envelope: freshQualified,
+    valid: true,
+  });
+
   cases.push({ name: "deployed envelope clears active release authority", envelope: deployedAfterAct, valid: true });
 
   const deployedWithReusableAuthority = JSON.parse(JSON.stringify(deployedAfterAct));
@@ -923,6 +1468,178 @@ function runSelfTest() {
     local_edits: "kept",
   };
   cases.push({ name: "stop clears elevated authority", envelope: stoppedWithReleaseAuthority, valid: false, expectedError: "must clear elevated action authority" });
+
+  const injectedOk = baseEnvelope();
+  injectedOk.injected_refs = [
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "apply pause on dirty tree",
+    },
+    {
+      kind: "preset",
+      class: "structural",
+      ref: "contract-presets.md#bugfix@v2",
+      content_sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      reason: "bugfix preset",
+    },
+  ];
+  cases.push({ name: "valid injected_refs accepted", envelope: injectedOk, valid: true });
+
+  const injectedEmpty = baseEnvelope();
+  injectedEmpty.injected_refs = [];
+  cases.push({ name: "empty injected_refs array accepted", envelope: injectedEmpty, valid: true });
+
+  const injectedDup = baseEnvelope();
+  injectedDup.injected_refs = [
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "one",
+    },
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "two",
+    },
+  ];
+  cases.push({
+    name: "duplicate injected_refs kind+ref+content_sha256 rejected",
+    envelope: injectedDup,
+    valid: false,
+    expectedError: "duplicates kind+ref+content_sha256",
+  });
+
+  const injectedTooManyLearned = baseEnvelope();
+  injectedTooManyLearned.injected_refs = [
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "a@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "r1",
+    },
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "b@v1",
+      content_sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      reason: "r2",
+    },
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "c@v1",
+      content_sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      reason: "r3",
+    },
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "d@v1",
+      content_sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      reason: "r4",
+    },
+  ];
+  cases.push({ name: "learned lesson cap rejected", envelope: injectedTooManyLearned, valid: false, expectedError: "learned lesson max is 3" });
+
+  const acceptedBase = baseEnvelope();
+  acceptedBase.intent = "accept";
+  acceptedBase.mode = "accept";
+  acceptedBase.phase = "ACCEPTED";
+  acceptedBase.verdict = "PASS";
+  acceptedBase.action_authority = "read";
+  acceptedBase.next_allowed_phase = "RELEASE_READY";
+  acceptedBase.acceptance_gate = passingGate("acceptance");
+  acceptedBase.acceptance_independence = qualifiedIndependence();
+
+  const acceptedFailVerdict = JSON.parse(JSON.stringify(acceptedBase));
+  acceptedFailVerdict.verdict = "FAIL";
+  cases.push({
+    name: "ACCEPTED + FAIL verdict rejected",
+    envelope: acceptedFailVerdict,
+    valid: false,
+    expectedError: "requires verdict in success set",
+  });
+
+  const acceptedDimFail = JSON.parse(JSON.stringify(acceptedBase));
+  acceptedDimFail.acceptance_gate.status_by_dimension.tests = {
+    status: "FAIL",
+    evidence_refs: ["tests:fail"],
+  };
+  cases.push({
+    name: "ACCEPTED + required dimension FAIL rejected",
+    envelope: acceptedDimFail,
+    valid: false,
+    expectedError: "must PASS for this phase",
+  });
+
+  const injectedWrongClass = baseEnvelope();
+  injectedWrongClass.injected_refs = [
+    {
+      kind: "lesson",
+      class: "structural",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "wrong class",
+    },
+  ];
+  cases.push({
+    name: "injected_refs wrong kind/class mapping rejected",
+    envelope: injectedWrongClass,
+    valid: false,
+    expectedError: "class must be learned for kind lesson",
+  });
+
+  const injectedMissingSha = baseEnvelope();
+  injectedMissingSha.injected_refs = [
+    { kind: "lesson", class: "learned", ref: "lessons.md#L1@v1", reason: "missing digest" },
+  ];
+  cases.push({
+    name: "injected_refs missing content_sha256 rejected",
+    envelope: injectedMissingSha,
+    valid: false,
+    expectedError: "content_sha256 must be 64 lowercase hex",
+  });
+
+  const harvestOk = baseEnvelope();
+  harvestOk.harvest_candidates = [
+    {
+      kind: "user_correction",
+      lane: "lesson",
+      summary: "user corrected scope",
+      source_ref: "chat:turn-3",
+      status: "candidate",
+    },
+  ];
+  cases.push({ name: "valid harvest_candidates accepted", envelope: harvestOk, valid: true });
+
+  const harvestBadStatus = baseEnvelope();
+  harvestBadStatus.harvest_candidates = [
+    {
+      kind: "user_correction",
+      lane: "lesson",
+      summary: "user corrected scope",
+      source_ref: "chat:turn-3",
+      status: "promoted",
+    },
+  ];
+  cases.push({ name: "harvest status must be candidate", envelope: harvestBadStatus, valid: false, expectedError: "status must be candidate" });
+
+  const harvestTooMany = baseEnvelope();
+  harvestTooMany.harvest_candidates = [
+    { kind: "user_correction", lane: "lesson", summary: "a", source_ref: "s1", status: "candidate" },
+    { kind: "path_change", lane: "lesson", summary: "b", source_ref: "s2", status: "candidate" },
+    { kind: "scope_deviation", lane: "lesson", summary: "c", source_ref: "s3", status: "candidate" },
+    { kind: "contradiction", lane: "profile", summary: "d", source_ref: "s4", status: "candidate" },
+  ];
+  cases.push({ name: "harvest_candidates max rejected", envelope: harvestTooMany, valid: false, expectedError: "harvest_candidates max is 3" });
 
   let failed = false;
   for (const testCase of cases) {
@@ -1096,4 +1813,50 @@ function main(argv = process.argv.slice(2)) {
   return 0;
 }
 
-process.exitCode = main();
+if (require.main === module) {
+  process.exitCode = main();
+}
+
+module.exports = {
+  SCHEMA_VERSION,
+  PHASES,
+  VERDICTS,
+  SUCCESS_VERDICTS,
+  MODES,
+  INTENTS,
+  ASSURANCES,
+  AUTHORITIES,
+  RELEASE_INTENTS,
+  RECONSTRUCTION_STATUSES,
+  CHANGE_CLASSES,
+  STOP_REASONS,
+  ACCEPTANCE_DIMENSIONS,
+  ACCEPTANCE_ALWAYS,
+  RELEASE_DIMENSIONS,
+  RELEASE_ALWAYS,
+  INJECTED_REF_KINDS,
+  INJECTED_REF_CLASSES,
+  INJECTED_REF_KIND_CLASS,
+  HARVEST_KINDS,
+  HARVEST_LANES,
+  validateEnvelope,
+  validateRefPaths,
+  validateInjectedRefs,
+  validateHarvestCandidates,
+  validatePhaseVerdictConsistency,
+  validateAcceptanceSemantics,
+  validateReleaseSemantics,
+  validateSnapshotMetadata,
+  validateSnapshotOrdering,
+  validateExecutionPlan,
+  validateReleaseActEnvelope,
+  validateAcceptanceIndependenceShape,
+  isValidAcceptanceIndependence,
+  isQualifiedAcceptanceIndependence,
+  isAcceptedOrHigher,
+  MAX_EXECUTION_PLAN_TTL_MS,
+  commandSha256,
+  baseEnvelope,
+  passingGate,
+  main,
+};

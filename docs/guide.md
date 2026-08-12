@@ -36,7 +36,7 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge: `[AQL 2.5.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+Example trust badge: `[AQL 2.6.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
 
 For routine tasks, the workflow starts from the prefilled presets in the skill's `references/contract-presets.md` (data, not new modes) to keep ALIGN short — this is automatic; there is nothing for the user to open or fill.
 
@@ -54,7 +54,7 @@ RAW → ALIGNED → EVIDENCED → BUILT → ACCEPTED
 
 - Diagnosis may end at `EVIDENCED`.
 - Implementation self-QA ends at `BUILT`.
-- Formal acceptance requires a fresh/different-role reviewer reading raw evidence first.
+- Formal acceptance requires a fresh-context reviewer with separation evidence reading raw evidence first.
 - After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest 0–3 lesson candidates and 0–2 collaboration-profile candidates; not a new phase.
 - `RELEASE_READY` is not deployment permission.
 - After deployment, active release authority is cleared; only historical evidence remains.
@@ -77,7 +77,20 @@ Compile `target_user_or_system` as the final consumer + medium.
 
 Personalization:
 - ALIGN reads `.ai/knowledge/collaboration-profile.md` when present: phrase-lexicon and preference defaults apply, the current turn's explicit instruction wins, and learned preferences never raise authority.
+- Missing profile: first-candidate bootstrap may create the file and write **only** under To Confirm; candidates are not standing authority and must not apply the same turn.
 - RETRO may sediment observed candidates per the skill's `references/personalization.md` — auto tier disclosed in one line, decision-changing habits confirm-first, permission-like items refused.
+- User-level knowledge (`~/.ai/knowledge/…`) is explicit opt-in only; never default-read or default-write.
+
+Envelope cache, refs, and stats:
+- Optional local cache under `.agent-quality-loop/` via packaged `aql-envelope.js` when `local_write+` is authorized; consumers invoke through `SKILL_ROOT`. Gitignore is the user's choice. Read-only tasks may leave no local envelope.
+- When a lesson, profile, preset, domain profile, probe, or route is actually applied, record it in envelope `injected_refs`. Absence of the field means measurement unknown, not “nothing injected.” `harvest_candidates` carries RETRO harvest (max 3).
+- `node scripts/aql-stats.js` reports coverage and descriptive associations — **observable and falsifiable, not causally proven**.
+
+Alignment compiler and routes:
+- Non-trivial ALIGN follows `references/alignment-compiler.md` inside the existing contract — not a second workflow. External `goal-prompt` is design/eval inspiration only (not vendored, not a runtime dependency).
+- Optional `--suite routes` installs explicit-only shims from `dist/route-shims/` plus the compatible `agent-quality-loop` parent (not in default discovery trees). **Uninstall manually** by deleting installed folders. `aql-accept` does not by itself create independence on every host. Codex: `$aql-diagnose …`; Cursor/Claude: `/aql-diagnose …`. See [route-shims README](../integrations/route-shims/README.md).
+- External write hooks: exact `execution_plan` match → host-native **ask** only (never AQL auto-allow). Envelope authorization fields are not current tool consent. See [cursor-hooks README](../integrations/cursor-hooks/README.md).
+- Stats: qualified associations require valid ordered snapshots; exposures union the contract timeline; current phase is max `snapshot.sequence`. Observable/falsifiable association, not causal proof.
 
 Consumer probe and multi-agent:
 - Any native-medium-consumable artifact (code uses behavior replay as its probe) needs acceptor cold consumption before `user_observable_result` can PASS; else honest `NOT_RUN`.

@@ -8,7 +8,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "2.5.0";
+const MANIFEST_VERSION = "2.6.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
@@ -18,12 +18,15 @@ const requiredFiles = [
   "references/contract-presets.md",
   "references/contracts.md",
   "references/domain-profiles.md",
+  "references/alignment-compiler.md",
   "references/evaluation-cases.md",
   "references/multi-agent-leverage.md",
   "references/personalization.md",
   "manifest.json",
   "scripts/validate-envelope.js",
   "scripts/validate-skill.js",
+  "scripts/aql-envelope.js",
+  "scripts/aql-stats.js",
 ];
 const errors = [];
 
@@ -255,6 +258,22 @@ const envelopeCheck = spawnSync(process.execPath, [path.join(root, "scripts", "v
 });
 if (envelopeCheck.status !== 0) {
   errors.push(`envelope self-test failed: ${(envelopeCheck.stderr || envelopeCheck.stdout).trim()}`);
+}
+
+const writerCheck = spawnSync(process.execPath, [path.join(root, "scripts", "aql-envelope.js"), "--self-test"], {
+  cwd: root,
+  encoding: "utf8",
+});
+if (writerCheck.status !== 0) {
+  errors.push(`aql-envelope self-test failed: ${(writerCheck.stderr || writerCheck.stdout).trim()}`);
+}
+
+const statsCheck = spawnSync(process.execPath, [path.join(root, "scripts", "aql-stats.js"), "--self-test"], {
+  cwd: root,
+  encoding: "utf8",
+});
+if (statsCheck.status !== 0) {
+  errors.push(`aql-stats self-test failed: ${(statsCheck.stderr || statsCheck.stdout).trim()}`);
 }
 
 if (errors.length > 0) {

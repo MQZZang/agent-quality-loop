@@ -22,21 +22,24 @@ Volume is the failure mode here, not tooling. One well-argued change beats five 
 
 ## Changing the skills
 
-The Cursor tree is authoritative. The Codex tree (`.agents/skills/`) and the Agent Plugins tree (top-level `skills/`) are generated.
+The Cursor tree is authoritative for **core** packages. The Codex tree (`.agents/skills/`) and the Agent Plugins tree (top-level `skills/`) are generated mirrors for core packages via `scripts/sync-skills.js`.
+
+**Route packages** (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) are generated from `integrations/route-shims/routes.json` by `scripts/gen-route-shims.js` into `dist/route-shims/{cursor,agents,plugins}/`. They must never be hand-edited and must not appear under default discovery trees (`.cursor/skills`, `.agents/skills`, or `skills/`). The installer exposes them via `--suite routes` (not part of `core`/`full`); that suite also installs the compatible `agent-quality-loop` parent. **Uninstall is manual** — delete the installed folders from each user skill tree. See [integrations/route-shims/README.md](integrations/route-shims/README.md) for invocation syntax (Codex `$…` vs Cursor/Claude `/…`).
 
 Each skill's adjacent `manifest.json` is the version and distribution source of truth. The public Node installer produces portable real-file snapshots and refuses to replace an existing junction; it does not create live links. Maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`, while Codex maintenance consumes snapshots from generated `.agents/skills/<name>`. Optional Cursor hooks are mechanical predicates, never semantic acceptance.
 
-1. Edit files under `.cursor/skills/` only. Never hand-edit `.agents/skills/` or `skills/` — both are overwritten.
-2. Regenerate the mirrors (and package manifests) and run the checks:
+1. Edit core files under `.cursor/skills/` only. Never hand-edit `.agents/skills/` or `skills/` for core packages — both are overwritten by sync.
+2. Edit route bindings in `integrations/route-shims/routes.json` only. Regenerate into `dist/route-shims/`; never hand-edit generated route packages or leave legacy copies under skill discovery trees.
+3. Regenerate mirrors (and package manifests) and run the checks:
 
 ```bash
 node scripts/sync-skills.js
-node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
-node scripts/validate-workflow.js
+node scripts/gen-route-shims.js
+node scripts/validate-all.js
 git diff --check
 ```
 
-All of these must pass. CI runs the same validators and additionally fails if either generated mirror has drifted (`node scripts/sync-skills.js --check`).
+All of these must pass. CI runs `node scripts/validate-all.js`, which includes mirror drift (`node scripts/sync-skills.js --check`) and route-shim drift (`node scripts/gen-route-shims.js --check`).
 
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 
@@ -47,7 +50,7 @@ Models improve, and a mechanism that earns its keep today can be pure ceremony a
 - Every behavioral mechanism must name the failure mode it counters. A mechanism nobody can tie to a failure mode is already a removal candidate.
 - When the host model landscape changes materially, re-run a sample of evaluation cases blind — without naming the mechanism under test — across the executor tiers recorded in `.ai/knowledge/lessons.md` (flagship / mid / budget). The packaged procedure is [probes/PROBES.md](probes/PROBES.md) and results accumulate in [MATRIX.md](MATRIX.md). If the failure mode no longer reproduces on any tier, demote the mechanism: fold it into a shorter invariant or delete it, and cite the probe evidence in the change.
 - Deletions get the same review bar as additions, but shrinking is a success, not a regression. The ceremony budget and the proactive assurance downgrade are the runtime half of this policy; this section is the maintenance half.
-- `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project) into phase, verdict, and acceptance-dimension counts and distributions. Use it as the measurement input when deciding what to demote, instead of anecdote.
+- `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project). Only **valid, ordered** writer snapshots enter qualified outcomes; exposures are the per-contract timeline union of `injected_refs` (`kind+ref+content_sha256`); current phase follows max `snapshot.sequence` (not highest historical phase); legacy unordered files are reported but not qualified. Absence of `injected_refs` means measurement unknown, not “nothing injected.” Associations are descriptive — **observable and falsifiable, not causally proven**. Read-only tasks may leave no local envelope; report coverage anyway. Use the aggregator as measurement input when deciding what to demote, instead of anecdote. The optional Cursor authority hook never auto-allows external writes; exact `execution_plan` match yields native `ask` only.
 
 ## First contributions
 

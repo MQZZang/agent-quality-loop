@@ -4,11 +4,20 @@
 /**
  * AQL authority gate — Cursor hooks (preToolUse / beforeShellExecution).
  * Deterministic enforcement for decidable envelope authority invariants.
- * Undecidable / missing inputs → allow + warning (fail-open in logic).
+ *
+ * External write-class commands are fail-closed: never auto-allow.
+ * Exact release execution_plan match → native `ask` only (never `allow`).
+ *
+ * Set AQL_HOOKS_DISABLE=1 to bypass all enforcement (local dev only).
  */
 
 const fs = require('fs');
 const path = require('path');
+
+const ASK_USER_MESSAGE =
+  'AQL release plan matches this exact command. Confirm this external action.';
+const ASK_AGENT_MESSAGE =
+  "Await the user's native confirmation. Do not alter or broaden the command.";
 
 function readStdin() {
   return new Promise((resolve, reject) => {
@@ -36,19 +45,105 @@ function deny(message) {
   });
 }
 
+function ask() {
+  emit({
+    permission: 'ask',
+    user_message: ASK_USER_MESSAGE,
+    agent_message: ASK_AGENT_MESSAGE,
+  });
+}
+
+/** Fail-closed hard error: deny JSON + exit 2 (pairs with hooks failClosed). */
+function hardDeny(message) {
+  deny(message || 'AQL authority-gate failed closed.');
+  process.exitCode = 2;
+}
+
 function loadConfig() {
-  const configPath = path.join(__dirname, 'gates.config.json');
+  const configPath =
+    typeof process.env.AQL_HOOKS_CONFIG === 'string' && process.env.AQL_HOOKS_CONFIG.trim()
+      ? process.env.AQL_HOOKS_CONFIG
+      : path.join(__dirname, 'gates.config.json');
+  let raw;
   try {
-    const raw = fs.readFileSync(configPath, 'utf8');
-    return JSON.parse(raw);
+    raw = fs.readFileSync(configPath, 'utf8');
   } catch (err) {
-    return {
-      _loadError: String(err && err.message ? err.message : err),
-      writeTools: ['Write', 'Delete', 'EditNotebook', 'StrReplace'],
-      externalWriteCommandPattern:
-        '(git\\s+push|gh\\s+(pr\\s+create|release)|npm\\s+publish|yarn\\s+publish|pnpm\\s+publish|vercel|netlify|kubectl\\s+apply|terraform\\s+apply|aws\\s+|gcloud\\s+|az\\s+)',
-    };
+    const error = new Error(
+      'AQL authority-gate failed closed: config missing or unreadable (' +
+        String(err && err.message ? err.message : err) +
+        ').'
+    );
+    error.code = 'ECONFIG';
+    throw error;
   }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    const error = new Error(
+      'AQL authority-gate failed closed: config JSON invalid (' +
+        String(err && err.message ? err.message : err) +
+        ').'
+    );
+    error.code = 'ECONFIG';
+    throw error;
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    const error = new Error('AQL authority-gate failed closed: config must be a JSON object.');
+    error.code = 'ECONFIG';
+    throw error;
+  }
+  return parsed;
+}
+
+function loadCanonicalValidator() {
+  const candidates = [
+    path.join(__dirname, '../../.cursor/skills/agent-quality-loop/scripts/validate-envelope.js'),
+    path.join(__dirname, '../../skills/agent-quality-loop/scripts/validate-envelope.js'),
+  ];
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) continue;
+    const mod = require(candidate);
+    const required = [
+      'validateEnvelope',
+      'validateReleaseActEnvelope',
+      'validateExecutionPlan',
+      'MAX_EXECUTION_PLAN_TTL_MS',
+    ];
+    const missing = required.filter((name) => typeof mod[name] !== 'function' && mod[name] === undefined);
+    const missingFns = required.filter((name) => name !== 'MAX_EXECUTION_PLAN_TTL_MS' && typeof mod[name] !== 'function');
+    if (missingFns.length > 0) {
+      const error = new Error(
+        'AQL authority-gate failed closed: canonical validator missing exports: ' + missingFns.join(', ')
+      );
+      error.code = 'EVALIDATOR';
+      throw error;
+    }
+    if (typeof mod.MAX_EXECUTION_PLAN_TTL_MS !== 'number') {
+      const error = new Error('AQL authority-gate failed closed: canonical validator missing MAX_EXECUTION_PLAN_TTL_MS');
+      error.code = 'EVALIDATOR';
+      throw error;
+    }
+    return mod;
+  }
+  const error = new Error('AQL authority-gate failed closed: canonical validator unavailable.');
+  error.code = 'EVALIDATOR';
+  throw error;
+}
+
+function loadSnapshotChain() {
+  const candidates = [
+    path.join(__dirname, '../../.cursor/skills/agent-quality-loop/scripts/snapshot-chain.js'),
+    path.join(__dirname, '../../skills/agent-quality-loop/scripts/snapshot-chain.js'),
+  ];
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) continue;
+    const mod = require(candidate);
+    if (mod && typeof mod.currentDigestMatchesHead === 'function') return mod;
+  }
+  const error = new Error('AQL authority-gate failed closed: snapshot-chain module unavailable.');
+  error.code = 'EVALIDATOR';
+  throw error;
 }
 
 function workspaceCandidates(payload) {
@@ -98,58 +193,8 @@ function unlockHint(authority) {
   return (
     'Current envelope action_authority is "' +
     authority +
-    '". External write-class operations require current-turn release authorization ' +
-    'and an updated envelope with action_authority that permits the side effect ' +
-    '(typically "release" after RELEASE_READY preflight).'
-  );
-}
-
-function nonEmptyAuthorizationValue(value) {
-  if (typeof value === 'string') return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0 && value.every(nonEmptyAuthorizationValue);
-  if (value !== null && typeof value === 'object') {
-    const keys = Object.keys(value);
-    return keys.length > 0 && keys.every((key) => nonEmptyAuthorizationValue(value[key]));
-  }
-  return false;
-}
-
-function authorizationIsExpired(expiresOn) {
-  if (typeof expiresOn !== 'string') return false;
-  // Scope descriptors such as "current turn only" are not dates. Only enforce
-  // expiry when the value is recognizably ISO-shaped and parseable.
-  if (!/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/.test(expiresOn)) {
-    return false;
-  }
-  const parsed = Date.parse(expiresOn);
-  return !Number.isNaN(parsed) && parsed < Date.now();
-}
-
-function hasCompleteCurrentReleaseAuthorization(envelope) {
-  const authorization = envelope.release_authorization;
-  if (!authorization || typeof authorization !== 'object' || Array.isArray(authorization)) return false;
-  if (authorization.authorized_this_turn !== true) return false;
-  const required = [
-    'environment',
-    'operation',
-    'targets',
-    'expected_effects',
-    'principal_or_role',
-    'rollback',
-    'manual_checks',
-    'expires_on',
-  ];
-  return required.every((field) => nonEmptyAuthorizationValue(authorization[field])) &&
-    !authorizationIsExpired(authorization.expires_on);
-}
-
-function isExplicitReleaseActRoute(envelope) {
-  return (
-    envelope.intent === 'release' &&
-    envelope.mode === 'release' &&
-    envelope.phase === 'RELEASE_READY' &&
-    envelope.action_authority === 'release' &&
-    envelope.release_intent === 'act'
+    '". External write-class operations require a release-act envelope with a ' +
+    'bound execution_plan (exact command + cwd) and native user confirmation.'
   );
 }
 
@@ -157,11 +202,10 @@ function extractCommand(payload, eventName) {
   if (eventName === 'beforeShellExecution' && typeof payload.command === 'string') {
     return payload.command;
   }
-  if (eventName === 'preToolUse') {
-    const input = payload.tool_input;
-    if (input && typeof input.command === 'string') return input.command;
-  }
   if (typeof payload.command === 'string') return payload.command;
+  if (payload.tool_input && typeof payload.tool_input.command === 'string') {
+    return payload.tool_input.command;
+  }
   return null;
 }
 
@@ -171,17 +215,93 @@ function extractToolName(payload, eventName) {
   return null;
 }
 
+function extractCwd(payload) {
+  if (typeof payload.cwd === 'string' && payload.cwd.trim()) return payload.cwd;
+  if (
+    payload.tool_input &&
+    typeof payload.tool_input.working_directory === 'string' &&
+    payload.tool_input.working_directory.trim()
+  ) {
+    return payload.tool_input.working_directory;
+  }
+  return null;
+}
+
+function canonicalPath(p) {
+  if (typeof p !== 'string' || !p.trim()) return null;
+  const resolved = path.resolve(p);
+  try {
+    return fs.realpathSync(resolved);
+  } catch (_err) {
+    return resolved;
+  }
+}
+
+function workspaceRealpath(root) {
+  if (typeof root !== 'string' || !root.trim()) return null;
+  try {
+    return fs.realpathSync(path.resolve(root));
+  } catch (_err) {
+    return path.resolve(root);
+  }
+}
+
+function evaluateExternalWrite(envelope, command, payload, validator, snapshotChain, workspaceRoot) {
+  const resolvedWorkspace = workspaceRealpath(workspaceRoot || extractCwd(payload));
+  const cwdRealpath = canonicalPath(extractCwd(payload));
+  const now = Date.now();
+
+  const releaseErrors = validator.validateReleaseActEnvelope(envelope, {
+    workspaceRoot: resolvedWorkspace,
+    command,
+    cwdRealpath,
+    now,
+    maxTtlMs: validator.MAX_EXECUTION_PLAN_TTL_MS,
+    requireHost: 'cursor',
+  });
+  if (releaseErrors.length > 0) {
+    deny(
+      'AQL authority-gate blocked external write-class shell command: ' + releaseErrors[0]
+    );
+    return;
+  }
+
+  const contractId =
+    typeof envelope.contract_id === 'string' && envelope.contract_id.trim()
+      ? envelope.contract_id
+      : null;
+  if (!contractId || !resolvedWorkspace) {
+    deny(
+      'AQL authority-gate blocked external write-class shell command: missing contract_id or workspace for snapshot head verification.'
+    );
+    return;
+  }
+
+  const headCheck = snapshotChain.currentDigestMatchesHead(resolvedWorkspace, contractId);
+  if (!headCheck.ok) {
+    deny(
+      'AQL authority-gate blocked external write-class shell command: ' + headCheck.reason
+    );
+    return;
+  }
+
+  ask();
+}
+
 async function main() {
+  if (process.env.AQL_HOOKS_TEST_THROW === '1') {
+    throw new Error('induced test failure');
+  }
+
   let raw;
   try {
     raw = await readStdin();
   } catch (err) {
-    allow({
-      agent_message:
-        'AQL authority-gate warning: failed to read stdin (' +
+    hardDeny(
+      'AQL authority-gate failed closed: stdin read error (' +
         String(err && err.message ? err.message : err) +
-        '); allowing.',
-    });
+        ').'
+    );
     return;
   }
 
@@ -192,19 +312,82 @@ async function main() {
 
   let payload;
   try {
-    payload = raw && raw.trim() ? JSON.parse(raw) : {};
+    if (!raw || !raw.trim()) {
+      hardDeny('AQL authority-gate failed closed: empty stdin.');
+      return;
+    }
+    payload = JSON.parse(raw);
   } catch (err) {
-    allow({
-      agent_message:
-        'AQL authority-gate warning: invalid JSON stdin (' +
+    hardDeny(
+      'AQL authority-gate failed closed: invalid JSON stdin (' +
         String(err && err.message ? err.message : err) +
-        '); allowing.',
-    });
+        ').'
+    );
+    return;
+  }
+
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    hardDeny('AQL authority-gate failed closed: hook payload must be a JSON object.');
+    return;
+  }
+
+  let config;
+  let validator;
+  let snapshotChain;
+  try {
+    config = loadConfig();
+    validator = loadCanonicalValidator();
+    snapshotChain = loadSnapshotChain();
+  } catch (err) {
+    hardDeny(err.message);
     return;
   }
 
   const eventName =
     typeof payload.hook_event_name === 'string' ? payload.hook_event_name : '';
+
+  let pattern;
+  try {
+    const patternSource =
+      typeof process.env.AQL_HOOKS_EXTERNAL_WRITE_PATTERN === 'string' &&
+      process.env.AQL_HOOKS_EXTERNAL_WRITE_PATTERN.length > 0
+        ? process.env.AQL_HOOKS_EXTERNAL_WRITE_PATTERN
+        : config.externalWriteCommandPattern;
+    pattern = new RegExp(patternSource, 'i');
+  } catch (err) {
+    hardDeny(
+      'AQL authority-gate failed closed: invalid externalWriteCommandPattern (' +
+        String(err && err.message ? err.message : err) +
+        ').'
+    );
+    return;
+  }
+
+  const command = extractCommand(payload, eventName);
+  const isExternal = typeof command === 'string' && pattern.test(command);
+
+  if (isExternal) {
+    const located = findEnvelope(payload);
+    if (!located) {
+      deny(
+        'AQL authority-gate blocked external write-class shell command: no readable envelope at .agent-quality-loop/envelope.json.'
+      );
+      return;
+    }
+
+    const envelope = readEnvelope(located.envelopePath);
+    if (envelope._parseError) {
+      deny(
+        'AQL authority-gate blocked external write-class shell command: envelope unreadable (' +
+          envelope._parseError +
+          ').'
+      );
+      return;
+    }
+
+    evaluateExternalWrite(envelope, command, payload, validator, snapshotChain, located.workspace);
+    return;
+  }
 
   const located = findEnvelope(payload);
   if (!located) {
@@ -218,7 +401,7 @@ async function main() {
       agent_message:
         'AQL authority-gate warning: envelope unreadable (' +
         envelope._parseError +
-        '); allowing.',
+        '); allowing non-external action.',
     });
     return;
   }
@@ -227,33 +410,9 @@ async function main() {
   if (typeof authority !== 'string' || !authority) {
     allow({
       agent_message:
-        'AQL authority-gate warning: envelope missing action_authority; allowing.',
+        'AQL authority-gate warning: envelope missing action_authority; allowing non-external action.',
     });
     return;
-  }
-
-  const config = loadConfig();
-  let pattern;
-  try {
-    pattern = new RegExp(config.externalWriteCommandPattern, 'i');
-  } catch (err) {
-    allow({
-      agent_message:
-        'AQL authority-gate warning: invalid externalWriteCommandPattern (' +
-        String(err && err.message ? err.message : err) +
-        '); allowing.',
-    });
-    return;
-  }
-
-  const command = extractCommand(payload, eventName);
-  if (typeof command === 'string' && pattern.test(command)) {
-    if (!isExplicitReleaseActRoute(envelope) || !hasCompleteCurrentReleaseAuthorization(envelope)) {
-      deny(
-        'AQL authority-gate blocked external write-class shell command. It requires the explicit release route (intent=release, mode=release, phase=RELEASE_READY, action_authority=release, release_intent=act) and complete, unexpired current-turn release authorization.'
-      );
-      return;
-    }
   }
 
   if (authority === 'read') {
@@ -274,10 +433,17 @@ async function main() {
 }
 
 main().catch((err) => {
-  allow({
-    agent_message:
-      'AQL authority-gate warning: unexpected error (' +
+  hardDeny(
+    'AQL authority-gate failed closed: unexpected error (' +
       String(err && err.message ? err.message : err) +
-      '); allowing.',
-  });
+      ').'
+  );
 });
+
+module.exports = {
+  loadConfig,
+  loadCanonicalValidator,
+  loadSnapshotChain,
+  evaluateExternalWrite,
+  hardDeny,
+};

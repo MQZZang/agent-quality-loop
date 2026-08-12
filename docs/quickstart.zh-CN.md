@@ -24,7 +24,15 @@ npx skills add MQZZang/agent-quality-loop
 node scripts/install.js --suite core --to all
 ```
 
-`--to` 可选 `agents`（Codex）、`cursor`、`claude`、`both`、`all`；`--suite full` 额外安装 `skill-factory`。项目级安装（规则 + AGENTS.md + 知识模板）见 [README 安装节](../README.md#install)。
+`--to` 可选 `agents`（Codex）、`cursor`、`claude`、`both`、`all`；`--suite full` 额外安装 `skill-factory`；`--suite routes` 从 `dist/route-shims/` 安装四个显式路由并带上兼容的 `agent-quality-loop` 父包（不属于 core/full；**卸载需手动删除**各宿主目录下的对应文件夹）。项目级安装（规则 + AGENTS.md + 知识模板）见 [README 安装节](../README.md#install)。
+
+可选本地信封缓存写入（需 `local_write` 及以上）：
+
+```bash
+node scripts/aql-envelope.js --workspace <项目目录> --input envelope.json
+```
+
+已安装技能则用该技能包内的同名脚本（通过 `SKILL_ROOT`，不要相对项目 cwd）。`.agent-quality-loop/` 是否进 `.gitignore` 由你决定。
 
 ## 日常怎么用
 
@@ -40,17 +48,21 @@ node scripts/install.js --suite core --to all
 你会看到的习惯：动手前的**三行对齐**（目标 / 边界 / 最可能的误解）；目标会先对照你项目的真实现状核验（你点名的文件、行为会先被只读查证，说错了前提会在动手前被指出来）；结尾的一行**信任徽章**，如：
 
 ```text
-[AQL 2.5.0 | 已构建并通过自检 | evidence: 3 条命令全过 | next: 独立验收]
+[AQL 2.6.0 | 已构建并通过自检 | evidence: 3 条命令全过 | next: 独立验收]
 ```
 
 徽章里的状态是被约束的声明：`已独立验收` 和 `自检通过` 是两回事，`已验收` 也不等于 `已发布`。
 
 ## 它会越用越合你
 
-反复出现的说法（比如你说"验收"就是指只读独立评审）和稳定偏好会按 [个性化协议](../.cursor/skills/agent-quality-loop/references/personalization.md) 沉淀进协作画像：一行披露、可随时删除、**永远不能作为权限来源**——"以后都直接推送"这类"偏好"会被拒绝记录。
+反复出现的说法（比如你说"验收"就是指只读独立评审）和稳定偏好会按 [个性化协议](../.cursor/skills/agent-quality-loop/references/personalization.md) 沉淀进协作画像：一行披露、可随时删除、**永远不能作为权限来源**——"以后都直接推送"这类"偏好"会被拒绝记录。画像文件尚不存在时，首次观察只会写入「待确认」候选，**不会当轮立刻生效**。用户级知识路径（`~/.ai/knowledge/…`）需你显式开启，安装器不会默认创建。
+
+信封里的 `injected_refs` / 统计脚本给出的是**可观察、可证伪的关联**，不是因果证明；字段缺失表示「未测量」，不等于「什么都没注入」。统计只对合法、有序（`snapshot.sequence`）快照做合格关联；曝光来自同一 contract 全时间线并集；当前 phase 取最大 sequence，不是历史上最高 phase。只读任务可能没有本地信封缓存，统计仍应报告覆盖情况。外部写入：信封里的 release plan **不等于**当次工具授权；精确匹配后仍由宿主原生确认（`ask`），AQL hook 不会自动 `allow`。
 
 ## 别轻信，去验证
 
 本包的行为声明是可复现的：[probes/PROBES.md](../probes/PROBES.md) 是盲测协议，[MATRIX.md](../MATRIX.md) 是各档模型的实测结果（包含失败行）。用 `node probes/make-fixtures.js` 生成夹具，在你自己的模型上跑一遍，欢迎把结果行提交回来。
 
 更多细节：[docs/guide.md](guide.md)（英文完整指南）· [README](../README.md)。
+
+维护者改包后本地验证：`node scripts/validate-all.js`（CI 同款入口）。
