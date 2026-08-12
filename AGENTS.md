@@ -34,12 +34,13 @@ Use `$ask-plan-code-qa` or `$review-gate` directly only when deliberately bypass
 
 ## Tool Paths
 
-For the Windows-first installer, see [README.md](README.md#windows-first-install-recommended-on-windows); optional machine-decidable hook predicates are in [integrations/cursor-hooks](integrations/cursor-hooks/README.md).
+For the bundled installer, see [README.md](README.md#installer-one-command-any-os); optional machine-decidable hook predicates are in [integrations/cursor-hooks](integrations/cursor-hooks/README.md).
 
 | Tool | Skill source |
 |---|---|
 | Cursor | `.cursor/skills/<name>/SKILL.md` |
 | Codex | `.agents/skills/<name>/SKILL.md` |
+| Claude Code and other SKILL.md hosts | installed snapshot of `.agents/skills/<name>` (`node scripts/install.js --to claude`, or copy into the host's skills directory) |
 
 The adjacent skill `manifest.json` is the version/distribution source of truth. Edit `.cursor/skills/` only, then run `node scripts/sync-skills.js` to replace the Codex mirror. Never hand-edit `.agents/skills/`; `scripts/sync-skills.sh` is deprecated compatibility only.
 
@@ -73,7 +74,7 @@ If installed into a project, read these when present:
 
 1. The target project's `AGENTS.md` and scoped instructions.
 2. `.ai/knowledge/project-context.md`; treat `Not Verified` as unknown.
-3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win.
+3. `.ai/knowledge/collaboration-profile.md`; explicit current-turn user instructions still win. ALIGN applies matching phrase-lexicon and preference defaults, and RETRO may sediment 0–2 observed candidates per the skill's personalization reference; learned preferences never raise authority.
 4. `.ai/knowledge/lessons.md`; cite only verified/active lessons. ALIGN injects matching active lessons; ACCEPT checks recidivism. At `project` + local write, write verified lessons and disclose the diff; global/read-only yields candidates for confirmation.
 
 Project facts belong in knowledge files, not in the generic skills.
@@ -113,7 +114,7 @@ When a lower layer conflicts, preserve the higher layer and disclose the conflic
 After changing workflow files:
 
 1. Edit `.cursor/skills/` and any matching `.cursor/rules/`/human docs.
-2. Run `node scripts/sync-skills.js`.
+2. Run `node scripts/sync-skills.js` (mutating: regenerates `.agents/skills/` and every package manifest).
 3. Run the Agent Quality Loop validator from its actual skill root:
 
    ```bash

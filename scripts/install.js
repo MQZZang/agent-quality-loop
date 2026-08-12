@@ -51,19 +51,22 @@ function parseArgs(argv) {
   if (!Object.prototype.hasOwnProperty.call(SUITES, options.suite)) {
     throw new Error(`--suite must be one of: ${Object.keys(SUITES).join(", ")}`);
   }
-  if (!["agents", "cursor", "both"].includes(options.to)) {
-    throw new Error("--to must be one of: agents, cursor, both");
+  if (!["agents", "cursor", "claude", "both", "all"].includes(options.to)) {
+    throw new Error("--to must be one of: agents, cursor, claude, both, all");
   }
   return options;
 }
 
 function targetRoots(to, home = os.homedir()) {
   const roots = [];
-  if (to === "agents" || to === "both") {
+  if (to === "agents" || to === "both" || to === "all") {
     roots.push({ label: "agents", root: path.join(home, ".agents", "skills") });
   }
-  if (to === "cursor" || to === "both") {
+  if (to === "cursor" || to === "both" || to === "all") {
     roots.push({ label: "cursor", root: path.join(home, ".cursor", "skills") });
+  }
+  if (to === "claude" || to === "all") {
+    roots.push({ label: "claude", root: path.join(home, ".claude", "skills") });
   }
   return roots;
 }
@@ -106,8 +109,8 @@ function guardDestinationRoot(destinationRoot) {
 }
 
 function sourceRootForTarget(root, label) {
-  // Cursor is authoritative; Codex/agents consume only the generated mirror.
-  return path.join(root, label === "agents" ? ".agents" : ".cursor", "skills");
+  // Cursor is authoritative; every other host consumes the generated mirror.
+  return path.join(root, label === "cursor" ? ".cursor" : ".agents", "skills");
 }
 
 function buildInstallPlan({ root = repoRoot(), packages, destinations }) {
@@ -198,6 +201,22 @@ function runSelfTest() {
     });
     check(agentsPlan[0].sourceDir === path.join(agentsRoot, "fixture"), "agents routes from generated .agents source");
     check(cursorPlan[0].sourceDir === path.join(cursorRoot, "fixture"), "cursor routes from authoritative .cursor source");
+    const claudePlan = buildInstallPlan({
+      root: fixtureRoot,
+      packages: ["fixture"],
+      destinations: [{ label: "claude", root: destinationRoot }],
+    });
+    check(claudePlan[0].sourceDir === path.join(agentsRoot, "fixture"), "claude routes from generated .agents source");
+    const fakeHome = path.join(fixtureRoot, "home");
+    const allRoots = targetRoots("all", fakeHome);
+    check(
+      allRoots.length === 3 &&
+        allRoots[0].root === path.join(fakeHome, ".agents", "skills") &&
+        allRoots[1].root === path.join(fakeHome, ".cursor", "skills") &&
+        allRoots[2].root === path.join(fakeHome, ".claude", "skills"),
+      "--to all targets agents, cursor, and claude user trees",
+    );
+    check(main(["--help"]) === 0, "--help prints usage and exits 0");
     const dryRun = installPackage(agentsPlan[0].sourceDir, agentsPlan[0].destinationDir, true);
     check(dryRun.dryRun === true && !fs.existsSync(agentsPlan[0].destinationDir), "dry-run writes no destination files");
     const snapshot = installPackage(agentsPlan[0].sourceDir, agentsPlan[0].destinationDir, false);
@@ -231,14 +250,22 @@ function runSelfTest() {
   return failed ? 1 : 0;
 }
 
+const USAGE = "Usage: node scripts/install.js [--suite core|full] [--to agents|cursor|claude|both|all] [--dry-run] [--help]";
+
 function main(argv = process.argv.slice(2)) {
   if (argv.length === 1 && argv[0] === "--self-test") return runSelfTest();
+  if (argv.includes("--help") || argv.includes("-h")) {
+    console.log(USAGE);
+    console.log("  --to picks user-level destinations: agents -> ~/.agents/skills (Codex), cursor -> ~/.cursor/skills, claude -> ~/.claude/skills; both = agents+cursor, all = all three.");
+    console.log("  The installer copies skills only; project rules and AGENTS.md ship via the project-level copy (see README).");
+    return 0;
+  }
   let options;
   try {
     options = parseArgs(argv);
   } catch (error) {
     console.error(error.message);
-    console.error("Usage: node scripts/install.js [--suite core|full] [--to agents|cursor|both] [--dry-run]");
+    console.error(USAGE);
     return 2;
   }
 

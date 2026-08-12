@@ -58,6 +58,18 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-12 — Acceptance evidence must bind the exact shipped bytes
+
+**Trigger:** Producing or consuming an acceptance/verification report for an artifact that is regenerated, committed, or installed after the verification ran
+**Root cause:** Commit-time regeneration (sync-skills rewrites every manifest with a fresh `generated_at`) changes bytes after verification. The report's hashes then describe a pre-push state that survives only inside the report, and local installs refreshed before the regeneration silently sit one step behind the pushed tree.
+**Rule:** Order the endgame as regenerate → verify → report, with nothing mutating afterward — or commit first and verify the pushed SHA. Every acceptance report must name the commit or tree it verified, and local installs are refreshed after the final commit, never before.
+**Evidence:** The v2.2 completion report cited manifest SHA-256 `BB1C831E…` and "source, mirror, installed byte-identical"; pushed `35821c3` contains manifests regenerated at `2026-08-12T04:00:16Z`, seconds before the commit, with actual SHA-256 `d376a8ab…`. The cloud re-acceptance had to supersede the reported hash before it could proceed.
+**Evidence to read:** `git log -1 --format=%H` against the commit named in the report, then a fresh `sha256sum` of each shipped `manifest.json` against the report's value
+**Scope:** project
+**Status:** active
+**Last fired:** 2026-08-12
+**Applies when:** Writing or trusting acceptance, release-readiness, or install-parity claims for artifacts that get regenerated, committed, or installed after verification
+
 ### 2026-08-11 — A repository's publishable surface is larger than its working tree
 
 **Trigger:** Auditing a repository for private content before making it public, or before any handoff that exposes history

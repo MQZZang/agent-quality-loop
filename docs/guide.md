@@ -4,7 +4,7 @@
 
 The workflow exists to produce the user's observable outcome with the smallest sufficient scope, evidence, and authority. It is not a ritual checklist and does not require users to learn lifecycle YAML.
 
-For installation, use the [Windows-first entry](../README.md#windows-first-install-recommended-on-windows): the public CLI makes portable real-file snapshots and refuses existing junctions. Repository maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`; Codex maintenance installs from generated `.agents/skills/<name>` snapshots. Optional deterministic predicates are documented in [Cursor hooks](../integrations/cursor-hooks/README.md), and never constitute semantic acceptance.
+For installation, use the [installer entry](../README.md#installer-one-command-any-os): the public CLI makes portable real-file snapshots into the Codex, Cursor, and Claude Code user trees and refuses existing junctions. Repository maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`; Codex maintenance installs from generated `.agents/skills/<name>` snapshots. Optional deterministic predicates are documented in [Cursor hooks](../integrations/cursor-hooks/README.md), and never constitute semantic acceptance.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge: `[AQL 2.2.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+Example trust badge: `[AQL 2.3.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
 
 For routine tasks, start from the prefilled snippets in `.cursor/skills/agent-quality-loop/references/contract-presets.md` (data, not new modes) to keep ALIGN short.
 
@@ -55,7 +55,7 @@ RAW → ALIGNED → EVIDENCED → BUILT → ACCEPTED
 - Diagnosis may end at `EVIDENCED`.
 - Implementation self-QA ends at `BUILT`.
 - Formal acceptance requires a fresh/different-role reviewer reading raw evidence first.
-- After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest 0–3 lesson candidates; not a new phase.
+- After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest 0–3 lesson candidates and 0–2 collaboration-profile candidates; not a new phase.
 - `RELEASE_READY` is not deployment permission.
 - After deployment, active release authority is cleared; only historical evidence remains.
 
@@ -74,6 +74,10 @@ Internal phase/envelope details appear only for blockers, handoffs, resume, rele
 Ask at most two questions, and only when the answer changes the outcome or authority and cannot be discovered safely from context.
 
 Compile `target_user_or_system` as the final consumer + medium.
+
+Personalization:
+- ALIGN reads `.ai/knowledge/collaboration-profile.md` when present: phrase-lexicon and preference defaults apply, the current turn's explicit instruction wins, and learned preferences never raise authority.
+- RETRO may sediment observed candidates per the skill's `references/personalization.md` — auto tier disclosed in one line, decision-changing habits confirm-first, permission-like items refused.
 
 Consumer probe and multi-agent:
 - Any native-medium-consumable artifact (code uses behavior replay as its probe) needs acceptor cold consumption before `user_observable_result` can PASS; else honest `NOT_RUN`.
