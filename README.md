@@ -76,7 +76,7 @@ The agent infers all three from your ordinary wording by following the routing r
 
 Pick these up in chat; deeper mechanics live in [docs/guide.md](docs/guide.md).
 
-1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. The goal is compiled from your project's observable reality, not only from your words: files and behaviors you name get a cheap read-only check first, so a mistaken premise surfaces before anything is edited. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
+1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. The goal is compiled from your project's observable reality, not only from your words: files and behaviors you name get a cheap read-only check first, so a mistaken premise can surface before anything is edited. The evaluation suite tests exactly this discipline; cheaper models are likelier to slip it, which is one reason acceptance re-checks the outcome instead of trusting the edit. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
 2. **Self-QA ≠ independent acceptance** — “I ran the checks I claim” can justify a local `BUILT` result. Formal acceptance needs a fresh / different-role review that reads raw evidence first (`review-gate` when used).
 3. **No evidence, no pass** — missing required checks are reported as not run or blocked, not waved through.
 4. **Publish needs a separate current-turn ask** — a `full` local fix+accept path stops at independent acceptance. Deploy/publish needs its own exact authorization that turn.
@@ -146,7 +146,7 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 ## Install
 
-Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer validators.
+Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators and an envelope-statistics aggregator).
 
 ### Installer (one command, any OS)
 

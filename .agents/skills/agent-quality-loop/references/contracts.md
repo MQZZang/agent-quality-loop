@@ -62,7 +62,9 @@ Compile facts from the cheapest sufficient rung, in order; every rung is read-on
 3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
 4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
 
-A mechanism named in the request compiles as the outcome it serves plus a hypothesis entry, with the inferred outcome stated in the alignment lines. Grounding depth follows the Ceremony Budget: `fast` verifies only referents the task already touches; `formal` verifies every conclusion-changing referent.
+A mechanism named in the request compiles as the outcome it serves plus a hypothesis entry, with the inferred outcome stated in the alignment lines.
+
+Depth by tier: `fast` verifies only referents the task already touches; `standard` adds every referent the request names; `formal` verifies every conclusion-changing referent. After a mismatch, disclosure comes first: at most one bounded pass over the named referents and their immediate directories before disclosing — disclosure precedes any wider search.
 
 Keep the three routing axes independent:
 

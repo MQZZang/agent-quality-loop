@@ -47,7 +47,7 @@ Models improve, and a mechanism that earns its keep today can be pure ceremony a
 - Every behavioral mechanism must name the failure mode it counters. A mechanism nobody can tie to a failure mode is already a removal candidate.
 - When the host model landscape changes materially, re-run a sample of evaluation cases blind — without naming the mechanism under test — across the executor tiers recorded in `.ai/knowledge/lessons.md` (flagship / mid / budget). If the failure mode no longer reproduces on any tier, demote the mechanism: fold it into a shorter invariant or delete it, and cite the probe evidence in the change.
 - Deletions get the same review bar as additions, but shrinking is a success, not a regression. The ceremony budget and the proactive assurance downgrade are the runtime half of this policy; this section is the maintenance half.
-- `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project) into phase, verdict, and acceptance-dimension rates. Use it as the measurement input when deciding what to demote, instead of anecdote.
+- `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project) into phase, verdict, and acceptance-dimension counts and distributions. Use it as the measurement input when deciding what to demote, instead of anecdote.
 
 ## House style
 

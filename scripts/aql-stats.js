@@ -136,7 +136,7 @@ function renderReport(stats) {
     `Scope deviations: ${stats.scope_deviation_total} across ${stats.scope_deviation_envelopes} envelope(s)`,
   );
   lines.push(...renderTable("Blocker reasons", stats.blocker_reasons));
-  lines.push(`Independent-acceptance records: ${stats.independence_recorded}`);
+  lines.push(`Acceptance-independence recorded (any value, including degraded): ${stats.independence_recorded}`);
   for (const file of stats.invalid) lines.push(`INVALID (skipped): ${file}`);
   return lines.join("\n");
 }

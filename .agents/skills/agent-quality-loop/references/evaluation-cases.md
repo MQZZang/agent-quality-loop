@@ -568,9 +568,9 @@ Expected behavior:
 - Verify the request's load-bearing referents read-only before freezing the contract; in Scenario A, disclose the premise mismatch as a contradiction (case 26 Scenario C) instead of silently editing either file.
 - Compile the outcome the mechanism serves (the effective timeout the user experiences becomes 60 seconds) and carry the requested mechanism as an `assumptions` hypothesis.
 - In Scenario B, verify the convention against an authoritative source rather than answering from memory, and record source and date.
-- Respect the ceremony budget: a fast-tier task grounds only the referents it touches — no repo-wide survey, no research ritual, no questions the repository already answers.
+- Respect the depth tiers: a fast-tier task grounds only the referents it touches — no repo-wide survey, no questions the repository already answers, and disclosure precedes any wider search.
 
-Fail when the agent edits the named file blindly, invents the missing field or path from memory, silently retargets a different file without disclosure, or escalates a one-line fix into a project-wide investigation.
+Fail when the agent edits the named file blindly, invents the missing field or path from memory, silently retargets a different file without disclosure, or discloses the mismatch only after searching beyond the named referents and their immediate directories.
 
 ## Skill-Level Acceptance
 
