@@ -2,9 +2,14 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value shared by all four packaged skills. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## Unreleased
+
+- Distribution facts verified after the v2.5.0 release: the skills.sh CLI (`npx skills add MQZZang/agent-quality-loop`) discovers all four skills and installs from the cross-client `.agents/skills/` tree; the top-level `skills/` tree remains the Agent Plugins component root. Install docs now lead with the one-command path and state which tree each standard reads.
+- Maintainer-instruction lesson recorded: commands handed to another executor need verified flags — the skills CLI has no `--dry-run`; `-l` is the list-only form.
+
 ## 2.5.0 — 2026-08-12
 
-- Standards surface: root `plugin.json` (Agent Plugins 1.0.0, closed schema) plus a generated top-level `skills/` mirror, so plugin-aware clients and registry crawlers can consume the repository directly.
+- Standards surface: root `plugin.json` (Agent Plugins 1.0.0, closed schema) plus a generated top-level `skills/` mirror — Agent Plugins clients consume the top-level `skills/` tree, and registries such as skills.sh read the cross-client `.agents/skills/` tree.
 - Frontmatter carries the optional Agent Skills spec fields: `license: MIT` and `metadata` (author, version); the packaged validator now parses the spec's optional field set and fails on any version drift against the manifest.
 - Blind behavioral probes packaged as a reproducible protocol: `probes/make-fixtures.js` (deterministic fixtures, blindness lint, integrity `--verify`) and `probes/PROBES.md` (decidable grading tied to evaluation cases 43/44/45).
 - `MATRIX.md`: model-tier compliance results seeded with the first tri-model run, including the composer budget-tier double FAIL.

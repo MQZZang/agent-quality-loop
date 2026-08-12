@@ -173,6 +173,14 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, an envelope-statistics aggregator, and the probe fixture generator).
 
+### Fastest: via the skills.sh CLI
+
+```bash
+npx skills add MQZZang/agent-quality-loop
+```
+
+Verified 2026-08-12: the CLI finds all four skills in this repository and installs from its cross-client `.agents/skills/` tree. It has no `--dry-run`; to list what would be installed without installing, use `npx skills add MQZZang/agent-quality-loop -l`. The two install paths differ: the skills.sh CLI applies its own scope and copy/link semantics (`npx skills --help`) and picks up all four skills, while the bundled installer below writes user-level real-file snapshots and defaults to the three-skill `core` suite.
+
 ### Installer (one command, any OS)
 
 From a clone of this repository:
@@ -199,7 +207,7 @@ node scripts/install.js --suite core --to agents
 
 Any other agent that reads the open `SKILL.md` format can consume this package as well: copy `.agents/skills/<name>` into that host's skills directory.
 
-The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. The same top-level `skills/` tree is what `SKILL.md` registry crawlers index. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
+The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. Registry tooling varies in which tree it reads: the skills.sh CLI installs from the cross-client `.agents/skills/` tree (verified 2026-08-12), while Agent Plugins clients read the top-level `skills/` tree per that specification — the repository ships both, so each standard finds its own. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
 
 Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 
@@ -248,9 +256,9 @@ Diagnose the root cause of the failing build. Do not change files.
 
 Two things should happen: the agent restates goal, boundary, and most likely misunderstanding before doing anything, and it stops at a diagnosis instead of editing. If it starts editing straight away, the rules did not load — after a project-level copy, check that `.cursor/rules/` and `.cursor/skills/` landed at the **root** of the target project; after an installer run, check the host's skill list for the skill name.
 
-### 2. Codex user-level skills (optional; needs a separate installer)
+### 2. Legacy alternative: Codex user-level skills via skill-installer (only if you already use that tool)
 
-This path installs the four skills into your Codex user skill area via **skill-installer** — a separate tool **not shipped in this repository**. Use it only if you already have skill-installer available; otherwise use §1, which needs nothing beyond a file copy.
+The bundled installer above already covers Codex user-level skills (`--to agents`). This legacy path installs the four skills via **skill-installer** — a separate tool **not shipped in this repository** — and exists only for users who already work with it; otherwise use the bundled installer or §1's plain file copy.
 
 Ask Codex to use `$skill-installer` with repository `MQZZang/agent-quality-loop`, ref `master`, and these paths:
 

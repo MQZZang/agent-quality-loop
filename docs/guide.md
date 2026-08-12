@@ -4,7 +4,7 @@
 
 The workflow exists to produce the user's observable outcome with the smallest sufficient scope, evidence, and authority. It is not a ritual checklist and does not require users to learn lifecycle YAML.
 
-For installation, use the [installer entry](../README.md#installer-one-command-any-os): the public CLI makes portable real-file snapshots into the Codex, Cursor, and Claude Code user trees and refuses existing junctions. Repository maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`; Codex maintenance installs from generated `.agents/skills/<name>` snapshots. Optional deterministic predicates are documented in [Cursor hooks](../integrations/cursor-hooks/README.md), and never constitute semantic acceptance.
+For installation, use the [installer entry](../README.md#installer-one-command-any-os): the bundled Node installer makes portable real-file snapshots into the Codex, Cursor, and Claude Code user trees and refuses existing junctions. Repository maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`; Codex maintenance installs from generated `.agents/skills/<name>` snapshots. Optional deterministic predicates are documented in [Cursor hooks](../integrations/cursor-hooks/README.md), and never constitute semantic acceptance.
 
 ## Architecture
 
@@ -38,7 +38,7 @@ Formal assurance never raises authority. Credentials being available never grant
 
 Example trust badge: `[AQL 2.5.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
 
-For routine tasks, start from the prefilled snippets in `.cursor/skills/agent-quality-loop/references/contract-presets.md` (data, not new modes) to keep ALIGN short.
+For routine tasks, the workflow starts from the prefilled presets in the skill's `references/contract-presets.md` (data, not new modes) to keep ALIGN short — this is automatic; there is nothing for the user to open or fill.
 
 ## Lifecycle
 
@@ -159,7 +159,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 - Standalone only when explicitly invoked.
 - Embedded by agent-quality-loop for code implementation.
 - Reuses parent alignment; no duplicate opening/template.
-- Sub-executor handoff uses a self-contained Dispatch Brief projected from the parent contract; definition lives in `.cursor/skills/agent-quality-loop/references/code-implementation-adapter.md` (not in ask-plan-code-qa).
+- A delegated sub-executor receives a self-contained brief carrying the same agreed goal, boundaries, and evidence requirements (the Dispatch Brief, defined in `.cursor/skills/agent-quality-loop/references/code-implementation-adapter.md`, not in ask-plan-code-qa).
 - Returns changed artifacts, checks, gaps, risks, and `result_phase: BUILT`.
 - Never grants acceptance or release.
 
@@ -173,7 +173,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 ## Maintenance
 
 1. Edit `.cursor/skills/` only.
-2. Run `node scripts/sync-skills.js` to sync to `.agents/skills/` (`scripts/sync-skills.sh` is deprecated compatibility only).
+2. Run `node scripts/sync-skills.js` to regenerate both generated mirrors (`.agents/skills/` and `skills/`) (`scripts/sync-skills.sh` is deprecated compatibility only).
 3. Run structural validators.
 4. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
 5. Obtain an independent review before declaring formal acceptance.
