@@ -121,3 +121,12 @@ After changing workflow files:
 7. Use a fresh/different-role independent reviewer before declaring formal acceptance.
 
 Production/external actions remain human-controlled even when all local checks pass.
+
+## Cursor Cloud specific instructions
+
+This repository is a documentation/skills package, not a runnable service. There is no `package.json`, no dependency install step, and nothing to build, deploy, or run as a server. The only executables are Node validators, and they use the standard library only.
+
+- Toolchain: Node.js is the only requirement (CI pins Node 22 in `.github/workflows/validate.yml`); it is preinstalled in the Cloud VM, so the startup update script is effectively a no-op.
+- Lint/test/build/run for this repo all map to the validation suite. The exact commands live in `README.md` ("Validate changes") and `CONTRIBUTING.md`; run them from the repo root: `./scripts/sync-skills.sh`, `node .cursor/skills/agent-quality-loop/scripts/validate-skill.js`, `node scripts/validate-workflow.js`, and `git diff --check`. CI (`.github/workflows/validate.yml`) runs the same two validators plus `diff -qr .cursor/skills .agents/skills`.
+- Non-obvious gotcha: `.agents/skills/` is a generated mirror of `.cursor/skills/`. Only edit `.cursor/skills/`, then run `./scripts/sync-skills.sh`. Both `validate-workflow.js` and CI fail the build if the mirror has drifted, so never hand-edit `.agents/skills/`.
+- Non-obvious gotcha: trailing whitespace is semantically significant in `.md`/`.mdc` files (two trailing spaces = Markdown hard break, relied on by some rules). `.gitattributes` disables the trailing-space check for these files, so editors that strip whitespace will silently break rules without `git diff --check` warning.
