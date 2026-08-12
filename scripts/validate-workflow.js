@@ -6,18 +6,45 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { checkSkills } = require("./sync-skills");
-const { walkFiles } = require("./gen-manifest");
+const { walkFiles, MANIFEST_VERSION } = require("./gen-manifest");
 
 const root = path.resolve(__dirname, "..");
 const cursorRoot = path.join(root, ".cursor", "skills");
 const codexRoot = path.join(root, ".agents", "skills");
+const pluginRoot = path.join(root, "skills");
 const errors = [];
 
 for (const skill of ["agent-quality-loop", "ask-plan-code-qa", "review-gate", "skill-factory"]) {
-  for (const skillsRoot of [cursorRoot, codexRoot]) {
+  for (const skillsRoot of [cursorRoot, codexRoot, pluginRoot]) {
     if (!fs.existsSync(path.join(skillsRoot, skill, "SKILL.md"))) {
       errors.push(`missing ${path.relative(root, skillsRoot)}/${skill}/SKILL.md`);
     }
+  }
+  const source = fs.readFileSync(path.join(cursorRoot, skill, "SKILL.md"), "utf8");
+  if (!source.includes(`version: "${MANIFEST_VERSION}"`)) {
+    errors.push(`${skill} frontmatter metadata.version must be "${MANIFEST_VERSION}"`);
+  }
+  if (!/^license: MIT$/m.test(source)) {
+    errors.push(`${skill} frontmatter must declare license: MIT`);
+  }
+}
+
+// Agent Plugins manifest: root plugin.json with the canonical closed schema.
+const pluginManifestPath = path.join(root, "plugin.json");
+if (!fs.existsSync(pluginManifestPath)) {
+  errors.push("missing plugin.json (Agent Plugins manifest)");
+} else {
+  try {
+    const plugin = JSON.parse(fs.readFileSync(pluginManifestPath, "utf8"));
+    if (plugin.$schema !== "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json") {
+      errors.push("plugin.json $schema must be the canonical Agent Plugins 1.0.0 schema URL");
+    }
+    if (plugin.name !== "agent-quality-loop") errors.push("plugin.json name must be agent-quality-loop");
+    if (plugin.version !== MANIFEST_VERSION) {
+      errors.push(`plugin.json version must equal the manifest version ${MANIFEST_VERSION}`);
+    }
+  } catch (error) {
+    errors.push(`plugin.json: invalid JSON (${error.message})`);
   }
 }
 

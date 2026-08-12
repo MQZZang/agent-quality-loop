@@ -1,6 +1,10 @@
 ---
 name: agent-quality-loop
 description: Use when a user wants an AI coding or workspace agent to turn a natural-language objective into a scoped first-principles task, diagnose evidence, implement through the appropriate domain adapter, independently verify formal completion, prepare a release, or resume work without goal drift. Routes task intent, assurance level, and action authority separately; supports align, evidence, execute, accept, release, and safe local full workflows. Trigger on phrases such as end-to-end, full root-cause analysis, turn this into a clear goal, production quality, independently accept this, resume the last task, prepare a release — or their equivalent in any language, for example 完整闭环、全面根因分析、转化为清晰目标、正式质量、独立验收、继续上个任务、准备发布 — or explicit $agent-quality-loop use. Do not use for trivial factual Q&A or casual brainstorming with no execution or acceptance workflow.
+license: MIT
+metadata:
+  author: MQZZang
+  version: "2.5.0"
 ---
 
 # Agent Quality Loop

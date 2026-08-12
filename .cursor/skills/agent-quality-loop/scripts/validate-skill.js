@@ -8,7 +8,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "2.4.0";
+const MANIFEST_VERSION = "2.5.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
@@ -113,8 +113,22 @@ if (fs.existsSync(skillPath)) {
   if (!frontmatter) {
     errors.push("SKILL.md frontmatter is required");
   } else {
+    // Agent Skills spec (agentskills.io) fields only: name and description are
+    // required; license, compatibility, allowed-tools, and a string-to-string
+    // metadata block map are the permitted optional fields.
     const fields = {};
+    let openMap = null;
     for (const line of frontmatter[1].split(/\r?\n/)) {
+      const nested = line.match(/^ {2}([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$/);
+      if (nested && openMap) {
+        const [, key, rawValue] = nested;
+        if (Object.prototype.hasOwnProperty.call(openMap, key)) errors.push(`SKILL.md frontmatter has duplicate metadata.${key}`);
+        const value = parseYamlStringScalar(rawValue);
+        if (typeof value !== "string") errors.push(`SKILL.md frontmatter metadata.${key} must be a string scalar`);
+        openMap[key] = value;
+        continue;
+      }
+      openMap = null;
       const match = line.match(/^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$/);
       if (!match) {
         errors.push(`SKILL.md frontmatter has unsupported syntax: ${line}`);
@@ -122,16 +136,34 @@ if (fs.existsSync(skillPath)) {
       }
       const [, key, rawValue] = match;
       if (Object.prototype.hasOwnProperty.call(fields, key)) errors.push(`SKILL.md frontmatter has duplicate ${key}`);
+      if (key === "metadata" && rawValue.trim() === "") {
+        fields[key] = {};
+        openMap = fields[key];
+        continue;
+      }
       fields[key] = parseYamlStringScalar(rawValue);
     }
-    const keys = Object.keys(fields).sort();
-    if (keys.length !== 2 || keys[0] !== "description" || keys[1] !== "name") {
-      errors.push("SKILL.md frontmatter may contain only name and description");
+    const allowedKeys = new Set(["name", "description", "license", "compatibility", "allowed-tools", "metadata"]);
+    for (const key of Object.keys(fields)) {
+      if (!allowedKeys.has(key)) errors.push(`SKILL.md frontmatter key not in the Agent Skills spec: ${key}`);
+    }
+    if (!("name" in fields) || !("description" in fields)) {
+      errors.push("SKILL.md frontmatter must declare name and description");
     }
     if (fields.name !== "agent-quality-loop") errors.push("SKILL.md frontmatter name is invalid");
     const description = fields.description;
     if (typeof description !== "string" || !description.trim() || description.length > 1024) {
       errors.push("SKILL.md frontmatter description must be a non-empty string of at most 1024 characters");
+    }
+    if ("license" in fields && (typeof fields.license !== "string" || !fields.license.trim())) {
+      errors.push("SKILL.md frontmatter license must be a non-empty string when present");
+    }
+    if ("metadata" in fields) {
+      if (typeof fields.metadata !== "object" || fields.metadata === null) {
+        errors.push("SKILL.md frontmatter metadata must be a block map of string scalars");
+      } else if (fields.metadata.version !== MANIFEST_VERSION) {
+        errors.push(`SKILL.md frontmatter metadata.version must equal the manifest version ${MANIFEST_VERSION}`);
+      }
     }
   }
   if (skill.split(/\r?\n/).length > 500) errors.push("SKILL.md exceeds 500 lines");

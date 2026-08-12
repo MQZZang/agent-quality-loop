@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agent-quality-loop",
+  "version": "2.5.0",
+  "description": "Trust-boundary quality loop for coding agents: compile natural language into a task contract, gate completion claims on evidence, keep acceptance independent, and never conflate accepted with released.",
+  "author": {
+    "name": "MQZZang",
+    "url": "https://github.com/MQZZang"
+  },
+  "homepage": "https://github.com/MQZZang/agent-quality-loop",
+  "repository": "https://github.com/MQZZang/agent-quality-loop",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "quality-loop",
+    "acceptance",
+    "verification",
+    "evidence",
+    "trust",
+    "review"
+  ]
+}

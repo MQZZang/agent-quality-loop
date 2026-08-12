@@ -3,6 +3,10 @@ name: skill-factory
 description: >-
   Use when the user needs to create, review, refactor, streamline, or evaluate
   an Agent Skill, a Cursor Rule, or a prompt template.
+license: MIT
+metadata:
+  author: MQZZang
+  version: "2.5.0"
 ---
 
 # Skill Factory

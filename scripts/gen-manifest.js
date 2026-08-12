@@ -11,7 +11,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
-const MANIFEST_VERSION = "2.4.0";
+const MANIFEST_VERSION = "2.5.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 

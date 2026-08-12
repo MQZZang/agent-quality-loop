@@ -36,7 +36,7 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge: `[AQL 2.4.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+Example trust badge: `[AQL 2.5.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
 
 For routine tasks, start from the prefilled snippets in `.cursor/skills/agent-quality-loop/references/contract-presets.md` (data, not new modes) to keep ALIGN short.
 

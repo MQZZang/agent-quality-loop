@@ -21,6 +21,12 @@ function agentsSkillsRoot(root = repoRoot()) {
   return path.join(root, ".agents", "skills");
 }
 
+// Third mirror: Agent Plugins clients and registry crawlers discover skills at
+// the repo-top-level skills/ directory (plugin.json names it as the component root).
+function pluginSkillsRoot(root = repoRoot()) {
+  return path.join(root, "skills");
+}
+
 function compareTrees(leftRoot, rightRoot) {
   const errors = [];
   if (!fs.existsSync(leftRoot)) {
@@ -64,35 +70,40 @@ function checkAllManifests(skillsRoot) {
 function syncSkills(options = {}) {
   const root = options.root || repoRoot();
   const source = cursorSkillsRoot(root);
-  const mirror = agentsSkillsRoot(root);
+  const mirrors = [agentsSkillsRoot(root), pluginSkillsRoot(root)];
 
   if (!fs.existsSync(source)) {
     throw new Error(`missing authoritative skills tree: ${source}`);
   }
 
-  fs.rmSync(mirror, { recursive: true, force: true });
-  fs.mkdirSync(path.dirname(mirror), { recursive: true });
-  fs.cpSync(source, mirror, { recursive: true });
+  for (const mirror of mirrors) {
+    fs.rmSync(mirror, { recursive: true, force: true });
+    fs.mkdirSync(path.dirname(mirror), { recursive: true });
+    fs.cpSync(source, mirror, { recursive: true });
+  }
 
   // Shared timestamp keeps mirrored manifests byte-identical after sync.
   const generatedAt = new Date().toISOString();
   const packageNames = listPackageSkillDirs(source).map((dir) => path.basename(dir));
   for (const name of packageNames) {
     writeManifest(path.join(source, name), { generatedAt, name });
-    writeManifest(path.join(mirror, name), { generatedAt, name });
+    for (const mirror of mirrors) {
+      writeManifest(path.join(mirror, name), { generatedAt, name });
+    }
   }
 
-  return { root, source, mirror, packageNames, generatedAt };
+  return { root, source, mirrors, packageNames, generatedAt };
 }
 
 function checkSkills(options = {}) {
   const root = options.root || repoRoot();
   const source = cursorSkillsRoot(root);
-  const mirror = agentsSkillsRoot(root);
   const errors = [];
-  errors.push(...compareTrees(source, mirror));
+  for (const mirror of [agentsSkillsRoot(root), pluginSkillsRoot(root)]) {
+    errors.push(...compareTrees(source, mirror));
+    errors.push(...checkAllManifests(mirror));
+  }
   errors.push(...checkAllManifests(source));
-  errors.push(...checkAllManifests(mirror));
   return errors;
 }
 
@@ -114,7 +125,7 @@ function main(argv = process.argv.slice(2)) {
   }
 
   const result = syncSkills();
-  console.log(`Synced .cursor/skills/ → .agents/skills/ (${result.packageNames.length} packages)`);
+  console.log(`Synced .cursor/skills/ → .agents/skills/ + skills/ (${result.packageNames.length} packages)`);
   for (const name of result.packageNames) {
     console.log(`  manifest: ${name}@${MANIFEST_VERSION}`);
   }
@@ -134,6 +145,7 @@ module.exports = {
   compareTrees,
   cursorSkillsRoot,
   agentsSkillsRoot,
+  pluginSkillsRoot,
 };
 
 if (require.main === module) {
