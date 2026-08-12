@@ -371,13 +371,13 @@ Allowed `state` values (mapped from lifecycle phase / stop condition):
 English example:
 
 ```text
-[AQL 2.3.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+[AQL 2.4.0 | independently accepted | evidence: all required dimensions PASS | next: none]
 ```
 
 Chinese-scenario example (state words may be localized; syntax unchanged):
 
 ```text
-[AQL 2.3.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+[AQL 2.4.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
 ```
 
 ## Envelope Consistency Check

@@ -162,7 +162,7 @@ function runSelfTest() {
         verdict: "PASS",
         mode: "execute",
         assurance: "standard",
-        skill_version: "2.3.0",
+        skill_version: "0.0.0-fixture",
         implementation_receipt: { scope_deviations: ["touched extra doc"] },
       }),
     );
@@ -173,7 +173,7 @@ function runSelfTest() {
         verdict: "PASS",
         mode: "full",
         assurance: "formal",
-        skill_version: "2.3.0",
+        skill_version: "0.0.0-fixture",
         acceptance_gate: {
           status_by_dimension: {
             goal_fidelity: { status: "PASS" },
@@ -203,7 +203,7 @@ function runSelfTest() {
     );
     check(stats.blocker_reasons["missing evidence"] === 1, "blocker reasons aggregate");
     check(stats.independence_recorded === 1, "independent-acceptance records counted");
-    check(stats.by_skill_version["2.3.0"] === 2 && stats.by_skill_version["(unset)"] === 1, "skill_version drift is visible");
+    check(stats.by_skill_version["0.0.0-fixture"] === 2 && stats.by_skill_version["(unset)"] === 1, "skill_version drift is visible");
     const rendered = renderReport(stats);
     check(rendered.includes("Envelopes scanned: 4") && rendered.includes("INVALID"), "text report names totals and invalid files");
     const missingProbe = listJsonFiles([path.join(root, "does-not-exist")]);

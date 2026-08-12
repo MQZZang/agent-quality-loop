@@ -58,6 +58,18 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-12 — Re-verify PR and base state before every push in a long session
+
+**Trigger:** Pushing additional commits to a PR branch during a long turn, or mutating a PR's title, body, or status
+**Root cause:** A PR's state is a remote fact that changes without notice: the user squash-merged the open PR mid-session while the agent kept pushing six commits to the merged PR's branch. GitHub accepts those pushes and body edits silently, and pull_request workflows stop triggering because a merged PR emits no synchronize events — locally misread as a CI outage, costing a diagnostic detour (a workflow-file revert) aimed at the wrong cause.
+**Rule:** Before each push or PR mutation after any pause, re-read the PR state (`gh pr view --json state,mergeStateStatus`). If merged or closed: stop; branch new work off the updated base, cherry-pick, and open a fresh PR; verify squash fidelity (`git diff <merge-commit> <old-head>` empty) so prior acceptance transfers to the base; restore the merged PR's description to its merged scope.
+**Evidence:** The runs list showed pull_request runs only through `bf8e5ff`; later heads had no github-actions check suite at all; `gh pr view 7` returned `state: MERGED` with master at `af32b1b`, byte-identical to `bf8e5ff`.
+**Evidence to read:** `gh pr view <n> --json state` before pushing; `git diff <merge-commit> <old-head> --stat` for squash parity
+**Scope:** project
+**Status:** active
+**Last fired:** 2026-08-12
+**Applies when:** Long-running turns that push repeatedly to a PR branch, resume after user activity, or interpret sudden CI silence on pushes
+
 ### 2026-08-12 — Budget-tier single-shot compile can fabricate a missing referent despite explicit prose
 
 **Trigger:** Relying on ALIGN grounding prose alone to stop a cheap executor model from "making the request true" when a named referent does not exist as described
