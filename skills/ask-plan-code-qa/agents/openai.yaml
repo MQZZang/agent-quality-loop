@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code Implementation Adapter"
+  short_description: "Plan, implement, and self-check scoped code changes"
+  default_prompt: "Use $ask-plan-code-qa explicitly to plan, implement, and self-check this code change without claiming independent acceptance."
+policy:
+  allow_implicit_invocation: false

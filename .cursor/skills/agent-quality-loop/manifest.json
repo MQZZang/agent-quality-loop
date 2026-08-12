@@ -1,18 +1,18 @@
 {
   "name": "agent-quality-loop",
-  "version": "2.4.0",
-  "generated_at": "2026-08-12T07:10:10.144Z",
+  "version": "2.5.0",
+  "generated_at": "2026-08-12T08:09:49.123Z",
   "files": {
-    "SKILL.md": "2c728ee932f48dd59f746dc5b48e3cef9c3b9fb4e60a7ffe8794374d648b7016",
+    "SKILL.md": "33901fe2a7504cc0f278d82c7c624307e444c976e18769f01c6209373b72d0a4",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "dccaca7b6796837d45aa6879e3b551c11ca44d6754f35dccf529d00ee2c382ae",
+    "references/contracts.md": "c574097c7a1a4cf26302c596799367c49172473beed3a4f043839d1c87194744",
     "references/domain-profiles.md": "e9db2120b42295e7aca8716415759fd1d441d68e8df81e70d9e6fb0cb891e248",
     "references/evaluation-cases.md": "a0da074f4113beed1e92b53de5ee730478893ad358c48007ccb5fa94763822a0",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
     "references/personalization.md": "4ef06f00c16d77f5328a83ae33efe0e79af96e8b87c83cbb46fa4bad90628100",
-    "scripts/validate-envelope.js": "3627935a29d5a002f394a890d0caa7229eec063a792a374bec6cca026dc0e995",
-    "scripts/validate-skill.js": "0483e6ecb24677cb3f5f95fd31ae6fd7ac53190804d0153568aca1ae75bc21a4"
+    "scripts/validate-envelope.js": "207bc450b19aebc36e7a1ffc06f58bbc37d890878feb4c62e648773d646f783a",
+    "scripts/validate-skill.js": "92b719a3b00a417a1017378293e7deac9607bc99e583ac833aa378f28db322aa"
   }
 }

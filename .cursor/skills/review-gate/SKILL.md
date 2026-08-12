@@ -6,6 +6,10 @@ description: >-
   Use standalone only when explicitly invoked; when called by agent-quality-loop,
   return evidence-based review findings and a conservative verdict without repairing
   the artifact or duplicating lifecycle output. Never use for implementation self-QA.
+license: MIT
+metadata:
+  author: MQZZang
+  version: "2.5.0"
 ---
 
 # Review Gate

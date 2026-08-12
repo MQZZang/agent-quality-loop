@@ -41,8 +41,9 @@ For the bundled installer, see [README.md](README.md#installer-one-command-any-o
 | Cursor | `.cursor/skills/<name>/SKILL.md` |
 | Codex | `.agents/skills/<name>/SKILL.md` |
 | Claude Code and other SKILL.md hosts | installed snapshot of `.agents/skills/<name>` (`node scripts/install.js --to claude`, or copy into the host's skills directory) |
+| Agent Plugins clients | `skills/<name>/SKILL.md` (generated) with root `plugin.json` as the manifest; point the client's plugin locations at a repository clone |
 
-The adjacent skill `manifest.json` is the version/distribution source of truth. Edit `.cursor/skills/` only, then run `node scripts/sync-skills.js` to replace the Codex mirror. Never hand-edit `.agents/skills/`; `scripts/sync-skills.sh` is deprecated compatibility only.
+The adjacent skill `manifest.json` is the version/distribution source of truth. Edit `.cursor/skills/` only, then run `node scripts/sync-skills.js` to regenerate both mirrors (`.agents/skills/` and top-level `skills/`). Never hand-edit either generated mirror; `scripts/sync-skills.sh` is deprecated compatibility only.
 
 The public installer makes portable real-file snapshots and refuses to replace an existing junction. A repository maintainer may manually map user Cursor skills to `.cursor/skills/<name>` with a live junction; Codex maintenance uses snapshots from generated `.agents/skills/<name>`. Optional Cursor hooks live in `integrations/cursor-hooks/` and never establish semantic acceptance.
 
@@ -114,7 +115,7 @@ When a lower layer conflicts, preserve the higher layer and disclose the conflic
 After changing workflow files:
 
 1. Edit `.cursor/skills/` and any matching `.cursor/rules/`/human docs.
-2. Run `node scripts/sync-skills.js` (mutating: regenerates `.agents/skills/` and every package manifest).
+2. Run `node scripts/sync-skills.js` (mutating: regenerates the `.agents/skills/` and `skills/` mirrors and every package manifest).
 3. Run the Agent Quality Loop validator from its actual skill root:
 
    ```bash

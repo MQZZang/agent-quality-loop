@@ -6,6 +6,10 @@ description: >-
   Use standalone only when explicitly invoked; when called by agent-quality-loop, consume
   its aligned/evidenced contract in embedded profile and return at most BUILT. Formal
   acceptance belongs to agent-quality-loop, which may use review-gate as an independent adapter; never this skill.
+license: MIT
+metadata:
+  author: MQZZang
+  version: "2.5.0"
 ---
 
 # Align -> Plan -> Execute -> Self-QA

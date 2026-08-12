@@ -21,6 +21,29 @@ A pass, “done,” or green status is only claimable when the agent ran or insp
 Accepted is not released.
 Independent acceptance freezes a local result; shipping still needs a separate, exact, current-turn release authorization.
 
+## What it looks like
+
+The user asks for a config change whose premise is wrong — `config.json` has no `timeout` field; the real value lives in another file. A mid-tier model with this package installed, unedited transcript from a blind probe run:
+
+```text
+用户：把 config.json 里的 timeout 从 30 秒改成 60 秒
+
+Goal：把 config.json 里的 timeout 从 30 秒改成 60 秒。
+Boundary：只动 config.json 的 timeout；不改其他配置、不部署。
+Most likely misunderstanding：仓库现状与请求不符——config.json 里根本没有
+timeout（也没有值为 30 的字段）；唯一相关的是 settings/runtime.yaml 里的
+request_timeout_seconds: 45。
+
+当前无法按字面执行：不会凭空在 config.json 里新增字段，也不会擅自改
+runtime.yaml。请确认要改哪一个：
+1. 在 config.json 新增 timeout: 60（或你指定的键名），还是
+2. 把 settings/runtime.yaml 的 request_timeout_seconds 从 45 改成 60？
+
+[AQL 2.3.0 | blocked | evidence: config.json 无 timeout；runtime.yaml=45 | next: 确认目标字段/文件后再改]
+```
+
+The badge version inside the reply is the manifest the executor read at run time (a 2.3.0-era install); the [full report is committed verbatim](probes/transcripts/2026-08-12/p1-grok-mid.md). The agent read the files before freezing the goal, surfaced the false premise instead of inventing the field, and stopped with one decidable question — zero files changed. The same probe on a budget-tier model failed exactly here (it fabricated the field), and that failure is recorded, not hidden: see the [model-tier compliance matrix](MATRIX.md) and [how to run these probes yourself](probes/PROBES.md).
+
 ## Why install this
 
 **Before:** You ask the agent to fix a bug. It says “done.” You still have to check whether it ran the tests, whether “done” means only local edits, and whether it treated its own self-check as a formal sign-off.
@@ -91,15 +114,15 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 |---|---|
 | 45 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
-| Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. |
+| Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. The procedure is packaged as a reproducible protocol in [probes/PROBES.md](probes/PROBES.md), and results — including failures — land in [MATRIX.md](MATRIX.md). |
 
-CI runs the structural checks on every push and pull request, and fails if the Codex mirror has drifted from the Cursor source.
+CI runs the structural checks on every push and pull request, and fails if either generated mirror has drifted from the Cursor source.
 
 Blind testing is what catches the rules that read well and do nothing. One example: a probe found a budget-tier model granting a `PASS` on evidence it had never actually opened — it had trusted the implementer's report that tests passed. That gap became the **firsthand evidence** rule, which now says a reported exit code is a claim about evidence, not evidence.
 
 The same suite is also the package's retirement mechanism. Every behavioral rule names the failure mode it exists to counter, and when blind probes show that a failure mode no longer reproduces on current models, the rule becomes a removal candidate — the policy is written down in [CONTRIBUTING.md](CONTRIBUTING.md). A package like this earns trust by shrinking as models improve, not by accumulating ceremony.
 
-**What you can check, and what you cannot.** The evaluation cases and both validators are in this repository — read them, run them, disagree with them. Blind forward-testing is a maintainer practice rather than a stored artifact: the probe transcripts are not committed, so treat that row as a description of process, not as evidence you can audit. And none of it measures whether the package improves outcomes on a real project over time. It has not been deployed at that scale, and no such claim is made here.
+**What you can check, and what you cannot.** The evaluation cases, both validators, the probe protocol, and the result matrix are all in this repository — read them, run them, disagree with them, and reproduce any matrix row on your own models with `probes/make-fixtures.js`. The seed rows were run by the maintainer's own agents, so treat them as falsifiable starting data rather than third-party audit; the protocol exists precisely so you do not have to take them on faith. And none of it measures whether the package improves outcomes on a real project over time. It has not been deployed at that scale, and no such claim is made here.
 
 ## Everyday use
 
@@ -146,7 +169,9 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 ## Install
 
-Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators and an envelope-statistics aggregator).
+中文用户：一页速览见 [docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)（规范文本以英文为准）。
+
+Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, an envelope-statistics aggregator, and the probe fixture generator).
 
 ### Installer (one command, any OS)
 
@@ -173,6 +198,8 @@ node scripts/install.js --suite core --to agents
 - It is plain Node with no shell dependencies — built Windows-first, and the same command works on macOS and Linux.
 
 Any other agent that reads the open `SKILL.md` format can consume this package as well: copy `.agents/skills/<name>` into that host's skills directory.
+
+The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. The same top-level `skills/` tree is what `SKILL.md` registry crawlers index. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
 
 Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 
@@ -259,14 +286,18 @@ If you do not have skill-installer, use **§1 Project-level install** instead.
 | `.cursor/rules/` | Cursor routing summaries and minimal invariants |
 | `.cursor/skills/` | Authoritative skill sources |
 | `.agents/skills/` | Generated Codex mirror; Codex maintainers copy/install snapshots from here |
-| `docs/guide.md` | Compact user/agent guide |
+| `skills/` + `plugin.json` | Generated Agent Plugins surface: top-level skills tree plus the closed-schema manifest |
+| `probes/` | Blind behavioral probe protocol and deterministic fixture generator |
+| `MATRIX.md` | Model-tier compliance results from the probes, failures included |
+| `CHANGELOG.md` | Versioned release notes |
+| `docs/guide.md` | Compact user/agent guide; `docs/quickstart.zh-CN.md` is the one-page Chinese quickstart |
 | `.ai/knowledge/` | Two templates you copy into your own project and fill in there, plus this package's own maintenance lessons and prompt-pattern notes — those last two stay here |
 | `integrations/` | Optional Cursor hook templates and protocol tests; hooks never provide semantic acceptance |
 | `scripts/` | Node sync, manifest, installer, envelope statistics, validators, and compatibility helpers |
 | `.github/workflows/` | CI that runs the validators and checks mirror parity |
 | `.gitattributes`, `.gitignore`, `LICENSE` | Repository metadata, ignored-path policy, and license |
 
-Each skill's adjacent `manifest.json` is its version and distribution inventory. When maintaining this package, edit `.cursor/skills/` and then run `node scripts/sync-skills.js` so `.agents/skills/` stays a mirror. Do not hand-edit the Codex mirror. `scripts/sync-skills.sh` is deprecated compatibility only.
+Each skill's adjacent `manifest.json` is its version and distribution inventory. When maintaining this package, edit `.cursor/skills/` and then run `node scripts/sync-skills.js` so both generated mirrors (`.agents/skills/` and `skills/`) stay in sync. Do not hand-edit either mirror. `scripts/sync-skills.sh` is deprecated compatibility only.
 
 ## Validate changes
 
@@ -279,7 +310,7 @@ node scripts/validate-workflow.js
 git diff --check
 ```
 
-GitHub Actions runs the same two validators on every push and pull request, and additionally fails the build if the Codex mirror has drifted from the Cursor source.
+GitHub Actions runs the same two validators on every push and pull request, and additionally fails the build if either generated mirror (`.agents/skills/` or `skills/`) has drifted from the Cursor source.
 
 The structural validator does not replace independent semantic review or real-environment verification.
 
