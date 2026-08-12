@@ -104,6 +104,8 @@ Most likely misunderstanding: name the highest-variance semantic or authority in
 
 Produce the compact contract defined in [contracts.md](references/contracts.md). For routine task presets, see [contract-presets.md](references/contract-presets.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
 
+**Grounding:** Compile from observed reality, not only from the user's words — users often cannot name the real need, so the request's description of the system is itself a hypothesis. Before freezing the contract, verify its load-bearing referents (named files, behaviors, terms) read-only against the current environment per the [grounding ladder](references/contracts.md#grounding-ladder); when the compile depends on facts or conventions outside the project, verify against an authoritative source rather than model memory and record source and date. A premise contradicted by observation is a contradiction (disclose it; see below); a requested mechanism compiles as the outcome it serves plus an `assumptions` entry, never as the goal itself. Grounding depth follows the ceremony budget: `fast` checks only referents the task already touches and never turns a trivial task into a research project.
+
 **Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
 
 **Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching phrase-lexicon and preference defaults per [personalization.md](references/personalization.md). The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority.
@@ -308,6 +310,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Advisory-only findings downgrade a valid delivery to FAIL | Map by severity binding; advisory-only does not block an otherwise valid Proceed |
 | Reports a correction that changed nothing | Apply Repair delta; treat as unresolved until the next taker sees a different actionable state |
 | Records a permission-like “preference” (auto-push, skip acceptance) | Refuse via the personalization firewall; authority needs a current-turn request |
+| Compiles the goal only from the user's words when one read would falsify the premise | Ground load-bearing referents before the freeze; disclose the mismatch |
 | Silently switches routes, or hard-stops because the chosen route failed | Disclose the three-line Path change; goal/non-goal/authority changes return to ALIGN |
 | Ceremony exceeds the size of the change | Suggest assurance downgrade to the user |
 

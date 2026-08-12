@@ -76,7 +76,7 @@ The agent infers all three from your ordinary wording by following the routing r
 
 Pick these up in chat; deeper mechanics live in [docs/guide.md](docs/guide.md).
 
-1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
+1. **Three-line alignment before heavy edits** — goal, boundary, most likely misunderstanding. The goal is compiled from your project's observable reality, not only from your words: files and behaviors you name get a cheap read-only check first, so a mistaken premise surfaces before anything is edited. If the request is high-stakes or ambiguous, it may wait for your explicit OK before implementing.
 2. **Self-QA ≠ independent acceptance** — “I ran the checks I claim” can justify a local `BUILT` result. Formal acceptance needs a fresh / different-role review that reads raw evidence first (`review-gate` when used).
 3. **No evidence, no pass** — missing required checks are reported as not run or blocked, not waved through.
 4. **Publish needs a separate current-turn ask** — a `full` local fix+accept path stops at independent acceptance. Deploy/publish needs its own exact authorization that turn.
@@ -89,7 +89,7 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 
 | Check | What it covers |
 |---|---|
-| 44 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
+| 45 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. |
 
@@ -262,7 +262,7 @@ If you do not have skill-installer, use **§1 Project-level install** instead.
 | `docs/guide.md` | Compact user/agent guide |
 | `.ai/knowledge/` | Two templates you copy into your own project and fill in there, plus this package's own maintenance lessons and prompt-pattern notes — those last two stay here |
 | `integrations/` | Optional Cursor hook templates and protocol tests; hooks never provide semantic acceptance |
-| `scripts/` | Node sync, manifest, installer, validators, and compatibility helpers |
+| `scripts/` | Node sync, manifest, installer, envelope statistics, validators, and compatibility helpers |
 | `.github/workflows/` | CI that runs the validators and checks mirror parity |
 | `.gitattributes`, `.gitignore`, `LICENSE` | Repository metadata, ignored-path policy, and license |
 

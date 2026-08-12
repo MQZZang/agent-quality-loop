@@ -53,6 +53,17 @@ Do not force the user to fill this schema. Infer from the request, repository, a
 
 Identifier, request, goal, target, problem, workspace, reconstruction, and expiry fields are non-empty scalar strings; do not serialize one-item arrays in their place. Collection fields are explicitly named as lists in the full envelope.
 
+### Grounding Ladder
+
+Compile facts from the cheapest sufficient rung, in order; every rung is read-only:
+
+1. The request and retained conversation context.
+2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents here before the contract freezes; a premise the environment contradicts is a contradiction to disclose, never to silently resolve toward either side.
+3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
+4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
+
+A mechanism named in the request compiles as the outcome it serves plus a hypothesis entry, with the inferred outcome stated in the alignment lines. Grounding depth follows the Ceremony Budget: `fast` verifies only referents the task already touches; `formal` verifies every conclusion-changing referent.
+
 Keep the three routing axes independent:
 
 - `intent` chooses the requested outcome; map it to the smallest compatible `mode`.

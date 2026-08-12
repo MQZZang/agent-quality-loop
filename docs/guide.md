@@ -88,6 +88,7 @@ Consumer probe and multi-agent:
 ALIGN and contradiction:
 - `formal` / high-ambiguity creative ALIGN ends with an explicit OK wait; contradictions are disclosed, not silently resolved.
 - Formal/high-ambiguity ALIGN also needs who/medium/sees-what `success_observables` and decidable `counterexamples`; decision-changing counterexamples must be run before PASS.
+- ALIGN grounds the compile before the freeze: load-bearing referents verified read-only against the environment, external conventions against authoritative sources (source and date recorded), premises contradicted by observation disclosed. A requested mechanism compiles as outcome + hypothesis; grounding depth follows the ceremony budget.
 
 Review, repair, and path:
 - Finding severity (`blocker`/`warning`/`advisory`) binds verdict mapping; source-align outranks probe agreement.
