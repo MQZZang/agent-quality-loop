@@ -26,6 +26,9 @@ jobs:
       - name: Installer routing and atomic-preflight regression cases
         run: node scripts/install.js --self-test
 
+      - name: Envelope statistics aggregation cases
+        run: node scripts/aql-stats.js --self-test
+
       - name: Skill package structure and envelope regression cases
         run: node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
 
