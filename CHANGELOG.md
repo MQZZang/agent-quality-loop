@@ -9,7 +9,7 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## 2.5.0 — 2026-08-12
 
-- Standards surface: root `plugin.json` (Agent Plugins 1.0.0, closed schema) plus a generated top-level `skills/` mirror, so plugin-aware clients and registry crawlers can consume the repository directly.
+- Standards surface: root `plugin.json` (Agent Plugins 1.0.0, closed schema) plus a generated top-level `skills/` mirror — Agent Plugins clients consume the top-level `skills/` tree, and registries such as skills.sh read the cross-client `.agents/skills/` tree.
 - Frontmatter carries the optional Agent Skills spec fields: `license: MIT` and `metadata` (author, version); the packaged validator now parses the spec's optional field set and fails on any version drift against the manifest.
 - Blind behavioral probes packaged as a reproducible protocol: `probes/make-fixtures.js` (deterministic fixtures, blindness lint, integrity `--verify`) and `probes/PROBES.md` (decidable grading tied to evaluation cases 43/44/45).
 - `MATRIX.md`: model-tier compliance results seeded with the first tri-model run, including the composer budget-tier double FAIL.

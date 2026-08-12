@@ -179,7 +179,7 @@ Nothing to build and no runtime dependency. Installing means copying Markdown ru
 npx skills add MQZZang/agent-quality-loop
 ```
 
-Verified 2026-08-12: the CLI finds all four skills in this repository and installs from its cross-client `.agents/skills/` tree. It has no `--dry-run`; to list what would be installed without installing, use `npx skills add MQZZang/agent-quality-loop -l`.
+Verified 2026-08-12: the CLI finds all four skills in this repository and installs from its cross-client `.agents/skills/` tree. It has no `--dry-run`; to list what would be installed without installing, use `npx skills add MQZZang/agent-quality-loop -l`. The two install paths differ: the skills.sh CLI applies its own scope and copy/link semantics (`npx skills --help`) and picks up all four skills, while the bundled installer below writes user-level real-file snapshots and defaults to the three-skill `core` suite.
 
 ### Installer (one command, any OS)
 
@@ -256,9 +256,9 @@ Diagnose the root cause of the failing build. Do not change files.
 
 Two things should happen: the agent restates goal, boundary, and most likely misunderstanding before doing anything, and it stops at a diagnosis instead of editing. If it starts editing straight away, the rules did not load — after a project-level copy, check that `.cursor/rules/` and `.cursor/skills/` landed at the **root** of the target project; after an installer run, check the host's skill list for the skill name.
 
-### 2. Codex user-level skills (optional; needs a separate installer)
+### 2. Legacy alternative: Codex user-level skills via skill-installer (only if you already use that tool)
 
-This path installs the four skills into your Codex user skill area via **skill-installer** — a separate tool **not shipped in this repository**. Use it only if you already have skill-installer available; otherwise use §1, which needs nothing beyond a file copy.
+The bundled installer above already covers Codex user-level skills (`--to agents`). This legacy path installs the four skills via **skill-installer** — a separate tool **not shipped in this repository** — and exists only for users who already work with it; otherwise use the bundled installer or §1's plain file copy.
 
 Ask Codex to use `$skill-installer` with repository `MQZZang/agent-quality-loop`, ref `master`, and these paths:
 

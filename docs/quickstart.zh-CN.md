@@ -12,7 +12,7 @@
 
 ## 安装（任一系统，一条命令）
 
-已装 skills.sh CLI 的话，一条命令直接装（该 CLI 没有 `--dry-run`；只想查看清单用 `-l`）：
+已装 skills.sh CLI 的话，一条命令直接装（skills.sh 会发现并安装全部四个技能；下方安装器的 `core` 套件只装三件核心环。该 CLI 没有 `--dry-run`，只想查看清单用 `-l`）：
 
 ```bash
 npx skills add MQZZang/agent-quality-loop
