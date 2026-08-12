@@ -192,6 +192,12 @@ function runSelfTest() {
     check(promptSheet("X").includes("X/p1/proj"), "prompt sheet paths are POSIX-normalized");
     const probesDoc = fs.readFileSync(path.join(__dirname, "PROBES.md"), "utf8");
     check(probesDoc.includes(`protocol **${PROTOCOL_VERSION}**`), "PROBES.md names the same protocol version as this generator");
+    // Golden pin: editing fixture bytes or prompt wording without bumping
+    // PROTOCOL_VERSION (and re-pinning) must fail, not slide through green.
+    check(
+      protocolStamp() === `protocol: ${PROTOCOL_VERSION}\nfixtures+prompts digest: 78fe521157e5`,
+      "fixture and prompt bytes match the pinned v1 digest (a content change requires a protocol bump and a new pin)",
+    );
     fs.appendFileSync(path.join(dirA, "p1", "proj", "config.json"), "\n");
     const drift = verify(dirA);
     check(!drift.ok && drift.changes.some((c) => c.includes("p1/proj/config.json")), "verify detects fixture drift after a probe run");
