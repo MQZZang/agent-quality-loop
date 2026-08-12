@@ -42,7 +42,7 @@ Trivial Q&A and casual brainstorming stay direct; this package is for diagnosis,
 | Cursor project rules (`.cursor/rules/`) | Always-on minimal boundaries (`00-agent-constitution.mdc`), plus routing summaries that point at the skills |
 | Cursor skills (`.cursor/skills/`) | The agent can load `agent-quality-loop`, `ask-plan-code-qa`, and `review-gate` when the task matches, plus `skill-factory` for authoring work |
 | Codex skills (`.agents/skills/`) | The same four skills, mirrored for Codex |
-| Claude Code personal skills (`~/.claude/skills/`) | The same four skills, installed with the bundled installer (`--to claude`) |
+| Claude Code personal skills (`~/.claude/skills/`) | The same skills, installed with the bundled installer (`--to claude`; the default `core` suite is the three-piece loop, `--suite full` adds `skill-factory`) |
 | Chat UI | No new chrome. You keep typing in the same chat box. |
 
 How you invoke it day to day:

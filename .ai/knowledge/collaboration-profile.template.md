@@ -10,7 +10,7 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 **How the agent uses it:**
 
 - Read it during **Align** (before proposing the Unified Goal). Apply known preferences **by default**; do **not** re-ask what the profile already answers.
-- Keep it **lightweight and incremental** — populate via **propose-on-confirm** (like `lessons.md`), **never** a big upfront questionnaire.
+- Keep it **lightweight and incremental** — populate per the tiers in the skill's `references/personalization.md`: auto-observed entries (lexicon, communication) write directly with a one-line disclosed diff, decision-changing habits are propose-on-confirm, and it is **never** a big upfront questionnaire.
 - Preferences are **defaults, not overrides** — the user's explicit instruction this turn always wins.
 - Anything under **To Confirm** is not yet a settled preference — do not treat it as one.
 - Triggers, write tiers, and the authority firewall (what may sediment automatically, what needs confirmation, and what must never be learned) are defined in the skill package's `references/personalization.md`; this file is the data carrier. Learned preferences never raise authority.
