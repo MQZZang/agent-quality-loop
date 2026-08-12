@@ -7,3 +7,21 @@
 
 # Route shim generator emits LF; keep working-tree text LF even with core.autocrlf.
 dist/route-shims/** text eol=lf
+
+# Skill package text must stay LF so invalid-UTF-8 fallback cannot diverge
+# across Windows autocrlf vs Ubuntu LF checkouts (manifest sha256 blind spot).
+.cursor/skills/**/*.js text eol=lf
+.cursor/skills/**/*.md text eol=lf
+.cursor/skills/**/*.json text eol=lf
+.cursor/skills/**/*.yaml text eol=lf
+.cursor/skills/**/*.yml text eol=lf
+.agents/skills/**/*.js text eol=lf
+.agents/skills/**/*.md text eol=lf
+.agents/skills/**/*.json text eol=lf
+.agents/skills/**/*.yaml text eol=lf
+.agents/skills/**/*.yml text eol=lf
+skills/**/*.js text eol=lf
+skills/**/*.md text eol=lf
+skills/**/*.json text eol=lf
+skills/**/*.yaml text eol=lf
+skills/**/*.yml text eol=lf

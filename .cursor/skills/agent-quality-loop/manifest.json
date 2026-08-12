@@ -1,7 +1,7 @@
 {
   "name": "agent-quality-loop",
   "version": "2.6.1",
-  "generated_at": "2026-08-12T14:17:55.223Z",
+  "generated_at": "2026-08-12T14:21:42.367Z",
   "files": {
     "SKILL.md": "ad27db61b28f82218da1e614cb6ae2a0bf01533c1574d83ab8b12cdd8a3f5d52",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
@@ -13,10 +13,10 @@
     "references/evaluation-cases.md": "22dce267d679187565f630b22aa6abe150302e088afe10c8c1d0ee1de87c3332",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
     "references/personalization.md": "ae621565023e75888a47d24099f1c795fcf226b41a84fff9206ff5b135b98415",
-    "scripts/aql-envelope.js": "646c866e2f5c0c497fbbdc19de8dce6aaed50c606c2abd780c0bff1befc5a7c5",
+    "scripts/aql-envelope.js": "60b0d787e53b5c80230b26e38e3ccb17283d95628b803ce70da5b78f184cb71c",
     "scripts/aql-stats.js": "c65000c87d5bfb9fe33166be080668a5dc7c26079ee01206b2f4cb6ab4f63163",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
-    "scripts/validate-envelope.js": "c489f89c7cadc289023b030e4379139f7f91c1b46d404268323141c726e241d5",
-    "scripts/validate-skill.js": "52893df289f5eff6bd2533d26740fed78b0eb451a8c2512290ebe227bc51a77c"
+    "scripts/validate-envelope.js": "fa82effbb0bd908f7362a0d1a9b2dce4a18e122435864bb8804f41dba70a7a19",
+    "scripts/validate-skill.js": "29b112e98e17a9af09887db50b5b700785fb6dafe02b9cf92a026687972d0c41"
   }
 }

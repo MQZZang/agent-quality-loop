@@ -48,11 +48,25 @@ function parseYamlStringScalar(rawValue) {
   return value;
 }
 
+function isTextExtension(absolutePath) {
+  return TEXT_EXTENSIONS.has(path.extname(absolutePath).toLowerCase());
+}
+
+function utf8ValidityError(absolutePath, contents = fs.readFileSync(absolutePath)) {
+  if (!isTextExtension(absolutePath)) return null;
+  try {
+    new TextDecoder("utf-8", { fatal: true }).decode(contents);
+    return null;
+  } catch (error) {
+    return error.message || "invalid UTF-8";
+  }
+}
+
 function sha256File(absolutePath) {
   const hash = crypto.createHash("sha256");
   const contents = fs.readFileSync(absolutePath);
   let normalized = contents;
-  if (TEXT_EXTENSIONS.has(path.extname(absolutePath).toLowerCase())) {
+  if (isTextExtension(absolutePath)) {
     try {
       const decoded = new TextDecoder("utf-8", { fatal: true }).decode(contents);
       normalized = Buffer.from(decoded.replace(/\r\n/g, "\n"), "utf8");
@@ -237,6 +251,12 @@ if (fs.existsSync(manifestPath)) {
           continue;
         }
         const absolute = path.join(root, relativePath);
+        const utf8Error = utf8ValidityError(absolute);
+        if (utf8Error) {
+          mismatches.push(
+            `invalid UTF-8 in text file ${relativePath} (${utf8Error}); hash falls back to raw bytes and is not cross-EOL safe`,
+          );
+        }
         const actual = sha256File(absolute);
         if (actual !== expectedHash) mismatches.push(`sha256 mismatch ${relativePath}`);
       }

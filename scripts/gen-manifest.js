@@ -19,16 +19,31 @@ function repoRoot() {
   return path.resolve(__dirname, "..");
 }
 
+function isTextExtension(absolutePath) {
+  return TEXT_EXTENSIONS.has(path.extname(absolutePath).toLowerCase());
+}
+
+function utf8ValidityError(absolutePath, contents = fs.readFileSync(absolutePath)) {
+  if (!isTextExtension(absolutePath)) return null;
+  try {
+    new TextDecoder("utf-8", { fatal: true }).decode(contents);
+    return null;
+  } catch (error) {
+    return error.message || "invalid UTF-8";
+  }
+}
+
 function sha256File(absolutePath) {
   const hash = crypto.createHash("sha256");
   const contents = fs.readFileSync(absolutePath);
   let normalized = contents;
-  if (TEXT_EXTENSIONS.has(path.extname(absolutePath).toLowerCase())) {
+  if (isTextExtension(absolutePath)) {
     try {
       const decoded = new TextDecoder("utf-8", { fatal: true }).decode(contents);
       normalized = Buffer.from(decoded.replace(/\r\n/g, "\n"), "utf8");
     } catch {
-      // Keep malformed text-extension files binary-raw.
+      // Keep malformed text-extension files binary-raw — callers that require
+      // cross-EOL invariance must reject via utf8ValidityError first.
     }
   }
   hash.update(normalized);
@@ -154,6 +169,13 @@ function checkManifestConsistency(packageDir) {
       continue;
     }
     const absolute = path.join(packageDir, relativePath);
+    const utf8Error = utf8ValidityError(absolute);
+    if (utf8Error) {
+      errors.push(
+        `${path.basename(packageDir)}: invalid UTF-8 in text file ${relativePath} (${utf8Error}); ` +
+          "hash falls back to raw bytes and is not cross-EOL safe",
+      );
+    }
     const actual = sha256File(absolute);
     if (actual !== manifest.files[relativePath]) {
       errors.push(`${path.basename(packageDir)}: sha256 mismatch ${relativePath}`);
@@ -216,6 +238,8 @@ function runSelfTest() {
     check(!fs.readFileSync(lf).equals(fs.readFileSync(crlf)), "raw LF and CRLF differ");
     check(sha256File(lf) === sha256File(crlf), "valid UTF-8 LF and CRLF share digest");
     check(sha256File(bad80) !== sha256File(bad81), "invalid UTF-8 bytes retain distinct digests");
+    check(Boolean(utf8ValidityError(bad80)), "utf8ValidityError flags invalid UTF-8 text");
+    check(utf8ValidityError(lf) === null, "utf8ValidityError accepts valid UTF-8 text");
 
     const packageDir = path.join(fixtureRoot, "package");
     fs.mkdirSync(packageDir);
@@ -227,6 +251,16 @@ function runSelfTest() {
       const errors = checkManifestConsistency(packageDir);
       check(errors.length > 0, `rejects unsafe or non-walked manifest path ${JSON.stringify(unsafePath)}`);
     }
+    const brokenPackage = path.join(fixtureRoot, "broken-utf8");
+    fs.mkdirSync(brokenPackage);
+    fs.writeFileSync(path.join(brokenPackage, "bad.txt"), Buffer.from([0xe2, 0x80, 0x3f]));
+    const brokenManifest = buildManifest(brokenPackage, { generatedAt: "2000-01-01T00:00:00.000Z" });
+    fs.writeFileSync(path.join(brokenPackage, MANIFEST_NAME), JSON.stringify(brokenManifest), "utf8");
+    const brokenErrors = checkManifestConsistency(brokenPackage);
+    check(
+      brokenErrors.some((error) => error.includes("invalid UTF-8 in text file")),
+      "rejects skill package text files with invalid UTF-8",
+    );
     const cleanManifest = buildManifest(packageDir, { generatedAt: "2000-01-01T00:00:00.000Z" });
     fs.writeFileSync(path.join(packageDir, MANIFEST_NAME), JSON.stringify(cleanManifest), "utf8");
     const externalDir = path.join(fixtureRoot, "external");
@@ -274,6 +308,8 @@ module.exports = {
   MANIFEST_NAME,
   TEXT_EXTENSIONS,
   sha256File,
+  utf8ValidityError,
+  isTextExtension,
   validateManifestPath,
   walkFiles,
   listPackageSkillDirs,

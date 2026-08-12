@@ -7,6 +7,7 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 ## 2.6.1 — 2026-08-12
 
 - Exact-tag CI closure: route-shim `--check` normalizes CRLF; `.gitattributes` forces `dist/route-shims/**` LF; `aql-stats` reports redact absolute paths (fixes Ubuntu self-test leak).
+- Manifest cross-platform blind spot: corrupted UTF-8 punctuation in `aql-envelope.js` / `validate-envelope.js` forced raw-byte hashing (EOL-sensitive). Restored valid UTF-8; manifest/`validate-skill`/`gen-manifest` now **fail** invalid UTF-8 text files; skill-tree `.gitattributes` forces LF.
 - Release workflow: `.github/workflows/release.yml` requires Ubuntu + Windows `validate-all` on the exact tag SHA before attestation + GitHub Release; `scripts/gen-release-attestation.js` derives counts from source.
 - Stop gate: removed `.stop-gate-fired` workspace marker; anti-loop uses host `loop_count` / `loop_limit` only.
 - Hooks modes: `compatibility` (heuristic external-write patterns) vs `strict` (unknown shell ask/deny); expanded patterns (docker/helm/firebase/curl mutating methods/scp/rsync); optional MCP policy in `gates.config.json`. Claims: matched external-write and configured MCP never auto-`allow` — not a full shell sandbox.

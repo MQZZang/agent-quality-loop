@@ -82,7 +82,7 @@ function isSymlinkOrJunction(targetPath) {
     // Windows directory junctions often report as directories via lstat without
     // isSymbolicLink; detect via reparse-point bit when available.
     if (process.platform === "win32" && typeof stat.isDirectory === "function" && (stat.mode & 0o100000) === 0) {
-      // Fall through â€?Node marks junctions as symbolic links on modern Node.
+      // Fall through  - Node marks junctions as symbolic links on modern Node.
     }
     return false;
   } catch (error) {
@@ -269,7 +269,7 @@ function formatChainError(chain) {
 function assertChainWritable(workspaceRoot, contractId) {
   const chain = loadWorkspaceSnapshots(workspaceRoot, contractId);
   if (chain.pollutedFiles.length > 0 || chain.status === "invalid") {
-    const err = new Error(`EORDER: snapshot chain invalid â€?${formatChainError(chain)}`);
+    const err = new Error(`EORDER: snapshot chain invalid  - ${formatChainError(chain)}`);
     err.code = "EORDER";
     err.chain = chain;
     throw err;
@@ -574,9 +574,9 @@ function runSelfTest() {
         "history filename includes sequence phase digest",
       );
 
-      // consecutive writes â†?different history files + monotonic sequence
+      // consecutive writes ->different history files + monotonic sequence
       const summary2 = writeEnvelope(workspace, envelope);
-      check(summary.history_path !== summary2.history_path, "same contract/phase consecutive writes â†?different history files");
+      check(summary.history_path !== summary2.history_path, "same contract/phase consecutive writes ->different history files");
       check(fs.existsSync(summary.history_path) && fs.existsSync(summary2.history_path), "history not overwritten");
       const second = JSON.parse(fs.readFileSync(summary2.current_path, "utf8"));
       check(
@@ -605,7 +605,7 @@ function runSelfTest() {
       );
     }
 
-    // --- invalid JSON â†?no files ---
+    // --- invalid JSON ->no files ---
     const wsBadJson = path.join(root, "ws-bad-json");
     fs.mkdirSync(wsBadJson, { recursive: true });
     const badJsonPath = path.join(root, "bad.json");
@@ -620,10 +620,10 @@ function runSelfTest() {
     }
     check(
       badJsonCode === 2 && !fs.existsSync(path.join(wsBadJson, AQL_DIR_NAME)),
-      "invalid JSON â†?no files",
+      "invalid JSON ->no files",
     );
 
-    // --- structurally invalid â†?no files ---
+    // --- structurally invalid ->no files ---
     const wsStruct = path.join(root, "ws-struct");
     fs.mkdirSync(wsStruct, { recursive: true });
     const badStruct = baseEnvelope();
@@ -634,9 +634,9 @@ function runSelfTest() {
     } catch (error) {
       structError = error;
     }
-    check(!!structError && !fs.existsSync(path.join(wsStruct, AQL_DIR_NAME)), "structurally invalid â†?no files");
+    check(!!structError && !fs.existsSync(path.join(wsStruct, AQL_DIR_NAME)), "structurally invalid ->no files");
 
-    // --- missing reference â†?no files ---
+    // --- missing reference ->no files ---
     const wsMissingRef = path.join(root, "ws-missing-ref");
     fs.mkdirSync(wsMissingRef, { recursive: true });
     const missingRef = baseEnvelope();
@@ -649,10 +649,10 @@ function runSelfTest() {
     }
     check(
       !!missingErr && String(missingErr.message).includes("missing path refs") && !fs.existsSync(path.join(wsMissingRef, AQL_DIR_NAME)),
-      "missing reference â†?no files",
+      "missing reference ->no files",
     );
 
-    // --- read authority reject â†?no files ---
+    // --- read authority reject ->no files ---
     const wsRead = path.join(root, "ws-read");
     fs.mkdirSync(wsRead, { recursive: true });
     fs.writeFileSync(path.join(wsRead, "present.txt"), "ok\n", "utf8");
@@ -672,7 +672,7 @@ function runSelfTest() {
     } catch (error) {
       readErr = error;
     }
-    check(!!readErr && !fs.existsSync(path.join(wsRead, AQL_DIR_NAME)), "read authority reject â†?no files");
+    check(!!readErr && !fs.existsSync(path.join(wsRead, AQL_DIR_NAME)), "read authority reject ->no files");
 
     // --- path traversal reject ---
     const wsTrav = path.join(root, "ws-trav");
@@ -772,7 +772,7 @@ function runSelfTest() {
     } catch (error) {
       order999Err = error;
     }
-    check(!!order999Err && order999Err.code === "EORDER", "pseudo sequence 999 â†?EORDER");
+    check(!!order999Err && order999Err.code === "EORDER", "pseudo sequence 999 ->EORDER");
     const after999 = JSON.parse(fs.readFileSync(order999Summary.current_path, "utf8"));
     check(after999.snapshot.sequence === 1, "EORDER blocks append after forged sequence");
 
@@ -805,7 +805,7 @@ function runSelfTest() {
     } catch (error) {
       brokenPrevErr = error;
     }
-    check(!!brokenPrevErr && brokenPrevErr.code === "EORDER", "broken previous_digest â†?EORDER");
+    check(!!brokenPrevErr && brokenPrevErr.code === "EORDER", "broken previous_digest ->EORDER");
 
     // --- EORDER: duplicate sequence ---
     const wsDupSeq = path.join(root, "ws-dup-seq");
@@ -834,9 +834,9 @@ function runSelfTest() {
     } catch (error) {
       dupSeqErr = error;
     }
-    check(!!dupSeqErr && dupSeqErr.code === "EORDER", "duplicate sequence â†?EORDER");
+    check(!!dupSeqErr && dupSeqErr.code === "EORDER", "duplicate sequence ->EORDER");
 
-    // --- valid 1/2 â†?next 3 ---
+    // --- valid 1/2 ->next 3 ---
     const wsValidChain = path.join(root, "ws-valid-chain");
     fs.mkdirSync(wsValidChain, { recursive: true });
     fs.writeFileSync(path.join(wsValidChain, "present.txt"), "ok\n", "utf8");
@@ -850,7 +850,7 @@ function runSelfTest() {
     const valid2 = writeEnvelope(wsValidChain, validEnv);
     check(valid1.sequence === 1 && valid2.sequence === 2, "valid chain writes seq 1 and 2");
     const valid3 = writeEnvelope(wsValidChain, validEnv);
-    check(valid3.sequence === 3, "valid 1/2 â†?next 3");
+    check(valid3.sequence === 3, "valid 1/2 ->next 3");
   } finally {
     for (const fixture of fixtures) {
       try {
