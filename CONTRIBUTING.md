@@ -22,12 +22,12 @@ Volume is the failure mode here, not tooling. One well-argued change beats five 
 
 ## Changing the skills
 
-The Cursor tree is authoritative. The Codex tree is generated.
+The Cursor tree is authoritative. The Codex tree (`.agents/skills/`) and the Agent Plugins tree (top-level `skills/`) are generated.
 
 Each skill's adjacent `manifest.json` is the version and distribution source of truth. The public Node installer produces portable real-file snapshots and refuses to replace an existing junction; it does not create live links. Maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`, while Codex maintenance consumes snapshots from generated `.agents/skills/<name>`. Optional Cursor hooks are mechanical predicates, never semantic acceptance.
 
-1. Edit files under `.cursor/skills/` only. Never hand-edit `.agents/skills/` — it is overwritten.
-2. Regenerate the mirror (and package manifests) and run the checks:
+1. Edit files under `.cursor/skills/` only. Never hand-edit `.agents/skills/` or `skills/` — both are overwritten.
+2. Regenerate the mirrors (and package manifests) and run the checks:
 
 ```bash
 node scripts/sync-skills.js
@@ -36,7 +36,7 @@ node scripts/validate-workflow.js
 git diff --check
 ```
 
-All of these must pass. CI runs the same validators and additionally fails if the mirror has drifted (`node scripts/sync-skills.js --check`).
+All of these must pass. CI runs the same validators and additionally fails if either generated mirror has drifted (`node scripts/sync-skills.js --check`).
 
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 
@@ -45,9 +45,17 @@ All of these must pass. CI runs the same validators and additionally fails if th
 Models improve, and a mechanism that earns its keep today can be pure ceremony a year from now — that is how mature skill packages age into obstacles. To keep this one prunable:
 
 - Every behavioral mechanism must name the failure mode it counters. A mechanism nobody can tie to a failure mode is already a removal candidate.
-- When the host model landscape changes materially, re-run a sample of evaluation cases blind — without naming the mechanism under test — across the executor tiers recorded in `.ai/knowledge/lessons.md` (flagship / mid / budget). If the failure mode no longer reproduces on any tier, demote the mechanism: fold it into a shorter invariant or delete it, and cite the probe evidence in the change.
+- When the host model landscape changes materially, re-run a sample of evaluation cases blind — without naming the mechanism under test — across the executor tiers recorded in `.ai/knowledge/lessons.md` (flagship / mid / budget). The packaged procedure is [probes/PROBES.md](probes/PROBES.md) and results accumulate in [MATRIX.md](MATRIX.md). If the failure mode no longer reproduces on any tier, demote the mechanism: fold it into a shorter invariant or delete it, and cite the probe evidence in the change.
 - Deletions get the same review bar as additions, but shrinking is a success, not a regression. The ceremony budget and the proactive assurance downgrade are the runtime half of this policy; this section is the maintenance half.
 - `node scripts/aql-stats.js` aggregates envelope snapshots (`.agent-quality-loop/` in a consumer project) into phase, verdict, and acceptance-dimension counts and distributions. Use it as the measurement input when deciding what to demote, instead of anecdote.
+
+## First contributions
+
+Three entry points that need no prior context, in rising order of effort:
+
+1. **Run the probes on your model and PR a matrix row.** Follow [probes/PROBES.md](probes/PROBES.md); attach the transcript and the `--verify` output. FAIL rows are as valuable as PASS rows — they are what the re-baseline policy runs on.
+2. **Report a failure sample.** A real transcript where an agent following this package mis-routed, over-ceremonied, or claimed without evidence — with the raw request and what you expected. These become evaluation cases.
+3. **Propose an evaluation case.** A written scenario with decidable expected behavior and fail lines, matching the style of [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 
 ## House style
 
