@@ -173,7 +173,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 ## Maintenance
 
 1. Edit `.cursor/skills/` only.
-2. Run `node scripts/sync-skills.js` to sync to `.agents/skills/` (`scripts/sync-skills.sh` is deprecated compatibility only).
+2. Run `node scripts/sync-skills.js` to regenerate both generated mirrors (`.agents/skills/` and `skills/`) (`scripts/sync-skills.sh` is deprecated compatibility only).
 3. Run structural validators.
 4. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
 5. Obtain an independent review before declaring formal acceptance.

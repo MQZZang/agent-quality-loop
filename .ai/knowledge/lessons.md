@@ -58,6 +58,18 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
 
+### 2026-08-12 — Copy-paste instructions are release-grade: verify external CLI flags or mark them unverified
+
+**Trigger:** Writing commands for another executor (human or agent) to run against an external CLI or service
+**Root cause:** A maintainer instruction pack included `npx skills add … --dry-run` on the assumption that a dry-run flag exists by convention. The CLI silently ignores unknown flags and executed a real install — an unintended side effect delivered through an instruction block that looked authoritative. Grounding rung 3 (authoritative sources over model memory) applies to outgoing instructions exactly as it applies to incoming premises.
+**Rule:** Any command handed to another executor is a release-grade artifact: verify flags against the tool's own `--help` or docs first, or explicitly mark the line "unverified — run --help first". Never assume a safety flag (dry-run, no-op, list) exists; prefer the tool's confirmed read-only form (here: `-l`).
+**Evidence:** 2026-08-12 local execution report: "CLI help 无 --dry-run；该参数被忽略并实际执行了安装。只列清单应使用 -l。"
+**Evidence to read:** The local executor's verbatim step-6 output; `npx skills --help`
+**Scope:** project
+**Status:** active
+**Last fired:** 2026-08-12
+**Applies when:** Writing instruction packs, dispatch briefs, or docs that contain runnable commands against external tools
+
 ### 2026-08-12 — Re-verify PR and base state before every push in a long session
 
 **Trigger:** Pushing additional commits to a PR branch during a long turn, or mutating a PR's title, body, or status

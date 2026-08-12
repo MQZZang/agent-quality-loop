@@ -173,6 +173,14 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, an envelope-statistics aggregator, and the probe fixture generator).
 
+### Fastest: via the skills.sh CLI
+
+```bash
+npx skills add MQZZang/agent-quality-loop
+```
+
+Verified 2026-08-12: the CLI finds all four skills in this repository and installs from its cross-client `.agents/skills/` tree. It has no `--dry-run`; to list what would be installed without installing, use `npx skills add MQZZang/agent-quality-loop -l`.
+
 ### Installer (one command, any OS)
 
 From a clone of this repository:
@@ -199,7 +207,7 @@ node scripts/install.js --suite core --to agents
 
 Any other agent that reads the open `SKILL.md` format can consume this package as well: copy `.agents/skills/<name>` into that host's skills directory.
 
-The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. The same top-level `skills/` tree is what `SKILL.md` registry crawlers index. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
+The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. Registry tooling varies in which tree it reads: the skills.sh CLI installs from the cross-client `.agents/skills/` tree (verified 2026-08-12), while Agent Plugins clients read the top-level `skills/` tree per that specification — the repository ships both, so each standard finds its own. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
 
 Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 

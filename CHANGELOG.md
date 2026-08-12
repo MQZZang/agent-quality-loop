@@ -2,6 +2,11 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value shared by all four packaged skills. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## Unreleased
+
+- Distribution facts verified after the v2.5.0 release: the skills.sh CLI (`npx skills add MQZZang/agent-quality-loop`) discovers all four skills and installs from the cross-client `.agents/skills/` tree; the top-level `skills/` tree remains the Agent Plugins component root. Install docs now lead with the one-command path and state which tree each standard reads.
+- Maintainer-instruction lesson recorded: commands handed to another executor need verified flags — the skills CLI has no `--dry-run`; `-l` is the list-only form.
+
 ## 2.5.0 — 2026-08-12
 
 - Standards surface: root `plugin.json` (Agent Plugins 1.0.0, closed schema) plus a generated top-level `skills/` mirror, so plugin-aware clients and registry crawlers can consume the repository directly.
