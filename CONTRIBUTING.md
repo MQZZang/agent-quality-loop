@@ -38,18 +38,6 @@ git diff --check
 
 All of these must pass. CI runs the same validators and additionally fails if either generated mirror has drifted (`node scripts/sync-skills.js --check`).
 
-Two script self-tests are not yet wired into `.github/workflows/validate.yml`, because agent-authored pushes must not modify workflow files. A maintainer commit on `master` should add exactly:
-
-```yaml
-      - name: Envelope statistics aggregation cases
-        run: node scripts/aql-stats.js --self-test
-
-      - name: Probe fixture generator cases
-        run: node probes/make-fixtures.js --self-test
-```
-
-and may rename the mirror step to "Generated mirrors match the Cursor source". Delete this paragraph in the same commit.
-
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 
 ## Capability re-baseline
