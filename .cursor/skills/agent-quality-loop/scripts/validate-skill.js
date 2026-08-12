@@ -8,17 +8,19 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "2.2.0";
+const MANIFEST_VERSION = "2.3.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
   "SKILL.md",
   "agents/openai.yaml",
   "references/code-implementation-adapter.md",
+  "references/contract-presets.md",
   "references/contracts.md",
   "references/domain-profiles.md",
   "references/evaluation-cases.md",
   "references/multi-agent-leverage.md",
+  "references/personalization.md",
   "manifest.json",
   "scripts/validate-envelope.js",
   "scripts/validate-skill.js",

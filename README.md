@@ -6,7 +6,9 @@ Coding agents made producing a change far cheaper than reviewing one, and they m
 
 A growing set of tools answers this with a mechanical gate: declare a check, run it, and refuse to let the agent stop until it passes. Those work, and where a command can settle the question you should use one. This package covers the part a command cannot settle — whether the goal was the right goal, whether the evidence actually bears on the claim, whether “hide it” meant delete it. It constrains what the agent is allowed to claim, so that “done” arrives with evidence attached rather than leaving you to re-derive the truth.
 
-Concretely, it is a portable workflow package for Cursor and for the Codex CLI agent. It does not add a new panel or button to the IDE. After you install it into a project, the agent’s **default working habits** change for non-trivial tasks.
+Concretely, it is a portable workflow package for Cursor, the Codex CLI, Claude Code, and any other agent that reads the open `SKILL.md` format. It does not add a new panel or button to the IDE. After you install it, the agent’s **default working habits** change for non-trivial tasks.
+
+It is built to be the collaboration bridge between you and the agent: it compiles what you meant into a checkable contract, drives evidence-first execution, and hands back claims you can trust. It is also designed to fit you better the more you use it — recurring phrases and stable preferences sediment into a collaboration profile that later alignments read, disclosed in one line, revocable, and never a source of authority.
 
 ## Three invariants
 
@@ -33,19 +35,20 @@ Independent acceptance freezes a local result; shipping still needs a separate, 
 
 Trivial Q&A and casual brainstorming stay direct; this package is for diagnosis, implementation, acceptance, release checks, and resume work.
 
-## What changes in Cursor / Codex
+## What changes in Cursor / Codex / Claude Code
 
 | Surface | What you get |
 |---|---|
 | Cursor project rules (`.cursor/rules/`) | Always-on minimal boundaries (`00-agent-constitution.mdc`), plus routing summaries that point at the skills |
 | Cursor skills (`.cursor/skills/`) | The agent can load `agent-quality-loop`, `ask-plan-code-qa`, and `review-gate` when the task matches, plus `skill-factory` for authoring work |
 | Codex skills (`.agents/skills/`) | The same four skills, mirrored for Codex |
+| Claude Code personal skills (`~/.claude/skills/`) | The same four skills, installed with the bundled installer (`--to claude`) |
 | Chat UI | No new chrome. You keep typing in the same chat box. |
 
 How you invoke it day to day:
 
 - **Usually:** plain language is enough (examples below). Cursor / Codex match the request to the skill descriptions and project rules.
-- **Optionally:** name the skill explicitly when you want to force the entry. In Cursor the skill appears in the chat skill list as `/agent-quality-loop`; the `$agent-quality-loop` spelling used throughout this package's skill descriptions is the Codex-side form. Either way it is **not** required for every turn.
+- **Optionally:** name the skill explicitly when you want to force the entry. In Cursor and Claude Code the skill appears in the chat skill list as `/agent-quality-loop`; the `$agent-quality-loop` spelling used throughout this package's skill descriptions is the Codex-side form. Either way it is **not** required for every turn.
 
 ## How the pieces fit
 
@@ -78,6 +81,7 @@ Pick these up in chat; deeper mechanics live in [docs/guide.md](docs/guide.md).
 3. **No evidence, no pass** — missing required checks are reported as not run or blocked, not waved through.
 4. **Publish needs a separate current-turn ask** — a `full` local fix+accept path stops at independent acceptance. Deploy/publish needs its own exact authorization that turn.
 5. **Lessons stick around** — failures and acceptance stops can update `.ai/knowledge/lessons.md`; later alignments read matching active entries so the same mistake is less likely to repeat.
+6. **It adapts to you** — recurring phrases and stable preferences sediment into `.ai/knowledge/collaboration-profile.md` under a strict firewall: observed defaults are disclosed in one line and revocable, decision-changing habits need your confirmation, and anything permission-like is refused. Later alignments read the profile, so the compile gets closer to what you meant with less back-and-forth.
 
 ## How this package is tested
 
@@ -85,13 +89,15 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 
 | Check | What it covers |
 |---|---|
-| 42 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
+| 44 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. |
 
 CI runs the structural checks on every push and pull request, and fails if the Codex mirror has drifted from the Cursor source.
 
 Blind testing is what catches the rules that read well and do nothing. One example: a probe found a budget-tier model granting a `PASS` on evidence it had never actually opened — it had trusted the implementer's report that tests passed. That gap became the **firsthand evidence** rule, which now says a reported exit code is a claim about evidence, not evidence.
+
+The same suite is also the package's retirement mechanism. Every behavioral rule names the failure mode it exists to counter, and when blind probes show that a failure mode no longer reproduces on current models, the rule becomes a removal candidate — the policy is written down in [CONTRIBUTING.md](CONTRIBUTING.md). A package like this earns trust by shrinking as models improve, not by accumulating ceremony.
 
 **What you can check, and what you cannot.** The evaluation cases and both validators are in this repository — read them, run them, disagree with them. Blind forward-testing is a maintainer practice rather than a stored artifact: the probe transcripts are not committed, so treat that row as a description of process, not as evidence you can audit. And none of it measures whether the package improves outcomes on a real project over time. It has not been deployed at that scale, and no such claim is made here.
 
@@ -142,7 +148,7 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer validators.
 
-### Windows-first install (recommended on Windows)
+### Installer (one command, any OS)
 
 From a clone of this repository:
 
@@ -150,12 +156,25 @@ From a clone of this repository:
 node scripts/install.js --suite core --to agents
 ```
 
-- `core` installs the three-piece suite (`agent-quality-loop`, `ask-plan-code-qa`, `review-gate`).
-- `--to agents` targets the Codex skill tree; use `--to cursor` or `--to both` when you want Cursor skills, or both hosts.
-- `--dry-run` prints the planned copy actions without writing.
-- The public installer creates portable, real-file snapshots at ordinary destinations. It never creates a live junction and refuses to replace an existing symlink or Windows junction; repair or remove that link deliberately first.
+- `core` installs the three-piece suite (`agent-quality-loop`, `ask-plan-code-qa`, `review-gate`); `--suite full` adds `skill-factory`.
+- `--to` picks the user-level destination(s):
 
-Optional deterministic enforcement add-on: see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
+| `--to` | Destination | Host |
+|---|---|---|
+| `agents` | `~/.agents/skills/` | Codex CLI |
+| `cursor` | `~/.cursor/skills/` | Cursor personal skills |
+| `claude` | `~/.claude/skills/` | Claude Code personal skills |
+| `both` | agents + cursor | |
+| `all` | all three | |
+
+- `--dry-run` prints the planned copy actions without writing; `--help` prints usage.
+- The installer writes **user-level skills only**. Project rules (`.cursor/rules/`), `AGENTS.md`, and the knowledge templates ship through the project-level copy in §1 below.
+- It creates portable, real-file snapshots at ordinary destinations. It never creates a live junction and refuses to replace an existing symlink or Windows junction; repair or remove that link deliberately first.
+- It is plain Node with no shell dependencies — built Windows-first, and the same command works on macOS and Linux.
+
+Any other agent that reads the open `SKILL.md` format can consume this package as well: copy `.agents/skills/<name>` into that host's skills directory.
+
+Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 
 If a consumer deliberately enables the optional local envelope cache, it should add `.agent-quality-loop/` to `.gitignore`; host/output handoff remains valid when no local write is authorized.
 
@@ -184,17 +203,23 @@ Works for Cursor and Codex inside a single repo. No external installer.
 
    Do **not** copy this repository's `lessons.md`. It contains lessons learned while maintaining *this package* on the author's machine, and the agent injects matching lessons into its alignment — so copying it would feed you someone else's environment problems. Your project starts empty and accumulates its own. `prompt-patterns.md` is reference reading for maintainers and is not needed in a target project either.
 
+   The collaboration profile is also the file this package grows for you over time: recurring phrases and confirmed preferences sediment there under the firewall defined in the skill's `references/personalization.md` — observed defaults disclosed and revocable, decision-changing habits confirm-first, authority never.
+
 4. Keep the lifecycle rules and skills as they are unless you are deliberately maintaining this package. `.ai/knowledge/` is the part meant to be customized.
 
 ### Check that it took effect
 
-Open the target project in Cursor, or point Codex at that tree, and ask for something non-trivial with an explicit boundary:
+The two install paths leave different footprints, so check the one you used.
+
+**After the installer (user-level skills):** nothing new appears inside your project — the skills are personal, host-level files. Check the host's skill list instead: `/agent-quality-loop` shows up in the Cursor and Claude Code skill lists, and Codex answers to `$agent-quality-loop`. The always-on rule boundaries (`.cursor/rules/`) exist only after a project-level copy.
+
+**After the project-level copy (§1):** open the target project and ask for something non-trivial with an explicit boundary:
 
 ```text
 Diagnose the root cause of the failing build. Do not change files.
 ```
 
-Two things should happen: the agent restates goal, boundary, and most likely misunderstanding before doing anything, and it stops at a diagnosis instead of editing. If it starts editing straight away, the rules did not load — check that `.cursor/rules/` and `.cursor/skills/` landed at the **root** of the target project.
+Two things should happen: the agent restates goal, boundary, and most likely misunderstanding before doing anything, and it stops at a diagnosis instead of editing. If it starts editing straight away, the rules did not load — after a project-level copy, check that `.cursor/rules/` and `.cursor/skills/` landed at the **root** of the target project; after an installer run, check the host's skill list for the skill name.
 
 ### 2. Codex user-level skills (optional; needs a separate installer)
 

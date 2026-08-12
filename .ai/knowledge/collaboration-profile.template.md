@@ -13,6 +13,7 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 - Keep it **lightweight and incremental** — populate via **propose-on-confirm** (like `lessons.md`), **never** a big upfront questionnaire.
 - Preferences are **defaults, not overrides** — the user's explicit instruction this turn always wins.
 - Anything under **To Confirm** is not yet a settled preference — do not treat it as one.
+- Triggers, write tiers, and the authority firewall (what may sediment automatically, what needs confirmation, and what must never be learned) are defined in the skill package's `references/personalization.md`; this file is the data carrier. Learned preferences never raise authority.
 
 ---
 
@@ -51,6 +52,14 @@ Copy this file to `collaboration-profile.md` in each project (or user setup) tha
 
 - 👍 Liked: <an answer/behavior the user valued, and why>
 - 👎 Disliked: <an answer/behavior the user rejected, and why>
+
+## Phrase Lexicon
+
+Recurring user phrases mapped to the operational meaning both sides settled on. An entry fires only when the phrase is used in its recorded sense (a quoted title or unrelated context is a mismatch).
+
+| Phrase (user's words) | Compiled meaning | Source | Status | Last fired |
+|---|---|---|---|---|
+| <e.g. “验收”> | <independent accept mode, read-only> | observed \| confirmed | active | never |
 
 ---
 

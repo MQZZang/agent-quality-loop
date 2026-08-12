@@ -127,6 +127,8 @@ Use the narrowest class supported by the user's words:
 
 Words such as “删除、去掉、开放、上线、当前、正式、完成” are semantic-risk terms. Resolve their class before execution.
 
+Quantifiers (“全部、所有、每个”, all/every) and negative-scope markers (“不要动、保持、除了”, do not touch/keep/except) are compile-risk terms: over-broad quantity and a dropped negative boundary are the two most common miscompiles. Preserve each one explicitly in `scope_allowlist` / `non_goals`.
+
 ## Evidence Labels and Levels
 
 Label every material claim:
@@ -356,13 +358,13 @@ Allowed `state` values (mapped from lifecycle phase / stop condition):
 English example:
 
 ```text
-[AQL 2.2.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+[AQL 2.3.0 | independently accepted | evidence: all required dimensions PASS | next: none]
 ```
 
 Chinese-scenario example (state words may be localized; syntax unchanged):
 
 ```text
-[AQL 2.2.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+[AQL 2.3.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
 ```
 
 ## Envelope Consistency Check

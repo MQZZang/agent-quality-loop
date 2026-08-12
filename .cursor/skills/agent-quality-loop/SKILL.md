@@ -106,6 +106,8 @@ Produce the compact contract defined in [contracts.md](references/contracts.md).
 
 **Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
 
+**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching phrase-lexicon and preference defaults per [personalization.md](references/personalization.md). The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority.
+
 **Observability gate:** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
 
 **Divergence probe:** On ambiguity, `assurance=formal`, or high-ambiguity creative work, run the divergence probe per [multi-agent-leverage.md](references/multi-agent-leverage.md) (`standard`: open when an ambiguity signal hits).
@@ -194,7 +196,7 @@ Lightweight post-ACCEPT harvest; not a lifecycle phase and not part of the envel
 
 **Sources (priority):** review-gate findings > mid-task user corrections > `scope_deviations` > failing/`NOT_RUN` patterns.
 
-**Output:** 0–3 candidates (`trigger` / root cause / rule / evidence / `scope: project|global`). If none, one sentence—no ceremony.
+**Output:** 0–3 lesson candidates (`trigger` / root cause / rule / evidence / `scope: project|global`), plus 0–2 collaboration-profile candidates (phrase lexicon / preferences) sedimented per [personalization.md](references/personalization.md) tiers. If none, one sentence—no ceremony.
 
 **Write:** `project` + `local_write` → write `.ai/knowledge/lessons.md` and disclose the diff; `global` or read-only → candidates pending confirmation. Follow that file's lesson rules. Harvested lessons follow the Output Contract **Repair delta** rule.
 
@@ -279,6 +281,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 - [ ] Full envelopes pass the deterministic structural validator when available.
 - [ ] Full handoff envelopes pass field, enum, reference, mode-phase, and release-authorization consistency checks.
 - [ ] Native-medium artifacts get a declared-perspective consumer probe before `user_observable_result` can PASS; contradictions are disclosed in ALIGN, not silently resolved.
+- [ ] Profile-learned preferences tighten but never loosen contract floors, evidence requirements, or authority.
 
 ## Failure Modes
 
@@ -304,6 +307,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Ritualizes empty RETRO after every ACCEPT | Emit 0–3 lesson candidates only when harvest sources exist; otherwise one sentence |
 | Advisory-only findings downgrade a valid delivery to FAIL | Map by severity binding; advisory-only does not block an otherwise valid Proceed |
 | Reports a correction that changed nothing | Apply Repair delta; treat as unresolved until the next taker sees a different actionable state |
+| Records a permission-like “preference” (auto-push, skip acceptance) | Refuse via the personalization firewall; authority needs a current-turn request |
 | Silently switches routes, or hard-stops because the chosen route failed | Disclose the three-line Path change; goal/non-goal/authority changes return to ALIGN |
 | Ceremony exceeds the size of the change | Suggest assurance downgrade to the user |
 
