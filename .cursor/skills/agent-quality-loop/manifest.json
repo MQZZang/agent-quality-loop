@@ -1,13 +1,13 @@
 {
   "name": "agent-quality-loop",
   "version": "2.3.0",
-  "generated_at": "2026-08-12T06:41:09.464Z",
+  "generated_at": "2026-08-12T06:49:31.609Z",
   "files": {
-    "SKILL.md": "36ff617bb24d06525659b8f0a0140b8e6d5e3a719649a3bdc37ee4f8112fbd98",
+    "SKILL.md": "a470c49fee2316ad58e7f02e1de92031a3f843cf8192bf04a9f1078fc7c8bf09",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "8037ae2bcd249c5df13f51df5cd1da0b51bafc59d16c5fbbde5634c909865ed9",
+    "references/contracts.md": "e6693d79afa4713323fc3e56c057ea88ceef7aa822db4f1417625a96675d4cf2",
     "references/domain-profiles.md": "e9db2120b42295e7aca8716415759fd1d441d68e8df81e70d9e6fb0cb891e248",
     "references/evaluation-cases.md": "452244a11e419b4522cbf3cc834e821f2546959990d201f6773356c890ddce77",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",

@@ -58,7 +58,7 @@ Identifier, request, goal, target, problem, workspace, reconstruction, and expir
 Compile facts from the cheapest sufficient rung, in order; every rung is read-only:
 
 1. The request and retained conversation context.
-2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents here before the contract freezes; a premise the environment contradicts is a contradiction to disclose, never to silently resolve toward either side.
+2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents here before the contract freezes; a premise the environment contradicts is a contradiction to disclose before any edit, never to silently resolve toward either side. Never fabricate a missing referent to satisfy the letter of the request — a mechanical edit that cannot produce the user-observable outcome is a miscompile, not a resolution.
 3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
 4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
 
