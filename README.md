@@ -42,7 +42,7 @@ runtime.yaml。请确认要改哪一个：
 [AQL 2.3.0 | blocked | evidence: config.json 无 timeout；runtime.yaml=45 | next: 确认目标字段/文件后再改]
 ```
 
-The agent read the files before freezing the goal, surfaced the false premise instead of inventing the field, and stopped with one decidable question — zero files changed. The same probe on a budget-tier model failed exactly here (it fabricated the field), and that failure is recorded, not hidden: see the [model-tier compliance matrix](MATRIX.md) and [how to run these probes yourself](probes/PROBES.md).
+The badge version inside the reply is the manifest the executor read at run time (a 2.3.0-era install); the [full report is committed verbatim](probes/transcripts/2026-08-12/p1-grok-mid.md). The agent read the files before freezing the goal, surfaced the false premise instead of inventing the field, and stopped with one decidable question — zero files changed. The same probe on a budget-tier model failed exactly here (it fabricated the field), and that failure is recorded, not hidden: see the [model-tier compliance matrix](MATRIX.md) and [how to run these probes yourself](probes/PROBES.md).
 
 ## Why install this
 
@@ -116,7 +116,7 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. The procedure is packaged as a reproducible protocol in [probes/PROBES.md](probes/PROBES.md), and results — including failures — land in [MATRIX.md](MATRIX.md). |
 
-CI runs the structural checks on every push and pull request, and fails if the Codex mirror has drifted from the Cursor source.
+CI runs the structural checks on every push and pull request, and fails if either generated mirror has drifted from the Cursor source.
 
 Blind testing is what catches the rules that read well and do nothing. One example: a probe found a budget-tier model granting a `PASS` on evidence it had never actually opened — it had trusted the implementer's report that tests passed. That gap became the **firsthand evidence** rule, which now says a reported exit code is a claim about evidence, not evidence.
 
@@ -169,6 +169,8 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 ## Install
 
+中文用户：一页速览见 [docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)（规范文本以英文为准）。
+
 Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer tools (validators, an envelope-statistics aggregator, and the probe fixture generator).
 
 ### Installer (one command, any OS)
@@ -197,7 +199,7 @@ node scripts/install.js --suite core --to agents
 
 Any other agent that reads the open `SKILL.md` format can consume this package as well: copy `.agents/skills/<name>` into that host's skills directory.
 
-The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so a plugin-aware client (VS Code, Copilot, Kiro, and other adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. The same top-level `skills/` tree is what `SKILL.md` registry crawlers index.
+The repository is also a valid [Agent Plugin](https://agent-plugins.org): the root `plugin.json` plus the generated top-level `skills/` tree follow the Agent Plugins 1.0.0 layout, so any client implementing that specification (VS Code, Copilot, and Kiro are among the announced adopters) can load the package by pointing its plugin locations at a clone of this repository — no extra packaging step. The same top-level `skills/` tree is what `SKILL.md` registry crawlers index. Per-client plugin-location behavior is that client's own contract; this repository claims layout conformance, verified by its validators.
 
 Optional deterministic enforcement add-on (Cursor only): see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 

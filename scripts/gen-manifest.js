@@ -187,6 +187,7 @@ function generateAll(options = {}) {
   const trees = [
     path.join(root, ".cursor", "skills"),
     path.join(root, ".agents", "skills"),
+    path.join(root, "skills"),
   ];
   const results = [];
   for (const skillsRoot of trees) {

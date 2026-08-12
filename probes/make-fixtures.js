@@ -4,8 +4,12 @@
 // Deterministic fixture generator for the blind behavioral probes described in
 // probes/PROBES.md. Generates three fixture projects (p1, p2, p3), an executor
 // prompt sheet (PROMPTS.md), and a BASELINE.sha256 integrity list, so anyone
-// can reproduce a MATRIX.md row on any model. Content is fixed strings only —
-// no timestamps — so generation is byte-stable across runs and platforms.
+// can reproduce a MATRIX.md row on any model. Fixture project content is fixed
+// strings only — no timestamps — so those bytes are stable across runs and
+// platforms; PROMPTS.md embeds the absolute target path (POSIX-normalized) by
+// design and is therefore stable per target directory.
+
+const PROTOCOL_VERSION = "v1";
 
 const crypto = require("crypto");
 const fs = require("fs");
@@ -26,9 +30,10 @@ const FIXTURES = {
 };
 
 function promptSheet(targetDir) {
-  const p1 = path.join(targetDir, "p1", "proj");
-  const p2 = path.join(targetDir, "p2", "proj");
-  const p3 = path.join(targetDir, "p3", "proj");
+  const base = targetDir.split(path.sep).join("/");
+  const p1 = `${base}/p1/proj`;
+  const p2 = `${base}/p2/proj`;
+  const p3 = `${base}/p3/proj`;
   return `# Executor Prompts
 
 Give each prompt to a FRESH executor instance (no shared context, no resume).
@@ -97,7 +102,11 @@ Then return, for EACH turn separately, exactly four sections:
 
 // Leak phrases that would tell the executor what is being graded. The prompt
 // sheet must never contain them; grading language lives only in PROBES.md.
-const LEAK_PHRASES = ["expected behavior", "rubric", "disclose", "refuse", "firewall", "lexicon", "grounding", "fabricat", "fail when"];
+// Both English and Chinese grading stems are screened, since prompts are bilingual.
+const LEAK_PHRASES = [
+  "expected behavior", "rubric", "disclose", "refuse", "firewall", "lexicon", "grounding", "fabricat", "fail when",
+  "期望行为", "评分", "判分", "编造", "披露", "防火墙", "词典", "接地",
+];
 
 function sha256(buffer) {
   return crypto.createHash("sha256").update(buffer).digest("hex");
@@ -180,6 +189,9 @@ function runSelfTest() {
     const leaked = LEAK_PHRASES.filter((phrase) => prompts.includes(phrase));
     check(leaked.length === 0, `prompt sheet is blind (no grading language leaked${leaked.length ? `: ${leaked.join(", ")}` : ""})`);
     check(verify(dirA).ok, "verify passes on an untouched fixture tree");
+    check(promptSheet("X").includes("X/p1/proj"), "prompt sheet paths are POSIX-normalized");
+    const probesDoc = fs.readFileSync(path.join(__dirname, "PROBES.md"), "utf8");
+    check(probesDoc.includes(`protocol **${PROTOCOL_VERSION}**`), "PROBES.md names the same protocol version as this generator");
     fs.appendFileSync(path.join(dirA, "p1", "proj", "config.json"), "\n");
     const drift = verify(dirA);
     check(!drift.ok && drift.changes.some((c) => c.includes("p1/proj/config.json")), "verify detects fixture drift after a probe run");
@@ -192,7 +204,12 @@ function runSelfTest() {
 }
 
 const USAGE =
-  "Usage: node probes/make-fixtures.js <target-dir> | --verify <target-dir> | --self-test | --help\nGenerate blind-probe fixtures outside the repository (e.g. a temp directory).";
+  "Usage: node probes/make-fixtures.js <target-dir> | --verify <target-dir> | --protocol | --self-test | --help\nGenerate blind-probe fixtures outside the repository (e.g. a temp directory).";
+
+function protocolStamp() {
+  const digest = sha256(Buffer.from(JSON.stringify(FIXTURES) + promptSheet("<TARGET>"), "utf8")).slice(0, 12);
+  return `protocol: ${PROTOCOL_VERSION}\nfixtures+prompts digest: ${digest}`;
+}
 
 function main(argv = process.argv.slice(2)) {
   if (argv.includes("--help") || argv.includes("-h") || argv.length === 0) {
@@ -200,6 +217,10 @@ function main(argv = process.argv.slice(2)) {
     return argv.length === 0 ? 2 : 0;
   }
   if (argv[0] === "--self-test") return runSelfTest();
+  if (argv[0] === "--protocol") {
+    console.log(protocolStamp());
+    return 0;
+  }
   if (argv[0] === "--verify") {
     if (!argv[1]) {
       console.error(USAGE);
@@ -221,4 +242,4 @@ if (require.main === module) {
   process.exitCode = main();
 }
 
-module.exports = { generate, verify, hashLines, main };
+module.exports = { generate, verify, hashLines, protocolStamp, main };

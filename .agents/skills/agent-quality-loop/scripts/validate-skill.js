@@ -118,7 +118,18 @@ if (fs.existsSync(skillPath)) {
     // metadata block map are the permitted optional fields.
     const fields = {};
     let openMap = null;
+    let blockKey = null;
     for (const line of frontmatter[1].split(/\r?\n/)) {
+      if (blockKey !== null) {
+        const blockLine = line.match(/^ {2,}(\S.*)$/);
+        if (blockLine || line.trim() === "") {
+          if (blockLine) {
+            fields[blockKey] = fields[blockKey] === "" ? blockLine[1] : `${fields[blockKey]} ${blockLine[1]}`;
+          }
+          continue;
+        }
+        blockKey = null;
+      }
       const nested = line.match(/^ {2}([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$/);
       if (nested && openMap) {
         const [, key, rawValue] = nested;
@@ -139,6 +150,12 @@ if (fs.existsSync(skillPath)) {
       if (key === "metadata" && rawValue.trim() === "") {
         fields[key] = {};
         openMap = fields[key];
+        continue;
+      }
+      // YAML block scalars (>- style folded descriptions) are spec-valid.
+      if (/^[>|][+-]?$/.test(rawValue.trim())) {
+        fields[key] = "";
+        blockKey = key;
         continue;
       }
       fields[key] = parseYamlStringScalar(rawValue);
