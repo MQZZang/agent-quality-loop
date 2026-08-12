@@ -4,6 +4,17 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+## 2.6.1 — 2026-08-12
+
+- Exact-tag CI closure: route-shim `--check` normalizes CRLF; `.gitattributes` forces `dist/route-shims/**` LF; `aql-stats` reports redact absolute paths (fixes Ubuntu self-test leak).
+- Release workflow: `.github/workflows/release.yml` requires Ubuntu + Windows `validate-all` on the exact tag SHA before attestation + GitHub Release; `scripts/gen-release-attestation.js` derives counts from source.
+- Stop gate: removed `.stop-gate-fired` workspace marker; anti-loop uses host `loop_count` / `loop_limit` only.
+- Hooks modes: `compatibility` (heuristic external-write patterns) vs `strict` (unknown shell ask/deny); expanded patterns (docker/helm/firebase/curl mutating methods/scp/rsync); optional MCP policy in `gates.config.json`. Claims: matched external-write and configured MCP never auto-`allow` — not a full shell sandbox.
+- Claim consistency: `scripts/validate-claims.js` enforces evaluation-case continuity and README number sync; `docs/claim-evidence-matrix.md`.
+- Read-only `scripts/aql-doctor.js` (+ `--json` / `--self-test`).
+- Host probe matrix + longitudinal pilot scaffolds remain `NOT_RUN` / under evaluation — not causal proof.
+- Note: `v2.6.0` remains published historically; its exact release commit failed validation on both CI platforms and is superseded by `v2.6.1`.
+
 ## 2.6.0 — 2026-08-12
 
 - Unified validation entry: `node scripts/validate-all.js` runs the full maintainer/CI suite sequentially; GitHub Actions now invokes only this script on Ubuntu and Windows.

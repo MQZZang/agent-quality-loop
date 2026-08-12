@@ -1,10 +1,10 @@
 {
   "name": "aql-accept",
-  "version": "2.6.0",
-  "generated_at": "2026-08-12T13:21:57.144Z",
+  "version": "2.6.1",
+  "generated_at": "2026-08-12T14:17:55.393Z",
   "files": {
-    "SKILL.md": "d4f5b199d4b94dfcb4f9bff5e2e9dee47f105ad4f8cce1ed365a9ecc730df052",
-    "agents/openai.yaml": "bc73914fa1f09cc654d05dc4a391fae0e801459436ce69a3ed1fdf9aab191105"
+    "SKILL.md": "18ea97d545d5e2f0f1e15a2f953f57c97f6316a088be0a1f2ed7c90ae912b647",
+    "agents/openai.yaml": "4429328e6acb739413c03064c2780530a899b2aa33b687422a7e8b4dd4bd943d"
   },
   "depends_on": [
     "agent-quality-loop"

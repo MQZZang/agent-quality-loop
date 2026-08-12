@@ -6,7 +6,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   author: MQZZang
-  version: "2.6.0"
+  version: "2.6.1"
 ---
 # AQL Diagnose
 

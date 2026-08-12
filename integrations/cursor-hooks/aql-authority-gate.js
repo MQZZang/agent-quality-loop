@@ -2,11 +2,16 @@
 'use strict';
 
 /**
- * AQL authority gate — Cursor hooks (preToolUse / beforeShellExecution).
+ * AQL authority gate — Cursor hooks (preToolUse / beforeShellExecution / beforeMCPExecution).
  * Deterministic enforcement for decidable envelope authority invariants.
  *
  * External write-class commands are fail-closed: never auto-allow.
  * Exact release execution_plan match → native `ask` only (never `allow`).
+ * Matched external-write shell and configured MCP mutation actions never receive
+ * automatic allow from this hook.
+ *
+ * mode=compatibility: heuristic pattern coverage only — NOT full shell understanding / not a sandbox.
+ * mode=strict: unknown shells never silent-allow (ask or deny per policy).
  *
  * Set AQL_HOOKS_DISABLE=1 to bypass all enforcement (local dev only).
  */
@@ -18,6 +23,25 @@ const ASK_USER_MESSAGE =
   'AQL release plan matches this exact command. Confirm this external action.';
 const ASK_AGENT_MESSAGE =
   "Await the user's native confirmation. Do not alter or broaden the command.";
+
+const ASK_UNKNOWN_SHELL_USER =
+  'AQL strict mode: unknown shell command requires confirmation.';
+const ASK_UNKNOWN_SHELL_AGENT =
+  'Do not proceed with this shell command until the user confirms. Strict mode never silent-allows unknown shells.';
+
+const ASK_MCP_MUTATION_USER =
+  'AQL: configured MCP mutation tool requires confirmation.';
+const ASK_MCP_MUTATION_AGENT =
+  "Await the user's native confirmation. Do not alter or broaden this MCP mutation.";
+
+const ASK_UNKNOWN_MCP_USER =
+  'AQL strict mode: unknown MCP tool requires confirmation.';
+const ASK_UNKNOWN_MCP_AGENT =
+  'Do not proceed with this MCP tool until the user confirms.';
+
+/** Small explicit allowlist for strict-mode read-ish shells only. */
+const SAFE_READ_SHELL_RE =
+  /^\s*(?:git\s+(?:status|diff|log|show)|ls|dir|type|cat|Get-Content|rg|findstr)(?:\s|$)/i;
 
 function readStdin() {
   return new Promise((resolve, reject) => {
@@ -50,6 +74,14 @@ function ask() {
     permission: 'ask',
     user_message: ASK_USER_MESSAGE,
     agent_message: ASK_AGENT_MESSAGE,
+  });
+}
+
+function askCustom(userMessage, agentMessage) {
+  emit({
+    permission: 'ask',
+    user_message: userMessage,
+    agent_message: agentMessage,
   });
 }
 
@@ -96,6 +128,14 @@ function loadConfig() {
   return parsed;
 }
 
+function resolveMode(config) {
+  return config && config.mode === 'strict' ? 'strict' : 'compatibility';
+}
+
+function resolveUnknownShellPolicy(config) {
+  return config && config.strictUnknownShellPolicy === 'deny' ? 'deny' : 'ask';
+}
+
 function loadCanonicalValidator() {
   const candidates = [
     path.join(__dirname, '../../.cursor/skills/agent-quality-loop/scripts/validate-envelope.js'),
@@ -110,7 +150,6 @@ function loadCanonicalValidator() {
       'validateExecutionPlan',
       'MAX_EXECUTION_PLAN_TTL_MS',
     ];
-    const missing = required.filter((name) => typeof mod[name] !== 'function' && mod[name] === undefined);
     const missingFns = required.filter((name) => name !== 'MAX_EXECUTION_PLAN_TTL_MS' && typeof mod[name] !== 'function');
     if (missingFns.length > 0) {
       const error = new Error(
@@ -246,6 +285,30 @@ function workspaceRealpath(root) {
   }
 }
 
+function isMcpEvent(eventName) {
+  if (typeof eventName !== 'string' || !eventName) return false;
+  return (
+    eventName === 'beforeMCPExecution' ||
+    eventName === 'beforeMcpExecution' ||
+    /^beforeMCPExecution$/i.test(eventName)
+  );
+}
+
+function isShellInvocation(payload, eventName, command) {
+  if (typeof command !== 'string') return false;
+  if (eventName === 'beforeShellExecution') return true;
+  const toolName = extractToolName(payload, eventName);
+  if (toolName === 'Shell') return true;
+  return false;
+}
+
+function isSafeReadShell(command) {
+  return typeof command === 'string' && SAFE_READ_SHELL_RE.test(command);
+}
+
+/**
+ * External / MCP-mutation path: ask or deny only — NEVER permission allow.
+ */
 function evaluateExternalWrite(envelope, command, payload, validator, snapshotChain, workspaceRoot) {
   const resolvedWorkspace = workspaceRealpath(workspaceRoot || extractCwd(payload));
   const cwdRealpath = canonicalPath(extractCwd(payload));
@@ -286,6 +349,203 @@ function evaluateExternalWrite(envelope, command, payload, validator, snapshotCh
   }
 
   ask();
+}
+
+/**
+ * MCP known mutation: same release-act exact-plan gates; never auto-allow.
+ * Uses tool_name as the bound execution_plan.command string.
+ */
+function evaluateMcpMutation(envelope, toolName, payload, validator, snapshotChain, workspaceRoot) {
+  const resolvedWorkspace = workspaceRealpath(workspaceRoot || extractCwd(payload));
+  const cwdRealpath = canonicalPath(extractCwd(payload));
+  const now = Date.now();
+
+  const releaseErrors = validator.validateReleaseActEnvelope(envelope, {
+    workspaceRoot: resolvedWorkspace,
+    command: toolName,
+    cwdRealpath,
+    now,
+    maxTtlMs: validator.MAX_EXECUTION_PLAN_TTL_MS,
+    requireHost: 'cursor',
+  });
+  if (releaseErrors.length > 0) {
+    deny(
+      'AQL authority-gate blocked MCP mutation tool "' + toolName + '": ' + releaseErrors[0]
+    );
+    return;
+  }
+
+  const contractId =
+    typeof envelope.contract_id === 'string' && envelope.contract_id.trim()
+      ? envelope.contract_id
+      : null;
+  if (!contractId || !resolvedWorkspace) {
+    deny(
+      'AQL authority-gate blocked MCP mutation tool "' +
+        toolName +
+        '": missing contract_id or workspace for snapshot head verification.'
+    );
+    return;
+  }
+
+  const headCheck = snapshotChain.currentDigestMatchesHead(resolvedWorkspace, contractId);
+  if (!headCheck.ok) {
+    deny(
+      'AQL authority-gate blocked MCP mutation tool "' + toolName + '": ' + headCheck.reason
+    );
+    return;
+  }
+
+  askCustom(ASK_MCP_MUTATION_USER, ASK_MCP_MUTATION_AGENT);
+}
+
+function handleExternalWritePath(payload, command, validator, snapshotChain) {
+  const located = findEnvelope(payload);
+  if (!located) {
+    deny(
+      'AQL authority-gate blocked external write-class shell command: no readable envelope at .agent-quality-loop/envelope.json.'
+    );
+    return;
+  }
+
+  const envelope = readEnvelope(located.envelopePath);
+  if (envelope._parseError) {
+    deny(
+      'AQL authority-gate blocked external write-class shell command: envelope unreadable (' +
+        envelope._parseError +
+        ').'
+    );
+    return;
+  }
+
+  evaluateExternalWrite(envelope, command, payload, validator, snapshotChain, located.workspace);
+}
+
+function handleMcp(payload, config, mode, validator, snapshotChain) {
+  const toolName = extractToolName(payload, payload.hook_event_name || '');
+  const mcpCfg = config.mcp && typeof config.mcp === 'object' ? config.mcp : {};
+  const knownRead = Array.isArray(mcpCfg.known_read_tools) ? mcpCfg.known_read_tools : [];
+  const knownMutation = Array.isArray(mcpCfg.known_mutation_tools)
+    ? mcpCfg.known_mutation_tools
+    : [];
+  const unknownPolicy =
+    mcpCfg.unknown_mcp_policy && typeof mcpCfg.unknown_mcp_policy === 'object'
+      ? mcpCfg.unknown_mcp_policy
+      : {};
+
+  if (!toolName) {
+    if (mode === 'strict') {
+      askCustom(ASK_UNKNOWN_MCP_USER, ASK_UNKNOWN_MCP_AGENT);
+      return;
+    }
+    allow({
+      _aql_note:
+        'AQL compatibility: MCP event missing tool_name; allowed with disclosure. Heuristic coverage only — not a sandbox.',
+    });
+    return;
+  }
+
+  if (knownRead.indexOf(toolName) !== -1) {
+    allow();
+    return;
+  }
+
+  if (knownMutation.indexOf(toolName) !== -1) {
+    const located = findEnvelope(payload);
+    if (!located) {
+      deny(
+        'AQL authority-gate blocked MCP mutation tool "' +
+          toolName +
+          '": no readable envelope at .agent-quality-loop/envelope.json.'
+      );
+      return;
+    }
+    const envelope = readEnvelope(located.envelopePath);
+    if (envelope._parseError) {
+      deny(
+        'AQL authority-gate blocked MCP mutation tool "' +
+          toolName +
+          '": envelope unreadable (' +
+          envelope._parseError +
+          ').'
+      );
+      return;
+    }
+    evaluateMcpMutation(envelope, toolName, payload, validator, snapshotChain, located.workspace);
+    return;
+  }
+
+  // Unknown MCP tool
+  if (mode === 'strict') {
+    const strictPol = unknownPolicy.strict === 'deny' ? 'deny' : 'ask';
+    if (strictPol === 'deny') {
+      deny('AQL strict mode blocked unknown MCP tool "' + toolName + '".');
+      return;
+    }
+    askCustom(ASK_UNKNOWN_MCP_USER, ASK_UNKNOWN_MCP_AGENT);
+    return;
+  }
+
+  // compatibility unknown
+  const compatPol = unknownPolicy.compatibility || 'allow_with_disclosure';
+  if (compatPol === 'deny') {
+    deny('AQL compatibility mode blocked unknown MCP tool "' + toolName + '".');
+    return;
+  }
+  if (compatPol === 'ask') {
+    askCustom(ASK_UNKNOWN_MCP_USER, ASK_UNKNOWN_MCP_AGENT);
+    return;
+  }
+  allow({
+    _aql_note:
+      'AQL compatibility: unknown MCP tool "' +
+      toolName +
+      '" allowed with disclosure. Heuristic / configured-list coverage only — not a sandbox.',
+  });
+}
+
+function applyNonExternalAuthority(payload, eventName, config) {
+  const located = findEnvelope(payload);
+  if (!located) {
+    allow();
+    return;
+  }
+
+  const envelope = readEnvelope(located.envelopePath);
+  if (envelope._parseError) {
+    allow({
+      agent_message:
+        'AQL authority-gate warning: envelope unreadable (' +
+        envelope._parseError +
+        '); allowing non-external action.',
+    });
+    return;
+  }
+
+  const authority = envelope.action_authority;
+  if (typeof authority !== 'string' || !authority) {
+    allow({
+      agent_message:
+        'AQL authority-gate warning: envelope missing action_authority; allowing non-external action.',
+    });
+    return;
+  }
+
+  if (authority === 'read') {
+    const writeTools = Array.isArray(config.writeTools) ? config.writeTools : [];
+    const toolName = extractToolName(payload, eventName);
+    if (toolName && writeTools.indexOf(toolName) !== -1) {
+      const msg =
+        'AQL authority-gate blocked write-class tool "' +
+        toolName +
+        '" under action_authority "read". ' +
+        unlockHint(authority);
+      deny(msg);
+      return;
+    }
+  }
+
+  allow();
 }
 
 async function main() {
@@ -345,6 +605,12 @@ async function main() {
 
   const eventName =
     typeof payload.hook_event_name === 'string' ? payload.hook_event_name : '';
+  const mode = resolveMode(config);
+
+  if (isMcpEvent(eventName)) {
+    handleMcp(payload, config, mode, validator, snapshotChain);
+    return;
+  }
 
   let pattern;
   try {
@@ -367,69 +633,32 @@ async function main() {
   const isExternal = typeof command === 'string' && pattern.test(command);
 
   if (isExternal) {
-    const located = findEnvelope(payload);
-    if (!located) {
+    // External path: ask/deny only — never permission allow.
+    handleExternalWritePath(payload, command, validator, snapshotChain);
+    return;
+  }
+
+  const shellInvocation = isShellInvocation(payload, eventName, command);
+
+  if (mode === 'strict' && shellInvocation) {
+    if (isSafeReadShell(command)) {
+      applyNonExternalAuthority(payload, eventName, config);
+      return;
+    }
+    const unknownPolicy = resolveUnknownShellPolicy(config);
+    if (unknownPolicy === 'deny') {
       deny(
-        'AQL authority-gate blocked external write-class shell command: no readable envelope at .agent-quality-loop/envelope.json.'
+        'AQL strict mode blocked unknown shell command (not on safe-read list and not matched as external-write).'
       );
       return;
     }
-
-    const envelope = readEnvelope(located.envelopePath);
-    if (envelope._parseError) {
-      deny(
-        'AQL authority-gate blocked external write-class shell command: envelope unreadable (' +
-          envelope._parseError +
-          ').'
-      );
-      return;
-    }
-
-    evaluateExternalWrite(envelope, command, payload, validator, snapshotChain, located.workspace);
+    askCustom(ASK_UNKNOWN_SHELL_USER, ASK_UNKNOWN_SHELL_AGENT);
     return;
   }
 
-  const located = findEnvelope(payload);
-  if (!located) {
-    allow();
-    return;
-  }
-
-  const envelope = readEnvelope(located.envelopePath);
-  if (envelope._parseError) {
-    allow({
-      agent_message:
-        'AQL authority-gate warning: envelope unreadable (' +
-        envelope._parseError +
-        '); allowing non-external action.',
-    });
-    return;
-  }
-
-  const authority = envelope.action_authority;
-  if (typeof authority !== 'string' || !authority) {
-    allow({
-      agent_message:
-        'AQL authority-gate warning: envelope missing action_authority; allowing non-external action.',
-    });
-    return;
-  }
-
-  if (authority === 'read') {
-    const writeTools = Array.isArray(config.writeTools) ? config.writeTools : [];
-    const toolName = extractToolName(payload, eventName);
-    if (toolName && writeTools.indexOf(toolName) !== -1) {
-      const msg =
-        'AQL authority-gate blocked write-class tool "' +
-        toolName +
-        '" under action_authority "read". ' +
-        unlockHint(authority);
-      deny(msg);
-      return;
-    }
-  }
-
-  allow();
+  // compatibility (default): unmatched shells keep non-external behavior
+  // (allow unless write-tool / other gates). Heuristic coverage only.
+  applyNonExternalAuthority(payload, eventName, config);
 }
 
 main().catch((err) => {
@@ -445,5 +674,9 @@ module.exports = {
   loadCanonicalValidator,
   loadSnapshotChain,
   evaluateExternalWrite,
+  evaluateMcpMutation,
+  resolveMode,
+  isMcpEvent,
+  isSafeReadShell,
   hardDeny,
 };

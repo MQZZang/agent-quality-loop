@@ -4,3 +4,6 @@
 # leftover conflict markers.
 *.md whitespace=-trailing-space
 *.mdc whitespace=-trailing-space
+
+# Route shim generator emits LF; keep working-tree text LF even with core.autocrlf.
+dist/route-shims/** text eol=lf

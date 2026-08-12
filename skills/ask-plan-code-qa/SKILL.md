@@ -9,7 +9,7 @@ description: >-
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.6.0"
+  version: "2.6.1"
 ---
 
 # Align -> Plan -> Execute -> Self-QA

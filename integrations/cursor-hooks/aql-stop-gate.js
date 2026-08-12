@@ -3,8 +3,8 @@
 
 /**
  * AQL stop gate — Cursor hooks (stop).
- * When envelope claims a completion-class phase without evidence_refs, bounce once.
- * Marker file prevents follow-up loops.
+ * When envelope claims a completion-class phase without evidence_refs, bounce once
+ * per stop cycle using host loop_count / loop_limit (no workspace marker).
  */
 
 const fs = require('fs');
@@ -12,8 +12,10 @@ const path = require('path');
 
 const COMPLETION_PHASES = new Set(['BUILT', 'ACCEPTED', 'RELEASE_READY']);
 const BOUNCE_MESSAGE = 'completion claimed without evidence refs in envelope';
-const ALREADY_FIRED_NOTE =
-  'AQL stop-gate already fired once for this workspace; allowing completion to avoid loop.';
+const ALREADY_BOUNCED_NOTE =
+  'AQL stop-gate already bounced once this stop cycle (loop_count >= loop_limit); allowing completion to avoid loop.';
+const MISSING_LOOP_FIELDS_NOTE =
+  'AQL stop-gate warning: loop_count/loop_limit missing or non-numeric in stop payload; allowing to avoid infinite stop loop.';
 
 function readStdin() {
   return new Promise((resolve, reject) => {
@@ -71,8 +73,8 @@ function findEnvelope(payload) {
   return null;
 }
 
-function markerPath(workspace) {
-  return path.join(workspace, '.agent-quality-loop', '.stop-gate-fired');
+function nonNegativeNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
 }
 
 async function main() {
@@ -136,22 +138,17 @@ async function main() {
     return;
   }
 
-  const marker = markerPath(located.workspace);
-  if (fs.existsSync(marker)) {
-    allow(ALREADY_FIRED_NOTE);
+  const loopCount = payload.loop_count;
+  const loopLimit = payload.loop_limit;
+  if (!nonNegativeNumber(loopCount) || !nonNegativeNumber(loopLimit)) {
+    // Missing host loop fields → allow with disclosure (never invent workspace writes).
+    allow(MISSING_LOOP_FIELDS_NOTE);
     return;
   }
 
-  try {
-    fs.mkdirSync(path.dirname(marker), { recursive: true });
-    fs.writeFileSync(marker, new Date().toISOString() + '\n', 'utf8');
-  } catch (err) {
-    // Cannot persist anti-loop marker → allow rather than risk a stop loop.
-    allow(
-      'AQL stop-gate warning: could not write stop-gate marker (' +
-        String(err && err.message ? err.message : err) +
-        '); allowing instead of bouncing.'
-    );
+  // Host already bounced this stop cycle (or at/above configured limit).
+  if (loopCount >= loopLimit) {
+    allow(ALREADY_BOUNCED_NOTE);
     return;
   }
 

@@ -1,10 +1,20 @@
 {
-  "_readme": "JSON has no real comments. See README.md § gates.config.json. Adjust writeTools / externalWriteCommandPattern without editing gate scripts when possible.",
+  "_readme": "JSON has no real comments. See README.md § gates.config.json. Adjust writeTools / externalWriteCommandPattern / mode / mcp without editing gate scripts when possible. mode=compatibility is heuristic coverage — NOT full shell understanding / not a sandbox.",
+  "mode": "compatibility",
+  "strictUnknownShellPolicy": "ask",
   "writeTools": [
     "Write",
     "Delete",
     "EditNotebook",
     "StrReplace"
   ],
-  "externalWriteCommandPattern": "(git\\s+push|gh\\s+(pr\\s+create|release)|npm\\s+publish|yarn\\s+publish|pnpm\\s+publish|vercel|netlify|kubectl\\s+apply|terraform\\s+apply|aws\\s+|gcloud\\s+|az\\s+)"
+  "externalWriteCommandPattern": "(git\\s+push|gh\\s+(pr\\s+create|release)|npm\\s+publish|yarn\\s+publish|pnpm\\s+publish|vercel|netlify|kubectl\\s+apply|terraform\\s+apply|aws\\s+|gcloud\\s+|az\\s+|docker\\s+push|helm\\s+(upgrade|install|uninstall)|firebase\\s+deploy|curl\\b[^\\n]*(?:\\s-X\\s*(?:POST|PUT|PATCH|DELETE)|\\s--request\\s+(?:POST|PUT|PATCH|DELETE))|scp\\b|rsync\\b[^\\n]*[@:])",
+  "mcp": {
+    "known_read_tools": [],
+    "known_mutation_tools": [],
+    "unknown_mcp_policy": {
+      "compatibility": "allow_with_disclosure",
+      "strict": "ask"
+    }
+  }
 }

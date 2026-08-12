@@ -116,7 +116,7 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 
 | Check | What it covers |
 |---|---|
-| 61 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, alignment compile, profile bootstrap, contradictory instructions, and the failure modes each rule exists to prevent. |
+| 65 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, alignment compile, profile bootstrap, contradictory instructions, and the failure modes each rule exists to prevent. Count is validator-enforced by `scripts/validate-claims.js` (fails if this README number drifts). |
 | Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. The procedure is packaged as a reproducible protocol in [probes/PROBES.md](probes/PROBES.md), and results — including failures — land in [MATRIX.md](MATRIX.md). |
 
@@ -336,7 +336,9 @@ node scripts/validate-all.js
 git diff --check
 ```
 
-GitHub Actions runs `node scripts/validate-all.js` on every push and pull request (Ubuntu and Windows), including mirror parity and route-shim drift checks.
+GitHub Actions runs `node scripts/validate-all.js` on every push and pull request (Ubuntu and Windows), including mirror parity, route-shim drift, and claim-consistency checks (`scripts/validate-claims.js`). Claim ↔ evidence honesty for host probes / longitudinal work is summarized in [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
+
+Read-only workspace diagnosis (versions, hooks presence, MCP coverage disclosure, envelope-chain pollution/gap/fork/legacy): `node scripts/aql-doctor.js` or `node scripts/aql-doctor.js --json`. Doctor never deletes history, modifies profile, enables hooks, or auto-fixes projects. CI only runs `node scripts/aql-doctor.js --self-test` (cheap smoke), not a full consumer diagnose.
 
 The structural validator does not replace independent semantic review or real-environment verification.
 

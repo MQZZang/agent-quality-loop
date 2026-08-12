@@ -16,6 +16,13 @@
         "timeout": 15
       }
     ],
+    "beforeMCPExecution": [
+      {
+        "command": "node integrations/cursor-hooks/aql-authority-gate.js",
+        "failClosed": true,
+        "timeout": 15
+      }
+    ],
     "stop": [
       {
         "command": "node integrations/cursor-hooks/aql-stop-gate.js",

@@ -940,7 +940,337 @@ for (const [label, overrideFn] of [
   );
 }
 
-// --- 5. stop gate bounce when BUILT + empty evidence_refs ---
+// --- Stage 3: extended external patterns classify without plan → deny; never allow ---
+for (const [label, command] of [
+  ['docker-push', 'docker push myregistry/app:latest'],
+  ['helm-upgrade', 'helm upgrade myrel ./chart'],
+  ['helm-install', 'helm install myrel ./chart'],
+  ['helm-uninstall', 'helm uninstall myrel'],
+  ['firebase-deploy', 'firebase deploy --only hosting'],
+  ['curl-X-POST', 'curl -X POST https://example.com/api'],
+  ['curl-request-DELETE', 'curl --request DELETE https://example.com/api'],
+  ['scp', 'scp ./artifact.zip user@host:/tmp/'],
+  ['rsync-remote', 'rsync -av ./dist/ user@host:/var/www/'],
+]) {
+  const ws = mkWorkspace('ext-' + label);
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: command,
+      cwd: ws,
+    })
+  );
+  assert(
+    r.json && r.json.permission === 'deny',
+    'extended-external-' + label + ': deny without plan',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'extended-external-' + label + ': never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: compatibility unknown shell → allow (documented heuristic) ---
+{
+  const ws = mkWorkspace('compat-unknown-shell');
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: 'echo hello-world-compat',
+      cwd: ws,
+    })
+  );
+  assert(r.status === 0, 'compat-unknown-shell: exit 0', 'status=' + r.status);
+  assert(
+    r.json && r.json.permission === 'allow',
+    'compat-unknown-shell: permission allow (compatibility heuristic)',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: strict unknown shell → ask (not allow) ---
+{
+  const ws = mkWorkspace('strict-unknown-shell');
+  const strictConfig = path.join(fixtureRoot, 'gates-strict-ask.json');
+  fs.writeFileSync(
+    strictConfig,
+    JSON.stringify(
+      Object.assign({}, JSON.parse(fs.readFileSync(path.join(DIR, 'gates.config.json'), 'utf8')), {
+        mode: 'strict',
+        strictUnknownShellPolicy: 'ask',
+      }),
+      null,
+      2
+    ),
+    'utf8'
+  );
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: 'echo hello-world-strict',
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: strictConfig }
+  );
+  assert(r.status === 0, 'strict-unknown-shell-ask: exit 0', 'status=' + r.status);
+  assert(
+    r.json && r.json.permission === 'ask',
+    'strict-unknown-shell-ask: permission ask',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'strict-unknown-shell-ask: never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: strict unknown shell with deny policy → deny (not allow) ---
+{
+  const ws = mkWorkspace('strict-unknown-deny');
+  const strictConfig = path.join(fixtureRoot, 'gates-strict-deny.json');
+  fs.writeFileSync(
+    strictConfig,
+    JSON.stringify(
+      Object.assign({}, JSON.parse(fs.readFileSync(path.join(DIR, 'gates.config.json'), 'utf8')), {
+        mode: 'strict',
+        strictUnknownShellPolicy: 'deny',
+      }),
+      null,
+      2
+    ),
+    'utf8'
+  );
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: 'python -c "print(1)"',
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: strictConfig }
+  );
+  assert(
+    r.json && r.json.permission === 'deny',
+    'strict-unknown-shell-deny: permission deny',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'strict-unknown-shell-deny: never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: strict safe-read shell still allows ---
+{
+  const ws = mkWorkspace('strict-safe-read');
+  const strictConfig = path.join(fixtureRoot, 'gates-strict-safe.json');
+  fs.writeFileSync(
+    strictConfig,
+    JSON.stringify(
+      Object.assign({}, JSON.parse(fs.readFileSync(path.join(DIR, 'gates.config.json'), 'utf8')), {
+        mode: 'strict',
+        strictUnknownShellPolicy: 'ask',
+      }),
+      null,
+      2
+    ),
+    'utf8'
+  );
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: 'git status',
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: strictConfig }
+  );
+  assert(
+    r.json && r.json.permission === 'allow',
+    'strict-safe-read-git-status: allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: valid external plan still asks (never allow) ---
+{
+  const ws = mkWorkspace('ext-ask-never-allow');
+  writeReleaseEnvelopeChain(ws, 'docker push myregistry/app:latest');
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeShellExecution',
+      command: 'docker push myregistry/app:latest',
+      cwd: ws,
+    })
+  );
+  assertAsk(r, 'docker-push-release-ask');
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'docker-push-release-ask: external path never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: MCP known read → allow ---
+{
+  const ws = mkWorkspace('mcp-known-read');
+  const mcpConfig = path.join(fixtureRoot, 'gates-mcp.json');
+  const baseCfg = JSON.parse(fs.readFileSync(path.join(DIR, 'gates.config.json'), 'utf8'));
+  fs.writeFileSync(
+    mcpConfig,
+    JSON.stringify(
+      Object.assign({}, baseCfg, {
+        mode: 'compatibility',
+        mcp: {
+          known_read_tools: ['docs_search'],
+          known_mutation_tools: ['docs_write'],
+          unknown_mcp_policy: {
+            compatibility: 'allow_with_disclosure',
+            strict: 'ask',
+          },
+        },
+      }),
+      null,
+      2
+    ),
+    'utf8'
+  );
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeMCPExecution',
+      tool_name: 'docs_search',
+      tool_input: { query: 'x' },
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: mcpConfig }
+  );
+  assert(
+    r.json && r.json.permission === 'allow',
+    'mcp-known-read: allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: MCP known mutation without plan → deny (never allow) ---
+{
+  const ws = mkWorkspace('mcp-known-mutation');
+  const mcpConfig = path.join(fixtureRoot, 'gates-mcp.json');
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeMCPExecution',
+      tool_name: 'docs_write',
+      tool_input: { path: 'x' },
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: mcpConfig }
+  );
+  assert(
+    r.json && (r.json.permission === 'deny' || r.json.permission === 'ask'),
+    'mcp-known-mutation: ask or deny',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'mcp-known-mutation: never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: MCP unknown + compatibility → allow with disclosure ---
+{
+  const ws = mkWorkspace('mcp-unknown-compat');
+  const mcpConfig = path.join(fixtureRoot, 'gates-mcp.json');
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeMCPExecution',
+      tool_name: 'totally_unknown_mcp_tool',
+      tool_input: {},
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: mcpConfig }
+  );
+  assert(
+    r.json && r.json.permission === 'allow',
+    'mcp-unknown-compat: allow',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && typeof r.json._aql_note === 'string' && /disclosure|compatibility/i.test(r.json._aql_note),
+    'mcp-unknown-compat: disclosure note',
+    JSON.stringify(r.json)
+  );
+}
+
+// --- Stage 3: MCP unknown + strict → ask ---
+{
+  const ws = mkWorkspace('mcp-unknown-strict');
+  const mcpConfig = path.join(fixtureRoot, 'gates-mcp-strict.json');
+  const baseCfg = JSON.parse(fs.readFileSync(path.join(DIR, 'gates.config.json'), 'utf8'));
+  fs.writeFileSync(
+    mcpConfig,
+    JSON.stringify(
+      Object.assign({}, baseCfg, {
+        mode: 'strict',
+        mcp: {
+          known_read_tools: ['docs_search'],
+          known_mutation_tools: ['docs_write'],
+          unknown_mcp_policy: {
+            compatibility: 'allow_with_disclosure',
+            strict: 'ask',
+          },
+        },
+      }),
+      null,
+      2
+    ),
+    'utf8'
+  );
+  const r = runGate(
+    AUTHORITY,
+    basePayload(ws, {
+      hook_event_name: 'beforeMCPExecution',
+      tool_name: 'totally_unknown_mcp_tool',
+      tool_input: {},
+      cwd: ws,
+    }),
+    { AQL_HOOKS_CONFIG: mcpConfig }
+  );
+  assert(
+    r.json && r.json.permission === 'ask',
+    'mcp-unknown-strict: ask',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json && r.json.permission !== 'allow',
+    'mcp-unknown-strict: never allow',
+    JSON.stringify(r.json)
+  );
+}
+
+function stopMarkerPath(workspace) {
+  return path.join(workspace, '.agent-quality-loop', '.stop-gate-fired');
+}
+
+function assertNoStopMarker(workspace, name) {
+  assert(
+    !fs.existsSync(stopMarkerPath(workspace)),
+    name + ': no .stop-gate-fired marker',
+    stopMarkerPath(workspace)
+  );
+}
+
+// --- 5. stop gate bounce when BUILT + empty evidence_refs (loop_count=0) ---
 {
   const ws = mkWorkspace('stop-bounce');
   writeEnvelopeJson(ws, {
@@ -955,6 +1285,7 @@ for (const [label, overrideFn] of [
       hook_event_name: 'stop',
       status: 'completed',
       loop_count: 0,
+      loop_limit: 1,
     })
   );
   assert(r.status === 0, 'stop-bounce: exit 0', 'status=' + r.status);
@@ -965,13 +1296,10 @@ for (const [label, overrideFn] of [
     'stop-bounce: followup_message exact',
     JSON.stringify(r.json)
   );
-  assert(
-    fs.existsSync(path.join(ws, '.agent-quality-loop', '.stop-gate-fired')),
-    'stop-bounce: marker file created'
-  );
+  assertNoStopMarker(ws, 'stop-bounce');
 }
 
-// --- 6. stop gate anti-loop ---
+// --- 6. stop gate anti-loop via host loop_count (no workspace marker) ---
 {
   const ws = mkWorkspace('stop-loop');
   writeEnvelopeJson(ws, {
@@ -980,17 +1308,13 @@ for (const [label, overrideFn] of [
     phase: 'ACCEPTED',
     evidence_refs: [],
   });
-  fs.writeFileSync(
-    path.join(ws, '.agent-quality-loop', '.stop-gate-fired'),
-    'already\n',
-    'utf8'
-  );
   const r = runGate(
     STOP,
     basePayload(ws, {
       hook_event_name: 'stop',
       status: 'completed',
       loop_count: 1,
+      loop_limit: 1,
     })
   );
   assert(
@@ -1002,10 +1326,71 @@ for (const [label, overrideFn] of [
   assert(
     r.json &&
       typeof r.json._aql_note === 'string' &&
-      /already fired/i.test(r.json._aql_note),
+      /loop_count\s*>=\s*loop_limit|already bounced/i.test(r.json._aql_note),
     'stop-anti-loop: note present',
     JSON.stringify(r.json)
   );
+  assertNoStopMarker(ws, 'stop-anti-loop');
+}
+
+// --- 6b. independent workspace/contract can bounce again at loop_count=0 ---
+{
+  const ws = mkWorkspace('stop-bounce-b');
+  writeEnvelopeJson(ws, {
+    schema_version: '1.0.0',
+    action_authority: 'local_write',
+    phase: 'BUILT',
+    evidence_refs: [],
+  });
+  const r = runGate(
+    STOP,
+    basePayload(ws, {
+      hook_event_name: 'stop',
+      status: 'completed',
+      loop_count: 0,
+      loop_limit: 1,
+    })
+  );
+  assert(
+    r.json &&
+      r.json.followup_message ===
+        'completion claimed without evidence refs in envelope',
+    'stop-bounce-contract-b: followup_message exact',
+    JSON.stringify(r.json)
+  );
+  assertNoStopMarker(ws, 'stop-bounce-contract-b');
+}
+
+// --- 6c. missing loop fields → allow with disclosure (no marker write) ---
+{
+  const ws = mkWorkspace('stop-missing-loop');
+  writeEnvelopeJson(ws, {
+    schema_version: '1.0.0',
+    action_authority: 'local_write',
+    phase: 'BUILT',
+    evidence_refs: [],
+  });
+  const r = runGate(
+    STOP,
+    basePayload(ws, {
+      hook_event_name: 'stop',
+      status: 'completed',
+    })
+  );
+  assert(
+    r.json &&
+      (!r.json.followup_message || r.json.followup_message === ''),
+    'stop-missing-loop: allow (no bounce)',
+    JSON.stringify(r.json)
+  );
+  assert(
+    r.json &&
+      typeof r.json._aql_note === 'string' &&
+      /loop_count|loop_limit/i.test(r.json._aql_note),
+    'stop-missing-loop: disclosure note',
+    JSON.stringify(r.json)
+  );
+  assertNoStopMarker(ws, 'stop-missing-loop');
 }
 
 // --- 7. BUILT with evidence → allow ---
@@ -1023,6 +1408,7 @@ for (const [label, overrideFn] of [
       hook_event_name: 'stop',
       status: 'completed',
       loop_count: 0,
+      loop_limit: 1,
     })
   );
   assert(
@@ -1031,6 +1417,7 @@ for (const [label, overrideFn] of [
     'stop-with-evidence: allow (no followup)',
     JSON.stringify(r.json)
   );
+  assertNoStopMarker(ws, 'stop-with-evidence');
 }
 
 // --- 8. stop with no envelope → allow ---
@@ -1042,6 +1429,7 @@ for (const [label, overrideFn] of [
       hook_event_name: 'stop',
       status: 'completed',
       loop_count: 0,
+      loop_limit: 1,
     })
   );
   assert(
@@ -1050,6 +1438,7 @@ for (const [label, overrideFn] of [
     'stop-no-envelope: allow',
     JSON.stringify(r.json)
   );
+  assertNoStopMarker(ws, 'stop-no-envelope');
 }
 
 console.log('');

@@ -1,0 +1,203 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Exact tag to validate and release (e.g. v2.6.1)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag ref
+        id: ref
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.tag }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run full validation suite
+        run: node scripts/validate-all.js
+
+      - name: Write ubuntu pass marker
+        shell: bash
+        run: |
+          git rev-parse HEAD > ubuntu-pass.txt
+          cat ubuntu-pass.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-pass
+          path: ubuntu-pass.txt
+
+  validate-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Resolve tag ref
+        id: ref
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.tag }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run full validation suite
+        run: node scripts/validate-all.js
+
+      - name: Write windows pass marker
+        shell: bash
+        run: |
+          git rev-parse HEAD > windows-pass.txt
+          cat windows-pass.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-pass
+          path: windows-pass.txt
+
+  release:
+    needs: [validate-ubuntu, validate-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Resolve tag ref
+        id: ref
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.tag }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ubuntu-pass
+          path: _markers/ubuntu
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-pass
+          path: _markers/windows
+
+      - name: Verify exact-tag SHA alignment
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.ref.outputs.tag }}"
+          CHECKOUT_SHA="$(git rev-parse HEAD)"
+          TAG_SHA="$(git rev-list -n 1 "$TAG")"
+          UBUNTU_SHA="$(tr -d '[:space:]' < _markers/ubuntu/ubuntu-pass.txt)"
+          WINDOWS_SHA="$(tr -d '[:space:]' < _markers/windows/windows-pass.txt)"
+
+          echo "tag=$TAG"
+          echo "checkout_sha=$CHECKOUT_SHA"
+          echo "tag_sha=$TAG_SHA"
+          echo "ubuntu_sha=$UBUNTU_SHA"
+          echo "windows_sha=$WINDOWS_SHA"
+          echo "github_sha=$GITHUB_SHA"
+
+          if [ -z "$UBUNTU_SHA" ] || [ -z "$WINDOWS_SHA" ]; then
+            echo "::error::Missing platform validation markers"
+            exit 1
+          fi
+
+          if [ "$UBUNTU_SHA" != "$WINDOWS_SHA" ]; then
+            echo "::error::Ubuntu and Windows validated SHAs differ; refusing release"
+            exit 1
+          fi
+
+          if [ "$CHECKOUT_SHA" != "$TAG_SHA" ] || [ "$CHECKOUT_SHA" != "$UBUNTU_SHA" ]; then
+            echo "::error::Tag / checkout / validated SHA mismatch; refusing release"
+            exit 1
+          fi
+
+          # On tag-push, GITHUB_SHA must match the exact tagged commit.
+          # On workflow_dispatch, GITHUB_SHA is the dispatch branch tip and may differ;
+          # exact-tag green still requires checkout/tag/markers to agree (checked above).
+          if [ "${{ github.event_name }}" = "push" ] && [ "$CHECKOUT_SHA" != "$GITHUB_SHA" ]; then
+            echo "::error::GITHUB_SHA does not match validated tag SHA on tag push; refusing release"
+            exit 1
+          fi
+
+          echo "sha=$CHECKOUT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release attestation
+        shell: bash
+        run: |
+          node scripts/gen-release-attestation.js \
+            --tag "${{ steps.ref.outputs.tag }}" \
+            --commit "${{ steps.verify.outputs.sha }}" \
+            --ubuntu PASS \
+            --windows PASS \
+            --out attestation.json
+          cat attestation.json
+
+      - name: Compose release notes
+        id: notes
+        shell: bash
+        run: |
+          TAG="${{ steps.ref.outputs.tag }}"
+          {
+            echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
+            echo
+            echo "Longitudinal user-value evidence remains under evaluation."
+            if [ "$TAG" = "v2.6.1" ]; then
+              echo
+              echo "v2.6.0 exact-tag CI failed and is superseded by this v2.6.1 release."
+            fi
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ref.outputs.tag }}
+          name: ${{ steps.ref.outputs.tag }}
+          body_path: release-notes.md
+          files: attestation.json
+          fail_on_unmatched_files: true
+          generate_release_notes: false

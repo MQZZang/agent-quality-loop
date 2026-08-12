@@ -39,7 +39,11 @@ node scripts/validate-all.js
 git diff --check
 ```
 
-All of these must pass. CI runs `node scripts/validate-all.js`, which includes mirror drift (`node scripts/sync-skills.js --check`) and route-shim drift (`node scripts/gen-route-shims.js --check`).
+All of these must pass. CI runs `node scripts/validate-all.js`, which includes mirror drift (`node scripts/sync-skills.js --check`), route-shim drift (`node scripts/gen-route-shims.js --check`), claim consistency (`node scripts/validate-claims.js`), and `node scripts/aql-doctor.js --self-test`.
+
+If you add evaluation cases, update any README `N evaluation cases` claim to match — `validate-claims.js` fails on drift. Evidence honesty for host/longitudinal claims: [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
+
+For a read-only install/workspace health dump (not a CI gate for dirty consumer trees): `node scripts/aql-doctor.js` / `--json`. It must not be used to auto-delete envelope history, seed `~/.ai/knowledge`, or enable hooks.
 
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 

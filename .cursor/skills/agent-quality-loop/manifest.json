@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
-  "version": "2.6.0",
-  "generated_at": "2026-08-12T13:21:56.717Z",
+  "version": "2.6.1",
+  "generated_at": "2026-08-12T14:17:55.223Z",
   "files": {
-    "SKILL.md": "b2e47ac36f3524d0056dfb906ced96ece5a855c08ab73da033d2f592171f70c9",
+    "SKILL.md": "ad27db61b28f82218da1e614cb6ae2a0bf01533c1574d83ab8b12cdd8a3f5d52",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "references/alignment-compiler.md": "d77e218fb825331357a80d16ccf8ad9839213a5668b863fb9877623eb546dd11",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
@@ -13,10 +13,10 @@
     "references/evaluation-cases.md": "22dce267d679187565f630b22aa6abe150302e088afe10c8c1d0ee1de87c3332",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
     "references/personalization.md": "ae621565023e75888a47d24099f1c795fcf226b41a84fff9206ff5b135b98415",
-    "scripts/aql-envelope.js": "9d9d2f0883d1ff28fbdb42ffa4c13a506bc7252f80e24d704f72f3b1abadabd9",
-    "scripts/aql-stats.js": "72992b6bbb7bc0e2b287bae2466f23705a352a80d901d0cdf7d6bf703b6185ea",
+    "scripts/aql-envelope.js": "646c866e2f5c0c497fbbdc19de8dce6aaed50c606c2abd780c0bff1befc5a7c5",
+    "scripts/aql-stats.js": "c65000c87d5bfb9fe33166be080668a5dc7c26079ee01206b2f4cb6ab4f63163",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
-    "scripts/validate-envelope.js": "1ee3cb423b93c56f5de16be5e8f52116e745ae46bef3c9488eb68de082edafcd",
-    "scripts/validate-skill.js": "3aa7ef318adc9e7321e551f5f666b98f1d6e896de3494f858ff1224020ba675d"
+    "scripts/validate-envelope.js": "c489f89c7cadc289023b030e4379139f7f91c1b46d404268323141c726e241d5",
+    "scripts/validate-skill.js": "52893df289f5eff6bd2533d26740fed78b0eb451a8c2512290ebe227bc51a77c"
   }
 }

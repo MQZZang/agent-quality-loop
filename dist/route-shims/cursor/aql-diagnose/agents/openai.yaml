@@ -1,12 +1,6 @@
 interface:
-
   display_name: "AQL Diagnose"
-
   short_description: "Evidence-first diagnosis without implementation writes"
-
   default_prompt: "Use $aql-diagnose to investigate this task read-only and return evidence-backed findings up to EVIDENCED."
-
 policy:
-
   allow_implicit_invocation: false
-

@@ -350,7 +350,7 @@ function isQualifiedAcceptanceIndependence(independence) {
   );
 }
 
-/** ACCEPTED gate alias â€” never treat different_role as qualified. */
+/** ACCEPTED gate alias â€?never treat different_role as qualified. */
 function isValidAcceptanceIndependence(independence) {
   return isQualifiedAcceptanceIndependence(independence);
 }
@@ -366,7 +366,7 @@ function parseMechanicalIsoMs(value) {
 }
 
 /**
- * Canonical execution_plan validator. Hook must call this â€” no second rule set.
+ * Canonical execution_plan validator. Hook must call this â€?no second rule set.
  * @param {object} plan
  * @param {string[]} errors
  * @param {{ command?: string, cwdRealpath?: string, now?: number, maxTtlMs?: number, requireHost?: string }} context
@@ -1208,7 +1208,7 @@ function runSelfTest() {
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
 
   const withSkillVersion = baseEnvelope();
-  withSkillVersion.skill_version = "2.6.0";
+  withSkillVersion.skill_version = "2.6.1";
   cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
 
   const emptySkillVersion = baseEnvelope();

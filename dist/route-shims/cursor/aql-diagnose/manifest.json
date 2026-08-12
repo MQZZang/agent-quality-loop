@@ -1,10 +1,10 @@
 {
   "name": "aql-diagnose",
-  "version": "2.6.0",
-  "generated_at": "2026-08-12T13:21:57.144Z",
+  "version": "2.6.1",
+  "generated_at": "2026-08-12T14:17:55.393Z",
   "files": {
-    "SKILL.md": "16ea1a8a71894a6accc849420a0dfd26ca87d8dc9e3d1137948d2ce3ba01de38",
-    "agents/openai.yaml": "c2fc34249130e9e8d799265ae0df248233d00e9ca3ee4deb02d110bcd0982434"
+    "SKILL.md": "8273421011241b6cab9cfd6c10f31f940a8c1ff64ce815766aad44e956914a45",
+    "agents/openai.yaml": "83bbb3fb5c70684817195aa575960ffe17824999492ab2c394fc496344345129"
   },
   "depends_on": [
     "agent-quality-loop"

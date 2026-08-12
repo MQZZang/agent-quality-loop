@@ -4,7 +4,7 @@ description: Use when a user wants an AI coding or workspace agent to turn a nat
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.6.0"
+  version: "2.6.1"
 ---
 
 # Agent Quality Loop

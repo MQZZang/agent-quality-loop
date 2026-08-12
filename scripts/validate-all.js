@@ -3,6 +3,7 @@
 "use strict";
 
 const { spawnSync } = require("child_process");
+const os = require("os");
 const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
@@ -15,6 +16,9 @@ const COMMANDS = [
   ["scripts/test-route-shims.js"],
   [".cursor/skills/agent-quality-loop/scripts/validate-skill.js"],
   ["scripts/validate-workflow.js"],
+  ["scripts/validate-claims.js"],
+  ["scripts/aql-doctor.js", "--self-test"],
+  ["scripts/test-release-workflow-logic.js"],
   ["integrations/cursor-hooks/test.js"],
   ["probes/make-fixtures.js", "--self-test"],
   ["scripts/sync-skills.js", "--check"],
@@ -23,6 +27,15 @@ const COMMANDS = [
 function formatCommand(relativeScript, args) {
   const parts = ["node", relativeScript, ...args];
   return parts.join(" ");
+}
+
+function printEnvSummary() {
+  console.log("validate-all env summary");
+  console.log(`  node: ${process.version}`);
+  console.log(`  platform: ${process.platform} (${os.type()} ${os.release()})`);
+  console.log(`  arch: ${os.arch()}`);
+  console.log(`  cwd: ${process.cwd()}`);
+  console.log(`  repo_root: ${REPO_ROOT}`);
 }
 
 function runStep(relativeScript, args = []) {
@@ -44,6 +57,7 @@ function runStep(relativeScript, args = []) {
 }
 
 function main() {
+  printEnvSummary();
   let failed = false;
 
   for (const entry of COMMANDS) {
@@ -71,5 +85,6 @@ module.exports = {
   main,
   COMMANDS,
   runStep,
+  printEnvSummary,
   REPO_ROOT,
 };

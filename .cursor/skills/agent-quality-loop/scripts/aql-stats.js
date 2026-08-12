@@ -619,6 +619,17 @@ function renderTable(title, map) {
   return lines;
 }
 
+/** Redact absolute paths for human reports (relative to cwd if under cwd, else basename). */
+function redactPathForReport(filePath, cwd = process.cwd()) {
+  const resolved = path.resolve(String(filePath));
+  const base = path.resolve(cwd);
+  const relative = path.relative(base, resolved);
+  if (relative && !relative.startsWith("..") && !path.isAbsolute(relative)) {
+    return relative.split(path.sep).join("/");
+  }
+  return path.basename(resolved);
+}
+
 function renderReport(stats) {
   const lines = [];
   lines.push(stats.title || "AQL descriptive association report (not causal inference)");
@@ -659,7 +670,9 @@ function renderReport(stats) {
     }
   }
   lines.push(stats.note);
-  for (const file of stats.invalid) lines.push(`INVALID (skipped): ${file}`);
+  for (const file of stats.invalid) {
+    lines.push(`INVALID (skipped): ${redactPathForReport(file)}`);
+  }
   lines.push(`Envelopes scanned: ${stats.scanned_files} (parsed ${stats.parsed}, invalid ${stats.invalid.length})`);
   return lines.join("\n");
 }
@@ -670,7 +683,7 @@ function fixtureSha(label) {
 
 function makeBuiltEnvelope(overrides = {}) {
   const envelope = baseEnvelope();
-  envelope.skill_version = "2.6.0";
+  envelope.skill_version = "2.6.1";
   Object.assign(envelope, overrides);
   if (typeof envelope.contract_id === "string" && envelope.implementation_receipt) {
     envelope.implementation_receipt.input_contract_ref = `${envelope.contract_id}@tree`;
@@ -695,7 +708,7 @@ function makeAcceptedEnvelope(overrides = {}) {
     separation_evidence_ref: "source:fresh-acceptor-handoff",
     raw_evidence_before_implementer_narrative: true,
   };
-  envelope.skill_version = "2.6.0";
+  envelope.skill_version = "2.6.1";
   Object.assign(envelope, overrides);
   if (typeof envelope.contract_id === "string" && envelope.implementation_receipt) {
     envelope.implementation_receipt.input_contract_ref = `${envelope.contract_id}@tree`;
@@ -713,7 +726,7 @@ function writeSnapshotFile(filePath, envelope, sequence, previousDigest, recorde
       recorded_at: recordedAt || `2026-08-12T10:00:${String(sequence).padStart(2, "0")}.000Z`,
       sequence,
       previous_digest: previousDigest,
-      writer: "aql-envelope@2.6.0",
+      writer: "aql-envelope@2.6.1",
     },
   };
   const raw = `${JSON.stringify(prepared, null, 2)}\n`;
@@ -1033,7 +1046,7 @@ function runSelfTest() {
     );
 
     check(
-      rendered.includes("Workspace keys:") && !rendered.includes(root.replace(/\\/g, "\\\\")),
+      rendered.includes("Workspace keys:") && !rendered.includes(root),
       "report outputs workspace_key not absolute workspace path",
     );
 
@@ -1104,6 +1117,7 @@ module.exports = {
   listJsonFiles,
   aggregate,
   renderReport,
+  redactPathForReport,
   dedupeByDigest,
   contractKeyFor,
   workspaceKey,
