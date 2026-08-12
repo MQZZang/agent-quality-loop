@@ -68,11 +68,20 @@ Honor an explicit mode. Otherwise infer the smallest mode that satisfies the req
 | `release` | release preflight or explicitly authorized release action | `RELEASE_READY`, or a separately evidenced later state |
 | `full` | safe local end-to-end work | independent `ACCEPTED`; never enter `release` automatically |
 
-Mode also caps effective authority: `align`, `evidence`, and `accept` are read-only; `execute` and `full` are at most `local_write`. A non-null release intent is valid only on an explicit `intent: release`, `mode: release` route. Resume may reconstruct a release handoff but cannot consume an old authorization; the user must issue a new current-turn release request.
+Four user-intent terminals (no new phase enum). Stop at the requested terminal with `next_allowed_phase: null`; do not advance merely to fill the lifecycle:
+
+- evidence-only → `phase: EVIDENCED`, `verdict: PASS` or `PASS_WITH_RISK`; never suggest implement/release just to complete a chain.
+- ordinary implement / fix / self-test → `phase: BUILT`, `verdict: PASS` or `PASS_WITH_RISK`. This is the default success stop for `fast`/`standard`. Do not ritualistically create a fresh acceptor merely because the project supports independent acceptance.
+- explicit independent / formal accept → `phase: ACCEPTED`, `verdict: PASS`. `ACCEPTED` is a complete quality terminal: full stop; never auto-enter release preflight; never default `next` to publish.
+- release preflight only → `phase: RELEASE_READY`, `verdict: PASS`; read-only; no publish/push/deploy.
+
+User-visible status language (prefer Chinese in Chinese scenarios): 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Never use vague 完成 / 全部完成 / 正式完成 / 已验收可发布 that spans adjacent states.
+
+Mode also caps effective authority: `align`, `evidence`, and `accept` are read-only; `execute` and `full` are at most `local_write`. A non-null release intent is valid only on an explicit `intent: release`, `mode: release` route. Resume may reconstruct a release handoff but cannot consume an old authorization; the user must issue a new current-turn release request. Same-context work cannot grant `ACCEPTED`.
 
 If a requested later mode lacks a trustworthy earlier envelope, reconstruct the missing phases read-only. Never invent phase completion.
 
-Infer `full` when a request explicitly combines local implementation with independent acceptance and does not authorize external side effects. Do not stop at `BUILT` merely because the user omitted the mode name.
+Infer `full` when a request explicitly combines local implementation with independent acceptance and does not authorize external side effects. Do not stop at `BUILT` merely because the user omitted the mode name. When independent acceptance was not requested, ordinary implement still stops at `BUILT`.
 
 Routing precedence:
 
@@ -102,7 +111,7 @@ Restate three lines before non-trivial work and continue unless a genuine blocke
 
 ```text
 Goal: quote the user's words, then state the user-observable outcome.
-Boundary: name in-scope and explicit do-not-touch surfaces.
+Boundary: name in-scope and explicit do-not-touch surfaces, and state this turn's terminal (e.g. “只完成本地实现与自检，不进入独立验收或发布。”).
 Most likely misunderstanding: name the highest-variance semantic or authority interpretation.
 ```
 
@@ -222,7 +231,7 @@ Report readiness by dimension. `RELEASE_READY` does not mean `DEPLOYED`. After a
 
 ### 7. Maintain a resumable envelope
 
-Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. Carry it through the [canonical carrier and optional cache](references/contracts.md#envelope-persistence-canonical-carrier-and-optional-cache), never a second lifecycle store. In normal user-facing output, lead with a plain-language result: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
+Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. Carry it through the [canonical carrier and optional cache](references/contracts.md#envelope-persistence-canonical-carrier-and-optional-cache), never a second lifecycle store. In normal user-facing output, lead with a plain-language result: understood / 已对齐, 证据结论完成, 实现与自检通过, 独立质量验收通过, 发布准备检查通过, 已发布, or 生产结果已验证. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
 
 For resume, let the user say `continue <resume_ref>` in any language (for example `继续 <resume_ref>`); locate the latest valid envelope and artifact references automatically from the current task, workspace artifact, or available host persistence. Never require the user to copy YAML. For bare “继续上次任务”, use the sole unambiguous candidate; if multiple candidates exist, show at most three compact references and ask one choice. If no durable envelope is available or it has drifted, reconstruct read-only and ask only for missing outcome-changing information. An incomplete reconstruction stays read-only at or before `EVIDENCED`, reports `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize implementation, acceptance, or release.
 
@@ -240,7 +249,7 @@ Lead with the result. Show only the structure needed for the active mode.
 
 When the loop is active, end every user-visible summary with exactly one [Trust Badge](references/contracts.md#trust-badge-user-facing-status-line). Size ritual output to the [Ceremony Budget](references/contracts.md#ceremony-budget).
 
-Use plain-language state labels by default: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
+Use plain-language state labels by default (Chinese preferred in Chinese scenarios): 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Never blur adjacent states with vague 完成 / 全部完成 / 正式完成 / 已验收可发布. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
 
 Deep work does not require verbose output. Default limits are:
 

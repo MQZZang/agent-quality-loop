@@ -15,6 +15,8 @@ Evidence types: `SPEC` | `STATIC` | `SELF_TEST` | `BLIND_RUNTIME` | `LONGITUDINA
 | Blind probe protocol packaged (`probes/`) | SPEC | PASS |
 | Blind probe rows on current host/model tiers | BLIND_RUNTIME | NOT_RUN (see `docs/host-probe-matrix-2.6.1.md`) |
 | Host Goal Compiler / profile / route live sessions | BLIND_RUNTIME | NOT_RUN |
+| Terminal-selection host probes A/B/C (Cursor/Codex/Claude) | BLIND_RUNTIME | NOT_RUN (see `docs/host-probe-adaptive-2.6.1.md`; static skill text ≠ live PASS) |
+| Adaptive terminal screening pilot (6 tasks) | LONGITUDINAL | SCREENING only — descriptive, not causal (see `docs/pilot-adaptive-2.6.1.md`) |
 | Longitudinal user-value pilot | LONGITUDINAL | NOT_RUN (see `docs/longitudinal-pilot-2.6.1.md`) |
 | Causal improvement on real projects over time | LONGITUDINAL | NOT_RUN — not claimed |
 

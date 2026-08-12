@@ -33,6 +33,10 @@ Tag/commit fields filled at release attestation time. Rows below are the require
 
 Do not substitute another host's result.
 
+## Terminal-selection probes (adaptive)
+
+For Cursor / Codex / Claude Code × Probe A/B/C (BUILT / ACCEPTED / RELEASE_READY stop behavior), see `docs/host-probe-adaptive-2.6.1.md` — separate from P4–P8 above; currently NOT_RUN pending transcripts.
+
 ## Longitudinal pilot
 
 See `docs/longitudinal-pilot-2.6.1.md`. Status: **NOT_RUN** (scaffold only) — never claim causal proof from screening evidence alone. Release notes must state longitudinal evidence remains under evaluation.

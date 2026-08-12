@@ -19,13 +19,15 @@ How this skill fits ALIGN compile and ACCEPT expectations to the specific user o
 
 | Lane | Contents | Example |
 |---|---|---|
-| Phrase lexicon | The user's recurring words mapped to the operational meaning both sides settled on | user's “验收” = independent accept mode, read-only |
+| Phrase lexicon | Recurring words → operational meaning **only after** a user-confirmed personal dictionary entry (never a universal default) | *if confirmed for this user:* “验收” → independent accept, read-only — bare “验收” alone is **not** globally fixed |
 | Communication | Language, output density, structure preference, badge verbosity | conclusions in Chinese; terse summaries |
 | Collaboration habits | Question threshold, scope posture, acceptance-strictness preferences, decision habits | at most one question per turn; always run the counterexample |
 | Rejected options | Project-scoped, confirm-first stable rejections the user does not want re-proposed | do not re-propose Redis for this project's cache layer |
-| Route aliases | Confirm-first phrase → one of the fixed route ids below | “帮我过一遍” → `accept` |
+| Route aliases | Confirm-first phrase → one of the fixed route ids below (personal mapping only; not a universal default) | *only after explicit confirm:* “帮我过一遍” → `accept` |
 
 Adaptation targets ALIGN (compile fidelity) and ACCEPT (expectation fit). Do not accumulate execution-side style rules; execution quality tracks the base model, not the profile.
+
+Phrase lexicon fires **only** for `active` entries the user has confirmed (or second-hit promoted under the sedimentation rules). Until then, do not treat colloquial words such as “验收” as if they already mean a fixed route or lifecycle phase.
 
 ## Never Learn (Authority Firewall)
 
@@ -116,6 +118,24 @@ Read-only sessions emit candidates in the turn summary / envelope instead of wri
 3. Generic skill defaults.
 
 On a conflict between the turn instruction and an active profile entry, follow the instruction and do not rewrite the profile from one conflict; on the second consistent conflict, propose the update under To Confirm.
+
+### Bare「验收」and related phrase disambiguation
+
+When the user's words could change whether a **fresh context** is required, apply this default reading — then profile — then ask if still ambiguous. Current-turn explicit wording always overrides the profile. **Never** default bare「验收」to publish/release. Do **not** create a route alias unless the user explicitly confirms a long-term mapping.
+
+| User phrasing (examples) | Treat as | Path |
+|---|---|---|
+| 检查一下 / 自查 / 质量检查 | current-context check or self-QA | does **not** auto-produce `ACCEPTED` |
+| 独立验收 / 正式验收 / 找另一个上下文验收 | intent accept | fresh-context `ACCEPTED` path |
+| 发布验收 / 能不能发 / 上线前检查 | release preflight | `RELEASE_READY` path |
+| 发布 / 上线 / 推送 | separate release act | not acceptance wording alone |
+
+**Bare「验收」** (no independent/formal/release qualifier) when it would change whether fresh context is required **and** the profile has no confirmed meaning for that phrase:
+
+1. Prefer the sentence object / surrounding context.
+2. If still conclusively ambiguous: ask **one** choice question exactly like: 你这里指“独立质量验收”，还是“发布前就绪检查”？
+3. Never default「验收」to publish/release.
+4. Do not invent a lasting route alias from one clarification answer unless the user explicitly confirms a long-term mapping.
 
 ## User-Level Paths (Opt-In Only)
 

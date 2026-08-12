@@ -29,8 +29,10 @@ In either profile, review is read-only. Do not edit, repair, deploy, publish, or
 
 ## When to Use
 
-- User asks to **review / 验收 / inspect / audit / validate**
-- **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports**
+- User asks to **review / inspect / audit / validate**, or requests **independent / formal acceptance** (独立验收 / 正式验收 / 找另一个上下文验收)
+- Bare「验收」alone does **not** force this skill's independent-acceptance path. Use independent acceptance only when **any** of: (1) independent/formal phrasing as above; (2) an **active** confirmed profile lexicon/alias that maps the phrase to `accept`; or (3) the user answers the clarification question choosing 独立质量验收 — if bare「验收」would change whether fresh context is required and the profile has no confirmed meaning, prefer sentence context; if still ambiguous, ask once: 你这里指“独立质量验收”，还是“发布前就绪检查”？
+- Current-context「检查一下 / 自查 / 质量检查」→ self-QA / non-independent check — not auto-`ACCEPTED`.「发布验收 / 能不能发 / 上线前检查」→ release preflight (`RELEASE_READY`), not this accept path. Never treat bare「验收」as publish/release
+- **Acceptance review** of completed work, existing plans, code, or **implementation self-QA reports** (when independent accept is actually requested per the rules above)
 - Hallucination check, risk check, omission check on artifacts (not on in-progress implement unless reviewing a prior report)
 - **Goal-Achievement** check: does the result meet the original Unified Goal within its boundary?
 - User asks to verify "done" claims or review before merge
@@ -64,7 +66,7 @@ Every finding carries one severity: `blocker` | `warning` | `advisory`.
 ## When Not to Use
 
 - User wants to **implement, fix, refactor, or debug** → use **`agent-quality-loop`**; it may select `ask-plan-code-qa` as its implementation adapter
-- Agent's own **post-implement self-QA reporting** → implementation adapter, not this skill, unless a distinct context is asked to **review / 验收** that report
+- Agent's own **post-implement self-QA reporting** → implementation adapter, not this skill, unless a distinct context is asked for **independent / formal acceptance** of that report (bare「验收」alone is not enough; see When to Use)
 - Trivial praise or "LGTM" without reading artifacts
 - User only wants a plan written, not a review of existing work → use `agent-quality-loop` or explicit `$ask-plan-code-qa`
 
@@ -72,7 +74,7 @@ Every finding carries one severity: `blocker` | `warning` | `advisory`.
 
 1. Identify the original goal, scope, acceptance standard, frozen baseline, and applicable review types from the supplied contract and raw artifacts. If any decision-changing input is absent, report it; do not invent it.
 2. Gather requirements, plan, diff, artifacts, commands, and raw QA evidence from source — not memory or the implementer's narrative alone.
-3. When formal acceptance is requested, require a distinct fresh context with separation evidence — not a role rename alone — and read raw evidence before the implementer's summary. Otherwise label the result non-independent.
+3. When formal **independent** acceptance is requested (independent/formal phrasing, confirmed profile mapping to `accept`, or clarification answer choosing 独立质量验收), require a distinct fresh context with separation evidence — not a role rename alone — and read raw evidence before the implementer's summary. Otherwise label the result non-independent. Bare「验收」without those conditions must not claim independence or grant `ACCEPTED`.
 4. For experience-type artifacts, run Experience Review; at acceptance, check `.ai/knowledge/lessons.md` **active** lessons for recidivism.
 5. For each finding: Issue · Evidence · Risk · Suggested fix.
 6. End with Verdict + What Was Checked. In embedded profile, let `agent-quality-loop` map the verdict into lifecycle dimensions without repeating this report.

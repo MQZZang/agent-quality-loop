@@ -36,7 +36,8 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge: `[AQL 2.6.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+Example trust badge (ordinary implement terminal): `[AQL 2.6.1 | implemented with self-QA passed | evidence: 3 commands exit 0 | next: none]`  
+Explicit independent-accept request example: `[AQL 2.6.1 | independently accepted | evidence: required dimensions PASS | next: none]`
 
 For routine tasks, the workflow starts from the prefilled presets in the skill's `references/contract-presets.md` (data, not new modes) to keep ALIGN short — this is automatic; there is nothing for the user to open or fill.
 

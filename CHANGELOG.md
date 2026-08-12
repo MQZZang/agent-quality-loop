@@ -4,6 +4,8 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+- Terminal adaptive value (post-2.6.1 baseline): four legal terminals (EVIDENCED / BUILT / ACCEPTED / RELEASE_READY) may stop with `next_allowed_phase: null`; ALIGN Boundary states the turn terminal; user-visible Chinese status language tightened; bare「验收」disambiguation (not default publish); evaluation cases 66–73; adaptive host-probe / pilot docs remain screening or NOT_RUN until live transcripts exist. Package version still 2.6.1 until a later release.
+
 ## 2.6.1 — 2026-08-12
 
 - Exact-tag CI closure: route-shim `--check` normalizes CRLF; `.gitattributes` forces `dist/route-shims/**` LF; `aql-stats` reports redact absolute paths (fixes Ubuntu self-test leak).

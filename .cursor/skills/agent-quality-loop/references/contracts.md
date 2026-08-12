@@ -221,9 +221,9 @@ Keep lifecycle phase and verdict orthogonal. Phase is the last evidenced milesto
 | `RAW` | not yet aligned | `ALIGNED` |
 | `ALIGNED` | goal and scope aligned | `EVIDENCED` |
 | `EVIDENCED` | requested diagnosis/evidence complete | `BUILT`, or terminal with `next_allowed_phase: null` |
-| `BUILT` | implementation built; independent acceptance not yet passed | `ACCEPTED` |
-| `ACCEPTED` | all required acceptance dimensions passed independently | `RELEASE_READY` through explicit release preflight |
-| `RELEASE_READY` | frozen artifact is ready for an authorized release action | `DEPLOYED` |
+| `BUILT` | implementation built and self-QA done; independent acceptance not yet passed | `ACCEPTED` when later requested, or terminal with `next_allowed_phase: null` when independent accept was not requested |
+| `ACCEPTED` | all required acceptance dimensions passed independently; complete quality terminal | `RELEASE_READY` only through later explicit release preflight, or terminal with `next_allowed_phase: null` when release was not requested |
+| `RELEASE_READY` | frozen artifact passed read-only release preflight; awaiting explicit act | `DEPLOYED` only on later explicit authorized act, or terminal with `next_allowed_phase: null` while awaiting that act |
 | `DEPLOYED` | named target was changed and deployment was verified | `PRODUCTION_VERIFIED` |
 | `PRODUCTION_VERIFIED` | required real-target outcomes were verified | terminal |
 
@@ -368,31 +368,33 @@ When the loop is active, append exactly one badge line at the end of every user-
 
 `version` comes from the package `manifest.json` `version` field; if unreadable, use `unversioned`.
 
-Allowed `state` values (mapped from lifecycle phase / stop condition):
+Allowed `state` values (mapped from lifecycle phase / stop condition). Prefer Chinese labels in Chinese scenarios; `next: none` is normal for legitimate terminals:
 
-| State | Maps from |
-|---|---|
-| `aligned` | `ALIGNED` |
-| `evidence-complete` | `EVIDENCED` |
-| `built, self-QA passed` | `BUILT` after self-QA |
-| `independently accepted` | `ACCEPTED` |
-| `release-ready` | `RELEASE_READY` |
-| `deployed` | `DEPLOYED` |
-| `production-verified` | `PRODUCTION_VERIFIED` |
-| `blocked` | blocked stop |
-| `pending` | pending stop |
+| State (EN) | State (ZH) | Maps from |
+|---|---|---|
+| `aligned` | `已对齐` | `ALIGNED` |
+| `evidence conclusion complete` | `证据结论完成` | `EVIDENCED` |
+| `implemented with self-QA passed` | `实现与自检通过` | `BUILT` after self-QA |
+| `independent quality acceptance passed` | `独立质量验收通过` | `ACCEPTED` |
+| `release preflight passed` | `发布准备检查通过` | `RELEASE_READY` |
+| `deployed` | `已发布` | `DEPLOYED` |
+| `production result verified` | `生产结果已验证` | `PRODUCTION_VERIFIED` |
+| `blocked` | `已阻塞` | blocked stop |
+| `pending` | `待处理` | pending stop |
 
 English example:
 
 ```text
-[AQL 2.6.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+[AQL 2.6.1 | independent quality acceptance passed | evidence: all required dimensions PASS | next: none]
 ```
 
 Chinese-scenario example (state words may be localized; syntax unchanged):
 
 ```text
-[AQL 2.6.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+[AQL 2.6.1 | 独立质量验收通过 | evidence: 必选维度均 PASS | next: none]
 ```
+
+Other common Chinese terminals with `next: none`: `证据结论完成`, `实现与自检通过`, `发布准备检查通过`. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
 ## Envelope Consistency Check
 
@@ -401,16 +403,17 @@ Before handoff or release, verify:
 - every required field exists and uses a declared enum;
 - `schema_version`, `intent`, `assurance`, `mode`, and `action_authority` are present and mutually consistent;
 - `align`, `evidence`, and `accept` remain read-only; `execute` and `full` never exceed local write;
-- assurance does not raise action authority, and ordinary `implement + standard` work may stop at `BUILT` without inventing formal acceptance;
+- assurance does not raise action authority, and ordinary `implement` / fix / self-test (`fast` or `standard`) may stop at `BUILT` + `PASS`/`PASS_WITH_RISK` with `next_allowed_phase: null` without inventing formal acceptance or a fresh acceptor;
 - any executor adapter receipt is bound to the current contract/baseline and reports exactly `result_phase: BUILT`;
 - every Task Contract field is present under the same field name, including target user/system, problem signal, assumptions, and action authority;
-- the current and next phases follow the legal-transition table, or `next_allowed_phase` is null for a valid terminal result;
+- the current and next phases follow the legal-transition table, or `next_allowed_phase` is null for a valid terminal result (`EVIDENCED`, `BUILT`, `ACCEPTED`, or `RELEASE_READY` when that stage was the requested stop);
 - `mode: full` has not advanced beyond `phase: ACCEPTED`;
 - `mode: full` has effective authority no higher than `local_write` and consumes no release authorization;
 - a non-null `release_intent` appears only on the explicit `intent: release`, `mode: release` route; resume never consumes old release authority;
 - any `external_write`, `destructive`, or `release` authority has a complete, current-turn, target-specific authorization; `read`/`local_write` carries none;
-- `phase: BUILT` + `verdict: PENDING` represents unavailable independent acceptance;
-- `acceptance_gate` and `release_gate` are distinct namespaces; release work preserves and never overwrites the accepted gate;
+- `phase: BUILT` + `verdict: PENDING` represents unavailable independent acceptance when accept was requested; ordinary implement without accept request uses `BUILT` + `PASS`/`PASS_WITH_RISK` and `next_allowed_phase: null`;
+- `ACCEPTED` without an explicit release request keeps `release_gate: null` and `next_allowed_phase: null`; do not auto-continue to release preflight or default `next` to publish;
+- `acceptance_gate` and `release_gate` are distinct namespaces; release work preserves and never overwrites the accepted gate; do not pollute `acceptance_gate` with release checks;
 - `release_gate` remains null before preflight begins from `ACCEPTED`; a partial preflight may retain `phase: ACCEPTED` only with `release_intent: preflight`;
 - each active gate's `required_dimensions` is non-empty, contains no unknown names, and exactly matches its canonical dimensions classified `required`;
 - the acceptance gate always requires `goal_fidelity`, `semantic_invariants`, `user_observable_result`, and `reproducibility`; the release gate always requires `artifact_identity`, `accepted_baseline`, `target_environment`, and `rollback_recovery`;

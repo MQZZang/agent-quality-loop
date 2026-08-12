@@ -89,7 +89,7 @@ See `examples.md` for template-dump style vs reasoning style contrast.
 - Requirements are **ambiguous** (assumptions / blocking questions)
 - Readiness is **Revise** or **Blocked**
 - **Material risk** (production, contracts, security, cross-file)
-- User explicitly asks for Plan / review / 验收
+- User explicitly asks for Plan / review / 独立验收 / 正式验收 (structured output)
 
 **On Pass (normal path):**
 
@@ -110,7 +110,7 @@ User drives at four natural points:
 | **Goal** | Start of a standalone non-trivial task | Emit **the three opening lines** and proceed; embedded mode reuses the parent goal anchor |
 | **Ambiguity** | Multiple valid interpretations | Ask a genuine blocking question; do not silently choose |
 | **Approach** | Non-trivial change or user said wait | One-sentence approach; proceed unless user objects |
-| **Acceptance review** | User says review / 验收 / 把关 | Switch to **agent-quality-loop accept** — not Plan Gate; it may invoke `review-gate` |
+| **Acceptance / check wording** | User says 检查一下 / 自查 / 质量检查 / 验收 / 把关 / review | Disambiguate — do **not** auto-switch on bare「验收」. 检查/自查/质量检查 → stay on **implementation Self-QA** (≤ `BUILT`, never claim `ACCEPTED`). 独立验收 / 正式验收 / 找另一个上下文验收 → hand off to **agent-quality-loop accept** (fresh context; may invoke `review-gate`). 发布验收 / 能不能发 / 上线前检查 → **release-check** / `RELEASE_READY` path. Bare「验收」with no confirmed profile meaning and ambiguous fresh-context need: prefer sentence context; if still unclear, ask once: 你这里指“独立质量验收”，还是“发布前就绪检查”？ Never default「验收」to publish/release |
 
 ### Goal Handshake — three states
 
@@ -131,7 +131,8 @@ Escalate (Pause for confirmation) only after Doubt Resolution — never reflexiv
 
 ## When Not to Use
 
-- User wants **acceptance review / 验收 / review / inspect** of completed work or existing QA → **`agent-quality-loop` accept path**; it may invoke `review-gate`
+- User wants **independent / formal acceptance** (独立验收 / 正式验收 / 找另一个上下文验收) of completed work or existing QA → **`agent-quality-loop` accept path**; it may invoke `review-gate`. Bare「验收」alone does **not** force that handoff — see User Handshake disambiguation
+- User wants **release preflight** (发布验收 / 能不能发 / 上线前检查) → `agent-quality-loop` **release-check** / `RELEASE_READY` path — not this skill's Self-QA and not auto-`ACCEPTED`
 - Pure Q&A with no code (answer directly; optional brief Ask only)
 
 ## Workflow (Operating Procedure)
@@ -308,7 +309,7 @@ Proceed to Execute (Code) | Revise Plan | Ask User
 
 ## Self-QA · Implementation Self-QA Phase
 
-After Code. **Not user acceptance** (→ `agent-quality-loop` accept path). Judge the work **against the original Unified Goal**; keep it simple, low-noise, judgment-driven.
+After Code. **Not independent user acceptance** and **not** release readiness. Self-QA stays ≤ `BUILT` and must never claim `ACCEPTED`. Hand off only when the user clearly requests independent/formal accept (or confirms via clarification / active profile mapping); release-preflight wording goes to release-check. Judge the work **against the original Unified Goal**; keep it simple, low-noise, judgment-driven.
 
 ```markdown
 ## Implementation Self-QA
@@ -362,9 +363,9 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 
 ## Review Gate Boundary
 
-| | Plan Gate | Review Gate |
+| | Plan Gate | Review Gate / accept path |
 |---|-----------|-------------|
-| When | Before Code (internal) | User asks to review/验收 existing work |
+| When | Before Code (internal) | User asks for **independent / formal** acceptance of existing work (not bare「验收」alone; not 检查/自查/质量检查 Self-QA; not release preflight) |
 | Skill | (this skill) | `agent-quality-loop` accept path (`review-gate` may serve as its adapter) |
 
 ---
@@ -390,7 +391,7 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 - [ ] Review judged against the original goal; no success claims without Passing Evidence; no half-product delivered
 - [ ] Goal-met verdict quotes the applicable standalone or embedded goal anchor verbatim
 - [ ] Cross-file contracts grep-checked when applicable
-- [ ] Review requests routed to `agent-quality-loop` accept path, not Plan Gate
+- [ ] Independent/formal accept requests routed to `agent-quality-loop` accept path, not Plan Gate; bare「验收」disambiguated per User Handshake (self-QA vs accept vs release-check)
 - [ ] Implementation Self-QA reports at most `BUILT`; it never grants independent acceptance or release state.
 
 ## Failure Modes
@@ -405,7 +406,7 @@ Compact **never** skips: read-before-edit, Implementation Self-QA, Not Verified.
 | Gate output essay / empty headers on Pass | Shorten; use reasoning style per examples.md |
 | Source traversal correct but user concepts collapsed into source labels | Add or revise Must-Hold Checks; verify concept mapping, scope, exclusivity, counts, missing data, and evidence binding as needed |
 | Half-product / over-engineering / show-off code | Return to result-oriented; Occam; finish to a real root-cause result |
-| Confused Plan Gate with acceptance | User review/验收 → `agent-quality-loop` accept path |
+| Confused Plan Gate with acceptance | Independent/formal 验收 → `agent-quality-loop` accept path; 检查/自查 → Self-QA ≤ `BUILT`; bare ambiguous「验收」→ one clarification question |
 | Embedded adapter repeats the parent alignment/summary | Reuse the parent contract and return only the implementation receipt |
 | Self-QA claims `ACCEPTED` or release state | Downgrade to `BUILT`; route formal acceptance through the parent lifecycle |
 | Missing optional standalone reference | Use the self-contained rules in this file; do not claim an unread dependency |
@@ -432,7 +433,7 @@ Ask reconstructs intent and proposes a Unified Goal; Doubt Resolution first, the
 
 ### Boundary / failure
 
-Agent tries Code with Plan Gate Revise → **stop**, revise Plan. User says 「帮我验收」 → switch to **agent-quality-loop accept**, not Plan Gate.
+Agent tries Code with Plan Gate Revise → **stop**, revise Plan. User says「独立验收」/「正式验收」→ switch to **agent-quality-loop accept**, not Plan Gate. User says「检查一下」/「自查」→ Self-QA ≤ `BUILT`, never claim `ACCEPTED`. Bare「验收」with no confirmed profile meaning → prefer context; if still ambiguous, ask once: 你这里指“独立质量验收”，还是“发布前就绪检查”？
 
 ### Diagnostic — flawed user approach
 

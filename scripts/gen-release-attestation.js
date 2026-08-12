@@ -131,7 +131,7 @@ function gitRevParseHead() {
 
 /**
  * Prefer brief form /^## Case \d+/m when present; current evaluation-cases.md
- * uses /^## \d+\./m (65 cases). Do not hardcode the count.
+ * uses /^## \d+\./m. Do not hardcode the count; derive from headings.
  */
 function countEvaluationCases(markdown) {
   const caseHeadings = markdown.match(/^## Case \d+/gm);
