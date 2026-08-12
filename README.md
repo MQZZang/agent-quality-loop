@@ -8,6 +8,17 @@ A growing set of tools answers this with a mechanical gate: declare a check, run
 
 Concretely, it is a portable workflow package for Cursor and for the Codex CLI agent. It does not add a new panel or button to the IDE. After you install it into a project, the agent’s **default working habits** change for non-trivial tasks.
 
+## Three invariants
+
+Style never escalates authority.
+Asking for a thorough job, a polished write-up, or a formal checklist does not unlock deploy, publish, or any other side effect beyond the current `action_authority`.
+
+No completion claim without evidence.
+A pass, “done,” or green status is only claimable when the agent ran or inspected the evidence for that claim in this turn.
+
+Accepted is not released.
+Independent acceptance freezes a local result; shipping still needs a separate, exact, current-turn release authorization.
+
 ## Why install this
 
 **Before:** You ask the agent to fix a bug. It says “done.” You still have to check whether it ran the tests, whether “done” means only local edits, and whether it treated its own self-check as a formal sign-off.
@@ -75,7 +86,7 @@ A package that tells an agent “no evidence, no pass” has to hold itself to t
 | Check | What it covers |
 |---|---|
 | 42 evaluation cases | Written scenarios with expected behavior, in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). They cover happy paths, semantic ambiguity, authority boundaries, contradictory instructions, and the failure modes each rule exists to prevent. |
-| 23 envelope regression cases | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
+| Bundled envelope regression suite | The *envelope* is the compact structured record an agent hands forward between steps. These cases run on every change and pin its state machine — an adapter cannot grant itself acceptance, a local-only run cannot reach release state, and a handoff cannot name a phase whose required fields are missing. |
 | Blind forward-testing | Before a rule ships, its scenario is replayed on a separate model that has not seen the intended answer. A model never grades its own output. |
 
 CI runs the structural checks on every push and pull request, and fails if the Codex mirror has drifted from the Cursor source.
@@ -129,9 +140,30 @@ Agents in this package use a strict ladder. Do not collapse neighboring rows.
 
 ## Install
 
-Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are optional Node validators used when you edit the package itself.
+Nothing to build and no runtime dependency. Installing means copying Markdown rules and skills into a project; the only executables are the Node installer and optional maintainer validators.
 
-### 1. Project-level install (recommended, self-contained)
+### Windows-first install (recommended on Windows)
+
+From a clone of this repository:
+
+```bash
+node scripts/install.js --suite core --to agents
+```
+
+- `core` installs the three-piece suite (`agent-quality-loop`, `ask-plan-code-qa`, `review-gate`).
+- `--to agents` targets the Codex skill tree; use `--to cursor` or `--to both` when you want Cursor skills, or both hosts.
+- `--dry-run` prints the planned copy actions without writing.
+- The public installer creates portable, real-file snapshots at ordinary destinations. It never creates a live junction and refuses to replace an existing symlink or Windows junction; repair or remove that link deliberately first.
+
+Optional deterministic enforcement add-on: see [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
+
+If a consumer deliberately enables the optional local envelope cache, it should add `.agent-quality-loop/` to `.gitignore`; host/output handoff remains valid when no local write is authorized.
+
+### Maintainer deployment topology
+
+The public installer is for portable snapshots. Repository maintainers may instead keep Cursor live through a manually managed junction from the user Cursor skills directory to this repository's `.cursor/skills/<name>` source. Codex maintenance consumes the generated `.agents/skills/<name>` tree as a copy/snapshot, never as a junction. These are deployment conventions, not extra installer modes.
+
+### 1. Project-level install (manual copy, self-contained)
 
 Works for Cursor and Codex inside a single repo. No external installer.
 
@@ -201,20 +233,22 @@ If you do not have skill-installer, use **§1 Project-level install** instead.
 | `CONTRIBUTING.md` | How to propose a change, including the AI-assistance policy |
 | `.cursor/rules/` | Cursor routing summaries and minimal invariants |
 | `.cursor/skills/` | Authoritative skill sources |
-| `.agents/skills/` | Codex mirror generated by `scripts/sync-skills.sh` |
+| `.agents/skills/` | Generated Codex mirror; Codex maintainers copy/install snapshots from here |
 | `docs/guide.md` | Compact user/agent guide |
 | `.ai/knowledge/` | Two templates you copy into your own project and fill in there, plus this package's own maintenance lessons and prompt-pattern notes — those last two stay here |
-| `scripts/` | Mirror sync, the two validators, and a Windows helper |
+| `integrations/` | Optional Cursor hook templates and protocol tests; hooks never provide semantic acceptance |
+| `scripts/` | Node sync, manifest, installer, validators, and compatibility helpers |
 | `.github/workflows/` | CI that runs the validators and checks mirror parity |
+| `.gitattributes`, `.gitignore`, `LICENSE` | Repository metadata, ignored-path policy, and license |
 
-When maintaining this package, edit `.cursor/skills/` and then run `./scripts/sync-skills.sh` so `.agents/skills/` stays a mirror. Do not hand-edit the Codex mirror.
+Each skill's adjacent `manifest.json` is its version and distribution inventory. When maintaining this package, edit `.cursor/skills/` and then run `node scripts/sync-skills.js` so `.agents/skills/` stays a mirror. Do not hand-edit the Codex mirror. `scripts/sync-skills.sh` is deprecated compatibility only.
 
 ## Validate changes
 
 If you change the packaged skills or rules in this repository:
 
 ```bash
-./scripts/sync-skills.sh
+node scripts/sync-skills.js
 node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
 node scripts/validate-workflow.js
 git diff --check

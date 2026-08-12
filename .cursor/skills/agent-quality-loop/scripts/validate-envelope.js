@@ -3,6 +3,9 @@
 "use strict";
 
 const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { fileURLToPath, pathToFileURL } = require("url");
 
 const SCHEMA_VERSION = "agent-quality-loop/v2";
 const PHASES = [
@@ -70,6 +73,27 @@ const RELEASE_ALWAYS = [
   "target_environment",
   "rollback_recovery",
 ];
+const BARE_PATH_EXTENSIONS = new Set([
+  ".c", ".cc", ".cpp", ".cs", ".css", ".csv", ".go", ".h", ".hpp", ".html", ".java",
+  ".js", ".json", ".jsx", ".md", ".mdc", ".mjs", ".py", ".rb", ".rs", ".sh", ".sql",
+  ".toml", ".ts", ".tsx", ".txt", ".xml", ".yaml", ".yml",
+]);
+const BARE_PATH_BASENAMES = new Set([
+  "readme",
+  "license",
+  "copying",
+  "notice",
+  "makefile",
+  "dockerfile",
+  "procfile",
+  "gemfile",
+  "rakefile",
+  "cmakelists.txt",
+  ".gitignore",
+  ".gitattributes",
+  ".npmrc",
+  ".editorconfig",
+]);
 
 function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -282,6 +306,11 @@ function validateEnvelope(envelope) {
 
   if (!isObject(envelope)) return ["envelope must be a JSON object"];
   if (envelope.schema_version !== SCHEMA_VERSION) errors.push(`schema_version must be ${SCHEMA_VERSION}`);
+  if (Object.prototype.hasOwnProperty.call(envelope, "skill_version")) {
+    if (!nonEmptyString(envelope.skill_version)) {
+      errors.push("skill_version must be a non-empty string when present");
+    }
+  }
   for (const field of requiredStrings) {
     if (!nonEmptyString(envelope[field])) {
       errors.push(`${field} must be a non-empty string`);
@@ -599,9 +628,107 @@ function passingGate(kind) {
   };
 }
 
+function looksLikeFilePath(value) {
+  if (typeof value !== "string") return false;
+  const trimmed = stripDigestSuffix(value.trim());
+  if (!trimmed) return false;
+  if (/^file:/i.test(trimmed)) return true;
+  if (trimmed.startsWith("./") || trimmed.startsWith("../")) return true;
+  if (trimmed.startsWith("/")) return true;
+  if (/^[A-Za-z]:[\\/]/.test(trimmed)) return true;
+  const basename = trimmed.split(/[\\/]/).pop().toLowerCase();
+  if (BARE_PATH_BASENAMES.has(basename)) return true;
+  if (!/[\\/]/.test(trimmed)) {
+    return !/\s/.test(trimmed) && BARE_PATH_EXTENSIONS.has(path.extname(trimmed).toLowerCase());
+  }
+  return BARE_PATH_EXTENSIONS.has(path.extname(trimmed).toLowerCase());
+}
+
+function stripDigestSuffix(value) {
+  return value.replace(/@[a-f0-9]{64}$/i, "");
+}
+
+function resolveRefPath(ref, baseDir) {
+  let value = stripDigestSuffix(ref.trim());
+  if (/^file:/i.test(value)) {
+    if (/^file:\/\//i.test(value)) {
+      try {
+        return fileURLToPath(value);
+      } catch {
+        // Fall through to the explicit legacy relative-file form below.
+      }
+    }
+    value = value.slice("file:".length);
+    try {
+      value = decodeURIComponent(value);
+    } catch {
+      // keep raw path when URI decoding fails
+    }
+  }
+  if (/^[A-Za-z]:[\\/]/.test(value) || value.startsWith("/")) {
+    return path.resolve(value);
+  }
+  return path.resolve(baseDir, value);
+}
+
+function validateRefPaths(envelope, baseDir) {
+  const errors = [];
+  if (!isObject(envelope)) return ["envelope must be a JSON object"];
+  const missing = [];
+  for (const field of ["artifact_refs", "evidence_refs"]) {
+    const refs = Array.isArray(envelope[field]) ? envelope[field] : [];
+    for (const [index, ref] of refs.entries()) {
+      if (!looksLikeFilePath(ref)) continue;
+      const resolved = resolveRefPath(ref, baseDir);
+      if (!fs.existsSync(resolved)) {
+        missing.push(`${field}[${index}]=${ref}`);
+      }
+    }
+  }
+  if (missing.length > 0) {
+    errors.push(`missing path refs: ${missing.join("; ")}`);
+  }
+  return errors;
+}
+
+function runCheckRefs(envelopePath, baseDir) {
+  let envelope;
+  try {
+    envelope = JSON.parse(fs.readFileSync(envelopePath, "utf8"));
+  } catch (error) {
+    console.error(`INVALID: cannot read JSON envelope: ${error.message}`);
+    return 2;
+  }
+  const structural = validateEnvelope(envelope);
+  if (structural.length > 0) {
+    for (const error of structural) console.error(`INVALID: ${error}`);
+    return 1;
+  }
+  const refErrors = validateRefPaths(envelope, baseDir);
+  if (refErrors.length > 0) {
+    for (const error of refErrors) console.error(`INVALID: ${error}`);
+    return 1;
+  }
+  console.log("VALID: structural envelope invariants and path refs passed; semantic evidence still requires review");
+  return 0;
+}
+
 function runSelfTest() {
   const cases = [];
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
+
+  const withSkillVersion = baseEnvelope();
+  withSkillVersion.skill_version = "2.2.0";
+  cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
+
+  const emptySkillVersion = baseEnvelope();
+  emptySkillVersion.skill_version = "   ";
+  cases.push({
+    name: "empty skill_version rejected",
+    envelope: emptySkillVersion,
+    valid: false,
+    expectedError: "skill_version must be a non-empty string when present",
+  });
 
   const fullRelease = baseEnvelope();
   fullRelease.mode = "full";
@@ -808,19 +935,154 @@ function runSelfTest() {
     console.log(`${passed ? "PASS" : "FAIL"} ${testCase.name}${errors.length ? `: ${errors.join("; ")}` : ""}`);
     failed ||= !passed;
   }
+
+    const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aql-envelope-refs-"));
+  try {
+    const existing = path.join(fixtureRoot, "present.txt");
+    fs.writeFileSync(existing, "ok\n", "utf8");
+    fs.writeFileSync(path.join(fixtureRoot, "README"), "# present\n", "utf8");
+    fs.writeFileSync(path.join(fixtureRoot, "README.md"), "# present\n", "utf8");
+    const goodEnvelope = baseEnvelope();
+    goodEnvelope.artifact_refs = ["./present.txt@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee"];
+    goodEnvelope.evidence_refs = ["focused-test@result"];
+    fs.writeFileSync(path.join(fixtureRoot, "good.json"), `${JSON.stringify(goodEnvelope, null, 2)}\n`, "utf8");
+    const badEnvelope = baseEnvelope();
+    badEnvelope.artifact_refs = ["./missing.txt"];
+    badEnvelope.evidence_refs = ["file:./also-missing.txt"];
+    fs.writeFileSync(path.join(fixtureRoot, "bad.json"), `${JSON.stringify(badEnvelope, null, 2)}\n`, "utf8");
+
+    const goodErrors = validateRefPaths(goodEnvelope, fixtureRoot);
+    const goodPassed = goodErrors.length === 0;
+    console.log(`${goodPassed ? "PASS" : "FAIL"} check-refs accepts existing path refs${goodErrors.length ? `: ${goodErrors.join("; ")}` : ""}`);
+    failed ||= !goodPassed;
+
+    const badErrors = validateRefPaths(badEnvelope, fixtureRoot);
+    const badPassed = badErrors.some((error) => error.includes("missing path refs"));
+    console.log(`${badPassed ? "PASS" : "FAIL"} check-refs rejects missing path refs${badErrors.length ? `: ${badErrors.join("; ")}` : ""}`);
+    failed ||= !badPassed;
+
+    const bareMissingEnvelope = baseEnvelope();
+    bareMissingEnvelope.artifact_refs = ["sub/missing.js@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee"];
+    const bareMissingErrors = validateRefPaths(bareMissingEnvelope, fixtureRoot);
+    const bareMissingPassed = bareMissingErrors.some((error) => error.includes("sub/missing.js@"));
+    console.log(`${bareMissingPassed ? "PASS" : "FAIL"} check-refs rejects missing bare relative digest path${bareMissingErrors.length ? `: ${bareMissingErrors.join("; ")}` : ""}`);
+    failed ||= !bareMissingPassed;
+
+    const barePresentEnvelope = baseEnvelope();
+    barePresentEnvelope.artifact_refs = ["README.md"];
+    const barePresentErrors = validateRefPaths(barePresentEnvelope, fixtureRoot);
+    const barePresentPassed = barePresentErrors.length === 0;
+    console.log(`${barePresentPassed ? "PASS" : "FAIL"} check-refs accepts present bare filename${barePresentErrors.length ? `: ${barePresentErrors.join("; ")}` : ""}`);
+    failed ||= !barePresentPassed;
+
+    const bareReadmeEnvelope = baseEnvelope();
+    bareReadmeEnvelope.artifact_refs = ["README"];
+    const bareReadmeErrors = validateRefPaths(bareReadmeEnvelope, fixtureRoot);
+    const bareReadmePassed = bareReadmeErrors.length === 0;
+    console.log(`${bareReadmePassed ? "PASS" : "FAIL"} check-refs accepts present bare README${bareReadmeErrors.length ? `: ${bareReadmeErrors.join("; ")}` : ""}`);
+    failed ||= !bareReadmePassed;
+
+    const missingBareReadmeEnvelope = baseEnvelope();
+    missingBareReadmeEnvelope.artifact_refs = ["missing/README"];
+    const missingBareReadmeErrors = validateRefPaths(missingBareReadmeEnvelope, fixtureRoot);
+    const missingBareReadmePassed = missingBareReadmeErrors.some((error) => error.includes("missing/README"));
+    console.log(`${missingBareReadmePassed ? "PASS" : "FAIL"} check-refs rejects missing bare README${missingBareReadmeErrors.length ? `: ${missingBareReadmeErrors.join("; ")}` : ""}`);
+    failed ||= !missingBareReadmePassed;
+
+    const missingLicenseEnvelope = baseEnvelope();
+    missingLicenseEnvelope.artifact_refs = ["sub/LICENSE@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee"];
+    const missingLicenseErrors = validateRefPaths(missingLicenseEnvelope, fixtureRoot);
+    const missingLicensePassed = missingLicenseErrors.some((error) => error.includes("sub/LICENSE@"));
+    console.log(`${missingLicensePassed ? "PASS" : "FAIL"} check-refs rejects missing bare LICENSE digest path${missingLicenseErrors.length ? `: ${missingLicenseErrors.join("; ")}` : ""}`);
+    failed ||= !missingLicensePassed;
+
+    const fileUriEnvelope = baseEnvelope();
+    fileUriEnvelope.artifact_refs = [`${pathToFileURL(existing).href}@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee`];
+    const fileUriErrors = validateRefPaths(fileUriEnvelope, fixtureRoot);
+    const fileUriPassed = fileUriErrors.length === 0;
+    console.log(`${fileUriPassed ? "PASS" : "FAIL"} check-refs accepts file URI with digest${fileUriErrors.length ? `: ${fileUriErrors.join("; ")}` : ""}`);
+    failed ||= !fileUriPassed;
+
+    const proseEnvelope = baseEnvelope();
+    proseEnvelope.artifact_refs = ["focused test passed after careful review"];
+    const proseErrors = validateRefPaths(proseEnvelope, fixtureRoot);
+    const prosePassed = proseErrors.length === 0;
+    console.log(`${prosePassed ? "PASS" : "FAIL"} check-refs ignores ordinary prose${proseErrors.length ? `: ${proseErrors.join("; ")}` : ""}`);
+    failed ||= !prosePassed;
+
+    const ordinaryWordEnvelope = baseEnvelope();
+    ordinaryWordEnvelope.artifact_refs = ["evidence"];
+    const ordinaryWordErrors = validateRefPaths(ordinaryWordEnvelope, fixtureRoot);
+    const ordinaryWordPassed = ordinaryWordErrors.length === 0;
+    console.log(`${ordinaryWordPassed ? "PASS" : "FAIL"} check-refs ignores ordinary words${ordinaryWordErrors.length ? `: ${ordinaryWordErrors.join("; ")}` : ""}`);
+    failed ||= !ordinaryWordPassed;
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+
   return failed ? 1 : 0;
 }
 
-function main() {
-  if (process.argv[2] === "--self-test") return runSelfTest();
-  const inputPath = process.argv[2];
-  if (!inputPath) {
-    console.error("Usage: node scripts/validate-envelope.js <envelope.json> | --self-test");
+function parseCliArgs(argv) {
+  const options = {
+    selfTest: false,
+    checkRefs: false,
+    baseDir: process.cwd(),
+    inputPath: null,
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--self-test") {
+      options.selfTest = true;
+      continue;
+    }
+    if (arg === "--check-refs") {
+      options.checkRefs = true;
+      continue;
+    }
+    if (arg === "--base") {
+      const value = argv[++index];
+      if (!value) throw new Error("--base requires a directory");
+      options.baseDir = path.resolve(value);
+      continue;
+    }
+    if (arg.startsWith("--base=")) {
+      options.baseDir = path.resolve(arg.slice("--base=".length));
+      continue;
+    }
+    if (arg.startsWith("-")) {
+      throw new Error(`Unknown argument: ${arg}`);
+    }
+    if (options.inputPath) throw new Error("Only one envelope path is supported");
+    options.inputPath = arg;
+  }
+  return options;
+}
+
+function main(argv = process.argv.slice(2)) {
+  let options;
+  try {
+    options = parseCliArgs(argv);
+  } catch (error) {
+    console.error(error.message);
+    console.error(
+      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+    );
     return 2;
   }
+
+  if (options.selfTest) return runSelfTest();
+  if (!options.inputPath) {
+    console.error(
+      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+    );
+    return 2;
+  }
+  if (options.checkRefs) return runCheckRefs(options.inputPath, options.baseDir);
+
   let envelope;
   try {
-    envelope = JSON.parse(fs.readFileSync(inputPath, "utf8"));
+    envelope = JSON.parse(fs.readFileSync(options.inputPath, "utf8"));
   } catch (error) {
     console.error(`INVALID: cannot read JSON envelope: ${error.message}`);
     return 2;

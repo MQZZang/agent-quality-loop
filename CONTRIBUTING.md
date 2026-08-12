@@ -24,17 +24,19 @@ Volume is the failure mode here, not tooling. One well-argued change beats five 
 
 The Cursor tree is authoritative. The Codex tree is generated.
 
+Each skill's adjacent `manifest.json` is the version and distribution source of truth. The public Node installer produces portable real-file snapshots and refuses to replace an existing junction; it does not create live links. Maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`, while Codex maintenance consumes snapshots from generated `.agents/skills/<name>`. Optional Cursor hooks are mechanical predicates, never semantic acceptance.
+
 1. Edit files under `.cursor/skills/` only. Never hand-edit `.agents/skills/` — it is overwritten.
-2. Regenerate the mirror and run the checks:
+2. Regenerate the mirror (and package manifests) and run the checks:
 
 ```bash
-./scripts/sync-skills.sh
+node scripts/sync-skills.js
 node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
 node scripts/validate-workflow.js
 git diff --check
 ```
 
-All of these must pass. CI runs the same validators and additionally fails if the mirror has drifted.
+All of these must pass. CI runs the same validators and additionally fails if the mirror has drifted (`node scripts/sync-skills.js --check`).
 
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
 

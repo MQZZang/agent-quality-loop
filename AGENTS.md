@@ -34,12 +34,16 @@ Use `$ask-plan-code-qa` or `$review-gate` directly only when deliberately bypass
 
 ## Tool Paths
 
+For the Windows-first installer, see [README.md](README.md#windows-first-install-recommended-on-windows); optional machine-decidable hook predicates are in [integrations/cursor-hooks](integrations/cursor-hooks/README.md).
+
 | Tool | Skill source |
 |---|---|
 | Cursor | `.cursor/skills/<name>/SKILL.md` |
 | Codex | `.agents/skills/<name>/SKILL.md` |
 
-Edit `.cursor/skills/` only, then run `./scripts/sync-skills.sh` to replace the Codex mirror. Never hand-edit `.agents/skills/`.
+The adjacent skill `manifest.json` is the version/distribution source of truth. Edit `.cursor/skills/` only, then run `node scripts/sync-skills.js` to replace the Codex mirror. Never hand-edit `.agents/skills/`; `scripts/sync-skills.sh` is deprecated compatibility only.
+
+The public installer makes portable real-file snapshots and refuses to replace an existing junction. A repository maintainer may manually map user Cursor skills to `.cursor/skills/<name>` with a live junction; Codex maintenance uses snapshots from generated `.agents/skills/<name>`. Optional Cursor hooks live in `integrations/cursor-hooks/` and never establish semantic acceptance.
 
 Cursor routing summaries live in `.cursor/rules/`:
 
@@ -51,6 +55,7 @@ Cursor routing summaries live in `.cursor/rules/`:
 
 ## Non-Negotiable Boundaries
 
+- Package non-negotiables: Style never escalates authority; No completion claim without evidence; Accepted is not released.
 - Translate requests into a user-observable goal, scope allowlist, preserved non-goals, and falsifiable success evidence.
 - Read before editing; prefer the smallest root-cause change; do not refactor unrelated surfaces.
 - Keep intent, assurance, and action authority independent. More rigor never grants more permission.
@@ -108,7 +113,7 @@ When a lower layer conflicts, preserve the higher layer and disclose the conflic
 After changing workflow files:
 
 1. Edit `.cursor/skills/` and any matching `.cursor/rules/`/human docs.
-2. Run `./scripts/sync-skills.sh`.
+2. Run `node scripts/sync-skills.js`.
 3. Run the Agent Quality Loop validator from its actual skill root:
 
    ```bash

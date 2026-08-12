@@ -5,21 +5,13 @@
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
+const { checkSkills } = require("./sync-skills");
+const { walkFiles } = require("./gen-manifest");
 
 const root = path.resolve(__dirname, "..");
 const cursorRoot = path.join(root, ".cursor", "skills");
 const codexRoot = path.join(root, ".agents", "skills");
 const errors = [];
-
-function walk(directory, base = directory) {
-  const files = [];
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...walk(absolute, base));
-    else files.push(path.relative(base, absolute).replaceAll(path.sep, "/"));
-  }
-  return files.sort();
-}
 
 for (const skill of ["agent-quality-loop", "ask-plan-code-qa", "review-gate", "skill-factory"]) {
   for (const skillsRoot of [cursorRoot, codexRoot]) {
@@ -29,18 +21,9 @@ for (const skill of ["agent-quality-loop", "ask-plan-code-qa", "review-gate", "s
   }
 }
 
-if (fs.existsSync(cursorRoot) && fs.existsSync(codexRoot)) {
-  const cursorFiles = walk(cursorRoot);
-  const codexFiles = walk(codexRoot);
-  if (JSON.stringify(cursorFiles) !== JSON.stringify(codexFiles)) {
-    errors.push("Cursor and Codex skill file lists differ; run scripts/sync-skills.sh");
-  } else {
-    for (const relativePath of cursorFiles) {
-      const left = fs.readFileSync(path.join(cursorRoot, relativePath));
-      const right = fs.readFileSync(path.join(codexRoot, relativePath));
-      if (!left.equals(right)) errors.push(`skill mirror differs: ${relativePath}`);
-    }
-  }
+const mirrorErrors = checkSkills({ root });
+for (const error of mirrorErrors) {
+  errors.push(`skill mirror/manifest: ${error}`);
 }
 
 for (const [skill, expected] of [
@@ -64,6 +47,7 @@ for (const rule of [
   "05-agent-quality-loop.mdc",
   "10-ask-plan-code-qa.mdc",
   "20-review-gate.mdc",
+  "30-skill-factory.mdc",
 ]) {
   if (!fs.existsSync(path.join(root, ".cursor", "rules", rule))) errors.push(`missing routing rule: ${rule}`);
 }
@@ -74,7 +58,7 @@ for (const relativePath of publicDocs) {
   if (!content.includes("agent-quality-loop")) errors.push(`${relativePath} does not name the public entry`);
 }
 
-for (const relativePath of walk(root)) {
+for (const relativePath of walkFiles(root)) {
   if (relativePath.startsWith(".git/")) continue;
   const extension = path.extname(relativePath).toLowerCase();
   if (![".md", ".mdc", ".js", ".yaml", ".yml", ".sh", ".ps1", ""].includes(extension)) continue;

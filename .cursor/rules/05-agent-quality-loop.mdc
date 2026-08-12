@@ -19,6 +19,8 @@ Route three axes independently:
 
 Select `ask-plan-code-qa` only as the bounded code implementation adapter and `review-gate` only as the read-only independent review adapter. Reuse the parent contract and emit one user-facing summary.
 
+- Package entry: adjacent `manifest.json` is version/distribution truth; routine ALIGN may start from `references/contract-presets.md`; optional mechanical hooks live in `integrations/cursor-hooks/` (never semantic acceptance).
+- Active loop summaries end with one Trust Badge (manifest version when readable); size output to the Ceremony Budget in `contracts.md`.
 - After ACCEPT/FAIL stop: lightweight RETRO may write project `lessons.md` (disclose diff); ALIGN injects active lessons; ACCEPT checks recidivism.
 - Native-medium artifacts (incl. code via behavior replay): final-consumer framing + cold consumer probe required for `user_observable_result` PASS; blind consumer only when (`formal` or experiential) and host has subagents; else acceptor cold-consumes before implementer narrative / honest `NOT_RUN`.
 - Multi-agent: divergence probe / blind consumer per host support; subagent output = evidence, not acceptance. `formal`/high-ambiguity creative: explicit ALIGN OK; disclose contradictions.

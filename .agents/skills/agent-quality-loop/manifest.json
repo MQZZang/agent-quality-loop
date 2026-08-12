@@ -1,0 +1,17 @@
+{
+  "name": "agent-quality-loop",
+  "version": "2.2.0",
+  "generated_at": "2026-08-12T04:00:16.324Z",
+  "files": {
+    "SKILL.md": "d685c1c7641aeb1549ca5eba31076f34f1125ac7d695d19e917e3ffcc3328e0d",
+    "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
+    "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
+    "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
+    "references/contracts.md": "c23f42d4d182502bf83c4085e51d9b14e96cdd9338c03966b521e10852f1446f",
+    "references/domain-profiles.md": "e9db2120b42295e7aca8716415759fd1d441d68e8df81e70d9e6fb0cb891e248",
+    "references/evaluation-cases.md": "d11627435526c19de29e7739f0829f5b694fe9e3beb20f6d7af9c28f794d09ea",
+    "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
+    "scripts/validate-envelope.js": "5ecfe5b1e71393a2f9d4683a20c593881fe09f72e9a5033ecdae4a41b3c2c253",
+    "scripts/validate-skill.js": "cbbbce41833caf3ef042e530ba7ac36f23d9604fd03ceeacb88755eb9391e844"
+  }
+}

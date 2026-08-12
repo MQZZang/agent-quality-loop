@@ -17,7 +17,13 @@ Treat `DEPLOYED` and `PRODUCTION_VERIFIED` as later facts, never synonyms for `R
 
 Keep the user's input natural. Extract structure on the agent side; do not make the user fill a long form. Ask only when an unresolved choice materially changes the goal, scope, risk, or external authority.
 
+Style never escalates authority. No completion claim without evidence. Accepted is not released.
+
+**Package entry:** The adjacent `manifest.json` is the version and distribution truth. Find the repository Node installer at `scripts/install.js` and optional Cursor hooks at `integrations/cursor-hooks/`; hooks check decidable mechanics only and never semantic acceptance.
+
 ## When to Use
+
+Before generating a Trust Badge, read the adjacent `manifest.json` version; if it is unreadable, make the badge unversioned.
 
 Use the description as the trigger source of truth. After triggering, select one mode from the Mode Router. Do not expand scope merely because the user asks for “全面、深度、根因、第一性、苏格拉底、奥卡姆、无盲区”. Translate those phrases into concrete controls from [contracts.md](references/contracts.md).
 
@@ -66,7 +72,8 @@ Infer `full` when a request explicitly combines local implementation with indepe
 
 Routing precedence:
 
-- `full` always has the stronger cap. If the same request says “publish/deploy”, finish at most through independent acceptance and return a release handoff; do not consume release authority inside `full`.
+- While an outcome-changing semantic or destructive ambiguity is unresolved (for example display versus data/capability deletion), route the current segment as `intent: align`, `mode: align`, `action_authority: read`. Preserve the eventual requested change in `raw_request`/goal fields; do not serialize `intent: implement`, `mode: align`.
+- `full` always has the stronger cap. If the same request says “publish/deploy”, route the current local segment as `intent: implement`, `mode: full`, with `release_intent: null`; finish at most through independent acceptance and return a release handoff. Only a later, explicit current-turn request may start `intent: release`, `mode: release`.
 - In `release`, distinguish read-only `preflight` from external `act`. Preflight does not require mutation authority. Act requires the complete, current-turn authorization in the release contract.
 - A read-only `evidence` request may finish at `EVIDENCED` with no next phase. Do not propose execution merely to fill a lifecycle field.
 - A request to run an unspecified admin/production command, even with `--dry-run`, starts in ALIGN/EVIDENCE until the exact command, targets, reachable paths, and authority are known.
@@ -95,7 +102,7 @@ Boundary: name in-scope and explicit do-not-touch surfaces.
 Most likely misunderstanding: name the highest-variance semantic or authority interpretation.
 ```
 
-Produce the compact contract defined in [contracts.md](references/contracts.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
+Produce the compact contract defined in [contracts.md](references/contracts.md). For routine task presets, see [contract-presets.md](references/contract-presets.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
 
 **Lessons:** Read `.ai/knowledge/lessons.md`; inject **active** entries only when that entry's `Applies when` matches this task into contract `assumptions` / `pause_conditions`. On mismatch, skip inject this round and mark one RETRO sentence `retire_candidate`. Merge/expire/revise via field-level patch only (never wholesale-rewrite `lessons.md`); mark `promoted` only after a rule/skill/script already shows an observable absorbing diff — otherwise keep `active`.
 
@@ -151,7 +158,7 @@ Pause on scope expansion, dirty-file collision, generated-source ambiguity, miss
 
 ### 4. ACCEPT — Run an independent goal-achievement review
 
-Use `review-gate` when its skill and required references are readable. The acceptor must be a fresh context or different role and must read the original contract, artifacts, diff, and raw evidence before the implementer's narrative. Record distinct implementer/acceptor context references and the evidence-reading order. If review-gate is unavailable or incomplete, record the dependency gap and use this skill's conjunctive dimension review in the independent context; do not imitate or claim a review-gate run. If independence cannot be evidenced, keep `phase: BUILT`, return `verdict: PENDING`, and never self-certify.
+Use `review-gate` when its skill and required references are readable. The acceptor must be a fresh context or different role and must read the original contract, artifacts, diff, and raw evidence before the implementer's narrative. Record distinct implementer/acceptor context references and the evidence-reading order. If review-gate is unavailable or incomplete, record the dependency gap and use **built-in conjunctive review** (first-class path, not a downgrade excuse) in the independent context; do not imitate or claim a review-gate run. If independence cannot be evidenced, keep `phase: BUILT`, return `verdict: PENDING`, and never self-certify. Acceptance output must disclose `acceptance_path` ∈ {`review-gate`, `built-in-conjunctive`, `none→PENDING`}.
 
 When `review-gate` is invoked, its output contract governs the review report. Use this skill only to map that verdict and evidence into lifecycle phase and dimension statuses; do not replace or duplicate `Review Scope`, applicable findings, `Verdict`, or `What Was Checked`.
 
@@ -203,13 +210,13 @@ Report readiness by dimension. `RELEASE_READY` does not mean `DEPLOYED`. After a
 
 ### 7. Maintain a resumable envelope
 
-Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. In normal user-facing output, lead with a plain-language result: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
+Maintain the envelope from [contracts.md](references/contracts.md) at every stopping point. Carry it through the [canonical carrier and optional cache](references/contracts.md#envelope-persistence-canonical-carrier-and-optional-cache), never a second lifecycle store. In normal user-facing output, lead with a plain-language result: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Keep the compact phase summary internal unless phase detail helps resolve a blocker, supports handoff/resume, governs release, or the user asks for it. Keep any emitted envelope source-backed and small enough to hand to a fresh task. A transcript or implementer summary is not a substitute.
 
 For resume, let the user say `continue <resume_ref>` in any language (for example `继续 <resume_ref>`); locate the latest valid envelope and artifact references automatically from the current task, workspace artifact, or available host persistence. Never require the user to copy YAML. For bare “继续上次任务”, use the sole unambiguous candidate; if multiple candidates exist, show at most three compact references and ask one choice. If no durable envelope is available or it has drifted, reconstruct read-only and ask only for missing outcome-changing information. An incomplete reconstruction stays read-only at or before `EVIDENCED`, reports `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize implementation, acceptance, or release.
 
 **Resume trust order:** Prefer reconstructible present reality — workspace/repo state, diff, file contents, validator or test exit codes, and durable knowledge files. Serialized envelopes, transcripts, plan files, and prior summaries are clues that need corroboration, not authority. When a remembered claim conflicts with present reality, keep reality, discard the claim, and disclose.
 
-**Minimal persistence surface:** The only facts that cannot be rebuilt from artifacts are negotiated agreements: first-principles goal, non-goals, options the user explicitly rejected, and disclosed contradiction resolutions. When work spans sessions and local write is authorized, persist that compact agreement in a host/project carrier already in use (for example a plan/todo artifact or a file under `.ai/knowledge/`), small enough that staleness is obvious. Do not create a parallel state store, event ledger, or authority protocol — unverified durable state is durable misinformation.
+**Minimal persistence surface:** The only facts that cannot be rebuilt from artifacts are negotiated agreements: first-principles goal, non-goals, options the user explicitly rejected, and disclosed contradiction resolutions. The canonical envelope is the sole lifecycle carrier/cache exception; do not create a second state store, event ledger, or authority protocol. Write its local cache only when `local_write` is authorized and the target permits or ignores it; otherwise keep the same envelope in available host persistence and/or the output handoff. Present workspace reality always outranks the cache.
 
 On “stop”, “pause”, scope correction, or revoked authority, stop scheduling new actions immediately and, when control returns, persist the structured stop action state: completed, still in flight, cancelled before start, external authority invalidation, and local-edit disposition. Return `PENDING` or `BLOCKED`, never PASS. Invalidate external authorization, clear active release intent/authorization, reduce effective authority to at most local write, preserve the last valid phase, and rebuild from the earliest changed phase before resuming. Never claim that an already completed side effect was cancelled. Keep completed local edits unless the user authorizes a revert; when they conflict with the narrowed scope, ask one explicit keep-or-revert question before further edits.
 
@@ -218,6 +225,8 @@ Before emitting a full envelope, resolve `SKILL_ROOT` as the directory containin
 ## Output Contract
 
 Lead with the result. Show only the structure needed for the active mode.
+
+When the loop is active, end every user-visible summary with exactly one [Trust Badge](references/contracts.md#trust-badge-user-facing-status-line). Size ritual output to the [Ceremony Budget](references/contracts.md#ceremony-budget).
 
 Use plain-language state labels by default: understood, evidence complete, implemented with self-QA, independently accepted, release-ready, deployed, or production-verified. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
 
@@ -296,6 +305,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Advisory-only findings downgrade a valid delivery to FAIL | Map by severity binding; advisory-only does not block an otherwise valid Proceed |
 | Reports a correction that changed nothing | Apply Repair delta; treat as unresolved until the next taker sees a different actionable state |
 | Silently switches routes, or hard-stops because the chosen route failed | Disclose the three-line Path change; goal/non-goal/authority changes return to ALIGN |
+| Ceremony exceeds the size of the change | Suggest assurance downgrade to the user |
 
 ## Evaluation Cases
 

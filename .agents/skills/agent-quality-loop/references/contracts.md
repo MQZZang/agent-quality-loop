@@ -11,8 +11,11 @@ Use this reference when compiling a new request, handing work to another task, o
 - [Observability Gate (ALIGN)](#observability-gate-align)
 - [Lifecycle Semantics and Legal Transitions](#lifecycle-semantics-and-legal-transitions)
 - [Phase Summary and Full Envelope](#phase-summary-and-full-envelope)
+- [Envelope Persistence (Canonical Carrier and Optional Cache)](#envelope-persistence-canonical-carrier-and-optional-cache)
+- [Trust Badge (User-Facing Status Line)](#trust-badge-user-facing-status-line)
 - [Envelope Consistency Check](#envelope-consistency-check)
 - [Formal Quality Rule](#formal-quality-rule)
+- [Ceremony Budget](#ceremony-budget)
 
 ## Task Contract
 
@@ -56,7 +59,17 @@ Keep the three routing axes independent:
 - `assurance` chooses evidence rigor: `fast` for trivial reversible work, `standard` by default, and `formal` for explicit formal-quality or high-consequence work.
 - `action_authority` limits side effects and is never raised by assurance, available credentials, installed tools, or a lifecycle phase.
 
+If an outcome-changing semantic or destructive ambiguity still requires user alignment, the active segment is `intent: align`, `mode: align`, `action_authority: read`, even when the raw request eventually asks for implementation. Preserve that eventual outcome in the request/goal fields; `intent: implement`, `mode: align` is not a legal route pair.
+
 Authority is mode-bounded: `align`, `evidence`, and `accept` are read-only; `execute` and `full` are at most `local_write`; release preflight is read-only; release act uses explicit release authority. A non-null `release_intent` is valid only with `intent: release` and `mode: release`; resume must reconstruct and obtain a new current-turn release request rather than consume old authority.
+
+For a compound request that combines local implementation/independent acceptance with publish or deploy language, serialize the current segment as `intent: implement`, `mode: full`, `release_intent: null`, and stop at most at `ACCEPTED`. Preserve the requested release as a handoff/non-goal, not as the active intent. A later explicit current-turn request starts the separate `intent: release`, `mode: release` route.
+
+### Delegated-Agent Authority Inheritance
+
+Any dispatched subagent's effective authority is at most the parent envelope's `action_authority`. The Dispatch Brief must state that ceiling explicitly. Needs that exceed the ceiling escalate upward; self-authorization is forbidden.
+
+**Delegation boundary:** Host routing rules choose who executes, how many agents, and which model. This contract only defines trust conditions at measurement points: probe/acceptor independence, Brief completeness, and evidence before narrative.
 
 `executor_adapter` is selected only after alignment and evidence. It receives the contract and may return at most a `BUILT` implementation receipt; it cannot grant acceptance or release authority.
 
@@ -217,6 +230,7 @@ Emit this at a handoff or stopping point:
 
 ```yaml
 schema_version: agent-quality-loop/v2
+skill_version: string, optional; from the package manifest
 contract_id: inherited contract id
 resume_ref: compact contract id plus workspace/artifact baseline reference
 intent: inherited current intent
@@ -304,7 +318,52 @@ Formal acceptance requires distinct non-empty context references, `relation` equ
 
 Rebuild the envelope after a baseline change, conflicting concurrent edit, evidence expiry, goal/scope change, or failed acceptance. Do not infer authority from an old envelope.
 
-Resume discovery order is: exact `resume_ref`; the only valid envelope in current task/host state; a workspace handoff artifact referenced by the task. The envelope must preserve every Task Contract field above under the same name; do not rely on undocumented aliases such as `goal` or `authority`. If no complete envelope is available, set `reconstruction_status: incomplete`, reconstruct read-only, and request only the missing outcome-changing information. An incomplete reconstruction remains at or before `EVIDENCED`, uses `action_authority: read`, returns `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize a transition from `EVIDENCED` to `BUILT`. Never promise persistence the host does not provide.
+Resume discovery order is: explicit `resume_ref`; the same canonical envelope in available host persistence or an output handoff; then its permitted local cache at `.agent-quality-loop/envelope.json`. The envelope must preserve every Task Contract field above under the same name; do not rely on undocumented aliases such as `goal` or `authority`. This discovery order is distinct from reality-first trust: when recovered content conflicts with observable current workspace reality, the observable reality wins. If no complete envelope is available, set `reconstruction_status: incomplete`, reconstruct read-only, and request only the missing outcome-changing information. An incomplete reconstruction remains at or before `EVIDENCED`, uses `action_authority: read`, returns `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize a transition from `EVIDENCED` to `BUILT`. Never promise persistence the host does not provide.
+
+## Envelope Persistence (Canonical Carrier and Optional Cache)
+
+The canonical envelope is the only permitted lifecycle carrier/cache exception. It may be carried in host persistence or the output handoff; do not create a parallel state store, event ledger, or authority record. Persist a local cache only when `action_authority` is at least `local_write` **and** the target workspace permits the path or ignores it. Otherwise, do not write a local file: hand off the same envelope through the available host/output channel.
+
+- Permitted local current-envelope cache: `<workspace>/.agent-quality-loop/envelope.json`.
+- Optional local history snapshot: `<workspace>/.agent-quality-loop/history/<contract_id>-<phase>-<timestamp-or-artifact-id>.json`. The suffix must be unique for every snapshot; never overwrite a same-phase snapshot or rely on same-name append.
+- Persist or hand off at every stopping point. The cache is a resumability aid, not authority or evidence; observable current workspace/repository reality always wins over it.
+- Consumer projects that choose this cache should add `.agent-quality-loop/` to `.gitignore`.
+
+## Trust Badge (User-Facing Status Line)
+
+When the loop is active, append exactly one badge line at the end of every user-visible summary:
+
+```text
+[AQL <version> | <state> | evidence: <short summary> | next: <action or none>]
+```
+
+`version` comes from the package `manifest.json` `version` field; if unreadable, use `unversioned`.
+
+Allowed `state` values (mapped from lifecycle phase / stop condition):
+
+| State | Maps from |
+|---|---|
+| `aligned` | `ALIGNED` |
+| `evidence-complete` | `EVIDENCED` |
+| `built, self-QA passed` | `BUILT` after self-QA |
+| `independently accepted` | `ACCEPTED` |
+| `release-ready` | `RELEASE_READY` |
+| `deployed` | `DEPLOYED` |
+| `production-verified` | `PRODUCTION_VERIFIED` |
+| `blocked` | blocked stop |
+| `pending` | pending stop |
+
+English example:
+
+```text
+[AQL 2.2.0 | independently accepted | evidence: all required dimensions PASS | next: none]
+```
+
+Chinese-scenario example (state words may be localized; syntax unchanged):
+
+```text
+[AQL 2.2.0 | 已独立验收 | evidence: 必选维度均 PASS | next: none]
+```
 
 ## Envelope Consistency Check
 
@@ -413,3 +472,13 @@ release_gate:
 ```
 
 Before release preflight, `release_gate` is `null`. After preflight begins, both gates remain in the envelope. `unknown`, `NOT_RUN`, and an empty list are never valid PASS evidence; `unknown`/`NOT_RUN` are also invalid for `not_applicable.evidence_ref`.
+
+## Ceremony Budget
+
+| Assurance | Ceremony allowed |
+|---|---|
+| `fast` | Badge line only; no other ritual output |
+| `standard` | Badge plus receipt essentials |
+| `formal` | Full required sections |
+
+When ceremony volume clearly exceeds the size of the change, proactively suggest an assurance downgrade to the user.

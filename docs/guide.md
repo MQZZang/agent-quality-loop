@@ -4,6 +4,8 @@
 
 The workflow exists to produce the user's observable outcome with the smallest sufficient scope, evidence, and authority. It is not a ritual checklist and does not require users to learn lifecycle YAML.
 
+For installation, use the [Windows-first entry](../README.md#windows-first-install-recommended-on-windows): the public CLI makes portable real-file snapshots and refuses existing junctions. Repository maintainers may manually keep Cursor live through a junction to `.cursor/skills/<name>`; Codex maintenance installs from generated `.agents/skills/<name>` snapshots. Optional deterministic predicates are documented in [Cursor hooks](../integrations/cursor-hooks/README.md), and never constitute semantic acceptance.
+
 ## Architecture
 
 ```text
@@ -27,6 +29,16 @@ agent-quality-loop
 | Authority | read / local write / explicit external action | What side effects are allowed now? |
 
 Formal assurance never raises authority. Credentials being available never grant permission.
+
+## Three invariants
+
+- Style never escalates authority — rigor and polish do not raise `action_authority`.
+- No completion claim without evidence — pass/done requires firsthand evidence this turn.
+- Accepted is not released — `ACCEPTED` is not deploy permission.
+
+Example trust badge: `[AQL 2.2.0 | built, self-QA passed | evidence: 3 commands exit 0 | next: independent acceptance]`
+
+For routine tasks, start from the prefilled snippets in `.cursor/skills/agent-quality-loop/references/contract-presets.md` (data, not new modes) to keep ALIGN short.
 
 ## Lifecycle
 
@@ -156,7 +168,7 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 ## Maintenance
 
 1. Edit `.cursor/skills/` only.
-2. Sync to `.agents/skills/`.
+2. Run `node scripts/sync-skills.js` to sync to `.agents/skills/` (`scripts/sync-skills.sh` is deprecated compatibility only).
 3. Run structural validators.
 4. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
 5. Obtain an independent review before declaring formal acceptance.

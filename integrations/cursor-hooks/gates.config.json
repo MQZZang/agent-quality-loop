@@ -1,0 +1,10 @@
+{
+  "_readme": "JSON has no real comments. See README.md § gates.config.json. Adjust writeTools / externalWriteCommandPattern without editing gate scripts when possible.",
+  "writeTools": [
+    "Write",
+    "Delete",
+    "EditNotebook",
+    "StrReplace"
+  ],
+  "externalWriteCommandPattern": "(git\\s+push|gh\\s+(pr\\s+create|release)|npm\\s+publish|yarn\\s+publish|pnpm\\s+publish|vercel|netlify|kubectl\\s+apply|terraform\\s+apply|aws\\s+|gcloud\\s+|az\\s+)"
+}

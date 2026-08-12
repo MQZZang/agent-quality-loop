@@ -8,7 +8,11 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -16,13 +20,21 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Manifest generation safety regression cases
+        run: node scripts/gen-manifest.js --self-test
+
+      - name: Installer routing and atomic-preflight regression cases
+        run: node scripts/install.js --self-test
+
       - name: Skill package structure and envelope regression cases
         run: node .cursor/skills/agent-quality-loop/scripts/validate-skill.js
 
       - name: Routing, adapter policies, and public docs
         run: node scripts/validate-workflow.js
 
-      # scripts/sync-skills.sh rewrites the mirror, so CI compares instead of syncing:
-      # a drifted mirror must fail the build, not be silently repaired.
+      - name: Cursor hooks protocol tests
+        run: node integrations/cursor-hooks/test.js
+
+      # sync-skills.js --check compares mirrors and manifest hashes without rewriting.
       - name: Codex mirror matches the Cursor source
-        run: diff -qr .cursor/skills .agents/skills
+        run: node scripts/sync-skills.js --check

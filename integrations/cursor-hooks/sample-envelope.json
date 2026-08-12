@@ -1,0 +1,14 @@
+{
+  "_fixture_note": "Hooks-only fixture; not a valid AQL envelope.",
+  "schema_version": "agent-quality-loop/v2",
+  "contract_id": "sample-hooks-test",
+  "intent": "implement",
+  "assurance": "standard",
+  "mode": "full",
+  "action_authority": "read",
+  "phase": "BUILT",
+  "verdict": "PENDING",
+  "evidence_refs": [],
+  "first_principles_goal": "Sample envelope for cursor-hooks gate tests",
+  "scope_allowlist": ["integrations/cursor-hooks"]
+}
