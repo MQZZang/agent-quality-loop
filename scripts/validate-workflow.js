@@ -285,6 +285,17 @@ for (const rule of [
 
 }
 
+const aqlRulePath = path.join(root, ".cursor", "rules", "05-agent-quality-loop.mdc");
+if (fs.existsSync(aqlRulePath)) {
+  const aqlRule = fs.readFileSync(aqlRulePath, "utf8");
+  if (!aqlRule.includes("adaptive user result summary")) {
+    errors.push("05-agent-quality-loop.mdc must route the adaptive parent-owned user result summary");
+  }
+  if (aqlRule.includes("Trust Badge")) {
+    errors.push("05-agent-quality-loop.mdc must not require the legacy Trust Badge");
+  }
+}
+
 
 
 const publicDocs = ["AGENTS.md", "README.md", "docs/guide.md"];

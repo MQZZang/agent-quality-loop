@@ -15,6 +15,8 @@ Compact lookup for Adapter Router and ACCEPT. Pick the narrowest matching domain
 3. At ACCEPT, run the domain probe when the artifact is consumable in its native medium; bind the probe result to `user_observable_result`. If a real device/environment is required and unavailable, status is `NOT_RUN` with disclosure - never a text-only substitute.
 4. Route EXECUTE to the narrowest adapter/skill for the domain; lifecycle ownership stays in `agent-quality-loop`.
 
+Writing work uses [writing-collaboration-adapter.md](writing-collaboration-adapter.md) for drafting behavior, then keeps the consumer perspective and probe from the applicable row below. Mixed writing lists each domain and the governing consumer; document/presentation host skills still own file creation, rendering, and format validation.
+
 ## Domain Table
 
 | Domain | Consumer perspective | Probe method | Finished-quality baseline | Canonical dimension mapping |

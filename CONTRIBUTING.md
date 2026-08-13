@@ -43,6 +43,8 @@ All of these must pass. CI runs `node scripts/validate-all.js`, which includes m
 
 If you add evaluation cases, update any README `N evaluation cases` claim to match — `validate-claims.js` fails on drift. Evidence honesty for host/longitudinal claims: [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
 
+Corpus-derived rules must also pass `node scripts/validate-corpus-claims.js --claims <claims.json> --inventory <inventory.json>`. File-inventory coverage and semantic-claim coverage are separate: never report a complete hash inventory as complete understanding. Each accepted principle needs a source hash and page/span locator, mechanism, applicability boundary, counterexample, and integration target. Public availability is not license proof; keep excerpts short and research outputs outside the distributed Skill unless runtime use is necessary.
+
 For a read-only install/workspace health dump (not a CI gate for dirty consumer trees): `node scripts/aql-doctor.js` / `--json`. It must not be used to auto-delete envelope history, seed `~/.ai/knowledge`, or enable hooks.
 
 3. If you add or change a rule, add or update a case in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). A rule with no case is a rule nobody can tell is broken.
@@ -77,6 +79,7 @@ Three entry points that need no prior context, in rising order of effort:
 - Enforcement mechanisms for the semantic gates. Deterministic hooks can check that a procedure ran; they cannot check that a judgment was right, and attaching them to a quality gate produces ritual compliance. See the reasoning recorded in `.ai/knowledge/lessons.md`.
 - New required output sections. The package already fights verbosity.
 - Rules that restate an existing rule in different words.
+- Hidden user scores, psychological/brain diagnoses, engagement rewards, learned rankers/bandits/embeddings, or a second lifecycle/event/profile store without a separately accepted architecture and evidence case.
 
 ## Reporting a problem
 

@@ -1208,7 +1208,7 @@ function runSelfTest() {
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
 
   const withSkillVersion = baseEnvelope();
-  withSkillVersion.skill_version = "2.6.1";
+  withSkillVersion.skill_version = "2.7.0";
   cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
 
   const emptySkillVersion = baseEnvelope();

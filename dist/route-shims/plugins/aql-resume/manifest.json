@@ -1,9 +1,9 @@
 {
   "name": "aql-resume",
-  "version": "2.6.1",
-  "generated_at": "2026-08-12T14:17:55.393Z",
+  "version": "2.7.0",
+  "generated_at": "2026-08-13T12:42:04.154Z",
   "files": {
-    "SKILL.md": "f5b1a177b4a949711777d1cebdf55c846123e23fe35dc4523ff4b04f01fe6e79",
+    "SKILL.md": "ae465f8f9a6b40b6ec439c54b6335e89d5be26f7e7571f1b1b057cbd3500e33a",
     "agents/openai.yaml": "b10d81ca5580835a2f516618ed88395e1d23aaabaf0058b0470e90559f7d6cf3"
   },
   "depends_on": [

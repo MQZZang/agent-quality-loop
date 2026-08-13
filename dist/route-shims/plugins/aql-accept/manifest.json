@@ -1,9 +1,9 @@
 {
   "name": "aql-accept",
-  "version": "2.6.1",
-  "generated_at": "2026-08-12T14:17:55.393Z",
+  "version": "2.7.0",
+  "generated_at": "2026-08-13T12:42:04.154Z",
   "files": {
-    "SKILL.md": "7efb5b22c654659e0d55013c713eb61d8d258b2a603007e2acff92d9959a36b3",
+    "SKILL.md": "148a8e29569fc18320573de20dfff538353b4077e568b31da433d54870b95ab3",
     "agents/openai.yaml": "4429328e6acb739413c03064c2780530a899b2aa33b687422a7e8b4dd4bd943d"
   },
   "depends_on": [

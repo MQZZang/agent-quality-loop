@@ -1,22 +1,23 @@
 {
   "name": "agent-quality-loop",
-  "version": "2.6.1",
-  "generated_at": "2026-08-12T14:49:28.520Z",
+  "version": "2.7.0",
+  "generated_at": "2026-08-13T12:42:07.965Z",
   "files": {
-    "SKILL.md": "e15abb82567568868e4df022f1afbd61835105d9a4133278ceee741bfa5bcb37",
+    "SKILL.md": "a1dd09cc3175effa21b3f921e1cbcb413ac3c4534d356bec6c3f6bdba1bf2abe",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
-    "references/alignment-compiler.md": "d77e218fb825331357a80d16ccf8ad9839213a5668b863fb9877623eb546dd11",
+    "references/alignment-compiler.md": "c18e4bd94abc62866def3a6165c32d7a81f546236bd226afb20355c240414734",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "424d41cb3da6776e09a0c1bb5e659a62e132658d34b53023fc03a97df20e94ed",
-    "references/domain-profiles.md": "e9db2120b42295e7aca8716415759fd1d441d68e8df81e70d9e6fb0cb891e248",
-    "references/evaluation-cases.md": "4256c8eae5010eebae60ad12ec169aec0cd7c2799ef6b6c6bb07ee6295371e2b",
+    "references/contracts.md": "a2b7ca854e4bff2b5fb4f48940fba4967d75509a60f175106bd6b18b7b62f2e5",
+    "references/domain-profiles.md": "d30527d06e2f73640bbd6e81d6ea80db2aea6ab5766c9b983a89cf08dba42d68",
+    "references/evaluation-cases.md": "d580da4982b939cd9712aa9784c70e2f41115962f216dcf5075b78e4b039303d",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
-    "references/personalization.md": "a76b33f143b8a2e8c2bc0aa70f98fe8631afb832812cc21820ee5119a2bad9dd",
-    "scripts/aql-envelope.js": "60b0d787e53b5c80230b26e38e3ccb17283d95628b803ce70da5b78f184cb71c",
-    "scripts/aql-stats.js": "c65000c87d5bfb9fe33166be080668a5dc7c26079ee01206b2f4cb6ab4f63163",
+    "references/personalization.md": "db837355f011d332e4a24334fb9d7089af68da1259120f87714b37d9ef9a021d",
+    "references/writing-collaboration-adapter.md": "11aa8b064504884576680b6b571a754e2729a0b0185f1d23aa7796c590be4fe4",
+    "scripts/aql-envelope.js": "8bf0e19452bee36d56c23957f5f81877e2d9fcff8bea2fdb7645514439f0a9f3",
+    "scripts/aql-stats.js": "3fff2d60e7e031cacab6c7ba5c3f5362b6f6ae06694b58a7b2d297e8d25e5242",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
-    "scripts/validate-envelope.js": "fa82effbb0bd908f7362a0d1a9b2dce4a18e122435864bb8804f41dba70a7a19",
-    "scripts/validate-skill.js": "29b112e98e17a9af09887db50b5b700785fb6dafe02b9cf92a026687972d0c41"
+    "scripts/validate-envelope.js": "dfdbc25aba17534e08b2ca3fdbbed22297f16649e3d5b365dccad27c892d0eb4",
+    "scripts/validate-skill.js": "42cfc37aaf78290369955b478ce153aa22472bf1c08e74e1e12d4e23d014e8cc"
   }
 }

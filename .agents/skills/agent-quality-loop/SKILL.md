@@ -1,17 +1,19 @@
 ---
 name: agent-quality-loop
-description: Use when a user wants an AI coding or workspace agent to turn a natural-language objective into a scoped first-principles task, diagnose evidence, implement through the appropriate domain adapter, independently verify formal completion, prepare a release, or resume work without goal drift. Routes task intent, assurance level, and action authority separately; supports align, evidence, execute, accept, release, and safe local full workflows. Trigger on phrases such as end-to-end, full root-cause analysis, turn this into a clear goal, production quality, independently accept this, resume the last task, prepare a release — or their equivalent in any language, for example 完整闭环、全面根因分析、转化为清晰目标、正式质量、独立验收、继续上个任务、准备发布 — or explicit $agent-quality-loop use. Do not use for trivial factual Q&A or casual brainstorming with no execution or acceptance workflow.
+description: Use when a user wants an AI coding or workspace agent to turn natural language into a scoped first-principles task, diagnose evidence, implement through a domain adapter, collaborate on evidence-bound or creative writing, independently verify formal completion, prepare a release, or resume without goal drift. Routes intent, assurance, and authority separately; supports align, evidence, execute, accept, release, and safe local full workflows with transparent user-controlled preference/growth defaults. Trigger on phrases such as end-to-end, root-cause analysis, turn this into a clear goal, write or revise this with audience/source boundaries, independently accept this, resume the last task, prepare a release — or equivalents such as 完整闭环、全面根因分析、转化为清晰目标、协作写作或改稿、独立验收、继续上个任务、准备发布 — or explicit $agent-quality-loop use. Do not use for trivial factual Q&A or casual brainstorming with no execution or acceptance workflow.
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.6.1"
+  version: "2.7.0"
 ---
 
 # Agent Quality Loop
 
 ## Purpose
 
-Compile the user's natural language into a stable task contract, then move work through explicit trust boundaries:
+Act as a user-sovereign cognitive collaboration compiler: translate natural language into a stable, source-grounded task contract while preserving the user's authority and the AI's professional solution space. “Cognitive” means observable and falsifiable intent-to-outcome reasoning, never neuroscience, mind-reading, personality diagnosis, or hidden psychological scoring.
+
+Then move work through explicit trust boundaries:
 
 ```text
 RAW -> ALIGNED -> EVIDENCED -> BUILT -> ACCEPTED -> RELEASE_READY
@@ -27,7 +29,7 @@ Style never escalates authority. No completion claim without evidence. Accepted 
 
 ## When to Use
 
-Before generating a Trust Badge, read the adjacent `manifest.json` version; if it is unreadable, make the badge unversioned.
+Before showing build identity, read the adjacent `manifest.json` version. Treat it only as the package contract version; for a dirty or unreleased artifact, also report the actual HEAD plus dirty/diff identity instead of presenting the package version as the exact build.
 
 Use the description as the trigger source of truth. After triggering, select one mode from the Mode Router. Do not expand scope merely because the user asks for “全面、深度、根因、第一性、苏格拉底、奥卡姆、无盲区”. Translate those phrases into concrete controls from [contracts.md](references/contracts.md).
 
@@ -98,6 +100,7 @@ When `full` and publish/deploy language conflict, explain the local-only cap in 
 Select an executor only after ALIGN and EVIDENCE. The lifecycle contract stays owned here; the adapter owns domain execution only.
 
 - Code implementation: read [code-implementation-adapter.md](references/code-implementation-adapter.md); an installed `ask-plan-code-qa` may implement the same contract in `embedded` profile.
+- Writing or revision: read [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). It classifies the writing job and truth mode, keeps fixed/guided/open space visible, and selects a task-local `deliver` | `co-create` | `coach` posture. `coach` requires an explicit user request; posture is an existing source-backed assumption, not a new route or envelope field.
 - Documents, data, design, cloud, or other domains: use the narrowest applicable domain skill and require the same adapter receipt; pick domain probes via [domain-profiles.md](references/domain-profiles.md).
 - No suitable adapter: use the minimal generic plan/execute/self-QA loop; do not pretend a missing domain capability exists.
 
@@ -117,7 +120,7 @@ Most likely misunderstanding: name the highest-variance semantic or authority in
 
 Produce the compact contract defined in [contracts.md](references/contracts.md). For routine task presets, see [contract-presets.md](references/contract-presets.md). Distinguish display, data, capability, rollout, and release changes. Resolve discoverable doubts through read-only inspection. Ask at most two questions only when the answer changes direction and cannot be derived safely.
 
-**Alignment compiler:** For non-trivial goals, follow [alignment-compiler.md](references/alignment-compiler.md) — observable after-state (not activity verbs alone), current-to-target gap, full-scope evidence coverage, grounded context without fabrication, and material questions only. Ordinary Q&A / low-risk execute / plan-only stays on normal AQL routing; ALIGN still emits only the existing contract fields (no parallel goal ceremony).
+**Alignment compiler:** For non-trivial goals, follow [alignment-compiler.md](references/alignment-compiler.md) — observable after-state (not activity verbs alone), current-to-target gap, full-scope evidence coverage, grounded context without fabrication, material cognitive layers only, and bidirectional traceability across fixed constraints, guided choices, and open AI space. Ordinary Q&A / low-risk execute / plan-only stays on normal AQL routing; ALIGN still emits only the existing contract fields (no parallel goal ceremony).
 
 **Grounding:** The request's description of the system is itself a hypothesis — users often cannot name the real need. Verify its load-bearing referents (named files, behaviors, terms) read-only before the contract freezes, per the [grounding ladder](references/contracts.md#grounding-ladder): environment first, authoritative sources over model memory for external facts (record source and date), the user last; depth per the ladder's tier rule. A premise contradicted by observation is a contradiction: disclose it **before any edit** — never fabricate the missing referent, and resolve in the open toward the user-observable outcome (silently retargeting a different file is still a silent resolution). A requested mechanism compiles as that outcome plus an `assumptions` entry, never as the goal itself.
 
@@ -125,7 +128,7 @@ Produce the compact contract defined in [contracts.md](references/contracts.md).
 
 **ALIGN note:** When a lesson, profile, preset, domain profile, probe, or route is actually applied, record stable version-bound refs in envelope `injected_refs`.
 
-**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching **active** phrase-lexicon and preference defaults per [personalization.md](references/personalization.md); To Confirm candidates are not applied. The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority.
+**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching **active** phrase-lexicon and preference defaults per [personalization.md](references/personalization.md); To Confirm candidates are not applied. The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority. Writing preferences are narrow, context-qualified defaults. Growth Focus lives in the same profile, is explicit-confirm-only, and is a practice intention—not evidence of growth or a reason to enter `coach`.
 
 **Observability gate:** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
 
@@ -160,7 +163,7 @@ When the host supports it, parallelize read-only probe leaves per [multi-agent-l
 
 ### 3. EXECUTE — Make the smallest authorized local change
 
-Require `ALIGNED` and `EVIDENCED`, either supplied or reconstructed. For code, follow [code-implementation-adapter.md](references/code-implementation-adapter.md); if `ask-plan-code-qa` is available, use its compatible `embedded` profile. The adapter consumes the existing contract, skips duplicate alignment output, and returns only its implementation receipt. This skill owns lifecycle phase, assurance, evidence authority, and external-authority boundaries. Emit one combined user-facing summary, not parallel templates. When dispatching sub-executors, use that adapter's Dispatch Brief with the contract as the single source of truth.
+Require `ALIGNED` and `EVIDENCED`, either supplied or reconstructed. For code, follow [code-implementation-adapter.md](references/code-implementation-adapter.md); if `ask-plan-code-qa` is available, use its compatible `embedded` profile. For prose, follow [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md); actual document/presentation creation, rendering, and format validation remain with the narrow host artifact skill. The adapter consumes the existing contract, skips duplicate alignment output, and returns only its implementation receipt. This skill owns lifecycle phase, assurance, evidence authority, and external-authority boundaries. Emit one combined user-facing summary, not parallel templates. When dispatching sub-executors, use that adapter's Dispatch Brief with the contract as the single source of truth.
 
 Before editing:
 
@@ -215,7 +218,7 @@ Lightweight post-ACCEPT harvest; not a lifecycle phase and not part of the envel
 
 **Sources (priority):** review-gate findings > mid-task user corrections > `scope_deviations` > failing/`NOT_RUN` patterns.
 
-**Output:** 0–3 lesson candidates (`trigger` / root cause / rule / evidence / `scope: project|global`), plus 0–2 collaboration-profile candidates (phrase lexicon / preferences) sedimented per [personalization.md](references/personalization.md) tiers. If none, one sentence—no ceremony.
+**Output:** at most 3 total harvest candidates across lessons and the collaboration profile; at most 2 may be profile candidates. Each lesson carries `trigger` / root cause / rule / evidence / `scope: project|global`; profile candidates follow [personalization.md](references/personalization.md) tiers. A Growth Focus uses the profile lane and requires explicit user confirmation. If none, one sentence—no ceremony.
 
 **Write:** `project` + `local_write` → write `.ai/knowledge/lessons.md` and disclose the diff; `global` or read-only → candidates pending confirmation. Follow that file's lesson rules. Harvested lessons follow the Output Contract **Repair delta** rule.
 
@@ -247,9 +250,9 @@ Before emitting a full envelope, resolve `SKILL_ROOT` as the directory containin
 
 Lead with the result. Show only the structure needed for the active mode.
 
-When the loop is active, end every user-visible summary with exactly one [Trust Badge](references/contracts.md#trust-badge-user-facing-status-line). Size ritual output to the [Ceremony Budget](references/contracts.md#ceremony-budget).
+When the loop is active, lead with exactly one adaptive [User Result Summary](references/contracts.md#user-result-summary). The parent AQL owns that summary; adapters return receipts and never emit a parallel lifecycle/status block. Size detail to the [Result Detail Budget](references/contracts.md#result-detail-budget).
 
-Use plain-language state labels by default (Chinese preferred in Chinese scenarios): 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Never blur adjacent states with vague 完成 / 全部完成 / 正式完成 / 已验收可发布. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
+Preserve this information priority: collaboration conclusion → completed work → incomplete work and reason → user impact → whether the user must act → completion standard. This is a semantic order, not a mandatory long Markdown template: omit empty sections and compress routine success. Use plain-language state labels by default (Chinese preferred in Chinese scenarios): 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Never blur adjacent states with vague 完成 / 全部完成 / 正式完成 / 已验收可发布. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
 
 Deep work does not require verbose output. Default limits are:
 
@@ -258,6 +261,8 @@ Deep work does not require verbose output. Default limits are:
 - `execute`: changed surfaces, passing/failing/not-run evidence, and next phase;
 - `accept`: verdict first, then only decision-changing findings and dimension statuses;
 - `release`: expand as needed for safety, authority, rollback, and manual checks.
+
+`fast` / routine success normally fits 1–3 lines. `standard` gives the conclusion, decision-changing evidence, and only a necessary next step. `formal`, `FAIL`, `BLOCKED`, `PENDING`, handoff/resume, and release expand enough to expose the exact phase/verdict, incomplete evidence, artifact identity when relevant, and the executable completion standard.
 
 Exceed these limits only when evidence is genuinely necessary for a decision or the user explicitly requests a full artifact.
 
@@ -296,11 +301,14 @@ For `full`, proceed through safe local phases without asking for ritual approval
 - [ ] Release requires exact current-turn authority and real post-action verification.
 - [ ] The final envelope can resume work without reading the entire transcript.
 - [ ] Routine output is plain-language and low-noise; internal phases expand only for blockers, handoff, release, or explicit request.
+- [ ] The parent AQL emits exactly one adaptive user result summary at the start; adapters emit receipts only, and routine success is not forced through a long template.
 - [ ] Execution adapters return at most `BUILT`; formal acceptance and release remain owned by this lifecycle.
 - [ ] Full envelopes pass the deterministic structural validator when available.
 - [ ] Full handoff envelopes pass field, enum, reference, mode-phase, and release-authorization consistency checks.
 - [ ] Native-medium artifacts get a declared-perspective consumer probe before `user_observable_result` can PASS; contradictions are disclosed in ALIGN, not silently resolved.
 - [ ] Profile-learned preferences tighten but never loosen contract floors, evidence requirements, or authority.
+- [ ] Writing work declares one primary writing job, a canonical truth mode, and a separate source-handling strategy; it preserves fixed constraints while leaving guided and open professional choices genuinely open.
+- [ ] Current-artifact quality and longitudinal user growth are reported separately; `NOT_RUN` longitudinal evidence blocks any claim that growth is proven.
 
 ## Failure Modes
 
@@ -318,6 +326,7 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Forces a read-only diagnosis toward implementation | End at `EVIDENCED` with `next_allowed_phase: null` |
 | Continues after stop, scope correction, or revoked authority | Stop new actions, invalidate authority, report in-flight effects, and rebuild |
 | Repeats ask-plan or review-gate output | Keep one internal envelope and one user-facing summary; reuse the invoked skill's required sections |
+| Replaces the old machine status line with a new fixed long Markdown form | Preserve the result information priority, but omit empty sections and scale detail by assurance and verdict |
 | Uses formal assurance for every task | Select the lowest sufficient assurance; reserve independent acceptance for explicit or high-consequence needs |
 | Treats a code workflow as the universal executor | Route to the narrowest domain adapter and require the common implementation receipt |
 | Trusts prose alone for structural gates | Run the bundled envelope validator; block invalid handoffs or release states |
@@ -327,6 +336,8 @@ For `full`, proceed through safe local phases without asking for ritual approval
 | Advisory-only findings downgrade a valid delivery to FAIL | Map by severity binding; advisory-only does not block an otherwise valid Proceed |
 | Reports a correction that changed nothing | Apply Repair delta; treat as unresolved until the next taker sees a different actionable state |
 | Records a permission-like “preference” (auto-push, skip acceptance) | Refuse via the personalization firewall; authority needs a current-turn request |
+| Treats “brain-level” as mind-reading, personality scoring, or unsupported neuroscience | Translate it into observable cognitive layers, sources, assumptions, and falsifiable outcomes |
+| Turns every writing task into a lesson or fixed template | Default to `deliver`, keep ordinary work at `BUILT`, and use `coach`/Growth Focus only after explicit user choice |
 | Fabricates a missing referent, or discloses a premise mismatch only after editing | Ground named referents before the freeze; disclosure precedes any edit or wider search |
 | Silently switches routes, or hard-stops because the chosen route failed | Disclose the three-line Path change; goal/non-goal/authority changes return to ALIGN |
 | Ceremony exceeds the size of the change | Suggest assurance downgrade to the user |

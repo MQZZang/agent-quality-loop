@@ -103,7 +103,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `git log -1 --format=%H` against the commit named in the report, then a fresh `sha256sum` of each shipped `manifest.json` against the report's value
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-12
+**Last fired:** 2026-08-13
 **Applies when:** Writing or trusting acceptance, release-readiness, or install-parity claims for artifacts that get regenerated, committed, or installed after verification
 
 ### 2026-08-11 — A repository's publishable surface is larger than its working tree
@@ -139,7 +139,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** Read cases 37 and 38 in `.cursor/skills/agent-quality-loop/references/evaluation-cases.md` side by side, then `integrations/cursor-hooks/README.md` and `node integrations/cursor-hooks/test.js`; any mechanism that cannot separate the cases cannot serve as a semantic quality gate
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-11
+**Last fired:** 2026-08-13
 **Applies when:** Evaluating runtime hooks, harness-level enforcement, or any deterministic pre/post-action gate as a way to strengthen this suite's quality loop
 
 ### 2026-08-11 — Reconcile external research against this repo before it becomes a plan item
@@ -175,5 +175,5 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** Re-run the same blinded probe from `references/evaluation-cases.md` on one flagship + one mid + one budget executor; compare invariant compliance and mode-label variance across the three transcripts
 **Scope:** project
 **Status:** active
-**Last fired:** never
+**Last fired:** 2026-08-13
 **Applies when:** Forward-testing changes to agent-quality-loop, its adapters, or references before declaring them accepted

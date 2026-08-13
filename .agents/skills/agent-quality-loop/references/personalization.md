@@ -5,6 +5,8 @@ How this skill fits ALIGN compile and ACCEPT expectations to the specific user o
 ## Contents
 
 - [Learnable Lanes](#learnable-lanes)
+- [Writing Collaboration Preferences](#writing-collaboration-preferences)
+- [Growth Focus](#growth-focus)
 - [Never Learn (Authority Firewall)](#never-learn-authority-firewall)
 - [Observation Triggers](#observation-triggers)
 - [Candidate Bootstrap (Missing Profile)](#candidate-bootstrap-missing-profile)
@@ -22,6 +24,8 @@ How this skill fits ALIGN compile and ACCEPT expectations to the specific user o
 | Phrase lexicon | Recurring words → operational meaning **only after** a user-confirmed personal dictionary entry (never a universal default) | *if confirmed for this user:* “验收” → independent accept, read-only — bare “验收” alone is **not** globally fixed |
 | Communication | Language, output density, structure preference, badge verbosity | conclusions in Chinese; terse summaries |
 | Collaboration habits | Question threshold, scope posture, acceptance-strictness preferences, decision habits | at most one question per turn; always run the counterexample |
+| Writing collaboration preferences | Narrow, context-qualified defaults for working on prose | audience and medium; source strictness; feedback density; explicitly confirmed posture default |
+| Growth focus | An explicitly chosen transferable capability and observable behavior to practice over time | make causal claims traceable to sources in technical briefs |
 | Rejected options | Project-scoped, confirm-first stable rejections the user does not want re-proposed | do not re-propose Redis for this project's cache layer |
 | Route aliases | Confirm-first phrase → one of the fixed route ids below (personal mapping only; not a universal default) | *only after explicit confirm:* “帮我过一遍” → `accept` |
 
@@ -29,13 +33,37 @@ Adaptation targets ALIGN (compile fidelity) and ACCEPT (expectation fit). Do not
 
 Phrase lexicon fires **only** for `active` entries the user has confirmed (or second-hit promoted under the sedimentation rules). Until then, do not treat colloquial words such as “验收” as if they already mean a fixed route or lifecycle phase.
 
+## Writing Collaboration Preferences
+
+Writing preferences are stable collaboration defaults, not execution recipes. Keep each entry narrow and context-qualified: record the applicable audience, medium or task class, and only constraints such as source strictness, feedback density, or collaboration posture. Do not store fixed templates, mandatory voice/structure, or instructions that would make unrelated artifacts converge on one style.
+
+The task-local writing posture is `deliver` | `co-create` | `coach`. It remains a source-backed contract assumption for the current task. Do not profile a task-local posture unless the user explicitly confirms it as a stable default; `coach` is never inferred or promoted from repeated behavior. A matching active preference constrains the collaboration, but the agent should still vary structure and voice to fit the artifact, audience, and evidence.
+
+Recommended fields: `preference`, `value`, `scope`, `source`, `status`, and `last_fired`. Use `candidate` for the first write and do not apply it in that turn.
+
+## Growth Focus
+
+Growth Focus lives in this same collaboration profile; do not create a learner model, exposure log, event database, or second profile. Each item must name:
+
+- a transferable `capability` and an `observable_behavior`;
+- a bounded `scope`, user-selected `collaboration_posture` or `agent_support`, `source`, `status`, `last_fired`, and `review_or_expiry`;
+- when reviewed longitudinally, an `outcome` of `PILOT` | `PASS` | `FAIL` | `NOT_RUN`, linked to existing envelope history, adapter receipts, or evidence.
+
+A Growth Focus is a user-controlled practice intention, not evidence that the user or agent has improved. Do not create one from observed performance or an agent suggestion alone: the user must explicitly choose or confirm the focus. It is never second-hit inferred, and a candidate never activates in its creation turn. `NOT_RUN` means no longitudinal conclusion may be claimed. Keep current-work quality separate: judge the present artifact against its contract and evidence whether or not a growth focus fired.
+
+Outcome associations are descriptive only. Do not score, rank, run bandit-style optimization, embed, or infer capability from them, and do not optimize for engagement. The user may inspect, override, edit, archive, or delete every entry.
+
+When a matching active writing preference or Growth Focus actually affects a task, record its stable, version-bound profile reference in the existing envelope `injected_refs`. Associate a later outcome only with readable evidence whose envelope/receipt contains that reference; absence of the reference is `unknown`, not proof that the profile had no effect. Never copy raw prompts into the profile to create this association.
+
 ## Never Learn (Authority Firewall)
 
 Refuse to record, and never apply, any "preference" that would:
 
 - raise `action_authority` or pre-authorize external writes, deploys, publication, or destructive actions ("he always lets me push" is not learnable);
 - weaken the three invariants, skip acceptance evidence, or lower a required dimension's bar;
-- store secrets, credentials, or personal data beyond collaboration behavior;
+- treat the profile as authority, task evidence, acceptance evidence, or proof of longitudinal growth;
+- store secrets, credentials, raw prompts, or third-party personal data;
+- infer or store identity claims, psychological diagnoses, engagement goals, or hidden capability scores;
 - generalize a one-off emotional reaction or a single occurrence;
 - convert “don't ask push permission” / standing release language into standing authority.
 
@@ -69,7 +97,7 @@ When a qualifying observation arrives and no `collaboration-profile.md` exists y
 2. Write **only** under **To Confirm**.
 3. **Must not** apply the entry as an active preference in the same turn.
 4. Record at minimum: lane, proposed value, scope, source/task ref, observed date, `status: candidate`.
-5. Promote to active only after a **second independent task** shows the same signal, **or** the user explicitly confirms — except **rejected options** and **route aliases**, which require **explicit confirmation only** (no second-hit promote).
+5. Promote to active only after a **second independent task** shows the same signal, **or** the user explicitly confirms — except **rejected options**, **route aliases**, writing posture (especially `coach`), and **Growth Focus**, which require **explicit confirmation only** (no second-hit promote). Even an explicitly stated first-write candidate does not apply in its creation turn.
 6. Read-only sessions: emit the candidate in the turn output / envelope only — **no file write**.
 7. Authority-shaped content hits the firewall **before** write; refuse in one line.
 8. Field-level patch only; never wholesale-rewrite the profile.
@@ -104,9 +132,9 @@ Hard constraints:
 
 | Tier | Lanes | Write rule |
 |---|---|---|
-| Candidate-first | Phrase lexicon, communication, collaboration habits, rejected options, route aliases | First qualifying observation → To Confirm with `status: candidate`; do not apply as active the same turn |
-| Confirm / second-hit promote | Phrase lexicon, communication, collaboration habits (low-risk prefs only) | Promote to `active` after explicit user confirm **or** a second independent task with the same signal; disclose the promotion in one line |
-| Explicit confirm only | Rejected options, route aliases | Promote to `active` **only** after explicit user confirmation of the mapping — repeated mentions alone never auto-promote |
+| Candidate-first | Phrase lexicon, communication, collaboration habits, writing preferences, Growth Focus, rejected options, route aliases | First qualifying observation → To Confirm with `status: candidate`; do not apply as active the same turn |
+| Confirm / second-hit promote | Phrase lexicon, communication, collaboration habits, narrow writing preferences (low-risk prefs only; excludes posture) | Promote to `active` after explicit user confirm **or** a second independent task with the same signal; disclose the promotion in one line |
+| Explicit confirm only | Rejected options, route aliases, writing posture, Growth Focus | Promote to `active` **only** after explicit user confirmation — repeated mentions alone never auto-promote; never apply in the candidate-creation turn |
 | Never | Firewall list above; any authority-shaped or evidence-lowering “preference” | Do not write, do not apply; when the user's words implied one, state the refusal in one line — forever refuse, no sedimentation |
 
 Read-only sessions emit candidates in the turn summary / envelope instead of writing. Creating a missing profile file is allowed only to hold To Confirm candidates under `local_write` — never to activate defaults in the create turn.
@@ -116,6 +144,8 @@ Read-only sessions emit candidates in the turn summary / envelope instead of wri
 1. The explicit current-turn instruction — always wins.
 2. Matching **active** profile entries — applied as defaults. Lexicon / alias entries fire only in their recorded sense; a quoted title or unrelated context is a mismatch: skip and do not update `last_fired`. Candidates under To Confirm are not applied.
 3. Generic skill defaults.
+
+This order also governs writing preferences and Growth Focus. An active entry supplies a default or practice constraint only; it never supplies authority, evidence, or acceptance. Record `last_fired` only when the scope actually matched and the entry affected the contract.
 
 On a conflict between the turn instruction and an active profile entry, follow the instruction and do not rewrite the profile from one conflict; on the second consistent conflict, propose the update under To Confirm.
 
@@ -153,7 +183,8 @@ Rules:
 ## Hygiene
 
 - Every entry carries `source` (`observed` | `confirmed`), `status` (`candidate` | `active` | `archived`), and `last_fired` (`YYYY-MM-DD` | `never`). Candidates use `last_fired: never` until promoted and first applied.
+- RETRO may harvest at most **3 total candidates across lessons plus the profile**; at most **2** may be profile candidates. Growth Focus uses this profile lane and does not add another quota.
 - Same decay rule as lessons: an `active` entry not fired for 90 days, or mismatched across the 10 most recent injection windows, moves to `archived` (kept for manual revival, no longer applied). Candidates that sit unconfirmed may be dropped or left under To Confirm; they are never auto-applied by age.
-- Prefer at most 15 active lexicon/alias entries and 10 active preference entries; merge near-duplicates before adding.
+- Prefer at most 15 active lexicon/alias entries and 10 active preference/Growth Focus entries; merge near-duplicates before adding.
 - Field-level patch only; never rewrite the profile wholesale.
 - Keep entries plain language, host- and model-agnostic: the profile must mean the same thing to any agent that reads it.

@@ -14,6 +14,7 @@ Natural-language request
 agent-quality-loop
   ├─ align/evidence
   ├─ execute → ask-plan-code-qa adapter → BUILT receipt
+  ├─ write   → writing collaboration adapter → BUILT receipt
   ├─ accept  → review-gate adapter → independent verdict
   └─ release → read-only preflight → separately authorized action
 ```
@@ -36,8 +37,7 @@ Formal assurance never raises authority. Credentials being available never grant
 - No completion claim without evidence — pass/done requires firsthand evidence this turn.
 - Accepted is not released — `ACCEPTED` is not deploy permission.
 
-Example trust badge (ordinary implement terminal): `[AQL 2.6.1 | implemented with self-QA passed | evidence: 3 commands exit 0 | next: none]`  
-Explicit independent-accept request example: `[AQL 2.6.1 | independently accepted | evidence: required dimensions PASS | next: none]`
+The parent workflow starts with exactly one adaptive user result summary. Routine implementation success is normally 1–3 natural-language lines: conclusion plus the decisive self-QA evidence, with no empty headings. Formal acceptance, failure, blocking, pending evidence, handoff/resume, and release expand enough to show phase/verdict, user impact, missing evidence, required action, completion standard, and exact dirty artifact identity when relevant. Adapters return receipts only and never add a second status summary.
 
 For routine tasks, the workflow starts from the prefilled presets in the skill's `references/contract-presets.md` (data, not new modes) to keep ALIGN short — this is automatic; there is nothing for the user to open or fill.
 
@@ -56,7 +56,7 @@ RAW → ALIGNED → EVIDENCED → BUILT → ACCEPTED
 - Diagnosis may end at `EVIDENCED`.
 - Implementation self-QA ends at `BUILT`.
 - Formal acceptance requires a fresh-context reviewer with separation evidence reading raw evidence first.
-- After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest 0–3 lesson candidates and 0–2 collaboration-profile candidates; not a new phase.
+- After ACCEPT (including FAIL) or a FAIL/BLOCKED stop, a lightweight RETRO may harvest at most 3 total candidates across lessons and the profile (at most 2 profile candidates); not a new phase.
 - `RELEASE_READY` is not deployment permission.
 - After deployment, active release authority is cleared; only historical evidence remains.
 
@@ -80,6 +80,7 @@ Personalization:
 - ALIGN reads `.ai/knowledge/collaboration-profile.md` when present: phrase-lexicon and preference defaults apply, the current turn's explicit instruction wins, and learned preferences never raise authority.
 - Missing profile: first-candidate bootstrap may create the file and write **only** under To Confirm; candidates are not standing authority and must not apply the same turn.
 - RETRO may sediment observed candidates per the skill's `references/personalization.md` — auto tier disclosed in one line, decision-changing habits confirm-first, permission-like items refused.
+- Narrow writing preferences and Growth Focus live in that same file. Posture and Growth Focus are explicit-confirm-only; they do not prove growth, trigger coaching, or become acceptance evidence. Outcomes remain separate `PILOT` / `PASS` / `FAIL` / `NOT_RUN` observations derived from existing receipts/evidence, never a hidden reward or second event store.
 - User-level knowledge (`~/.ai/knowledge/…`) is explicit opt-in only; never default-read or default-write.
 
 Envelope cache, refs, and stats:
@@ -89,6 +90,7 @@ Envelope cache, refs, and stats:
 
 Alignment compiler and routes:
 - Non-trivial ALIGN follows `references/alignment-compiler.md` inside the existing contract — not a second workflow. External `goal-prompt` is design/eval inspiration only (not vendored, not a runtime dependency).
+- Its cognitive layers are observable intent-to-outcome diagnostics, not neuroscience or mind-reading. It compiles only material layers and preserves fixed constraints, guided choices, and open AI strategy with bidirectional source traceability.
 - Optional `--suite routes` installs explicit-only shims from `dist/route-shims/` plus the compatible `agent-quality-loop` parent (not in default discovery trees). **Uninstall manually** by deleting installed folders. `aql-accept` does not by itself create independence on every host. Codex: `$aql-diagnose …`; Cursor/Claude: `/aql-diagnose …`. See [route-shims README](../integrations/route-shims/README.md).
 - External write hooks: exact `execution_plan` match → host-native **ask** only (never AQL auto-allow). Envelope authorization fields are not current tool consent. See [cursor-hooks README](../integrations/cursor-hooks/README.md).
 - Stats: qualified associations require valid ordered snapshots; exposures union the contract timeline; current phase is max `snapshot.sequence`. Observable/falsifiable association, not causal proof.
@@ -122,6 +124,8 @@ Review, repair, and path:
 | `full：修复、验收并直接发布` | explain full cap; no publish; produce separate release handoff |
 | `停，缩小范围并撤销发布权限` | stop new actions; invalidate external authority; rebuild alignment |
 | `继续上次任务` | locate/validate envelope; incomplete reconstruction remains read-only |
+| `直接给我成稿，不要教学` | writing adapter, `deliver`, source/truth boundary, stop at BUILT |
+| `这次我想练开头` | writing adapter, explicit task-local `coach`, bounded scaffold and usable artifact |
 
 ## Semantic Safety
 
@@ -168,6 +172,13 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 
 ## Adapter Boundaries
 
+### writing-collaboration-adapter
+
+- Applies to drafting, revision, editorial, persuasive, factual, interpretive, fictional, and hybrid prose after the parent contract is aligned/evidenced.
+- Selects one primary job from nine reader/author outcomes, one of four canonical truth modes, and a separate source-handling strategy; it also declares fixed/guided/open space and a task-local `deliver`, `co-create`, or explicit `coach` posture.
+- Host document/presentation skills own file creation, rendering, layout, and format validation; domain profiles own consumer/cold-read acceptance.
+- Returns the canonical receipt with `result_phase` at most `BUILT`. One artifact is not longitudinal growth evidence.
+
 ### ask-plan-code-qa
 
 - Standalone only when explicitly invoked.
@@ -183,6 +194,45 @@ Inspect dry-run implementation path by path. A flag is not proof that initializa
 - Embedded by agent-quality-loop for independent acceptance.
 - Read-only; reports Review Scope, evidence-backed findings with severity, Verdict, and What Was Checked. QA Review checks ruler integrity against the post-ALIGN frozen contract.
 - Does not repair reviewed work or duplicate the parent's lifecycle summary.
+
+## Project-level install
+
+The bundled installer writes user-level skills only. For Cursor project rules, `AGENTS.md`, and knowledge templates, copy these paths into the target project:
+
+- `.cursor/` (rules + skills) — required for Cursor
+- `.agents/` (Codex skill mirror) — skip if you only use Cursor
+- `AGENTS.md`
+- `.ai/knowledge/` — optional; copy the two templates **and rename them**:
+
+| Copy from this repo | Save in your project as | Holds |
+|---|---|---|
+| `.ai/knowledge/project-context.template.md` | `.ai/knowledge/project-context.md` | Verified facts about your project |
+| `.ai/knowledge/collaboration-profile.template.md` | `.ai/knowledge/collaboration-profile.md` | How you prefer an agent to work with you |
+
+If the target already has `.cursor/rules/` or `.cursor/skills/`, copy file by file rather than replacing the directory. Do **not** copy this repository’s `lessons.md`; it is maintenance history from this package, not a starter file for your project. `prompt-patterns.md` is maintainer reference only.
+
+The public installer makes portable real-file snapshots and refuses to replace an existing junction. Repository maintainers may keep Cursor live through a manually managed junction to `.cursor/skills/<name>`; Codex maintenance consumes generated `.agents/skills/<name>` snapshots. These are deployment conventions, not extra installer modes.
+
+Optional local envelope cache (requires `local_write` or higher):
+
+```bash
+node scripts/aql-envelope.js --workspace <project-dir> --input envelope.json
+```
+
+From an installed skill, invoke the packaged writer via `SKILL_ROOT`, never relative to the project working directory. Whether to gitignore `.agent-quality-loop/` is the consumer’s choice.
+
+### Legacy Codex skill-installer
+
+The bundled installer already covers Codex user-level skills (`--to agents`). This path exists only for people who already use **skill-installer**, a separate tool not shipped here. Ask it to install repository `MQZZang/agent-quality-loop`, ref `master`, from:
+
+```text
+.agents/skills/agent-quality-loop
+.agents/skills/ask-plan-code-qa
+.agents/skills/review-gate
+.agents/skills/skill-factory
+```
+
+The installer does not overwrite existing skill directories; remove or back up an older installation deliberately first.
 
 ## Maintenance
 
