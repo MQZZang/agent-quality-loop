@@ -12,10 +12,10 @@ Use this reference when compiling a new request, handing work to another task, o
 - [Lifecycle Semantics and Legal Transitions](#lifecycle-semantics-and-legal-transitions)
 - [Phase Summary and Full Envelope](#phase-summary-and-full-envelope)
 - [Envelope Persistence (Canonical Carrier and Optional Cache)](#envelope-persistence-canonical-carrier-and-optional-cache)
-- [Trust Badge (User-Facing Status Line)](#trust-badge-user-facing-status-line)
+- [User Result Summary](#user-result-summary)
 - [Envelope Consistency Check](#envelope-consistency-check)
 - [Formal Quality Rule](#formal-quality-rule)
-- [Ceremony Budget](#ceremony-budget)
+- [Result Detail Budget](#result-detail-budget)
 
 ## Task Contract
 
@@ -358,43 +358,59 @@ The canonical envelope is the only permitted lifecycle carrier/cache exception. 
 - Persist or hand off at every stopping point. The cache is a resumability aid, not authority or evidence; observable current workspace/repository reality always wins over it.
 - Consumer projects that choose this cache should add `.agent-quality-loop/` to `.gitignore`.
 
-## Trust Badge (User-Facing Status Line)
+## User Result Summary
 
-When the loop is active, append exactly one badge line at the end of every user-visible summary:
+When the loop is active, the parent AQL leads with exactly one adaptive result summary. It translates the current envelope and adapter receipts into user-facing meaning; adapters never emit a competing phase/status summary. The summary follows this priority:
 
-```text
-[AQL <version> | <state> | evidence: <short summary> | next: <action or none>]
+1. collaboration conclusion;
+2. what the AI completed;
+3. what remains incomplete and why;
+4. the practical user impact;
+5. whether the user must act;
+6. the observable completion standard;
+7. phase, verdict, build identity, hashes, commands, and other audit detail only when they change a decision or support formal evidence.
+
+This is an information grammar, not a fixed long template. Omit empty sections. Routine success is normally one natural-language conclusion plus one evidence line; standard work adds only decision-changing evidence and a necessary next step. Expand formal, `FAIL`, `BLOCKED`, `PENDING`, handoff/resume, and release results. A useful expanded shape is:
+
+```markdown
+## Result: {plain-language conclusion}
+
+{Whether the requested outcome was reached and what that means to the user.}
+
+**Completed**
+
+- {Only material completed work.}
+
+**Still incomplete**
+
+- {Required gap and reason.}
+
+**User impact**
+
+{Practical impact, or omit when none.}
+
+**Next step**
+
+{Owner + minimum action, only when action is required.}
+Completion standard: {observable evidence that changes the verdict.}
 ```
 
-`version` comes from the package `manifest.json` `version` field; if unreadable, use `unversioned`.
+Apply these semantic rules:
 
-Allowed `state` values (mapped from lifecycle phase / stop condition). Prefer Chinese labels in Chinese scenarios; `next: none` is normal for legitimate terminals:
+- Known product defect → title says not passed / needs repair and `verdict: FAIL`.
+- Missing independent evidence while the result remains undecidable → pending evidence and `verdict: PENDING`.
+- Missing input, environment, authority, or another external prerequisite that prevents the required action/decision → blocked and `verdict: BLOCKED`.
+- “No issue was found” is bounded observation, not proof that no user is affected. Preserve the observed scope and do not upgrade an absence of detected evidence into a universal no-impact claim.
+- `NOT_RUN` is a dimension/evidence status, never a lifecycle phase. Never write “lifecycle: BLOCKED”.
+- No legal next action → omit the section or say no action is required; do not render an internal null as user-facing `next: none`.
+- `BLOCKED` / `PENDING` must expose the canonical reason, unlock owner, minimum action, side effects not taken, and observable completion standard.
+- Do not use pipe-delimited machine strips, user-facing `evidence:` / `next:` keys, color-only meaning, emoji arrays, pills, CSS/HTML, dashboards, wide tables, or top-of-response statistics cards.
+- Put full commands, absolute paths, hashes, and transcripts under later evidence detail instead of the first screen.
+- Prefer the user's language. Chinese results should not mix unnecessary English machine keys into the primary reading path.
 
-| State (EN) | State (ZH) | Maps from |
-|---|---|---|
-| `aligned` | `已对齐` | `ALIGNED` |
-| `evidence conclusion complete` | `证据结论完成` | `EVIDENCED` |
-| `implemented with self-QA passed` | `实现与自检通过` | `BUILT` after self-QA |
-| `independent quality acceptance passed` | `独立质量验收通过` | `ACCEPTED` |
-| `release preflight passed` | `发布准备检查通过` | `RELEASE_READY` |
-| `deployed` | `已发布` | `DEPLOYED` |
-| `production result verified` | `生产结果已验证` | `PRODUCTION_VERIFIED` |
-| `blocked` | `已阻塞` | blocked stop |
-| `pending` | `待处理` | pending stop |
+Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-English example:
-
-```text
-[AQL 2.6.1 | independent quality acceptance passed | evidence: all required dimensions PASS | next: none]
-```
-
-Chinese-scenario example (state words may be localized; syntax unchanged):
-
-```text
-[AQL 2.6.1 | 独立质量验收通过 | evidence: 必选维度均 PASS | next: none]
-```
-
-Other common Chinese terminals with `next: none`: `证据结论完成`, `实现与自检通过`, `发布准备检查通过`. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean published package may show `AQL 2.6.1`. A dirty/unreleased artifact must say, for example, `local unreleased build (based on AQL 2.6.1; HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 
@@ -505,12 +521,12 @@ release_gate:
 
 Before release preflight, `release_gate` is `null`. After preflight begins, both gates remain in the envelope. `unknown`, `NOT_RUN`, and an empty list are never valid PASS evidence; `unknown`/`NOT_RUN` are also invalid for `not_applicable.evidence_ref`.
 
-## Ceremony Budget
+## Result Detail Budget
 
-| Assurance | Ceremony allowed |
+| Assurance / result | Detail allowed |
 |---|---|
-| `fast` | Badge line only; no other ritual output |
-| `standard` | Badge plus receipt essentials |
-| `formal` | Full required sections |
+| `fast` / routine success | 1–3 lines; no empty headings or internal enum dump |
+| `standard` | Conclusion, decision-changing evidence, and a necessary next step |
+| `formal`, failure, blocker, pending, handoff/resume, release | Expanded summary with required audit/evidence boundaries |
 
-When ceremony volume clearly exceeds the size of the change, proactively suggest an assurance downgrade to the user.
+When result ceremony clearly exceeds the size of the change, compress the rendering without lowering the inherited assurance or evidence bar.

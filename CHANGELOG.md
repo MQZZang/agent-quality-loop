@@ -4,7 +4,10 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+- Parent-owned adaptive user results replace the mandatory pipe-delimited status line: routine success compresses, formal/failure/handoff/release expands, dirty artifacts bind exact identity, and adapters remain receipt-only. Writing now uses nine distinct jobs plus four canonical truth modes; source handling is a separate axis. Probe validation separates structure, identity, and independent semantic grade, retains P-W6 as FAIL, and checks local claim anchors.
 - Terminal adaptive value (post-2.6.1 baseline): four legal terminals (EVIDENCED / BUILT / ACCEPTED / RELEASE_READY) may stop with `next_allowed_phase: null`; ALIGN Boundary states the turn terminal; user-visible Chinese status language tightened; bare「验收」disambiguation (not default publish); evaluation cases 66–73; adaptive host-probe / pilot docs remain screening or NOT_RUN until live transcripts exist. Package version still 2.6.1 until a later release.
+- Cognitive collaboration + writing vertical: observable material cognitive layers, fixed/guided/open traceability, one writing adapter with truth modes and task-local deliver/co-create/explicit-coach posture, same-profile Writing Preferences + Growth Focus, and evaluation cases 74–82. Corpus research remains bounded to a read-only inventory and 14 traceable claims; no new lifecycle, route, authority source, ranker, embedding profile, or event store. Longitudinal writing growth remains NOT_RUN.
+- Public README rewritten around user-visible collaboration results (shared checkable goal, evidence, stop reason, and separate release authority). Writing remains the first vertical, not the product boundary. Current bytes stay Unreleased; package manifests still declare 2.6.1.
 
 ## 2.6.1 — 2026-08-12
 

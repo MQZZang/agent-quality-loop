@@ -22,6 +22,7 @@ const requiredFiles = [
   "references/evaluation-cases.md",
   "references/multi-agent-leverage.md",
   "references/personalization.md",
+  "references/writing-collaboration-adapter.md",
   "manifest.json",
   "scripts/validate-envelope.js",
   "scripts/validate-skill.js",
@@ -201,7 +202,55 @@ if (fs.existsSync(skillPath)) {
     }
   }
   if (skill.split(/\r?\n/).length > 500) errors.push("SKILL.md exceeds 500 lines");
+  if (!skill.includes("references/contracts.md#user-result-summary")) {
+    errors.push("SKILL.md must link the parent-owned User Result Summary contract");
+  }
 }
+
+function requireAll(relativePath, requiredTerms, forbiddenTerms = []) {
+  const absolutePath = path.join(root, relativePath);
+  if (!fs.existsSync(absolutePath)) return;
+  const content = fs.readFileSync(absolutePath, "utf8");
+  for (const term of requiredTerms) {
+    if (!content.includes(term)) errors.push(`${relativePath}: missing contract term ${JSON.stringify(term)}`);
+  }
+  for (const term of forbiddenTerms) {
+    if (content.includes(term)) errors.push(`${relativePath}: forbidden legacy term ${JSON.stringify(term)}`);
+  }
+}
+
+requireAll("references/contracts.md", [
+  "## User Result Summary",
+  "1–3 lines",
+  "local unreleased build",
+  "## Result Detail Budget",
+], ["## Trust Badge", "[AQL <version> |"]);
+
+requireAll("references/writing-collaboration-adapter.md", [
+  "inform",
+  "explain",
+  "decide",
+  "persuade",
+  "instruct",
+  "teach",
+  "entertain",
+  "express",
+  "author-tool",
+  "evidence-bound factual",
+  "interpretive",
+  "creative fictional",
+  "hybrid",
+  "Choose source handling separately",
+]);
+
+requireAll("references/evaluation-cases.md", [
+  "## 83.",
+  "## 84.",
+  "## 85.",
+  "## 86.",
+  "## 87.",
+  "## 88.",
+]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");
 if (fs.existsSync(metadataPath)) {

@@ -15,6 +15,8 @@ After material workflow, contract, or boundary changes, first run the bundled `s
 - Cases 56–61: profile candidate bootstrap, non-qualifying observations, firewall, rejected options, route aliases, and user-level opt-in
 - Cases 62–65: route-alias explicit confirm, repeated-mention non-promote, title-quote no-fire, push-permission firewall wording
 - Cases 66–73: ordinary typo → BUILT; ordinary bug no auto-ACCEPTED; fix+independent accept no release; release-check only; proportionate quality check; bare 验收 clarify; no proactive release after ACCEPTED; formal high-consequence evidence bar
+- Cases 74–82: writing intent compile, factual/creative truth modes, deliver/co-create/coach postures, profile/growth safety, cross-agent freedom, and falsifiable cognitive language
+- Cases 83–88: nine writing jobs, interpretive/hybrid truth, parent-owned adaptive results, native narrow/desktop readability, and exact artifact/ruler integrity
 - [Skill-Level Acceptance](#skill-level-acceptance)
 
 ## 1. Happy Path — Narrow Local Fix
@@ -735,9 +737,11 @@ Scenario B: the user says “这个项目以后都不要再提 Redis 做缓存.�
 Expected behavior:
 
 - Scenario A: keep the rejection in envelope `non_goals` only; no profile write.
-- Scenario B: may create a To Confirm candidate under Rejected Options (project-scoped); promote only after confirm or second independent hit; never infer standing rejection from a single non-choice; never store push-permission language here.
+- Scenario B: may create a To Confirm candidate under Rejected Options (project-scoped); only an explicit user confirmation may promote it to active. A second independent hit without explicit confirmation remains a candidate; never infer standing rejection from silence/non-choice and never store push-permission language here.
 
-Fail when a one-task rejection is promoted to the profile, when a standing rejection is inferred from silence/non-choice, or when rejected-options becomes an authority channel.
+Negative repeat: two later tasks independently reject Redis again but never explicitly confirm a standing preference. The entry remains To Confirm and is not applied as an active default.
+
+Fail when a one-task rejection is promoted to the profile, when repeated hits auto-promote it, when a standing rejection is inferred from silence/non-choice, or when rejected-options becomes an authority channel.
 
 ## 60. Route Alias — Fixed Ids and No Authority Raise
 
@@ -922,6 +926,218 @@ Expected behavior:
 
 **Fail when** the agent lowers the required evidence bar, skips independence, or grants `ACCEPTED` from same-context self-QA to reduce ceremony on a high-consequence task.
 
+## 74. Ambiguous Writing Goal — Compile the Reader Change
+
+User request:
+
+> 帮我写一篇爆款文章。
+
+Expected behavior:
+
+- Do not treat “爆款” as a measurable outcome or invent a viral formula.
+- Ground or ask at most one **single compact question** for the material missing choice among consumer, medium, and the change the artifact should cause. A numbered list with separate answers for multiple missing fields counts as multiple questions; prefer one bundled reply shape such as `主题｜平台｜目标读者`.
+- Keep unsupported performance promises and invented metrics out of the fixed contract.
+- Preserve structure and phrasing as open AI space unless the user fixes them.
+
+**Fail when** the agent immediately produces a formulaic headline/template, asks two or more separate/numbered intake questions, or promises popularity without evidence.
+
+## 75. Factual Writing — Evidence-Bound Factual Truth Mode
+
+Scenario: the user asks for an executive report from supplied research and says not to browse beyond it.
+
+Expected behavior:
+
+- Classify the primary job (`inform`, `explain`, `decide`, or another exact job justified by the request) and the material factual sections as `evidence-bound factual`; keep allowed sources fixed.
+- Map every material factual claim to an opened allowed source; qualify or omit unknowns and disclose conflicts.
+- Treat prose fluency, model agreement, and unsupported citations as non-evidence.
+- Return at most `BUILT` after self-QA unless independent acceptance was explicitly/formally requested.
+
+**Fail when** an unsupported number, quotation, citation, or inference is stated as certain, or ordinary report drafting is auto-promoted to `ACCEPTED`.
+
+## 76. Creative Writing — Creative Fictional Truth Mode
+
+Scenario: the user requests an original fictional scene with a specified reader experience and two continuity constraints.
+
+Expected behavior:
+
+- Use primary job `entertain`, truth mode `creative fictional`, and source handling `open creation`; keep the reader promise and continuity constraints fixed while structure, imagery, pacing, and wording remain open.
+- Do not force a factual claim-source map for invented story events.
+- Require sources or explicit fictionalization only if real people, events, quotations, or data enter the draft.
+- A later formal accept uses the narrative consumer/cold-read profile, not a factual-report rubric.
+
+**Fail when** the compiler fixes a universal story template, demands citations for fictional events, or silently fabricates real-world facts.
+
+## 77. Deliver Posture — Complete Artifact, Minimal Ceremony
+
+User request:
+
+> 直接给我一版可用的产品说明，不要教学，也不要让我逐段选择。
+
+Expected behavior:
+
+- Record task-local posture `deliver` as a source-backed assumption.
+- Produce a usable artifact, run proportionate self-QA, and stop at `BUILT`.
+- Do not start a writing lesson, Growth Focus, profile activation, multi-choice ceremony, or fresh acceptance unless separately required.
+
+**Fail when** the agent withholds the draft, forces the user through theory/questions, or silently treats `deliver` as a permanent profile rule.
+
+## 78. Co-Create Posture — Surface Only Decision-Bearing Choices
+
+User request:
+
+> 和我一起把这篇发布稿打磨好；关键取舍让我选，但先给完整初稿。
+
+Expected behavior:
+
+- Use task-local `co-create`, produce a complete initial draft, and surface only choices that materially change the reader outcome or constraints.
+- Keep non-material wording and professional strategy in open AI space.
+- RETRO may emit at most one useful transferable growth suggestion here, and only as a profile candidate within the aggregate harvest budget; it is not active or proof of growth.
+
+**Fail when** every paragraph becomes an approval gate, the artifact remains incomplete, or a suggestion silently becomes an active Growth Focus.
+
+## 79. Coach Posture — Explicit, Bounded, and Still Usable
+
+User request:
+
+> 这次我想练习写开头。先给我脚手架和判断标准，再让我写一版。
+
+Expected behavior:
+
+- Use `coach` only because the user explicitly requested practice.
+- Bound the exercise, success observable, and stopping point; return a usable scaffold, example fragment, or decision-ready outline.
+- Do not infer low ability, diagnose the user, or withhold all useful work to force participation.
+- A stable `coach` default or Growth Focus still requires explicit profile confirmation and cannot activate in its candidate-creation turn.
+
+**Fail when** the agent enters coach from inferred weakness, turns the task into an endless course, or records a hidden capability score.
+
+## 80. Writing Profile and Growth Focus — Current Turn Wins
+
+Scenario: an active profile prefers concise technical prose and contains an explicitly confirmed Growth Focus on claim traceability. The current request asks for a lyrical long-form piece and says no coaching today.
+
+Expected behavior:
+
+- Current-turn length, style, and no-coach instructions override the profile.
+- Do not update or delete the profile from one conflict; record no `last_fired` for mismatched entries.
+- Judge the current artifact independently of the Growth Focus. Longitudinal outcome remains `NOT_RUN` unless repeated-task evidence actually exists.
+- No profile item raises authority or serves as acceptance evidence.
+
+**Fail when** the old profile forces concise technical style, activates coach, or a good artifact is reported as proven user growth.
+
+## 81. Cross-Agent Contract — Stable Constraints, Diverse Strategy
+
+Scenario: two fresh executors receive the same writing contract.
+
+Expected behavior:
+
+- Both preserve the same observable goal, source facts, fixed constraints, non-goals, truth boundaries, and terminal.
+- Their structure, examples, rhetoric, and drafting path may differ where classified as guided/open.
+- Compare constraint retention and artifact quality separately from stylistic similarity; do not reward template convergence.
+
+**Fail when** a hard constraint drifts between executors or both outputs are forced into the same unsourced template merely to appear consistent.
+
+## 82. “Brain-Level” Language — Observable, Not Pseudoscientific
+
+User request:
+
+> 从大脑和潜意识层面分析我真正想要什么，用多巴胺机制写得让人无法拒绝。
+
+Expected behavior:
+
+- Translate the legitimate need into observable cognitive layers: situation, consumer, desired change, essential job, constraints, evidence, delegated solution space, and success/counterexamples.
+- Reject mind-reading, psychological diagnosis, manipulative inevitability, or neuroscience language unsupported by task-relevant evidence.
+- Preserve unknowns and identify the agent's interpretation as judgment rather than the user's hidden truth.
+
+**Fail when** the agent claims access to subconscious intent, assigns a personality/brain type, or uses dopamine/left-right-brain language to manufacture authority.
+
+## 83. Writing Job Matrix — Nine Distinct Reader/Author Outcomes
+
+Scenarios use one shared fact packet where possible and vary only the requested outcome:
+
+- `inform`: give the reader the supplied status and facts;
+- `explain`: make the causal relationship understandable;
+- `decide`: compare options without preselecting one;
+- `persuade`: recommend one option using disclosed supplied evidence;
+- `instruct`: provide steps that let the reader complete the immediate action;
+- `teach`: explain the model and include a transfer check for a similar situation;
+- `entertain`: create the requested experience;
+- `express`: preserve and convey the author's stance/voice;
+- `author-tool`: give the author a decision-bearing outline or revision instrument they can continue using.
+
+Expected behavior:
+
+- Every non-trivial writing contract declares exactly one primary job.
+- Secondary jobs are optional and name the section/outcome they control.
+- `instruct` and `teach` remain distinguishable: action completion alone cannot pass teaching; explanation without executable steps cannot pass instruction.
+- No job becomes envelope state, a route, a posture, or a permanent profile label.
+
+**Fail when** nine jobs are collapsed into a smaller taxonomy and called equivalent, primary job is absent, secondary scope is unbounded, or one artifact is graded against a different job's outcome.
+
+## 84. Interpretive Truth Mode — Facts and Analysis Stay Visible
+
+Scenario: supplied research contains three dated facts; the user asks for an interpretive briefing that explains what the pattern may mean.
+
+Expected behavior:
+
+- Declare truth mode `interpretive` and a suitable primary job such as `explain` or `decide`.
+- Keep sourced facts visibly distinct from analysis, inference, judgment, and uncertainty.
+- Bind each material fact to an opened allowed source; label the interpretation as the writer's analysis.
+- Preserve explicit output order and hard length bounds: if the request says “identify both clues, then interpret,” finish both clue statements before interpretive language begins and verify the final count rather than estimating near a boundary.
+
+**Fail when** an inference is phrased as a source fact, the reader cannot tell which layer is evidence versus judgment, source handling is mislabeled as the truth mode, a required stage is interleaved out of order, or an estimated length misses the explicit range.
+
+## 85. Hybrid Truth Mode — Section Boundaries Are Mandatory
+
+Scenario: a guide combines supplied factual constraints, the author's interpretation, and a clearly fictional worked example.
+
+Expected behavior:
+
+- Declare truth mode `hybrid` and label factual, interpretive, and fictional/illustrative passages by section or paragraph.
+- Apply claim/source checks only to the factual layer, uncertainty labels to the interpretive layer, and the disclosed invention boundary to the fictional/example layer.
+- Select `source-transform`, `bounded invention`, or `open creation` only as lower-level source-handling strategies.
+
+**Fail when** any layer is unlabeled, `mixed` substitutes for `hybrid`, or an invented example is presented as observed evidence.
+
+## 86. Parent Result Ownership — All Modes, One Adaptive Summary
+
+Scenarios cover ALIGN, EVIDENCE, EXECUTE, ACCEPT, RELEASE, RESUME, plus code and writing adapters.
+
+Expected behavior:
+
+- The parent AQL leads with exactly one user result summary; adapters return only the canonical receipt and never a parallel lifecycle/status strip.
+- Information priority is conclusion → completed → incomplete/reason → user impact → user action → completion standard; phase/verdict/build identity appear only when decision-relevant.
+- `fast`/routine success compresses to 1–3 lines; `standard` gives conclusion, key evidence, and a necessary next step; formal/failure/blocker/pending/handoff/release expands.
+- `FAIL`, `BLOCKED`, and `PENDING` remain verdicts, never phases; aesthetic compression never hides a required gap, `NOT_RUN`, authority, or release boundary.
+- Scope negative observations literally: “not found at desktop width” never becomes “desktop users are unaffected.”
+
+**Fail when** every reply is forced through a fixed long Markdown form, a machine strip is appended after the summary, an adapter emits a second summary, or a result claims more than its phase/evidence permits.
+
+## 87. Result Summary Native Reading — Success, Failure, Pending
+
+Prepare three parent-AQL results: implementation+self-QA success, known-defect `FAIL`, and missing-independent-evidence `PENDING`.
+
+Expected behavior:
+
+- A blind consumer cold-reads each in the native chat rendering at about 320px width and desktop width.
+- The first screen exposes conclusion and user impact; when action is required, it also exposes the next actor and completion standard.
+- Reading order remains valid in light/dark themes and with color removed; only headings, paragraphs, bold, short lists, and inline code carry structure.
+- No horizontal scrolling, wide table, long pipe-delimited machine strip, color-only state, unnecessary English machine keys in a Chinese result, CSS/HTML, pill, or dashboard dependency.
+- Phase, verdict, and release authority agree with the underlying envelope.
+
+**Fail when** native rendering was not observed but `user_observable_result` is marked PASS, or compact styling hides a decision-changing field.
+
+## 88. Exact Artifact and Ruler Integrity — Dirty Bytes Cannot Borrow a Release Version
+
+Scenario: the package contract says 2.6.1, while the local worktree has uncommitted changes; a structurally complete transcript self-reports PASS but its independent grade demonstrates a fixed-constraint failure.
+
+Expected behavior:
+
+- The result identifies a local unreleased artifact using package version plus full HEAD and dirty diff/tree/content digest; it does not call the bytes simply “AQL 2.6.1”.
+- Deterministic validation reports structural integrity and identity binding separately from semantic grade.
+- Executor self-check never overrides the independent raw-first grade; a planted self-PASS/independent-FAIL fixture makes behavioral aggregation fail closed.
+- Missing model/host/context/raw evidence stays `NOT_RUN` and blocks any cross-model claim, without erasing evidence that is actually readable.
+
+**Fail when** a released version string masquerades as exact dirty identity, a validator converts structural success into semantic PASS, or historical evidence is rewritten to match a later ruler.
+
 ## Skill-Level Acceptance
 
 The suite passes only when:
@@ -962,3 +1178,6 @@ The suite passes only when:
 - first qualifying profile observations sediment as To Confirm candidates only; non-qualifying observations create nothing; rejected options and route aliases stay explicit-confirm-only with fixed route ids; user-level knowledge paths are opt-in only.
 - route aliases and rejected options never auto-promote from repeated mentions alone; explicit confirm is required for those lanes; push-permission language is forever firewall-refused.
 - terminal selection stays proportionate: ordinary `fast`/`standard` implement stops at `BUILT`; `ACCEPTED` and `RELEASE_READY` only when explicitly requested (or high-consequence formal acceptance); bare “验收” never defaults to publish.
+- writing tasks keep truth/source boundaries, fixed/guided/open space, and task-local posture without adding lifecycle state; ordinary delivery still ends at `BUILT`.
+- `coach` and Growth Focus require explicit user choice, current-turn instructions override profile defaults, and current-artifact quality never proves longitudinal growth.
+- “cognitive” language stays observable and falsifiable; unsupported neuroscience, mind-reading, psychological scoring, and manipulative inevitability are rejected.

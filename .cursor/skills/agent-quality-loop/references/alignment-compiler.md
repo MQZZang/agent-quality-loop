@@ -4,6 +4,21 @@ How ALIGN turns a raw request into the existing Task Contract ([contracts.md](co
 
 ## Invariants
 
+### Material cognitive layers
+
+“Cognitive” here means an observable, falsifiable path from a request to an outcome—not neuroscience, mind-reading, personality diagnosis, or access to hidden thoughts. Compile only the layers that can change the result:
+
+```text
+L0 words used -> L1 situation/problem signal -> L2 consumer/medium
+-> L3 change the user wants to cause -> L4 essential job/need
+-> L5 constraints/non-goals/risks -> L6 decision criteria/trade-offs
+-> L7 facts/sources/unknowns/counterevidence -> L8 delegated AI solution space
+-> L9 success observables/counterexamples/minimum sufficient terminal
+-> L10 explicitly chosen transferable growth focus, when applicable
+```
+
+This stack is an internal diagnostic, not a required questionnaire or a new contract. Omit layers that would not change scope, execution, evidence, or the terminal. L10 never activates teaching or a profile entry by inference; the user must explicitly choose or confirm it under [personalization.md](personalization.md#growth-focus).
+
 ### 1. Observable after-state
 
 `Goal` / `success_observables` name a user- or system-observable after-state. Activity verbs alone (`investigate`, `improve`, `refactor`, `look into`) are invalid until rewritten as what would be true after success.
@@ -57,6 +72,16 @@ Do **not** hijack:
 
 into a separate goal-compiler ritual. ALIGN still emits only the existing AQL contract fields and three alignment lines — never a parallel goal document, `.goal-task/` store, or new lifecycle phase.
 
+## Fixed, Guided, and Open Space
+
+After grounding, classify each outcome-changing input without adding schema:
+
+- **Fixed:** explicit user constraints, authoritative facts, permissions, non-goals, safety boundaries, and acceptance obligations. Preserve them exactly enough to test.
+- **Guided:** preferences, examples, trade-offs, or source signals that influence the solution but permit several valid choices. Record their source and strength; do not silently harden them.
+- **Open:** strategy the user delegated to the AI—structure, sequencing, candidate mechanisms, wording, examples, or implementation choices not fixed elsewhere.
+
+Run a bidirectional trace before contract freeze and before acceptance: every fixed constraint maps forward to a contract obligation/evidence path, and every contract obligation maps backward to a user statement, authoritative source, or disclosed agent judgment. A choice with no source is open or an agent assumption, never a user requirement. If nothing meaningful remains open on a creative/professional task, check for accidental over-constraint; if a fixed item has no downstream check, the compile is incomplete.
+
 ## Fail-closed compile checks
 
 Before leaving ALIGN for non-trivial work:
@@ -67,6 +92,7 @@ Before leaving ALIGN for non-trivial work:
 | Evidence map | A named deliverable has no decidable evidence path |
 | Unknowns | Skipped investigation is papered over with invented facts |
 | Attribution | Agent judgment is labeled as the user's decision |
+| Freedom/traceability | An unsourced choice is hardened as fixed, no meaningful solution space remains, or a fixed constraint has no downstream evidence path |
 | Conflicts | Project rules / workspace contradict the compiled goal and the conflict is not disclosed |
 | Handoff | Compressed resume drops a conjunctive gate or required dimension |
 | Observability | A counterexample or success observable is non-decidable |

@@ -1,7 +1,7 @@
 {
   "name": "review-gate",
   "version": "2.6.1",
-  "generated_at": "2026-08-12T14:49:28.520Z",
+  "generated_at": "2026-08-13T10:21:05.036Z",
   "files": {
     "SKILL.md": "5210d5a94968767bdc0e60b04af9c07764af4a7c8fad57c426406d07a36b89eb",
     "agents/openai.yaml": "11ac7b253c22df2aaadf4948c7ba125eaa9e6883d90f7fd9d5b79643ff6d1599"
