@@ -1,23 +1,23 @@
 {
   "name": "agent-quality-loop",
-  "version": "2.6.1",
-  "generated_at": "2026-08-13T10:21:05.036Z",
+  "version": "2.7.0",
+  "generated_at": "2026-08-13T12:42:07.965Z",
   "files": {
-    "SKILL.md": "af47cdd7f518202758f2a3b518b3ae0b9869efc93c8c6d959ab4eda506dcd2a5",
+    "SKILL.md": "a1dd09cc3175effa21b3f921e1cbcb413ac3c4534d356bec6c3f6bdba1bf2abe",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "references/alignment-compiler.md": "c18e4bd94abc62866def3a6165c32d7a81f546236bd226afb20355c240414734",
     "references/code-implementation-adapter.md": "676301b614d1f41f560ea102974fea89251e60c3a502d824393581f0d8c86012",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "9447c7450e76477ceca775b0b7ff1a1a083c570c081615e0618164c982bdcb6a",
+    "references/contracts.md": "a2b7ca854e4bff2b5fb4f48940fba4967d75509a60f175106bd6b18b7b62f2e5",
     "references/domain-profiles.md": "d30527d06e2f73640bbd6e81d6ea80db2aea6ab5766c9b983a89cf08dba42d68",
-    "references/evaluation-cases.md": "d4c38bacacc773e6a1086ee46b3260ef0631bd347d47461ddf9ec414b31a184d",
+    "references/evaluation-cases.md": "d580da4982b939cd9712aa9784c70e2f41115962f216dcf5075b78e4b039303d",
     "references/multi-agent-leverage.md": "3fa33e9908262a63c7d6c0c0733e4d6404da0719623a242d58e2f4dacc6531f0",
     "references/personalization.md": "db837355f011d332e4a24334fb9d7089af68da1259120f87714b37d9ef9a021d",
     "references/writing-collaboration-adapter.md": "11aa8b064504884576680b6b571a754e2729a0b0185f1d23aa7796c590be4fe4",
-    "scripts/aql-envelope.js": "60b0d787e53b5c80230b26e38e3ccb17283d95628b803ce70da5b78f184cb71c",
-    "scripts/aql-stats.js": "c65000c87d5bfb9fe33166be080668a5dc7c26079ee01206b2f4cb6ab4f63163",
+    "scripts/aql-envelope.js": "8bf0e19452bee36d56c23957f5f81877e2d9fcff8bea2fdb7645514439f0a9f3",
+    "scripts/aql-stats.js": "3fff2d60e7e031cacab6c7ba5c3f5362b6f6ae06694b58a7b2d297e8d25e5242",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
-    "scripts/validate-envelope.js": "fa82effbb0bd908f7362a0d1a9b2dce4a18e122435864bb8804f41dba70a7a19",
-    "scripts/validate-skill.js": "14ba18be60815e26a84fc67e0af0ae98ea9e4bdb047ae5538290182edb931093"
+    "scripts/validate-envelope.js": "dfdbc25aba17534e08b2ca3fdbbed22297f16649e3d5b365dccad27c892d0eb4",
+    "scripts/validate-skill.js": "42cfc37aaf78290369955b478ce153aa22472bf1c08e74e1e12d4e23d014e8cc"
   }
 }

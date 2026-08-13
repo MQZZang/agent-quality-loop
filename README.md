@@ -2,63 +2,61 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) keeps you and an AI agent on one checkable goal during long work:** what the agent understood, what it did, what evidence supports the claim, why it stopped, and whether the next step needs your authorization.
+**Agent Quality Loop (AQL) 2.7.0** is a portable workflow for AI coding agents. It keeps you and the model on one checkable goal during long work: what the agent understood, what it did, what evidence supports the claim, why it stopped, and whether the next step needs your authorization.
 
-It is a portable workflow package for Cursor, the Codex CLI, Claude Code, and other agents that read the open `SKILL.md` format. It does not add a panel or button. After install, the agent’s **default habits** change for non-trivial tasks. Writing is the first vertical scenario, not the product boundary. “Cognitive” here means observable, falsifiable intent-to-outcome reasoning — not mind-reading, personality scoring, or neuroscience.
+It is not a new IDE, panel, or standalone app. After you install the skills, the agent’s **default habits** change for non-trivial tasks. Writing is the first vertical scenario, not the product boundary.
 
 中文一页速览：[docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)。规范文本以英文为准。
 
-## Who this is for
+## The problem
 
-Use this if you already run non-trivial work through an AI coding or workspace agent and still have to reconstruct the truth after it says “done”: whether the goal was the right goal, whether the evidence actually bears on the claim, whether “hide it” meant delete it, and whether “accepted” was silently treated as “published.”
+Agents made producing a change cheap. The cost moved onto whoever has to decide whether “done” is true. Mechanical gates help when a command can settle the question. AQL covers the part a command cannot: whether the goal was the right goal, whether the evidence bears on the claim, whether “hide it” meant delete it, and whether local self-QA was silently treated as publish permission.
 
-Mechanical gates are the right tool when a command can settle the question. This package covers the part a command cannot settle. It constrains what the agent is allowed to claim.
+## Who should use it
 
-Skip it for one-line factual answers, casual brainstorming, or tasks with no reusable execution or acceptance lifecycle.
+Use this if you already run non-trivial work in Cursor, the Codex CLI, Claude Code, or another `SKILL.md` host, and you still have to reconstruct the truth after the agent stops.
 
-## What changes after you install
+Skip it for one-line facts, casual brainstorming, or tasks with no reusable execution or acceptance lifecycle. It does not replace domain skills, human product judgment, real-device checks, or your release authority.
 
-For the same kind of request you already make, you should be able to observe:
+## What you can observe after install
 
-1. **A shared goal before heavy edits** — the agent restates the outcome, the edit boundary, and the most likely misunderstanding, and checks named files or behaviors before freezing the goal.
-2. **Claims with evidence attached** — a pass or “done” is only claimable when the agent ran or inspected the evidence for that claim in this turn.
-3. **A visible stop** — diagnosis can end as diagnosis; local implementation can end after self-QA; independent acceptance and publish are different later asks.
-4. **A separate publish switch** — deploy, upload, or release needs an exact current-turn authorization. A thorough local job does not unlock it.
-5. **Writing that keeps source and authority honest** — prose work names the reader job and truth boundary, still stops at local self-QA unless you ask for independent review, and does not treat a good draft as proof that you “grew.”
+For the same kind of request you already make:
 
-These are collaboration results, not an internal module list. The packaged skills, adapters, and validators exist to make those results checkable.
+1. **A shared goal before heavy edits** — outcome, edit boundary, and the most likely misunderstanding, with named files or behaviors checked before the goal freezes.
+2. **Claims with evidence attached** — a pass or “done” is only claimable when the agent ran or inspected that evidence in this turn.
+3. **A visible stop** — diagnosis can end as diagnosis; ordinary implementation can end after self-QA.
+4. **Separated authority** — self-QA, independent acceptance, and publish permission are different asks. Installing AQL never auto-publishes.
+5. **Honest writing work** — prose names the reader job and truth boundary. A good draft is not proof that you “grew.”
 
-## Before / after
-
-**Before:** You ask the agent to fix a bug. It says “done.” You still have to check whether it ran the tests, whether “done” means only local edits, and whether it treated its own self-check as a formal sign-off.
-
-**After:** For the same request, the agent is expected to align the goal, stay inside the stated boundary, attach firsthand evidence to any pass, and stop without publishing unless you authorize that exact action in the **current** turn.
-
-A real grounding example: the user asked to change `timeout` in `config.json`, but that file had no such field. The agent read the files, surfaced the false premise, asked one decidable question, and changed zero files. The [verbatim probe transcript](probes/transcripts/2026-08-12/p1-grok-mid.md) is preserved, including its older status-line grammar. The same probe on a budget-tier model fabricated the field; that failure remains in [MATRIX.md](MATRIX.md).
-
-## How a task moves
+## From a fuzzy request to a checkable result
 
 ```text
 Natural-language request
-        → align the checkable scope
+        → align a checkable scope
         → execute only from evidence
         → independently accept only when asked
         → authorize release separately, if at all
 ```
 
-You keep typing ordinary language. The agent infers what outcome you want now, how much evidence the risk warrants, and what side effects are allowed — and those three stay independent. Asking for a thorough job does not authorize a deploy.
+You keep typing ordinary language. The agent infers what outcome you want now, how much evidence the risk warrants, and what side effects are allowed. Those three stay independent: asking for a thorough job does not authorize a deploy.
 
-Trivial Q&A stays direct. This package is for diagnosis, implementation, writing, independent acceptance, release checks, and resume without goal drift.
+**Self-QA, independent acceptance, and release stay apart on purpose.**
 
-Three invariants do not move:
+| You asked for | What “done” may mean | What it is not |
+|---|---|---|
+| Fix / implement / self-test | Local changes plus the implementer’s own checks (`BUILT`) | Not independently accepted; not releasable |
+| Independently accept this | A fresh-context review of raw evidence (`ACCEPTED`) | Not permission to push, tag, or deploy |
+| Check whether this can ship / publish this | Read-only preflight, or a separately authorized external action | Not implied by a local fix, a green self-check, or formal wording |
 
-- Style never escalates authority.
-- No completion claim without evidence.
-- Accepted is not released.
+`full` stops at most at independent acceptance. Publishing always needs a later, exact current-turn authorization.
+
+**Routine output stays short; formal, failed, or blocked work expands.** Everyday success is normally 1–3 lines: conclusion, decisive evidence, and whether you must act. Formal acceptance, failure, blocking, pending evidence, handoff, and release expose phase, missing evidence, required action, and completion standard. Adapters return receipts only. There is no dashboard, HTML card, or decorative status chrome.
+
+Three invariants do not move: style never escalates authority; no completion claim without evidence; accepted is not released.
 
 ## Install
 
-Nothing to build and no runtime dependency. Installing copies Markdown rules and skills; the only executables are the Node installer and optional maintainer tools.
+Nothing to build and no runtime dependency. Installing copies Markdown rules and skills.
 
 ### Fastest: via the skills.sh CLI
 
@@ -66,31 +64,25 @@ Nothing to build and no runtime dependency. Installing copies Markdown rules and
 npx skills add MQZZang/agent-quality-loop
 ```
 
-Verified 2026-08-12: the CLI finds all four skills in this repository and installs from its cross-client `.agents/skills/` tree. It has no `--dry-run`; to list what would be installed without installing, use `npx skills add MQZZang/agent-quality-loop -l`. This path picks up all four skills. The bundled installer below defaults to the three-skill `core` suite and writes user-level real-file snapshots.
+Verified 2026-08-12: the CLI finds all four skills and installs from `.agents/skills/`. It has no `--dry-run`; list only with `npx skills add MQZZang/agent-quality-loop -l`. This path installs all four skills. The bundled installer below defaults to the three-skill `core` suite.
 
 ### Installer (one command, any OS)
-
-From a clone of this repository:
 
 ```bash
 node scripts/install.js --suite core --to agents
 ```
 
-- `core` installs `agent-quality-loop`, `ask-plan-code-qa`, and `review-gate`. `--suite full` adds `skill-factory`. `--suite routes` installs four explicit route shims plus the compatible parent from `dist/route-shims/` (not part of `core`/`full`; **uninstall manually** by deleting installed folders).
-- `--to` picks the user-level destination: `agents` (Codex CLI, `~/.agents/skills/`), `cursor` (Cursor personal skills), `claude` (Claude Code personal skills), `both`, or `all`.
-- `--dry-run` prints the planned copy without writing. The installer never creates a live junction and refuses to replace an existing symlink or Windows junction.
+- `core`: `agent-quality-loop`, `ask-plan-code-qa`, `review-gate`. `--suite full` adds `skill-factory`. `--suite routes` adds explicit shims from `dist/route-shims/` (**uninstall manually**).
+- `--to`: `agents` (Codex), `cursor`, `claude`, `both`, or `all`.
+- `--dry-run` prints the plan. The installer never creates a live junction.
 
-The repository also ships an [Agent Plugins](https://agent-plugins.org) layout (`plugin.json` plus the generated top-level `skills/` tree). That is layout compatibility, verified by this repo’s validators — not a claim that every announced client has been live-behavior tested.
+This repository also ships an [Agent Plugins](https://agent-plugins.org) layout. That is layout compatibility, verified by validators — not live-behavior PASS on every announced client.
 
-Any other `SKILL.md` host can copy `.agents/skills/<name>` into its skills directory.
-
-The installer writes **user-level skills only**. For Cursor project rules, `AGENTS.md`, and knowledge templates, copy those paths into the target project (file by file if the project already has `.cursor/`). Do **not** copy this repository’s `lessons.md`. Details and the knowledge-template rename table: [docs/guide.md](docs/guide.md#project-level-install).
+The installer writes **user-level skills only**. For Cursor project rules, copy `.cursor/`, `AGENTS.md`, and renamed knowledge templates into the project. Do **not** copy this repository’s `lessons.md`. Details: [docs/guide.md](docs/guide.md#project-level-install).
 
 Optional Cursor hooks check decidable mechanics only and never semantic acceptance: [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
 
 ### First use
-
-Natural language is enough:
 
 ```text
 Fix the local timeout. Do not deploy.
@@ -100,45 +92,33 @@ Check whether this is releasable. Do not release yet.
 Write the evidence-bound report and give me a usable draft; no coaching.
 ```
 
-After a project-level copy, a read-only diagnosis should restate goal, boundary, and likely misunderstanding, then stop without editing. After a user-level installer run, check the host skill list for `/agent-quality-loop` (Cursor / Claude Code) or `$agent-quality-loop` (Codex). Explicit skill names are optional.
+After a project-level copy, a read-only diagnosis should restate goal, boundary, and likely misunderstanding, then stop without editing. After a user-level install, look for `/agent-quality-loop` (Cursor / Claude Code) or `$agent-quality-loop` (Codex).
 
-`full` stops at most at independent acceptance. Publishing always needs a later, exact current-turn release request.
+**Before / after.** You ask for a bugfix and hear “done,” then still have to check tests, local-only scope, and whether self-QA was treated as sign-off. With AQL, the same request is expected to align the goal, stay inside the boundary, attach firsthand evidence, and stop without publishing unless you authorize that exact action in the **current** turn.
+
+A real grounding example: the user asked to change `timeout` in `config.json`, but that file had no such field. The agent read the files, surfaced the false premise, asked one decidable question, and changed zero files. Transcript: [p1-grok-mid.md](probes/transcripts/2026-08-12/p1-grok-mid.md). A budget-tier model fabricated the field; that failure remains in [MATRIX.md](MATRIX.md).
 
 ## Fit / not a fit
 
-**Fit**
+**Fit:** long or high-ambiguity agent work; local implementation that must not become a deploy; independent review of existing work; evidence-bound or creative writing with visible source and posture.
 
-- Long or high-ambiguity agent work where you need a shared, checkable goal.
-- Local implementation that must not quietly become a deploy.
-- Independent review of an existing change, without the implementer grading itself.
-- Evidence-bound or creative writing that must keep source, truth, and posture visible.
-
-**Not a fit**
-
-- One-line facts, casual ideation, or “just do something.”
-- Replacing domain skills, human product judgment, real-device checks, or release authority.
-- A hidden recommender, growth score, or proof that using the package makes you better over time.
-- Treating hooks, test counts, or an AI review as an oracle for the user outcome.
+**Not a fit:** one-line facts; replacing human judgment or release authority; a hidden recommender or growth score; treating hooks or test counts as an outcome oracle; expecting AQL to ship itself to GitHub.
 
 ## What is verified, and what is not
 
-A package that says “no evidence, no pass” has to hold itself to that rule.
-
 | Check | What it covers |
 |---|---|
-| 88 evaluation cases | Written scenarios with expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count is validator-enforced by `scripts/validate-claims.js`. |
-| Envelope regression suite | Pins the state machine: an adapter cannot grant itself acceptance; a local-only run cannot reach release state. |
-| Blind forward-testing | Scenario replay on a model that has not seen the intended answer. Protocol: [probes/PROBES.md](probes/PROBES.md). Results, including failures: [MATRIX.md](MATRIX.md). |
-| Writing probes | Structure, identity, and independent semantic grade are separate. P-W6 remains **FAIL** under its frozen story ruler. Transcripts: [behavior-probes.md](docs/research/llm-learning-corpus/behavior-probes.md). |
-| Corpus research | 397 files were inventoried. Fourteen AQL-relevant claims were distilled. That is not semantic coverage of the whole corpus. All inventoried licenses remain `unknown`. |
+| 88 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
+| Envelope regression suite | An adapter cannot grant itself acceptance; a local-only run cannot reach release state. |
+| Blind forward-testing | Protocol: [probes/PROBES.md](probes/PROBES.md). Results, including failures: [MATRIX.md](MATRIX.md). |
+| Writing probes | Structure, identity, and independent semantic grade are separate. P-W6 remains **FAIL**. Transcripts: [behavior-probes.md](docs/research/llm-learning-corpus/behavior-probes.md). |
+| Corpus research | 397 files inventoried; fourteen AQL-relevant claims distilled. Not semantic coverage of the whole corpus. Licenses remain `unknown`. |
 
-CI runs the structural checks on every push and pull request.
+CI runs the structural checks on every push and pull request. Structural checks are not semantic acceptance.
 
-**Do not read this working tree as the 2.6.1 GitHub Release.** Packaged skill manifests still declare version `2.6.1`; the collaboration-result, writing-vertical, and README changes in this branch are **Unreleased** relative to that tag.
+**机制已实现；长期、因果和跨宿主效果仍在持续验证，不影响当前合同、权限和证据机制的使用。** The collaboration contract, authority split, and evidence rules in this package are implemented and locally validated. Longitudinal user growth, causal improvement on real projects, and live behavior on every advertised host remain `NOT_RUN` or screening-only. That gap does not block using the current contract. This package is not claimed to make you grow, and installing it does not auto-publish.
 
-Seed probe rows were run by the maintainer’s agents. Treat them as falsifiable starting data, not a third-party audit. Reproduce a matrix row with `probes/make-fixtures.js`. Envelope statistics and `injected_refs` are **observable and falsifiable, not causally proven**. Missing `injected_refs` means measurement unknown, not “nothing was injected.”
-
-This package has not been shown to improve real-project outcomes over time. Longitudinal writing growth remains `NOT_RUN`. Live behavior on every advertised host is not claimed; the repo provides install and package layout for Cursor, Codex, Claude Code, and Agent Plugins clients. Optional host-probe and pilot docs stay `NOT_RUN` or screening-only until live transcripts exist. Claim mapping: [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
+Seed probe rows were run by the maintainer’s agents. Treat them as falsifiable starting data. Reproduce a matrix row with `probes/make-fixtures.js`. Envelope statistics are **observable and falsifiable, not causally proven**. Claim mapping: [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
 
 ## Status language
 
@@ -147,26 +127,24 @@ Do not collapse neighboring rows.
 | State | What it means in practice |
 |---|---|
 | Implemented with self-QA (`BUILT`) | Local changes exist and the implementer ran its own checks. Not independently accepted. Not releasable. |
-| Independently accepted (`ACCEPTED`) | A separate fresh-context review passed the required acceptance evidence. Still not permission to deploy. |
+| Independently accepted (`ACCEPTED`) | A separate fresh-context review passed required acceptance evidence. Still not permission to deploy. |
 | Release-ready (`RELEASE_READY`) | A frozen accepted artifact passed read-only release preflight. Still not a deploy. |
-| Deployed (`DEPLOYED`) | A named external target was actually changed under an authorized release action. |
+| Deployed (`DEPLOYED`) | A named external target was changed under an authorized release action. |
 | Production-verified (`PRODUCTION_VERIFIED`) | Required outcomes were observed on the real target after deploy. |
-
-Every active AQL reply starts with one adaptive user result summary. Routine success is 1–3 lines. Formal, failed, blocked, pending, handoff, and release results expose the audit detail. Adapters return receipts only.
 
 ## Compatibility and advanced use
 
 | Surface | What you get |
 |---|---|
 | Cursor project rules (`.cursor/rules/`) | Always-on minimal boundaries plus routing summaries |
-| Cursor / Codex / Claude skills | The same core loop: `agent-quality-loop` owns acceptance and release language; `ask-plan-code-qa` stops at `BUILT`; `review-gate` is read-only findings |
+| Cursor / Codex / Claude skills | `agent-quality-loop` owns acceptance and release language; `ask-plan-code-qa` stops at `BUILT`; `review-gate` is read-only findings |
 | Agent Plugins clients | Layout via `plugin.json` and top-level `skills/` |
 
-`skill-factory` is an optional authoring helper, not part of the quality loop. Optional explicit routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Invocation spelling differs by host: Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
+`skill-factory` is optional authoring, not part of the quality loop. Optional routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
 
-Recurring phrases and confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a strict firewall: disclosed, revocable, never a source of authority. This is not a hidden ranker, embedding profile, or engagement reward. User-level knowledge paths are explicit opt-in only. Growth Focus is an explicit practice intention, not evidence of growth and not a reason to enter coaching.
+Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, never a source of authority. This is not a hidden ranker. Growth Focus is an explicit practice intention, not evidence of growth.
 
-The compact lifecycle envelope can travel in host persistence or the turn handoff. Optional local cache and stats: [docs/guide.md](docs/guide.md).
+Optional envelope cache and stats: [docs/guide.md](docs/guide.md).
 
 ## License
 
@@ -175,5 +153,5 @@ MIT — see [LICENSE](LICENSE).
 ## Deeper reading
 
 - Day-to-day routing, project-level copy, envelope cache, and adapter boundaries: [docs/guide.md](docs/guide.md)
-- Repository invariants for agents working in this package: [AGENTS.md](AGENTS.md)
-- How to propose a change, mirror sync, and AI-assisted contribution rules: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Repository invariants: [AGENTS.md](AGENTS.md)
+- How to propose a change: [CONTRIBUTING.md](CONTRIBUTING.md)

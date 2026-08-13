@@ -21,7 +21,7 @@ const AQL_DIR_NAME = ".agent-quality-loop";
 const CURRENT_NAME = "envelope.json";
 const HISTORY_DIR_NAME = "history";
 const WRITE_LOCK_NAME = ".write.lock";
-const WRITER_ID = "aql-envelope@2.6.1";
+const WRITER_ID = "aql-envelope@2.7.0";
 const CONTENT_SHA256_RE = /^[a-f0-9]{64}$/;
 
 function readStdin() {
@@ -563,7 +563,7 @@ function runSelfTest() {
         written.snapshot &&
           written.snapshot.sequence === 1 &&
           written.snapshot.previous_digest === null &&
-          written.snapshot.writer === "aql-envelope@2.6.1" &&
+          written.snapshot.writer === "aql-envelope@2.7.0" &&
           typeof written.snapshot.recorded_at === "string" &&
           written.snapshot.recorded_at.includes("."),
         "writer injects snapshot metadata",
@@ -600,7 +600,7 @@ function runSelfTest() {
       check(
         third.snapshot.sequence === 3 &&
           third.snapshot.id !== "forged" &&
-          third.snapshot.writer === "aql-envelope@2.6.1",
+          third.snapshot.writer === "aql-envelope@2.7.0",
         "caller-supplied snapshot cannot forge writer metadata",
       );
     }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "agent-quality-loop",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Trust-boundary quality loop for coding agents: compile natural language into a task contract, gate completion claims on evidence, keep acceptance independent, and never conflate accepted with released.",
   "author": {
     "name": "MQZZang",

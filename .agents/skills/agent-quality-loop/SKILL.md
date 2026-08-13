@@ -4,7 +4,7 @@ description: Use when a user wants an AI coding or workspace agent to turn natur
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.6.1"
+  version: "2.7.0"
 ---
 
 # Agent Quality Loop

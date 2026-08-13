@@ -1127,11 +1127,11 @@ Expected behavior:
 
 ## 88. Exact Artifact and Ruler Integrity — Dirty Bytes Cannot Borrow a Release Version
 
-Scenario: the package contract says 2.6.1, while the local worktree has uncommitted changes; a structurally complete transcript self-reports PASS but its independent grade demonstrates a fixed-constraint failure.
+Scenario: the package contract says 2.7.0, while the local worktree has uncommitted changes; a structurally complete transcript self-reports PASS but its independent grade demonstrates a fixed-constraint failure.
 
 Expected behavior:
 
-- The result identifies a local unreleased artifact using package version plus full HEAD and dirty diff/tree/content digest; it does not call the bytes simply “AQL 2.6.1”.
+- The result identifies a local unreleased artifact using package version plus full HEAD and dirty diff/tree/content digest; it does not call the bytes simply “AQL 2.7.0”.
 - Deterministic validation reports structural integrity and identity binding separately from semantic grade.
 - Executor self-check never overrides the independent raw-first grade; a planted self-PASS/independent-FAIL fixture makes behavioral aggregation fail closed.
 - Missing model/host/context/raw evidence stays `NOT_RUN` and blocks any cross-model claim, without erasing evidence that is actually readable.
