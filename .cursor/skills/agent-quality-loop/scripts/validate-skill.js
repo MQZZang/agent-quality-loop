@@ -22,9 +22,12 @@ const requiredFiles = [
   "references/evaluation-cases.md",
   "references/multi-agent-leverage.md",
   "references/personalization.md",
+  "references/profile-projection.md",
   "references/writing-collaboration-adapter.md",
+  "fixtures/profile-projection-v1.json",
   "manifest.json",
   "scripts/validate-envelope.js",
+  "scripts/validate-profile-projection.js",
   "scripts/validate-skill.js",
   "scripts/aql-envelope.js",
   "scripts/aql-stats.js",
@@ -224,7 +227,20 @@ requireAll("references/contracts.md", [
   "1–3 lines",
   "local unreleased build",
   "## Result Detail Budget",
+  "injected_refs:",
+  "harvest_candidates:",
+  "### Collaboration Brief / Dispatch Brief",
 ], ["## Trust Badge", "[AQL <version> |"]);
+
+requireAll("references/profile-projection.md", [
+  "# Profile Projection v1",
+  "## Fresh Mode",
+  "## Candidate Filter",
+  "## Selection Order",
+  "## Contract Effects",
+  "## Source Tracking",
+  "## Mechanical Validation Boundary",
+]);
 
 requireAll("references/writing-collaboration-adapter.md", [
   "inform",
@@ -250,6 +266,7 @@ requireAll("references/evaluation-cases.md", [
   "## 86.",
   "## 87.",
   "## 88.",
+  "## 108.",
 ]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");
@@ -327,6 +344,15 @@ const envelopeCheck = spawnSync(process.execPath, [path.join(root, "scripts", "v
 });
 if (envelopeCheck.status !== 0) {
   errors.push(`envelope self-test failed: ${(envelopeCheck.stderr || envelopeCheck.stdout).trim()}`);
+}
+
+const profileProjectionCheck = spawnSync(
+  process.execPath,
+  [path.join(root, "scripts", "validate-profile-projection.js"), "--self-test"],
+  { cwd: root, encoding: "utf8" },
+);
+if (profileProjectionCheck.status !== 0) {
+  errors.push(`profile projection self-test failed: ${(profileProjectionCheck.stderr || profileProjectionCheck.stdout).trim()}`);
 }
 
 const writerCheck = spawnSync(process.execPath, [path.join(root, "scripts", "aql-envelope.js"), "--self-test"], {

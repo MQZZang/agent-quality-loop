@@ -45,6 +45,7 @@ release_gate: null until release preflight; then a separate canonical gate
 assumptions: safe and reversible assumptions only
 unknowns: material unresolved facts
 pause_conditions: conditions that prohibit the next phase
+injected_refs: optional source records for lessons, profile entries, presets, domain profiles, probes, or routes actually applied
 ```
 
 Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
@@ -286,6 +287,8 @@ assumptions: safe reversible assumptions preserved from the contract
 workspace_ref: branch/commit/tree hash or equivalent, plus dirty-state note
 artifact_refs: changed or reviewed artifacts with hashes when material
 evidence_refs: compact source/command/result references
+injected_refs: optional measured source records actually applied to this contract
+harvest_candidates: optional RETRO candidates; never active profile state
 implementation_receipt: null before execution; otherwise the structured adapter receipt below
 acceptance_gate: preserved structured acceptance gate below
 release_gate: null before release preflight; otherwise separate structured release gate below
@@ -298,6 +301,34 @@ blocker: null or {reason, missing, owner, minimal_unlock, side_effects_not_taken
 action_state_at_stop: null or structured fields below
 expiry_or_drift_condition: when the envelope must be rebuilt
 ```
+
+`injected_refs` uses the existing measured-source structure:
+
+```yaml
+injected_refs:
+  - kind: lesson | profile | preset | domain_profile | probe | route
+    class: learned | structural
+    ref: stable version-bound reference
+    content_sha256: 64 lowercase hex characters
+    reason: one-line explanation of why the source applied and what it affected
+```
+
+The validator preserves these budgets: 8 total, 5 learned, 3 lessons, 2 profile entries, and 3 structural refs. `lesson` and `profile` are `learned`; the other kinds are `structural`. Field absence means whether injection was measured is unknown. A present empty array means injection was measured and nothing was injected.
+
+`harvest_candidates` documents the existing RETRO carrier without creating a second feedback system:
+
+```yaml
+harvest_candidates:
+  - kind: user_correction | path_change | scope_deviation | contradiction | thrash_unlock | rejected_option
+    lane: lesson | profile | rejected_option
+    summary: one-line candidate statement
+    source_ref: current task/evidence reference, plus the original profile entry id when applicable
+    status: candidate
+```
+
+The total maximum is 3 and at most 2 may target profile/rejected-option lanes. Field absence means harvest was not measured or not represented; a present empty array means RETRO measured no candidates. A candidate is not active state, authority, evidence, or proof of improvement.
+
+Do not add `profile_projection`, `user_lens`, `profile_mode`, `collaboration_brief`, profile scores, or ranking probabilities to the envelope. Profile Projection v1 is a task-local compile step whose applied sources are already traceable through `injected_refs`.
 
 Allowed stop-reason values are `evidence_only_complete`, `user_cancelled`, `scope_changed`, `authority_revoked`, `ambiguity`, `evidence_gap`, `authority_gap`, `unsafe_workspace`, `acceptance_pending`, `acceptance_failed`, and `production_verified`. A user-requested pause normally uses `verdict: PENDING`; use `BLOCKED` only when a required decision or authorized next action is unavailable.
 
@@ -331,6 +362,10 @@ implementation_receipt:
 ```
 
 An embedded adapter consumes the existing goal, scope, assumptions, assurance, authority, and must-hold checks. It does not emit a second alignment contract or user-facing lifecycle summary. Reject any receipt that claims `ACCEPTED`, `RELEASE_READY`, deployment, or new authority.
+
+### Collaboration Brief / Dispatch Brief
+
+A Collaboration Brief or Dispatch Brief is the Task Contract's transient minimum view for the current executor. It is not separately persisted, has no independent contract id, phase, authority, goal source, or lifecycle, and does not copy the complete collaboration profile. Every item must trace to the current Task Contract, project reality, or `injected_refs`; the adapter returns only the implementation receipt above. Any independent Brief state or goal truth source fails consistency review.
 
 For acceptance, use:
 
@@ -422,6 +457,8 @@ Before handoff or release, verify:
 - assurance does not raise action authority, and ordinary `implement` / fix / self-test (`fast` or `standard`) may stop at `BUILT` + `PASS`/`PASS_WITH_RISK` with `next_allowed_phase: null` without inventing formal acceptance or a fresh acceptor;
 - any executor adapter receipt is bound to the current contract/baseline and reports exactly `result_phase: BUILT`;
 - every Task Contract field is present under the same field name, including target user/system, problem signal, assumptions, and action authority;
+- optional `injected_refs` and `harvest_candidates` preserve their measured-versus-unknown semantics, declared shapes, and budgets; profile refs identify exact entries rather than a merged hidden profile;
+- no profile projection or executor Brief creates a second contract id, phase, authority record, persistent state, or goal truth source;
 - the current and next phases follow the legal-transition table, or `next_allowed_phase` is null for a valid terminal result (`EVIDENCED`, `BUILT`, `ACCEPTED`, or `RELEASE_READY` when that stage was the requested stop);
 - `mode: full` has not advanced beyond `phase: ACCEPTED`;
 - `mode: full` has effective authority no higher than `local_write` and consumes no release authorization;

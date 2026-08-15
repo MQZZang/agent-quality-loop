@@ -109,6 +109,18 @@ const INJECTED_REF_KIND_CLASS = {
   probe: "structural",
   route: "structural",
 };
+const FORBIDDEN_ENVELOPE_FIELDS = ["profile_projection", "user_lens", "collaboration_brief"];
+const GENERIC_INJECTED_REF_REASONS = new Set([
+  "relevant",
+  "applied",
+  "applied profile",
+  "profile applied",
+  "user prefers this",
+  "n/a",
+  "na",
+  "none",
+  "unknown",
+]);
 const SUCCESS_VERDICTS = ["PASS", "PASS_WITH_RISK"];
 const CONTENT_SHA256_RE = /^[a-f0-9]{64}$/;
 const SNAPSHOT_WRITER_RE = /^aql-envelope@\d+\.\d+\.\d+$/;
@@ -262,6 +274,12 @@ function isOneLine(value) {
   return nonEmptyString(value) && !/[\r\n]/.test(value);
 }
 
+function hasMeaningfulInjectedRefReason(value) {
+  if (!isOneLine(value)) return false;
+  const normalized = value.trim().replace(/[.!?]+$/, "").toLowerCase();
+  return normalized.length >= 12 && !GENERIC_INJECTED_REF_REASONS.has(normalized);
+}
+
 function validateInjectedRefs(injectedRefs, errors = []) {
   // Absent field = measurement unknown (OK). Present [] = empty measurement.
   if (injectedRefs === undefined) return errors;
@@ -295,8 +313,8 @@ function validateInjectedRefs(injectedRefs, errors = []) {
     if (!nonEmptyString(entry.ref)) {
       errors.push(`${label}.ref must be a non-empty version-bound string`);
     }
-    if (!isOneLine(entry.reason)) {
-      errors.push(`${label}.reason must be a non-empty one-line string`);
+    if (!hasMeaningfulInjectedRefReason(entry.reason)) {
+      errors.push(`${label}.reason must concretely identify the match or effect`);
     }
     if (typeof entry.content_sha256 !== "string" || !CONTENT_SHA256_RE.test(entry.content_sha256)) {
       errors.push(`${label}.content_sha256 must be 64 lowercase hex`);
@@ -680,6 +698,7 @@ function validateHarvestCandidates(harvestCandidates, errors) {
   if (harvestCandidates.length > 3) {
     errors.push("harvest_candidates max is 3 when present");
   }
+  let profileCandidates = 0;
   for (const [index, entry] of harvestCandidates.entries()) {
     const label = `harvest_candidates[${index}]`;
     if (!isObject(entry)) {
@@ -691,6 +710,8 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     }
     if (!HARVEST_LANES.includes(entry.lane)) {
       errors.push(`${label}.lane is invalid`);
+    } else if (entry.lane === "profile" || entry.lane === "rejected_option") {
+      profileCandidates += 1;
     }
     if (entry.status !== "candidate") {
       errors.push(`${label}.status must be candidate`);
@@ -701,6 +722,9 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     if (!nonEmptyString(entry.summary)) {
       errors.push(`${label}.summary is required`);
     }
+  }
+  if (profileCandidates > 2) {
+    errors.push("harvest_candidates profile max is 2");
   }
 }
 
@@ -786,6 +810,11 @@ function validateEnvelope(envelope) {
 
   if (!isObject(envelope)) return ["envelope must be a JSON object"];
   if (envelope.schema_version !== SCHEMA_VERSION) errors.push(`schema_version must be ${SCHEMA_VERSION}`);
+  for (const field of FORBIDDEN_ENVELOPE_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(envelope, field)) {
+      errors.push(`${field} is forbidden; the Task Contract is the only lifecycle state`);
+    }
+  }
   if (Object.prototype.hasOwnProperty.call(envelope, "skill_version")) {
     if (!nonEmptyString(envelope.skill_version)) {
       errors.push("skill_version must be a non-empty string when present");
@@ -1499,14 +1528,14 @@ function runSelfTest() {
       class: "learned",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "one",
+      reason: "same lesson selected twice",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "two",
+      reason: "duplicate lesson reference",
     },
   ];
   cases.push({
@@ -1523,28 +1552,28 @@ function runSelfTest() {
       class: "learned",
       ref: "a@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "r1",
+      reason: "first learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "b@v1",
       content_sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      reason: "r2",
+      reason: "second learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "c@v1",
       content_sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-      reason: "r3",
+      reason: "third learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "d@v1",
       content_sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-      reason: "r4",
+      reason: "fourth learned lesson reference",
     },
   ];
   cases.push({ name: "learned lesson cap rejected", envelope: injectedTooManyLearned, valid: false, expectedError: "learned lesson max is 3" });
@@ -1587,7 +1616,7 @@ function runSelfTest() {
       class: "structural",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "wrong class",
+      reason: "lesson uses an invalid structural class",
     },
   ];
   cases.push({
@@ -1606,6 +1635,50 @@ function runSelfTest() {
     envelope: injectedMissingSha,
     valid: false,
     expectedError: "content_sha256 must be 64 lowercase hex",
+  });
+
+  const injectedMeaninglessReason = baseEnvelope();
+  injectedMeaninglessReason.injected_refs = [
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "x",
+    },
+  ];
+  cases.push({
+    name: "injected_refs rejects a meaningless reason",
+    envelope: injectedMeaninglessReason,
+    valid: false,
+    expectedError: "reason must concretely identify the match or effect",
+  });
+
+  const forbiddenProfileProjection = baseEnvelope();
+  forbiddenProfileProjection.profile_projection = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field profile_projection rejected",
+    envelope: forbiddenProfileProjection,
+    valid: false,
+    expectedError: "profile_projection is forbidden",
+  });
+
+  const forbiddenUserLens = baseEnvelope();
+  forbiddenUserLens.user_lens = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field user_lens rejected",
+    envelope: forbiddenUserLens,
+    valid: false,
+    expectedError: "user_lens is forbidden",
+  });
+
+  const forbiddenCollaborationBrief = baseEnvelope();
+  forbiddenCollaborationBrief.collaboration_brief = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field collaboration_brief rejected",
+    envelope: forbiddenCollaborationBrief,
+    valid: false,
+    expectedError: "collaboration_brief is forbidden",
   });
 
   const harvestOk = baseEnvelope();
@@ -1640,6 +1713,19 @@ function runSelfTest() {
     { kind: "contradiction", lane: "profile", summary: "d", source_ref: "s4", status: "candidate" },
   ];
   cases.push({ name: "harvest_candidates max rejected", envelope: harvestTooMany, valid: false, expectedError: "harvest_candidates max is 3" });
+
+  const harvestTooManyProfile = baseEnvelope();
+  harvestTooManyProfile.harvest_candidates = [
+    { kind: "user_correction", lane: "profile", summary: "a", source_ref: "s1", status: "candidate" },
+    { kind: "contradiction", lane: "profile", summary: "b", source_ref: "s2", status: "candidate" },
+    { kind: "rejected_option", lane: "rejected_option", summary: "c", source_ref: "s3", status: "candidate" },
+  ];
+  cases.push({
+    name: "harvest profile candidate max rejected",
+    envelope: harvestTooManyProfile,
+    valid: false,
+    expectedError: "harvest_candidates profile max is 2",
+  });
 
   let failed = false;
   for (const testCase of cases) {

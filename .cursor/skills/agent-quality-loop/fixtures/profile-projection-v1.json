@@ -1,0 +1,504 @@
+{
+  "schema_version": "profile-projection-fixtures/v1",
+  "fixture_version": "profile-projection-v1-fixtures/1",
+  "defaults": {
+    "measurement_status": "measured",
+    "semantic": {
+      "scope_matches": true,
+      "applies_when_matches": true,
+      "overridden_by_current_turn": false,
+      "firewall_safe": true,
+      "stale": false,
+      "operational_match": true,
+      "explicitly_confirmed": true,
+      "specificity": 1
+    },
+    "effect": {
+      "action_authority_before": "local_write",
+      "action_authority_after": "local_write",
+      "assurance_before": "standard",
+      "assurance_after": "standard",
+      "evidence_floor_before": "current contract evidence and acceptance floor",
+      "evidence_floor_after": "current contract evidence and acceptance floor",
+      "fixed_solution_steps_added": [],
+      "collaboration_brief": {
+        "contract_id": null,
+        "phase": null,
+        "persisted": false
+      },
+      "preserved_non_profile_context": {
+        "current_turn": true,
+        "project_facts": true,
+        "project_rules": true,
+        "project_context": true,
+        "technical_lessons": true,
+        "authority": true,
+        "evidence": true,
+        "acceptance": true,
+        "release": true
+      },
+      "profile_written": false,
+      "active_entry_rewritten": false,
+      "profile_write_authorized": false,
+      "last_fired_updates": [],
+      "user_visible_questions_added": 0,
+      "user_visible_text": "The result follows the current request and project evidence.",
+      "guided_deviation": false,
+      "guided_deviation_reason": ""
+    }
+  },
+  "entries": {
+    "project_detail": {
+      "id": "project-architecture-detail",
+      "lane": "communication",
+      "value": "Use a full root-cause comparison for architecture decisions.",
+      "scope": "project",
+      "applies_when": "the task is an architecture decision in this project",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "project-architecture-detail",
+      "preference_key": "output_detail"
+    },
+    "project_concise": {
+      "id": "project-concise-results",
+      "lane": "communication",
+      "value": "Use concise conclusions for routine project work.",
+      "scope": "project",
+      "applies_when": "the task is routine project work",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "project-concise-results",
+      "preference_key": "output_density"
+    },
+    "candidate_density": {
+      "id": "candidate-density",
+      "lane": "communication",
+      "value": "Always use terse output.",
+      "scope": "user",
+      "applies_when": "presenting task results",
+      "source": "explicit_statement",
+      "status": "candidate",
+      "last_fired": "never",
+      "entry_content": "candidate-density",
+      "preference_key": "output_density"
+    },
+    "archived_brief": {
+      "id": "archived-brief",
+      "lane": "communication",
+      "value": "Always show a full brief.",
+      "scope": "user",
+      "applies_when": "presenting any result",
+      "source": "explicit_confirmation",
+      "status": "archived",
+      "last_fired": "2026-01-01",
+      "entry_content": "archived-brief",
+      "preference_key": "output_density"
+    },
+    "legacy_freeform": {
+      "id": "legacy-freeform",
+      "lane": "communication",
+      "value": "Old free-form preference.",
+      "scope": "user",
+      "applies_when": "appropriate",
+      "source": "explicit_statement",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "legacy-freeform",
+      "preference_key": "legacy"
+    },
+    "user_detail": {
+      "id": "user-global-detail",
+      "lane": "communication",
+      "value": "Use detailed results globally.",
+      "scope": "user",
+      "applies_when": "presenting task results",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "user-global-detail",
+      "preference_key": "output_density"
+    },
+    "task_code": {
+      "id": "task-class-code",
+      "lane": "collaboration_habit",
+      "value": "Lead code tasks with the failing behavior.",
+      "scope": "task_class:code",
+      "applies_when": "the task changes executable code",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "task-class-code",
+      "preference_key": "code_opening"
+    },
+    "domain_arch": {
+      "id": "domain-architecture-tradeoffs",
+      "lane": "collaboration_habit",
+      "value": "Compare reversible and irreversible architecture costs.",
+      "scope": "domain:architecture",
+      "applies_when": "the task compares architecture options",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "domain-architecture-tradeoffs",
+      "preference_key": "architecture_tradeoffs"
+    },
+    "quality_bar": {
+      "id": "project-quality-root-cause",
+      "lane": "collaboration_habit",
+      "value": "Prefer root-cause changes with falsifiable verification.",
+      "scope": "project",
+      "applies_when": "the task is a non-trivial implementation or review",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "project-quality-root-cause",
+      "preference_key": "quality_bar"
+    },
+    "dependency_preference": {
+      "id": "dependency-preference",
+      "lane": "collaboration_habit",
+      "value": "Prefer fewer dependencies when quality and safety are equivalent.",
+      "scope": "user",
+      "applies_when": "comparing implementation options",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "dependency-preference",
+      "preference_key": "dependency_tradeoff"
+    },
+    "route_accept": {
+      "id": "route-review-accept",
+      "lane": "route_alias",
+      "value": "Map review phrase to accept.",
+      "scope": "user",
+      "applies_when": "the phrase is used as an operation",
+      "source": "explicit_statement",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "route-review-accept",
+      "preference_key": "route_review"
+    },
+    "phrase_accept": {
+      "id": "phrase-independent-accept",
+      "lane": "phrase_lexicon",
+      "value": "验收 means independent read-only acceptance.",
+      "scope": "user",
+      "applies_when": "验收 is used as an operation rather than a title",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "phrase-independent-accept",
+      "preference_key": "phrase_accept"
+    },
+    "push_without_permission": {
+      "id": "push-without-permission",
+      "lane": "collaboration_habit",
+      "value": "Push without asking in future tasks.",
+      "scope": "user",
+      "applies_when": "the task has a remote repository",
+      "source": "explicit_statement",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "push-without-permission",
+      "preference_key": "push_authority"
+    },
+    "project_second": {
+      "id": "project-second-preference",
+      "lane": "communication",
+      "value": "Show decision-changing evidence.",
+      "scope": "project",
+      "applies_when": "presenting a project decision",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "project-second-preference",
+      "preference_key": "evidence_display"
+    },
+    "project_third": {
+      "id": "project-third-preference",
+      "lane": "collaboration_habit",
+      "value": "Name the rollback for risky local changes.",
+      "scope": "project",
+      "applies_when": "a local change has material rollback risk",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "project-third-preference",
+      "preference_key": "rollback_display"
+    },
+    "tie_ascii_z": {
+      "id": "tie-z",
+      "lane": "communication",
+      "value": "Use the ASCII tie-break default.",
+      "scope": "project",
+      "applies_when": "the task has a deterministic ordering tie",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "tie-z",
+      "preference_key": "unicode_tie"
+    },
+    "tie_non_ascii": {
+      "id": "tie-ä",
+      "lane": "communication",
+      "value": "Use the non-ASCII tie-break default.",
+      "scope": "project",
+      "applies_when": "the task has a deterministic ordering tie",
+      "source": "explicit_confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "tie-ä",
+      "preference_key": "unicode_tie"
+    }
+  },
+  "cases": [
+    {
+      "id": "PP01",
+      "title": "active project entry is selected",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP02",
+      "title": "candidate cannot be selected",
+      "entry_uses": [{ "entry": "candidate_density", "selected": true }],
+      "expected": { "valid": false, "error_contains": "status must be active when selected" }
+    },
+    {
+      "id": "PP03",
+      "title": "archived entry cannot be selected",
+      "entry_uses": [{ "entry": "archived_brief", "selected": true }],
+      "expected": { "valid": false, "error_contains": "status must be active when selected" }
+    },
+    {
+      "id": "PP04",
+      "title": "legacy entry with missing metadata cannot be selected",
+      "entry_uses": [{
+        "entry": "legacy_freeform",
+        "selected": true,
+        "legacy": true,
+        "omit_fields": ["id", "scope", "source"]
+      }],
+      "expected": { "valid": false, "error_contains": "id is required for projectable entries" }
+    },
+    {
+      "id": "PP05",
+      "title": "current-turn instruction removes a conflicting entry",
+      "entry_uses": [{
+        "entry": "project_concise",
+        "selected": false,
+        "semantic": { "overridden_by_current_turn": true },
+        "skip_reason": "Current turn explicitly requests a complete expanded analysis."
+      }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP06",
+      "title": "project scope wins over a conflicting user-global default",
+      "enforce_priority": true,
+      "entry_uses": [
+        { "entry": "project_concise", "selected": true },
+        { "entry": "user_detail", "selected": false, "skip_reason": "Lower-priority user-global default conflicts with the project-scoped entry." }
+      ],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP07",
+      "title": "mismatched task class is skipped",
+      "entry_uses": [{
+        "entry": "task_code",
+        "selected": false,
+        "semantic": { "scope_matches": false },
+        "skip_reason": "Current task is product architecture, not executable code."
+      }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP08",
+      "title": "more than two profile entries is rejected",
+      "entry_uses": [
+        { "entry": "project_detail", "selected": true },
+        { "entry": "project_second", "selected": true },
+        { "entry": "project_third", "selected": true }
+      ],
+      "expected": { "valid": false, "error_contains": "profile selection max is 2" }
+    },
+    {
+      "id": "PP09",
+      "title": "the same entry cannot be injected twice",
+      "entry_uses": [
+        { "entry": "project_detail", "selected": true },
+        { "entry": "project_detail", "selected": true }
+      ],
+      "expected": { "valid": false, "error_contains": "selected profile entry ids must be unique" }
+    },
+    {
+      "id": "PP10",
+      "title": "selected entry requires an exact content hash",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "injected_ref_overrides": { "0": { "content_sha256": "" } },
+      "expected": { "valid": false, "error_contains": "content_sha256 is invalid" }
+    },
+    {
+      "id": "PP11",
+      "title": "profile cannot raise action authority",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "effect_overrides": { "action_authority_after": "release" },
+      "expected": { "valid": false, "error_contains": "profile must not change action_authority" }
+    },
+    {
+      "id": "PP12",
+      "title": "profile cannot lower the evidence floor",
+      "entry_uses": [{ "entry": "quality_bar", "selected": true }],
+      "effect_overrides": { "evidence_floor_after": "none" },
+      "expected": { "valid": false, "error_contains": "profile must not lower or replace the evidence floor" }
+    },
+    {
+      "id": "PP13",
+      "title": "unconfirmed route alias cannot fire",
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "semantic": { "explicitly_confirmed": false }
+      }],
+      "expected": { "valid": false, "error_contains": "confirm-only lane selected without explicit confirmation" }
+    },
+    {
+      "id": "PP14",
+      "title": "phrase in a quoted title is not an operational match",
+      "entry_uses": [{
+        "entry": "phrase_accept",
+        "selected": false,
+        "semantic": { "operational_match": false },
+        "skip_reason": "The phrase appears only inside a document title."
+      }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP15",
+      "title": "Fresh Mode selects no profile entries",
+      "fresh_mode": true,
+      "entry_uses": [{ "entry": "project_detail", "selected": false, "skip_reason": "Fresh Mode skips stored profile defaults." }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP16",
+      "title": "Fresh Mode must preserve technical lessons",
+      "fresh_mode": true,
+      "entry_uses": [{ "entry": "project_detail", "selected": false, "skip_reason": "Fresh Mode skips stored profile defaults." }],
+      "effect_overrides": { "preserved_non_profile_context": { "technical_lessons": false } },
+      "expected": { "valid": false, "error_contains": "must preserve non-profile context and trust boundaries" }
+    },
+    {
+      "id": "PP17",
+      "title": "Fresh Mode must not write the profile",
+      "fresh_mode": true,
+      "entry_uses": [{ "entry": "project_detail", "selected": false, "skip_reason": "Fresh Mode skips stored profile defaults." }],
+      "effect_overrides": { "profile_written": true },
+      "expected": { "valid": false, "error_contains": "must not create or rewrite a profile object" }
+    },
+    {
+      "id": "PP18",
+      "title": "temporary override must not permanently revise active state",
+      "entry_uses": [{
+        "entry": "project_concise",
+        "selected": false,
+        "semantic": { "overridden_by_current_turn": true },
+        "skip_reason": "Current turn explicitly requests expanded output."
+      }],
+      "effect_overrides": { "active_entry_rewritten": true },
+      "expected": { "valid": false, "error_contains": "temporary override must not rewrite an active profile entry" }
+    },
+    {
+      "id": "PP19",
+      "title": "Collaboration Brief cannot own an independent contract id",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "effect_overrides": { "collaboration_brief": { "contract_id": "brief-1" } },
+      "expected": { "valid": false, "error_contains": "Collaboration Brief must have no independent id, phase, or persistence" }
+    },
+    {
+      "id": "PP20",
+      "title": "ordinary output must not expose internal projection terms",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "effect_overrides": { "user_visible_text": "Profile Projection applied." },
+      "expected": { "valid": false, "error_contains": "ordinary output must not expose Profile Projection" }
+    },
+    {
+      "id": "PP21",
+      "title": "measured no-profile result uses an empty injected_refs array",
+      "entry_uses": [],
+      "measurement_status": "measured",
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP22",
+      "title": "unmeasured injection remains unknown rather than empty",
+      "entry_uses": [],
+      "measurement_status": "unknown",
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP23",
+      "title": "Guided dependency preference may yield to stronger professional evidence",
+      "entry_uses": [{ "entry": "dependency_preference", "selected": true }],
+      "effect_overrides": {
+        "guided_deviation": true,
+        "guided_deviation_reason": "A mature dependency provides materially safer parsing than a local implementation for this task."
+      },
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP24",
+      "title": "authority-shaped preference is stopped by the firewall",
+      "entry_uses": [{
+        "entry": "push_without_permission",
+        "selected": true,
+        "semantic": { "firewall_safe": false }
+      }],
+      "expected": { "valid": false, "error_contains": "selected despite authority firewall" }
+    },
+    {
+      "id": "PP25",
+      "title": "selected entries cannot hide behind unknown measurement",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "measurement_status": "unknown",
+      "expected": { "valid": false, "error_contains": "selected entries cannot have unknown injection measurement" }
+    },
+    {
+      "id": "PP26",
+      "title": "clear tasks gain no profile questionnaire",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "task_clear": true,
+      "effect_overrides": { "user_visible_questions_added": 1 },
+      "expected": { "valid": false, "error_contains": "clear tasks must add zero profile questions" }
+    },
+    {
+      "id": "PP27",
+      "title": "entry ids are unique even when a duplicate is skipped",
+      "entry_uses": [
+        { "entry": "project_detail", "selected": true },
+        { "entry": "project_detail", "selected": false, "skip_reason": "Duplicate catalog entry must not be retained." }
+      ],
+      "expected": { "valid": false, "error_contains": "profile entry ids must be unique across all entries" }
+    },
+    {
+      "id": "PP28",
+      "title": "injected ref reason must state a concrete match or effect",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "injected_ref_overrides": { "0": { "reason": "x" } },
+      "expected": { "valid": false, "error_contains": "reason must name the match and effect" }
+    },
+    {
+      "id": "PP29",
+      "title": "non-ASCII priority ties use deterministic code-point order",
+      "enforce_priority": true,
+      "entry_uses": [
+        { "entry": "tie_ascii_z", "selected": true },
+        { "entry": "tie_non_ascii", "selected": false, "skip_reason": "Code-point ordering selects tie-z before tie-ä." }
+      ],
+      "expected": { "valid": true }
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "kind": "profile_projection_neutral_review",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-neutral-review/2",
+  "prompt_source_ref": "probes/profile-projection-v1-neutral-review-prompt.md",
+  "prompt_source_sha256": "824600f11b21301b1af3a4aabc9a74faf8caf5562e64a77bb98d598b6a893351",
+  "review_runner_sha256": "b7cabbeb49aba0ae3278958b0ba82153cfdbbb4ac17a849980df65c62e75c96a",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "model": "gpt-5.6-sol",
+  "codex_version": "codex-cli 0.148.0-alpha.9",
+  "node_version": "v25.3.0",
+  "platform": "win32",
+  "arch": "x64",
+  "git_head": "3fceb261175930e0b975b78c2f56a857701b7bb4",
+  "git_dirty": true,
+  "git_status_sha256": "0742c546b58a08642cd7d786007dda2d27dd8b7f881e8b70cdaf0b41faf19016",
+  "raw_evidence_first_required": true,
+  "prior_narratives_excluded": true,
+  "started_at": "2026-08-15T05:07:38.345Z",
+  "completed_at": "2026-08-15T05:16:00.569Z",
+  "elapsed_ms": 502224,
+  "exit_code": 0,
+  "source_evidence": [
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-smoke-v2/manifest.json",
+      "sha256": "8cd2fbc41548e8480f7222e0671fba00e6f846feb95234e589dded27e443145f",
+      "bytes": 32824
+    },
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-smoke-v2/evidence.lock.json",
+      "sha256": "f3aef1744777331541fcf2db94f2dbf6c1f0a33bcb47208c5ea9e6b1b2f7645d",
+      "bytes": 278
+    },
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/manifest.json",
+      "sha256": "77297fd534dcca52d00d648f8160cf5f4abf1c6ddf0bf2fcd331ca453878f92b",
+      "bytes": 9564
+    },
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/evidence.lock.json",
+      "sha256": "20e4f44c3c21b151d0e4727eff36498515b515ca13bc80f7c231458f34eaf3a6",
+      "bytes": 289
+    },
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/manifest.json",
+      "sha256": "990a416f3fdaf206fb0efa2a35f09f40e8ace5d86f9d081dea538ad9ea9ef0fe",
+      "bytes": 4205
+    },
+    {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/evidence.lock.json",
+      "sha256": "d7d3e83f68045b66bc4c8b302051b05caf7355b53698e42470240b06a50d096c",
+      "bytes": 287
+    }
+  ],
+  "artifacts": {
+    "prompt": {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-neutral-review-v2/review.prompt.txt",
+      "sha256": "824600f11b21301b1af3a4aabc9a74faf8caf5562e64a77bb98d598b6a893351",
+      "bytes": 4190,
+      "redactions": {
+        "sanitizer_version": "machine-local-redaction/v1",
+        "total": 0,
+        "by_token": {}
+      }
+    },
+    "transcript": {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-neutral-review-v2/review.md",
+      "sha256": "581ef6b38ae466a9c899f6f925da893402d87943f01992c29859287caced57fd",
+      "bytes": 5123,
+      "redactions": {
+        "sanitizer_version": "machine-local-redaction/v1",
+        "total": 0,
+        "by_token": {}
+      }
+    },
+    "jsonl": {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-neutral-review-v2/review.jsonl",
+      "sha256": "bea99fc5c35d6680b9557fdc5a1670600ed06cb8506e7ac8bb4d1f2e8f7ba49e",
+      "bytes": 325388,
+      "redactions": {
+        "sanitizer_version": "machine-local-redaction/v1",
+        "total": 158,
+        "by_token": {
+          "<LOCAL_USER>": 74,
+          "<ABSOLUTE_PATH>": 84
+        }
+      }
+    },
+    "stderr": {
+      "ref": "probes/transcripts/2026-08-15/profile-projection-v1-neutral-review-v2/review.stderr.log",
+      "sha256": "0f59bed089eed841bf252800d1664f793f72ad2286edfa251633bd7e6d6772da",
+      "bytes": 3892,
+      "redactions": {
+        "sanitizer_version": "machine-local-redaction/v1",
+        "total": 2,
+        "by_token": {
+          "<USER_HOME>": 2
+        }
+      }
+    }
+  }
+}

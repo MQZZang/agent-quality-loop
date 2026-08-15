@@ -1,0 +1,104 @@
+{
+  "kind": "behavior_batch_environment",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-behavior-addendum/2",
+  "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "runner": "codex exec --ephemeral --sandbox read-only --json",
+  "suite_ref": "probes/profile-projection-v1-behavior-addendum.md",
+  "seed": 20260819,
+  "model": "gpt-5.6-sol",
+  "requested_concurrency": 1,
+  "codex_version": "codex-cli 0.148.0-alpha.9",
+  "node_version": "v25.3.0",
+  "platform": "win32",
+  "arch": "x64",
+  "git_head": "3fceb261175930e0b975b78c2f56a857701b7bb4",
+  "git_dirty": true,
+  "git_status_sha256": "0742c546b58a08642cd7d786007dda2d27dd8b7f881e8b70cdaf0b41faf19016",
+  "run_order": [
+    "T5-C"
+  ],
+  "expected_run_count": 1,
+  "completed_at": "2026-08-15T05:02:12.243Z",
+  "environment_artifact": {
+    "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/environment.json",
+    "sha256": "176d7d5a0956507945a42ec75f00541238745d2bfd9bf8299503383f6079c1b5",
+    "bytes": 1115,
+    "redactions": {
+      "sanitizer_version": "machine-local-redaction/v1",
+      "total": 0,
+      "by_token": {}
+    }
+  },
+  "runs": [
+    {
+      "run_id": "T5-C",
+      "task_id": "T5",
+      "condition": "C",
+      "model": "gpt-5.6-sol",
+      "started_at": "2026-08-15T04:59:04.195Z",
+      "ended_at": "2026-08-15T05:02:12.243Z",
+      "elapsed_ms": 188048,
+      "exit_code": 0,
+      "profile_input_kind": "host_gated",
+      "profile_input_sha256": "f29787eddab3fdc4d78f2fbd72363cebd34f5e220bf43eec9b2b1a10d35ac058",
+      "source_profile_sha256": "aa78abe4c931242152d9696e57223aaff65f88f7a12959a9269c52e7a4cec2a3",
+      "withheld_profile_bytes": true,
+      "protocol_version": "profile-projection-v1-behavior-addendum/2",
+      "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+      "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+      "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+      "artifacts": {
+        "prompt": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/t5-c.prompt.txt",
+          "sha256": "e7e86e00fbf2712a3dc19fe18060409c2df9f19474026a74404e5e47f6d0a5d0",
+          "bytes": 2880,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "transcript": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/t5-c.md",
+          "sha256": "2738b6bd12124d8af4986fce58ea992056201f23fff6b4afc976c951667d476d",
+          "bytes": 3163,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "jsonl": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/t5-c.jsonl",
+          "sha256": "af315b3ee903ccf81617e5ca2fa793294d7a5a18d127a2bee4cc83ce675ad745",
+          "bytes": 158879,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 32,
+            "by_token": {
+              "<LOCAL_USER>": 16,
+              "<ABSOLUTE_PATH>": 16
+            }
+          }
+        },
+        "stderr": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/t5-c.stderr.log",
+          "sha256": "8f26fec8e22fc9c5dfb3023ac60bd10febf48b92470ec42b2b03759d68d8372d",
+          "bytes": 3350,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 2,
+            "by_token": {
+              "<USER_HOME>": 2
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -4,6 +4,10 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+- Experimental Profile Projection v1: complete matching active collaboration-profile entries are projected task-locally into the existing Task Contract (max two) and traced through existing `injected_refs`; Fresh Mode skips stored profile defaults for one task while preserving project facts, lessons, authority, evidence, acceptance, and release boundaries. No persistent User Lens, second Brief contract, score, ranker, default-suite change, or version bump.
+- Canonical envelope docs now include the already-validated `injected_refs` and `harvest_candidates` carriers; profile/rejected-option harvest is capped at two candidates. The collaboration-profile template now exposes stable entry ids, lane/scope/condition/source/status metadata and legacy field-level compatibility.
+- Added Profile Projection v1 reference, 29-case deterministic fixture contract, cases 89–108, a sanitized exact-byte evidence runner, 12-run smoke, four-run coverage addendum, and a neutral raw-first review. The ten named one-host behavior mechanisms passed with zero hard-gate events; the A/B/C product control remains invalid because B does not isolate the projection step, so product-value, full-pilot, longitudinal, and release verdicts remain `NOT_RUN`/forbidden.
+
 ## 2.7.0 — 2026-08-13
 
 - Parent-owned adaptive user results replace the mandatory pipe-delimited status line: routine success compresses, formal/failure/handoff/release expands, dirty artifacts bind exact identity, and adapters remain receipt-only. Writing now uses nine distinct jobs plus four canonical truth modes; source handling is a separate axis. Probe validation separates structure, identity, and independent semantic grade, retains P-W6 as FAIL, and checks local claim anchors.

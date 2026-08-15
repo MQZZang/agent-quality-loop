@@ -108,10 +108,11 @@ A real grounding example: the user asked to change `timeout` in `config.json`, b
 
 | Check | What it covers |
 |---|---|
-| 88 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
+| 108 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
 | Envelope regression suite | An adapter cannot grant itself acceptance; a local-only run cannot reach release state. |
 | Blind forward-testing | Protocol: [probes/PROBES.md](probes/PROBES.md). Results, including failures: [MATRIX.md](MATRIX.md). |
 | Writing probes | Structure, identity, and independent semantic grade are separate. P-W6 remains **FAIL**. Transcripts: [behavior-probes.md](docs/research/llm-learning-corpus/behavior-probes.md). |
+| Profile Projection v1 probes | Sanitized, exact-byte-bound one-host evidence and a neutral raw-first review covered ten named mechanism behaviors with zero hard-gate events. The A/B/C control did not isolate incremental value, so product effect and the 48-run pilot remain `NOT_RUN`. Protocol and evidence: [profile-projection-v1-experiment.md](docs/profile-projection-v1-experiment.md). |
 | Corpus research | 397 files inventoried; fourteen AQL-relevant claims distilled. Not semantic coverage of the whole corpus. Licenses remain `unknown`. |
 
 CI runs the structural checks on every push and pull request. Structural checks are not semantic acceptance.
@@ -142,7 +143,7 @@ Do not collapse neighboring rows.
 
 `skill-factory` is optional authoring, not part of the quality loop. Optional routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
 
-Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, never a source of authority. This is not a hidden ranker. Growth Focus is an explicit practice intention, not evidence of growth.
+Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, never a source of authority. The Unreleased experimental Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; it creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed a neutral raw-first review, but the A/B/C value control was not discriminating; product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
 
 Optional envelope cache and stats: [docs/guide.md](docs/guide.md).
 

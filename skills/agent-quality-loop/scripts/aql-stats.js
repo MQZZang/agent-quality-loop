@@ -831,7 +831,7 @@ function runSelfTest() {
           class: "learned",
           ref: "lessons.md#L1@v1",
           content_sha256: lessonSha,
-          reason: "pause dirty",
+          reason: "pause on a dirty workspace",
         },
       ],
     });
@@ -859,7 +859,7 @@ function runSelfTest() {
         class: "learned",
         ref: "lessons.md#reopen@v1",
         content_sha256: fixtureSha("reopen"),
-        reason: "r",
+        reason: "reopen lesson influenced the task",
       },
     ];
     const r1 = writeSnapshotFile(path.join(aqlHistory, "reopen-1.json"), reopenAccepted, 1, null);

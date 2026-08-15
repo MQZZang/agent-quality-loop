@@ -1,0 +1,50 @@
+You are a fresh-context behavior-probe executor. This is a response-only simulation in a read-only repository; do not edit files, mutate a profile, create a contract file, push, publish, or release.
+
+Before answering, read only these mechanism files:
+- .cursor/skills/agent-quality-loop/SKILL.md
+- .cursor/skills/agent-quality-loop/references/personalization.md
+- .cursor/skills/agent-quality-loop/references/profile-projection.md
+
+Do not read the probe suite, experiment protocol, evaluation cases, validators, prior transcripts, or any real collaboration profile. Use only the raw request and condition input below. Do not ask a question when the request is clear.
+
+Probe id: T8
+Condition: C
+Condition input: Apply experimental Profile Projection v1 under the single existing Task Contract. The supplied fixture is the available profile source for this isolated run. Select no more than two matching active entries, remove current-turn conflicts before ranking, and record only entries that materially affect the response.
+Profile input kind: projection_source
+Profile input sha256: d3c3dbffaf1f952a3f453165d7976d8338c0916edaa45185ba04887b2534ea74
+
+RAW REQUEST (verbatim):
+只做架构决策，不改文件。比较自研解析器与成熟解析库；成熟库已覆盖畸形输入边界并持续修复安全问题，自研方案唯一明确优势是少一个依赖。请说明是否偏离“少依赖”默认以及原因。
+
+EXECUTOR-VISIBLE PROFILE INPUT:
+- id: domain-fewer-dependencies
+  lane: collaboration_habit
+  value: Prefer fewer dependencies as a default, while allowing stronger safety and maintenance evidence to outweigh that default.
+  scope: domain:backend
+  applies_when: Comparing backend implementation options where dependency count is a material trade-off.
+  source: repeated_choice
+  status: active
+  last_fired: never
+
+Give the exact response you would give the user under this condition. For a task that asks for a write, describe the intended bounded action and authority result without performing or falsely claiming the edit. Then return exactly these two sections and preserve only the executor-visible profile input in the receipt:
+
+USER_RESPONSE:
+<actual user-facing response>
+
+PROBE_RECEIPT:
+probe_id: T8
+condition: C
+raw_request: <exact raw request>
+profile_input_kind: projection_source
+profile_input_sha256: d3c3dbffaf1f952a3f453165d7976d8338c0916edaa45185ba04887b2534ea74
+profile_fixture: <exact executor-visible fixture above, or none>
+selected_profile_refs: <stable profile entry refs that actually influenced the response; [] when none>
+compiled_contract_effect: <one line>
+user_visible_question_count: <integer>
+action_authority_result: <one line>
+evidence_boundary_result: <one line>
+fresh_mode_result: <one line>
+profile_write_or_revision: <none or description>
+second_contract_created: <true|false>
+why_applied_answer: <one line or not_asked>
+verdict: <PASS|FAIL|NOT_RUN> - <one decidable line>

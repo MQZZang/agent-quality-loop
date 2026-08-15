@@ -5,6 +5,9 @@ How this skill fits ALIGN compile and ACCEPT expectations to the specific user o
 ## Contents
 
 - [Learnable Lanes](#learnable-lanes)
+- [Profile Entry Contract](#profile-entry-contract)
+- [Profile Projection v1](#profile-projection-v1)
+- [Fresh Mode](#fresh-mode)
 - [Writing Collaboration Preferences](#writing-collaboration-preferences)
 - [Growth Focus](#growth-focus)
 - [Never Learn (Authority Firewall)](#never-learn-authority-firewall)
@@ -15,6 +18,7 @@ How this skill fits ALIGN compile and ACCEPT expectations to the specific user o
 - [Sedimentation Tiers](#sedimentation-tiers)
 - [Application Order](#application-order)
 - [User-Level Paths (Opt-In Only)](#user-level-paths-opt-in-only)
+- [Legacy Compatibility](#legacy-compatibility)
 - [Hygiene](#hygiene)
 
 ## Learnable Lanes
@@ -33,13 +37,44 @@ Adaptation targets ALIGN (compile fidelity) and ACCEPT (expectation fit). Do not
 
 Phrase lexicon fires **only** for `active` entries the user has confirmed (or second-hit promoted under the sedimentation rules). Until then, do not treat colloquial words such as “验收” as if they already mean a fixed route or lifecycle phase.
 
+## Profile Entry Contract
+
+Every entry eligible for automatic application has the same minimum fields:
+
+```yaml
+id: stable unique id inside the profile
+lane: phrase_lexicon | communication | collaboration_habit | writing_preference | growth_focus | rejected_option | route_alias
+value: concrete collaboration default
+scope: project | domain:<name> | task_class:<name> | user
+applies_when: concrete human- and agent-readable condition
+source: explicit_statement | explicit_confirmation | repeated_correction | repeated_choice
+status: candidate | active | archived
+last_fired: YYYY-MM-DD | never
+```
+
+`id` is a stable human-maintained slug, not a line number or a hash of wording. The section labels Question Threshold, Risk Tolerance, Quality Bar, and Decision Habits use the `collaboration_habit` lane; Good vs Bad Responses becomes a reusable `communication` or `collaboration_habit` value rather than retaining raw conversation text.
+
+Candidates additionally record `source_ref` and `observed_at`. Never store a raw full prompt. Only `active` entries with the complete contract above may enter task projection.
+
+## Profile Projection v1
+
+Before applying profile defaults, follow [profile-projection.md](profile-projection.md). It selects at most two matching active entries into the existing Task Contract and traces only entries that actually affect the task through `injected_refs`.
+
+The projection is task-local and ephemeral. Do not create a persistent User Lens, a `profile_projection` envelope field, a second contract, an event ledger, a score, or a ranker. Semantic `scope` and `applies_when` matching remains evidence-grounded agent judgment; deterministic validators check the declared receipt and trust boundaries, not user understanding.
+
+## Fresh Mode
+
+When the current request says to ignore historical preferences or start fresh for this task, skip project and opted-in user collaboration-profile entries, including profile phrase/route aliases. Do not update `last_fired`, delete the profile, or turn Fresh Mode into a lasting preference.
+
+Fresh Mode does not skip current-turn instructions, project facts, `AGENTS.md`/rules, project context, technical lessons, authority, evidence, acceptance, or release boundaries. It creates no persistent state. If a full envelope is otherwise required, it may record one existing `assumptions` sentence and a measured `injected_refs` list containing no profile refs.
+
 ## Writing Collaboration Preferences
 
 Writing preferences are stable collaboration defaults, not execution recipes. Keep each entry narrow and context-qualified: record the applicable audience, medium or task class, and only constraints such as source strictness, feedback density, or collaboration posture. Do not store fixed templates, mandatory voice/structure, or instructions that would make unrelated artifacts converge on one style.
 
 The task-local writing posture is `deliver` | `co-create` | `coach`. It remains a source-backed contract assumption for the current task. Do not profile a task-local posture unless the user explicitly confirms it as a stable default; `coach` is never inferred or promoted from repeated behavior. A matching active preference constrains the collaboration, but the agent should still vary structure and voice to fit the artifact, audience, and evidence.
 
-Recommended fields: `preference`, `value`, `scope`, `source`, `status`, and `last_fired`. Use `candidate` for the first write and do not apply it in that turn.
+Use the common Profile Entry Contract fields. Use `candidate` for the first write and do not apply it in that turn.
 
 ## Growth Focus
 
@@ -53,7 +88,7 @@ A Growth Focus is a user-controlled practice intention, not evidence that the us
 
 Outcome associations are descriptive only. Do not score, rank, run bandit-style optimization, embed, or infer capability from them, and do not optimize for engagement. The user may inspect, override, edit, archive, or delete every entry.
 
-When a matching active writing preference or Growth Focus actually affects a task, record its stable, version-bound profile reference in the existing envelope `injected_refs`. Associate a later outcome only with readable evidence whose envelope/receipt contains that reference; absence of the reference is `unknown`, not proof that the profile had no effect. Never copy raw prompts into the profile to create this association.
+When a matching active writing preference or Growth Focus actually affects a task, record its stable entry reference and exact entry-content hash in the existing envelope `injected_refs`. Associate a later outcome only with readable evidence whose envelope/receipt contains that reference; absence of the reference is `unknown`, not proof that the profile had no effect. Never copy raw prompts into the profile to create this association.
 
 ## Never Learn (Authority Firewall)
 
@@ -86,6 +121,7 @@ A **qualifying first observation** may become a **candidate** (never an active p
 - model-inferred preferences the user never stated;
 - third-party claims about the user;
 - authority-shaped “preferences” (firewall).
+- user silence, result acceptance, or an apparently high-quality output without explicit feedback.
 
 Harvest still comes from RETRO after ACCEPT or FAIL/BLOCKED, or from an in-turn explicit standing statement — but the first write is always a candidate under To Confirm.
 
@@ -96,7 +132,7 @@ When a qualifying observation arrives and no `collaboration-profile.md` exists y
 1. May create the file from the template's section structure (disclose the create in one summary line).
 2. Write **only** under **To Confirm**.
 3. **Must not** apply the entry as an active preference in the same turn.
-4. Record at minimum: lane, proposed value, scope, source/task ref, observed date, `status: candidate`.
+4. Record at minimum: stable `id`, `lane`, proposed `value`, `scope`, concrete `applies_when`, allowed `source`, `source_ref`, `observed_at`, `status: candidate`, and `last_fired: never`.
 5. Promote to active only after a **second independent task** shows the same signal, **or** the user explicitly confirms — except **rejected options**, **route aliases**, writing posture (especially `coach`), and **Growth Focus**, which require **explicit confirmation only** (no second-hit promote). Even an explicitly stated first-write candidate does not apply in its creation turn.
 6. Read-only sessions: emit the candidate in the turn output / envelope only — **no file write**.
 7. Authority-shaped content hits the firewall **before** write; refuse in one line.
@@ -142,12 +178,12 @@ Read-only sessions emit candidates in the turn summary / envelope instead of wri
 ## Application Order
 
 1. The explicit current-turn instruction — always wins.
-2. Matching **active** profile entries — applied as defaults. Lexicon / alias entries fire only in their recorded sense; a quoted title or unrelated context is a mismatch: skip and do not update `last_fired`. Candidates under To Confirm are not applied.
+2. Matching **active** profile entries selected through [Profile Projection v1](profile-projection.md) — applied as Guided defaults. Lexicon / alias entries fire only in their recorded sense; a quoted title or unrelated context is a mismatch: skip and do not update `last_fired`. Candidates under To Confirm and legacy entries missing the minimum contract are not applied.
 3. Generic skill defaults.
 
 This order also governs writing preferences and Growth Focus. An active entry supplies a default or practice constraint only; it never supplies authority, evidence, or acceptance. Record `last_fired` only when the scope actually matched and the entry affected the contract.
 
-On a conflict between the turn instruction and an active profile entry, follow the instruction and do not rewrite the profile from one conflict; on the second consistent conflict, propose the update under To Confirm.
+On a conflict between the turn instruction and an active profile entry, remove the entry before projection, follow the instruction, and do not rewrite the profile from one conflict; on the second consistent conflict, propose the update under To Confirm. A selected entry updates `last_fired` only when it actually affected the contract and field-level profile write authority is available.
 
 ### Bare「验收」and related phrase disambiguation
 
@@ -180,11 +216,18 @@ Rules:
 - Touch user-level knowledge **only** when the user explicitly enables user-level knowledge for this host/session.
 - A project profile must **never** silently migrate to user-level.
 
+## Legacy Compatibility
+
+Existing profile text remains readable and must not be deleted or wholesale-rewritten. An old entry missing any of `id`, `lane`, `value`, `scope`, `applies_when`, `source`, `status`, or `last_fired` is not automatically projected as active. Normalize it only through explicit confirmation or the next authorized field-level edit.
+
+Legacy source labels such as `observed` and `confirmed` may be preserved as historical text, but they do not satisfy the new source field until normalized (`confirmed` normally becomes `explicit_confirmation`; ambiguous `observed` requires a source-backed choice). Do not silently migrate project entries to user-level or expose absolute home paths in shared reports.
+
 ## Hygiene
 
-- Every entry carries `source` (`observed` | `confirmed`), `status` (`candidate` | `active` | `archived`), and `last_fired` (`YYYY-MM-DD` | `never`). Candidates use `last_fired: never` until promoted and first applied.
+- Every projectable entry carries the full Profile Entry Contract. `source` is one of `explicit_statement` | `explicit_confirmation` | `repeated_correction` | `repeated_choice`; `status` is `candidate` | `active` | `archived`; `last_fired` is `YYYY-MM-DD` | `never`. Candidates use `last_fired: never` until promoted and first applied.
 - RETRO may harvest at most **3 total candidates across lessons plus the profile**; at most **2** may be profile candidates. Growth Focus uses this profile lane and does not add another quota.
 - Same decay rule as lessons: an `active` entry not fired for 90 days, or mismatched across the 10 most recent injection windows, moves to `archived` (kept for manual revival, no longer applied). Candidates that sit unconfirmed may be dropped or left under To Confirm; they are never auto-applied by age.
 - Prefer at most 15 active lexicon/alias entries and 10 active preference/Growth Focus entries; merge near-duplicates before adding.
 - Field-level patch only; never rewrite the profile wholesale.
 - Keep entries plain language, host- and model-agnostic: the profile must mean the same thing to any agent that reads it.
+- Fresh Mode, skipped entries, current-turn overrides, and entries that did not affect the contract never update `last_fired`.

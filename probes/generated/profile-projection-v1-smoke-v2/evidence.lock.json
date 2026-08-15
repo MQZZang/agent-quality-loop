@@ -1,0 +1,6 @@
+{
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "manifest_ref": "probes/generated/profile-projection-v1-smoke-v2/manifest.json",
+  "manifest_sha256": "77319af82ec5114c58d728b03776954766758106c93c37b83629bcfbcf7c82a6",
+  "manifest_bytes": 5360
+}

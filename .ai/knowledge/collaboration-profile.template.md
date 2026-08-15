@@ -1,105 +1,228 @@
 # Collaboration Profile Template
 
-Copy this file to `collaboration-profile.md` in each project (or user setup) that uses this workflow pack, then fill it in — or let the agent populate it incrementally.
+Copy this file to `collaboration-profile.md` in a project that uses this workflow pack, or to the documented user-level path only after explicit opt-in. Populate it incrementally; do not turn first use into a questionnaire.
 
-**What this is:** the user's **stable collaboration preferences** — how they like an AI to think and communicate with them — so that different AIs/models start from the **same cognitive baseline** across tasks and sessions. This is the persistence layer for *how we work together*, distinct from:
+**What this is:** stable, user-controlled collaboration defaults. It is separate from:
 
-- `project-context.md` — project **facts** (stack, commands, architecture)
-- `lessons.md` — **verified technical lessons** from past work
+- `project-context.md` — project facts, stack, commands, and architecture;
+- `lessons.md` — verified technical lessons;
+- the Task Contract — the current task's only goal, authority, evidence, and lifecycle truth source.
 
-**How the agent uses it:**
+The current-turn instruction always wins. Matching complete `active` entries may be selected as Guided defaults; candidates, archived entries, and incomplete legacy entries are not automatically applied. The profile is never authority, task evidence, acceptance evidence, release permission, identity diagnosis, or proof of growth.
 
-- Read it during **Align** (before proposing the Unified Goal). Apply known **active** preferences **by default**; do **not** re-ask what the profile already answers.
-- Populate per the tiers in the skill's `references/personalization.md`: first qualifying observations land under **To Confirm** as candidates. **Communication** and **low-risk collaboration/writing** preferences may become active after a second independent task or explicit confirm; **rejected options**, **route aliases**, writing posture, and **Growth Focus** require **explicit confirm only** (repeated mentions do not auto-promote). It is **never** a big upfront questionnaire.
-- Preferences are **defaults, not overrides** — the user's explicit instruction this turn always wins.
-- Anything under **To Confirm** is a **candidate, not an active preference** — do not apply it until promoted.
-- Triggers, write tiers, rejected-options / route-alias lanes, and the authority firewall (what may sediment, what needs confirmation, and what must never be learned) are defined in the skill package's `references/personalization.md`; this file is the data carrier. Learned preferences never raise authority.
-- This profile is not authority, task evidence, acceptance evidence, or proof of growth. The order is: explicit current-turn instruction, then matching active profile entries, then generic defaults.
+## Entry Format
+
+Every entry eligible for automatic task projection uses this exact field set:
+
+```markdown
+### <stable-entry-id>
+
+- id: <stable-entry-id>
+- lane: phrase_lexicon | communication | collaboration_habit | writing_preference | growth_focus | rejected_option | route_alias
+- value: <concrete collaboration default>
+- scope: project | domain:<name> | task_class:<name> | user
+- applies_when: <specific condition a human and an agent can evaluate>
+- source: explicit_statement | explicit_confirmation | repeated_correction | repeated_choice
+- status: candidate | active | archived
+- last_fired: YYYY-MM-DD | never
+```
+
+Use the same stable human-maintained slug for the heading and explicit `id` field. Rewording `value` does not silently create a new id. A project entry ref is:
+
+```text
+.ai/knowledge/collaboration-profile.md#<stable-entry-id>
+```
+
+An opted-in user-level ref uses `~/.ai/knowledge/collaboration-profile.md#<stable-entry-id>` in shared output, never an absolute home path. When an entry actually affects a task, `injected_refs.content_sha256` binds the exact single-entry Markdown block with CRLF normalized to LF.
+
+Do not store raw full prompts, secrets, third-party personal data, inferred identity/personality, hidden capability scores, profile scores, or standing release authority.
 
 ---
 
 ## Communication
 
-| Preference | Value |
-|------------|-------|
-| Language for conclusions | <e.g. write conclusions in Chinese> |
-| Output density | <terse one-liners / balanced / detailed> |
-| Structure vs prose | <prose by default / tables when deciding> |
+Use lane `communication` for language, density, response structure, and reusable good/bad-response guidance. Store the reusable default, not a raw conversation excerpt.
+
+### comm-conclusion-language
+
+- id: comm-conclusion-language
+- lane: communication
+- value: <e.g. write decision conclusions in Chinese>
+- scope: user
+- applies_when: <e.g. the task result is presented directly to this user>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Question Threshold
 
-- When to **decide and proceed** vs **ask first**: <e.g. resolve your own doubts first; only ask a genuine blocker that changes direction>
-- Max questions per turn on ambiguous tasks: <e.g. 1–2>
+Use lane `collaboration_habit`.
+
+### habit-material-questions-only
+
+- id: habit-material-questions-only
+- lane: collaboration_habit
+- value: <e.g. resolve discoverable doubts first; ask only when the answer changes the outcome>
+- scope: user
+- applies_when: <e.g. an ambiguous task still has an outcome-changing choice after inspection>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Risk Tolerance
 
-| Area | Preference |
-|------|------------|
-| Reversible / low-stakes | <e.g. move fast, no ceremony> |
-| Production / data / security | <e.g. extra caution; pause and confirm> |
-| Refactors / scope | <e.g. minimal change; ask before broadening> |
+Use lane `collaboration_habit`. This is a Guided collaboration preference and cannot lower project safety, authority, evidence, or acceptance floors.
+
+### habit-reversible-work-speed
+
+- id: habit-reversible-work-speed
+- lane: collaboration_habit
+- value: <e.g. proceed on reversible local changes without ritual confirmation>
+- scope: user
+- applies_when: <e.g. local low-stakes changes with no production/data/security effect>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Quality Bar
 
-- Definition of "good" for this user: <e.g. root-cause fix, no half-products, evidence-backed, Occam>
-- Non-negotiables: <e.g. no success claims without Passing Evidence>
+Use lane `collaboration_habit`.
+
+### habit-root-cause-quality
+
+- id: habit-root-cause-quality
+- lane: collaboration_habit
+- value: <e.g. prefer root-cause changes and evidence-bound completion claims>
+- scope: user
+- applies_when: <e.g. non-trivial diagnosis, implementation, or review>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Decision Habits
 
-- How this user weighs trade-offs: <e.g. correctness > speed; strong consistency over cache staleness>
-- Recurring criteria: <e.g. prefers fewer dependencies; prefers standard-library solutions>
+Use lane `collaboration_habit`. Do not turn a preference such as “fewer dependencies” into a Fixed implementation rule; stronger task evidence may justify a different Open solution.
+
+### habit-dependency-tradeoff
+
+- id: habit-dependency-tradeoff
+- lane: collaboration_habit
+- value: <e.g. prefer fewer dependencies when quality and safety are otherwise equivalent>
+- scope: user
+- applies_when: <e.g. comparing technically viable implementation options>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Good vs Bad Responses
 
-- 👍 Liked: <an answer/behavior the user valued, and why>
-- 👎 Disliked: <an answer/behavior the user rejected, and why>
+Use `communication` or `collaboration_habit`. Summarize the reusable reason; do not preserve the original prompt/response.
+
+### comm-decision-first
+
+- id: comm-decision-first
+- lane: communication
+- value: <e.g. lead with the decision, then show only evidence that can change it>
+- scope: user
+- applies_when: <e.g. architecture, product, or review decisions>
+- source: repeated_correction
+- status: candidate
+- last_fired: never
 
 ## Writing Collaboration Preferences
 
-Narrow, context-qualified defaults only. These may guide constraints but must not freeze structure or voice. The current task still declares its source-backed posture as `deliver` | `co-create` | `coach`; only an explicitly confirmed stable posture default belongs here, and `coach` is never inferred from repetition.
+Use lane `writing_preference`. Keep audience, medium, source strictness, feedback density, or explicitly confirmed posture narrow and context-qualified. Structure and voice remain Open unless the current task fixes them. `coach` is never inferred from repetition.
 
-| Preference | Value | Scope / context | Source | Status | Last fired |
-|---|---|---|---|---|---|
-| <audience / medium / source strictness / feedback density / posture default> | <narrow default> | <where it applies> | observed \| confirmed | candidate \| active \| archived | never |
+### writing-executive-source-strictness
+
+- id: writing-executive-source-strictness
+- lane: writing_preference
+- value: <e.g. material factual claims must trace to the supplied research packet>
+- scope: task_class:executive_brief
+- applies_when: <e.g. drafting factual executive briefs from a bounded source packet>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Growth Focus
 
-An explicitly chosen transferable practice focus. It is descriptive and user-controlled, lives in this profile, and is not proof that growth occurred. Keep current-artifact quality separate. `NOT_RUN` blocks any claim that longitudinal growth is proven.
+Use lane `growth_focus`. It requires explicit confirmation and names a transferable capability plus observable behavior, bounded support/posture, and review/expiry in `value`/`applies_when`. It is a practice intention, not evidence of improvement. Longitudinal outcome remains `NOT_RUN` until readable repeated-task evidence exists.
 
-| Capability | Observable behavior | Scope | Agent support / posture | Source / status | Last fired / review | Evidence refs / outcome |
-|---|---|---|---|---|---|---|
-| <transferable capability> | <behavior visible in an artifact or collaboration> | <where it applies> | <bounded support; deliver/co-create/coach only if explicitly chosen> | confirmed; candidate \| active \| archived | never; <review or expiry> | <envelope/receipt refs>; PILOT \| PASS \| FAIL \| NOT_RUN |
+### growth-claim-traceability
 
-When an active item affects a task, its stable version-bound reference goes into that task's existing `injected_refs`. Only readable outcomes carrying that reference may be associated here; never copy raw prompts into this profile.
+- id: growth-claim-traceability
+- lane: growth_focus
+- value: <e.g. practice making causal claims traceable; agent support is bounded feedback after a complete draft>
+- scope: task_class:technical_brief
+- applies_when: <e.g. user explicitly chooses this practice focus for technical briefs; review by YYYY-MM-DD>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ## Phrase Lexicon
 
-Recurring user phrases mapped to the operational meaning both sides settled on. An entry fires only when the phrase is used in its recorded sense (a quoted title or unrelated context is a mismatch).
+Use lane `phrase_lexicon`. The entry fires only in its recorded operational sense; quoted titles and unrelated mentions are mismatches. Promotion requires explicit confirmation or the allowed second-hit rule in the personalization protocol.
 
-| Phrase (user's words) | Compiled meaning | Source | Status | Last fired |
-|---|---|---|---|---|
-| <e.g. “验收”> | <independent accept mode, read-only> | observed \| confirmed | active | never |
+### phrase-independent-accept
 
-## Rejected Options (project-scoped, confirm-first)
+- id: phrase-independent-accept
+- lane: phrase_lexicon
+- value: <e.g. “验收” means independent read-only acceptance>
+- scope: user
+- applies_when: <e.g. the phrase is used as an operation, not inside a title or quotation>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
-Stable rejections the user does not want re-proposed in this project. Single-task non-goals stay in the task envelope — only explicit long-term / project-boundary rejections belong here. **Explicit confirm only** to promote; never infer from one non-choice; never store standing release/push authority.
+## Rejected Options
 
-| Rejected option | Scope | Source | Status | Notes |
-|---|---|---|---|---|
-| <e.g. Redis for local cache> | project | observed \| confirmed | candidate \| active | <why / when stated> |
+Use lane `rejected_option`. Entries are project-scoped, explicit-confirm-only defaults. A single-task rejection stays in that task's `non_goals`. Never store standing push/release authority here.
 
-## Route Aliases (diagnose \| accept \| release-check \| resume only)
+### reject-project-cache-redis
 
-Confirm-first phrase → fixed route id. No new physical skills. Must not raise authority or lower assurance floors. Title quotes / unrelated context do not fire; current-turn explicit instruction wins. **Explicit confirm only** to promote — repeated mentions without confirm do not auto-promote.
+- id: reject-project-cache-redis
+- lane: rejected_option
+- value: <e.g. do not re-propose Redis as this project's local cache>
+- scope: project
+- applies_when: <e.g. selecting the local cache architecture for this project>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
-| Phrase (user's words) | Route id | Source | Status | Last fired |
-|---|---|---|---|---|
-| <e.g. “帮我过一遍”> | accept | observed \| confirmed | candidate \| active | never |
+## Route Aliases
+
+Use lane `route_alias`. The value maps a confirmed phrase only to `diagnose`, `accept`, `release-check`, or `resume`. It creates no physical skill and cannot raise authority or lower assurance/evidence floors.
+
+### route-review-accept
+
+- id: route-review-accept
+- lane: route_alias
+- value: <e.g. “帮我过一遍” maps to `accept`>
+- scope: user
+- applies_when: <e.g. the phrase is used as a task operation, not in a title or quotation>
+- source: explicit_confirmation
+- status: candidate
+- last_fired: never
 
 ---
 
-## To Confirm (candidates — not active preferences)
+## To Confirm
 
-<!-- Observed candidates awaiting promotion. Rejected options, route aliases, writing posture, and Growth Focus require explicit confirmation; other low-risk preferences may use a second independent task hit. Never apply a candidate in its creation turn. -->
+Candidates awaiting promotion. Rejected options, route aliases, writing posture, and Growth Focus require explicit confirmation. Other low-risk lanes may use explicit confirmation or the permitted second independent signal. Never apply a candidate in its creation turn.
 
-- *(none yet)*
+### candidate-<stable-id>
+
+- id: candidate-<stable-id>
+- lane: <allowed lane>
+- value: <proposed reusable default>
+- scope: project | domain:<name> | task_class:<name> | user
+- applies_when: <specific condition>
+- source: explicit_statement | explicit_confirmation | repeated_correction | repeated_choice
+- source_ref: <task/envelope/evidence reference; no raw prompt>
+- observed_at: YYYY-MM-DD
+- status: candidate
+- last_fired: never
+
+## Legacy Compatibility
+
+Keep old free-form or table entries readable. Missing `id`, `lane`, `value`, `scope`, `applies_when`, `source`, `status`, or `last_fired` means the entry is not automatically projected. Normalize only through explicit confirmation or the next authorized field-level edit. Never wholesale-rewrite a real user profile, delete legacy content because fields are missing, or silently migrate project entries to user-level.

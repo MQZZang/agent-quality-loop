@@ -77,7 +77,9 @@ Ask at most two questions, and only when the answer changes the outcome or autho
 Compile `target_user_or_system` as the final consumer + medium.
 
 Personalization:
-- ALIGN reads `.ai/knowledge/collaboration-profile.md` when present: phrase-lexicon and preference defaults apply, the current turn's explicit instruction wins, and learned preferences never raise authority.
+- ALIGN reads `.ai/knowledge/collaboration-profile.md` when present. Experimental Profile Projection v1 selects at most two complete, matching `active` entries as Guided defaults in the existing Task Contract; the current turn's explicit instruction removes conflicts before selection, and learned preferences never raise authority or lower evidence/acceptance floors.
+- Profile Projection is ephemeral: no persistent User Lens, second contract, profile score, or ranker. Exact applied entries are traced through the existing `injected_refs`; semantic scope/condition matching remains agent judgment, not keyword scoring.
+- Fresh Mode natural-language requests skip project and opted-in user collaboration-profile entries for one task. They do not skip project facts/rules/context, technical lessons, authority, evidence, acceptance, or release boundaries; they do not write/delete the profile or update `last_fired`.
 - Missing profile: first-candidate bootstrap may create the file and write **only** under To Confirm; candidates are not standing authority and must not apply the same turn.
 - RETRO may sediment observed candidates per the skill's `references/personalization.md` — auto tier disclosed in one line, decision-changing habits confirm-first, permission-like items refused.
 - Narrow writing preferences and Growth Focus live in that same file. Posture and Growth Focus are explicit-confirm-only; they do not prove growth, trigger coaching, or become acceptance evidence. Outcomes remain separate `PILOT` / `PASS` / `FAIL` / `NOT_RUN` observations derived from existing receipts/evidence, never a hidden reward or second event store.
@@ -85,7 +87,7 @@ Personalization:
 
 Envelope cache, refs, and stats:
 - Optional local cache under `.agent-quality-loop/` via packaged `aql-envelope.js` when `local_write+` is authorized; consumers invoke through `SKILL_ROOT`. Gitignore is the user's choice. Read-only tasks may leave no local envelope.
-- When a lesson, profile, preset, domain profile, probe, or route is actually applied, record it in envelope `injected_refs`. Absence of the field means measurement unknown, not “nothing injected.” `harvest_candidates` carries RETRO harvest (max 3).
+- When a lesson, profile, preset, domain profile, probe, or route is actually applied, record it in envelope `injected_refs`. A profile ref names one stable entry id and exact entry-content hash; at most two profile refs apply per task. Absence of the field means measurement unknown, not “nothing injected”; `[]` means measured empty. `harvest_candidates` carries RETRO harvest (max 3 total, max 2 profile/rejected-option candidates).
 - `node scripts/aql-stats.js` reports coverage and descriptive associations — **observable and falsifiable, not causally proven**.
 
 Alignment compiler and routes:
@@ -238,8 +240,10 @@ The installer does not overwrite existing skill directories; remove or back up a
 
 1. Edit `.cursor/skills/` only.
 2. Run `node scripts/sync-skills.js` to regenerate both generated mirrors (`.agents/skills/` and `skills/`) (`scripts/sync-skills.sh` is deprecated compatibility only).
-3. Run structural validators.
-4. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
-5. Obtain an independent review before declaring formal acceptance.
+3. Run structural validators. Profile Projection changes also run `node .cursor/skills/agent-quality-loop/scripts/validate-profile-projection.js --self-test`; this checks declared fixture mechanics, not semantic matching.
+4. Reproduce fresh-context behavior with `node probes/run-profile-projection-smoke.js --self-test`; on a compatible authenticated Codex host run the smoke and addendum commands documented in `docs/profile-projection-v1-experiment.md`.
+5. Run `node probes/run-profile-projection-review.js --self-test` and `node probes/verify-profile-projection-evidence.js`. Published behavior evidence must be sanitized, exact-byte bound, and raw-first reviewed. A behavior PASS does not upgrade an invalid A/B/C comparison or prove product value.
+6. Forward-test ordinary fix, independent acceptance, and `full + publish` boundary.
+7. Obtain an independent review before declaring formal acceptance.
 
 See [AGENTS.md](../AGENTS.md) for repository-level invariants and [README.md](../README.md) for installation.
