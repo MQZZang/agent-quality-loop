@@ -8,17 +8,42 @@ It is not a new IDE, panel, or standalone app. After you install the skills, the
 
 中文一页速览：[docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)。规范文本以英文为准。
 
-## The problem
+Profile Projection v1 is an unreleased, opt-in experiment. For one task, AQL may apply at most two confirmed, genuinely relevant collaboration defaults. It does not turn the full profile into a second prompt contract, raise authority, or constrain the agent's professional method. Product effect and longitudinal value remain `NOT_RUN`.
+
+## What changes for you
+
+1. **One visible goal** — the agent states the outcome, edit boundary, and likely misunderstanding before substantial work.
+2. **Claims stay attached to evidence** — local self-QA, independent acceptance, and release permission remain separate.
+3. **Results lead with the decision** — the conclusion, practical boundary, evidence strength, and any required action appear before internal receipts.
+
+## A 60-second example
+
+```text
+Review this architecture change, fix the root cause, and verify it locally.
+Use my confirmed project defaults where they fit. Do not push or publish.
+```
+
+For a non-trivial task, the expected behavior is: align one Task Contract, let the current request override stored defaults, apply no more than two source-bound profile entries when their real carrier is readable, run proportionate checks, report the result and remaining uncertainty, then stop before any remote action.
+
+## Fit / not a fit
+
+**Fit:** long or ambiguous agent work; implementation that must stop locally; independent review; evidence-bound or creative writing; teams that need a readable separation between “built,” “accepted,” and “released.”
+
+**Not a fit:** one-line facts, casual brainstorming, replacing human product judgment, hidden personalization, or treating test counts as proof of user value.
+
+## Install
+
+```bash
+npx skills add MQZZang/agent-quality-loop
+```
+
+This installs skills, not probe transcripts or a runtime service. See [Installation details](#installation-details) for the bundled installer, suites, hosts, and project-level setup.
+
+## Why AQL exists
 
 Agents made producing a change cheap. The cost moved onto whoever has to decide whether “done” is true. Mechanical gates help when a command can settle the question. AQL covers the part a command cannot: whether the goal was the right goal, whether the evidence bears on the claim, whether “hide it” meant delete it, and whether local self-QA was silently treated as publish permission.
 
-## Who should use it
-
-Use this if you already run non-trivial work in Cursor, the Codex CLI, Claude Code, or another `SKILL.md` host, and you still have to reconstruct the truth after the agent stops.
-
-Skip it for one-line facts, casual brainstorming, or tasks with no reusable execution or acceptance lifecycle. It does not replace domain skills, human product judgment, real-device checks, or your release authority.
-
-## What you can observe after install
+## How it behaves on non-trivial work
 
 For the same kind of request you already make:
 
@@ -54,7 +79,7 @@ You keep typing ordinary language. The agent infers what outcome you want now, h
 
 Three invariants do not move: style never escalates authority; no completion claim without evidence; accepted is not released.
 
-## Install
+## Installation details
 
 Nothing to build and no runtime dependency. Installing copies Markdown rules and skills.
 
@@ -106,13 +131,15 @@ A real grounding example: the user asked to change `timeout` in `config.json`, b
 
 ## What is verified, and what is not
 
+Profile Projection v1 is experimental and opt-in. Its current evidence is limited to named mechanism behavior; product effect and longitudinal value are `NOT_RUN`. Installing this repository still installs only the skill package: probe evidence is not an installation payload.
+
 | Check | What it covers |
 |---|---|
-| 108 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
+| 109 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
 | Envelope regression suite | An adapter cannot grant itself acceptance; a local-only run cannot reach release state. |
 | Blind forward-testing | Protocol: [probes/PROBES.md](probes/PROBES.md). Results, including failures: [MATRIX.md](MATRIX.md). |
 | Writing probes | Structure, identity, and independent semantic grade are separate. P-W6 remains **FAIL**. Transcripts: [behavior-probes.md](docs/research/llm-learning-corpus/behavior-probes.md). |
-| Profile Projection v1 probes | Sanitized, exact-byte-bound one-host evidence and a neutral raw-first review covered ten named mechanism behaviors with zero hard-gate events. The A/B/C control did not isolate incremental value, so product effect and the 48-run pilot remain `NOT_RUN`. Protocol and evidence: [profile-projection-v1-experiment.md](docs/profile-projection-v1-experiment.md). |
+| Profile Projection v1 probes | Sanitized, exact-byte-bound one-host evidence and a neutral raw-first review covered ten named mechanism behaviors with zero hard-gate events. The old A/B/C control is `INVALID`; a replacement protocol is preregistered but `NOT_RUN`, so product effect and longitudinal value remain `NOT_RUN`. Protocol and evidence: [profile-projection-v1-experiment.md](docs/profile-projection-v1-experiment.md), [v3 preregistration](docs/profile-projection-v1-abc-preregistration-v3.md). |
 | Corpus research | 397 files inventoried; fourteen AQL-relevant claims distilled. Not semantic coverage of the whole corpus. Licenses remain `unknown`. |
 
 CI runs the structural checks on every push and pull request. Structural checks are not semantic acceptance.
@@ -143,7 +170,7 @@ Do not collapse neighboring rows.
 
 `skill-factory` is optional authoring, not part of the quality loop. Optional routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
 
-Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, never a source of authority. The Unreleased experimental Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; it creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed a neutral raw-first review, but the A/B/C value control was not discriminating; product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
+Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, content-bound to the readable carrier, and never a source of authority. The Unreleased experimental Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; it creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed its recorded raw-first review; the old A/B/C value control remains `INVALID`, and the executable v3 replacement is only preregistered. Product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
 
 Optional envelope cache and stats: [docs/guide.md](docs/guide.md).
 

@@ -7,6 +7,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
+const { hasUserProfileOptInAssumption, verifyProfileRefs } = require("./validate-profile");
 
 const MAX_EXECUTION_PLAN_TTL_MS = 15 * 60 * 1000;
 const CONTENT_SHA256_RE_LOCAL = /^[a-f0-9]{64}$/;
@@ -343,6 +344,15 @@ function validateInjectedRefs(injectedRefs, errors = []) {
   if (learnedProfile > 2) errors.push("injected_refs learned profile max is 2");
   if (structural > 3) errors.push("injected_refs structural max is 3");
   return errors;
+}
+
+function validateUserProfileOptIn(envelope, errors) {
+  const hasUserProfileRef = Array.isArray(envelope.injected_refs) && envelope.injected_refs.some((entry) => (
+    entry && entry.kind === "profile" && typeof entry.ref === "string" && entry.ref.startsWith("~/.ai/knowledge/collaboration-profile.md#")
+  ));
+  if (hasUserProfileRef && !hasUserProfileOptInAssumption(envelope.assumptions)) {
+    errors.push("user profile refs require a current_session user_profile_opt_in assumption with a safe source_ref");
+  }
 }
 
 function validateAcceptanceIndependenceShape(independence) {
@@ -988,6 +998,7 @@ function validateEnvelope(envelope) {
   validateReleaseSemantics(envelope, errors);
   validateAuthorization(envelope, errors);
   validateInjectedRefs(envelope.injected_refs, errors);
+  validateUserProfileOptIn(envelope, errors);
   validateHarvestCandidates(envelope.harvest_candidates, errors);
   if (Object.prototype.hasOwnProperty.call(envelope, "snapshot")) {
     validateSnapshotMetadata(envelope.snapshot, errors);
@@ -1517,6 +1528,30 @@ function runSelfTest() {
   ];
   cases.push({ name: "valid injected_refs accepted", envelope: injectedOk, valid: true });
 
+  const userProfileWithoutOptIn = baseEnvelope();
+  userProfileWithoutOptIn.injected_refs = [{
+    kind: "profile",
+    class: "learned",
+    ref: "~/.ai/knowledge/collaboration-profile.md#route-review-accept",
+    content_sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    reason: "Confirmed route alias changes task routing for this request.",
+  }];
+  cases.push({
+    name: "user profile ref without current-session opt-in assumption rejected",
+    envelope: userProfileWithoutOptIn,
+    valid: false,
+    expectedError: "user profile refs require a current_session user_profile_opt_in assumption",
+  });
+
+  const userProfileWithOptIn = JSON.parse(JSON.stringify(userProfileWithoutOptIn));
+  userProfileWithOptIn.assumptions = [{
+    kind: "user_profile_opt_in",
+    enabled: true,
+    scope: "current_session",
+    source_ref: "current-turn:user-profile-opt-in",
+  }];
+  cases.push({ name: "user profile ref with current-session opt-in assumption accepted", envelope: userProfileWithOptIn, valid: true });
+
   const injectedEmpty = baseEnvelope();
   injectedEmpty.injected_refs = [];
   cases.push({ name: "empty injected_refs array accepted", envelope: injectedEmpty, valid: true });
@@ -1831,6 +1866,9 @@ function parseCliArgs(argv) {
     selfTest: false,
     checkRefs: false,
     baseDir: process.cwd(),
+    projectProfile: null,
+    userProfile: null,
+    userProfileOptedIn: false,
     inputPath: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -1853,6 +1891,22 @@ function parseCliArgs(argv) {
       options.baseDir = path.resolve(arg.slice("--base=".length));
       continue;
     }
+    if (arg === "--project-profile") {
+      const value = argv[++index];
+      if (!value) throw new Error("--project-profile requires a path");
+      options.projectProfile = path.resolve(value);
+      continue;
+    }
+    if (arg === "--user-profile") {
+      const value = argv[++index];
+      if (!value) throw new Error("--user-profile requires a path");
+      options.userProfile = path.resolve(value);
+      continue;
+    }
+    if (arg === "--user-profile-opt-in") {
+      options.userProfileOptedIn = true;
+      continue;
+    }
     if (arg.startsWith("-")) {
       throw new Error(`Unknown argument: ${arg}`);
     }
@@ -1869,7 +1923,7 @@ function main(argv = process.argv.slice(2)) {
   } catch (error) {
     console.error(error.message);
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1877,7 +1931,7 @@ function main(argv = process.argv.slice(2)) {
   if (options.selfTest) return runSelfTest();
   if (!options.inputPath) {
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1894,6 +1948,35 @@ function main(argv = process.argv.slice(2)) {
   if (errors.length > 0) {
     for (const error of errors) console.error(`INVALID: ${error}`);
     return 1;
+  }
+  if (options.userProfile && !options.userProfileOptedIn) {
+    console.error("INVALID: --user-profile requires --user-profile-opt-in");
+    return 1;
+  }
+  const profileRefs = Array.isArray(envelope.injected_refs)
+    ? envelope.injected_refs.filter((entry) => entry && entry.kind === "profile")
+    : [];
+  if (profileRefs.length > 0) {
+    const defaultProjectProfile = path.join(options.baseDir, ".ai", "knowledge", "collaboration-profile.md");
+    const projectPath = options.projectProfile || (fs.existsSync(defaultProjectProfile) ? defaultProjectProfile : null);
+    try {
+      const binding = verifyProfileRefs({
+        refs: profileRefs,
+        baseDir: options.baseDir,
+        projectProfilePath: projectPath,
+        userProfilePath: options.userProfile,
+        userProfileOptedIn: options.userProfileOptedIn,
+      });
+      if (binding.errors.length > 0) {
+        for (const error of binding.errors) console.error(`INVALID: profile source binding: ${error}`);
+        return 1;
+      }
+      console.log(`${binding.status}: profile source binding checked=${binding.receipts.length}`);
+      if (binding.status !== "PASS") return 1;
+    } catch (error) {
+      console.error(`INVALID: cannot validate profile source binding: ${error.message}`);
+      return 1;
+    }
   }
   console.log("VALID: structural envelope invariants passed; semantic evidence still requires review");
   return 0;

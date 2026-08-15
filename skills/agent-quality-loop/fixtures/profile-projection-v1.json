@@ -1,7 +1,9 @@
 {
   "schema_version": "profile-projection-fixtures/v1",
-  "fixture_version": "profile-projection-v1-fixtures/1",
+  "fixture_version": "profile-projection-v1-fixtures/2",
   "defaults": {
+    "as_of": "2026-08-15",
+    "user_profile_opted_in": false,
     "measurement_status": "measured",
     "semantic": {
       "scope_matches": true,
@@ -10,7 +12,6 @@
       "firewall_safe": true,
       "stale": false,
       "operational_match": true,
-      "explicitly_confirmed": true,
       "specificity": 1
     },
     "effect": {
@@ -175,10 +176,27 @@
       "scope": "user",
       "applies_when": "the phrase is used as an operation",
       "source": "explicit_statement",
+      "confirmation_ref": "task:claimed-confirmation",
+      "trigger_phrase": "帮我过一遍",
+      "route_id": "accept",
       "status": "active",
       "last_fired": "never",
       "entry_content": "route-review-accept",
       "preference_key": "route_review"
+    },
+    "writing_coach": {
+      "id": "writing-posture-coach",
+      "lane": "writing_preference",
+      "value": "coach",
+      "writing_posture": "coach",
+      "scope": "user",
+      "applies_when": "the user is drafting a bounded technical brief",
+      "source": "repeated_choice",
+      "confirmation_ref": "task:self-reported-confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "writing-posture-coach",
+      "preference_key": "writing_posture"
     },
     "phrase_accept": {
       "id": "phrase-independent-accept",
@@ -243,7 +261,7 @@
     "tie_non_ascii": {
       "id": "tie-ä",
       "lane": "communication",
-      "value": "Use the non-ASCII tie-break default.",
+      "value": "Use the ASCII tie-break default.",
       "scope": "project",
       "applies_when": "the task has a deterministic ordering tie",
       "source": "explicit_confirmation",
@@ -263,18 +281,21 @@
     {
       "id": "PP02",
       "title": "candidate cannot be selected",
+      "user_profile_opted_in": true,
       "entry_uses": [{ "entry": "candidate_density", "selected": true }],
       "expected": { "valid": false, "error_contains": "status must be active when selected" }
     },
     {
       "id": "PP03",
       "title": "archived entry cannot be selected",
+      "user_profile_opted_in": true,
       "entry_uses": [{ "entry": "archived_brief", "selected": true }],
       "expected": { "valid": false, "error_contains": "status must be active when selected" }
     },
     {
       "id": "PP04",
       "title": "legacy entry with missing metadata cannot be selected",
+      "user_profile_opted_in": true,
       "entry_uses": [{
         "entry": "legacy_freeform",
         "selected": true,
@@ -297,7 +318,7 @@
     {
       "id": "PP06",
       "title": "project scope wins over a conflicting user-global default",
-      "enforce_priority": true,
+      "user_profile_opted_in": true,
       "entry_uses": [
         { "entry": "project_concise", "selected": true },
         { "entry": "user_detail", "selected": false, "skip_reason": "Lower-priority user-global default conflicts with the project-scoped entry." }
@@ -358,16 +379,18 @@
     {
       "id": "PP13",
       "title": "unconfirmed route alias cannot fire",
+      "user_profile_opted_in": true,
       "entry_uses": [{
         "entry": "route_accept",
         "selected": true,
-        "semantic": { "explicitly_confirmed": false }
+        "semantic": { "explicitly_confirmed": true }
       }],
-      "expected": { "valid": false, "error_contains": "confirm-only lane selected without explicit confirmation" }
+      "expected": { "valid": false, "error_contains": "confirmation-only entry requires source explicit_confirmation" }
     },
     {
       "id": "PP14",
       "title": "phrase in a quoted title is not an operational match",
+      "user_profile_opted_in": true,
       "entry_uses": [{
         "entry": "phrase_accept",
         "selected": false,
@@ -442,6 +465,7 @@
     {
       "id": "PP23",
       "title": "Guided dependency preference may yield to stronger professional evidence",
+      "user_profile_opted_in": true,
       "entry_uses": [{ "entry": "dependency_preference", "selected": true }],
       "effect_overrides": {
         "guided_deviation": true,
@@ -452,6 +476,7 @@
     {
       "id": "PP24",
       "title": "authority-shaped preference is stopped by the firewall",
+      "user_profile_opted_in": true,
       "entry_uses": [{
         "entry": "push_without_permission",
         "selected": true,
@@ -493,12 +518,163 @@
     {
       "id": "PP29",
       "title": "non-ASCII priority ties use deterministic code-point order",
-      "enforce_priority": true,
       "entry_uses": [
         { "entry": "tie_ascii_z", "selected": true },
         { "entry": "tie_non_ascii", "selected": false, "skip_reason": "Code-point ordering selects tie-z before tie-ä." }
       ],
       "expected": { "valid": true }
+    },
+    {
+      "id": "PP30",
+      "title": "exact task class outranks project scope",
+      "entry_uses": [
+        { "entry": "task_code", "selected": true, "conflict_key": "task_opening" },
+        { "entry": "project_detail", "selected": false, "conflict_key": "task_opening", "skip_reason": "Exact task-class scope has higher selection priority." }
+      ],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP31",
+      "title": "same-priority different values are an explicit conflict and both skip",
+      "entry_uses": [
+        { "entry": "project_detail", "selected": false, "conflict_key": "output_mode", "skip_reason": "Same-priority profile values conflict; no default is applied." },
+        { "entry": "project_concise", "selected": false, "conflict_key": "output_mode", "skip_reason": "Same-priority profile values conflict; no default is applied." }
+      ],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP32",
+      "title": "same-priority conflict cannot be resolved by specificity or stable id",
+      "entry_uses": [
+        { "entry": "project_detail", "selected": true, "conflict_key": "output_mode", "semantic": { "specificity": 99 } },
+        { "entry": "project_concise", "selected": false, "conflict_key": "output_mode", "skip_reason": "Conflicting same-priority value." }
+      ],
+      "expected": { "valid": false, "error_contains": "same-priority different values and must skip all" }
+    },
+    {
+      "id": "PP33",
+      "title": "impossible last_fired date is rejected",
+      "entry_uses": [{ "entry": "project_detail", "selected": true, "entry_overrides": { "last_fired": "2026-02-31" } }],
+      "expected": { "valid": false, "error_contains": "last_fired is not a real calendar date" }
+    },
+    {
+      "id": "PP34",
+      "title": "generic applies_when is rejected",
+      "entry_uses": [{ "entry": "project_detail", "selected": true, "entry_overrides": { "applies_when": "appropriate" } }],
+      "expected": { "valid": false, "error_contains": "applies_when is generic or a placeholder" }
+    },
+    {
+      "id": "PP35",
+      "title": "user profile entry requires explicit opt-in",
+      "entry_uses": [{ "entry": "dependency_preference", "selected": true }],
+      "expected": { "valid": false, "error_contains": "selected user profile entry without explicit opt-in" }
+    },
+    {
+      "id": "PP36",
+      "title": "writing posture cannot self-report confirmation",
+      "user_profile_opted_in": true,
+      "entry_uses": [{ "entry": "writing_coach", "selected": true, "semantic": { "explicitly_confirmed": true } }],
+      "expected": { "valid": false, "error_contains": "confirmation-only entry requires source explicit_confirmation" }
+    },
+    {
+      "id": "PP37",
+      "title": "route alias requires a canonical route id",
+      "user_profile_opted_in": true,
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "entry_overrides": {
+          "source": "explicit_confirmation",
+          "confirmation_ref": "task:confirmed-route",
+          "route_id": "unrestricted-lifecycle"
+        }
+      }],
+      "expected": { "valid": false, "error_contains": "route_id is invalid for route_alias" }
+    },
+    {
+      "id": "PP38",
+      "title": "confirmed structured route alias is selectable",
+      "user_profile_opted_in": true,
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "entry_overrides": {
+          "source": "explicit_confirmation",
+          "confirmation_ref": "task:confirmed-route"
+        }
+      }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP39",
+      "title": "last_fired update carries a real date",
+      "entry_uses": [{ "entry": "project_detail", "selected": true }],
+      "effect_overrides": {
+        "profile_write_authorized": true,
+        "last_fired_updates": [{ "id": "project-architecture-detail", "new_date": "2026-02-31" }]
+      },
+      "expected": { "valid": false, "error_contains": "last_fired update must include id and a real new_date" }
+    },
+    {
+      "id": "PP40",
+      "title": "priority enforcement cannot be disabled by omitting a flag",
+      "user_profile_opted_in": true,
+      "entry_uses": [
+        { "entry": "project_concise", "selected": false, "skip_reason": "Incorrectly skipped higher-priority project entry." },
+        { "entry": "user_detail", "selected": true }
+      ],
+      "expected": { "valid": false, "error_contains": "selected entries must be the first two non-conflicting eligible candidates" }
+    },
+    {
+      "id": "PP41",
+      "title": "future last_fired date is rejected against fixture as_of",
+      "entry_uses": [{ "entry": "project_detail", "selected": true, "entry_overrides": { "last_fired": "2027-01-01" } }],
+      "expected": { "valid": false, "error_contains": "last_fired cannot be after as_of" }
+    },
+    {
+      "id": "PP42",
+      "title": "caller-owned explicit confirmation boolean is forbidden",
+      "user_profile_opted_in": true,
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "entry_overrides": {
+          "source": "explicit_confirmation",
+          "confirmation_ref": "task:confirmed-route"
+        },
+        "semantic": { "explicitly_confirmed": true }
+      }],
+      "expected": { "valid": false, "error_contains": "semantic.explicitly_confirmed is forbidden" }
+    },
+    {
+      "id": "PP43",
+      "title": "rejected option cannot self-report confirmation",
+      "user_profile_opted_in": true,
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "entry_overrides": {
+          "lane": "rejected_option",
+          "source": "explicit_statement"
+        },
+        "semantic": { "explicitly_confirmed": true }
+      }],
+      "expected": { "valid": false, "error_contains": "confirmation-only entry requires source explicit_confirmation" }
+    },
+    {
+      "id": "PP44",
+      "title": "growth focus cannot self-report confirmation",
+      "user_profile_opted_in": true,
+      "entry_uses": [{
+        "entry": "route_accept",
+        "selected": true,
+        "entry_overrides": {
+          "lane": "growth_focus",
+          "source": "repeated_choice"
+        },
+        "semantic": { "explicitly_confirmed": true }
+      }],
+      "expected": { "valid": false, "error_contains": "confirmation-only entry requires source explicit_confirmation" }
     }
   ]
 }

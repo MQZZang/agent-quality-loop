@@ -9,9 +9,8 @@ const {
   EVIDENCE_FORMAT_VERSION,
   artifactRecord,
   sha256Bytes,
-  unsafeEvidenceKinds,
-  verifyArtifact,
 } = require("./profile-projection-evidence-utils");
+const { portableEvidenceKinds } = require("./profile-projection-portable-evidence");
 const { buildPrompt, parseSuite } = require("./run-profile-projection-smoke");
 
 const DEFAULT_DIRS = [
@@ -48,9 +47,27 @@ function collectFiles(directory) {
 
 function verifyDirectorySafety(directory) {
   for (const filePath of collectFiles(directory)) {
-    const kinds = unsafeEvidenceKinds(fs.readFileSync(filePath, "utf8"));
+    const kinds = portableEvidenceKinds(fs.readFileSync(filePath, "utf8"));
     if (kinds.length > 0) throw new Error(`${filePath}: unsafe evidence kinds ${kinds.join(", ")}`);
   }
+}
+
+function verifyArtifact(record) {
+  if (!record || typeof record.ref !== "string" || !/^[a-f0-9]{64}$/.test(record.sha256 || "")) {
+    throw new Error("Invalid evidence artifact record");
+  }
+  const filePath = path.resolve(ROOT, record.ref);
+  const canonicalRef = path.relative(ROOT, filePath).split(path.sep).join("/");
+  if (canonicalRef.startsWith("../") || path.isAbsolute(canonicalRef) || canonicalRef !== record.ref.replace(/\\/g, "/")) {
+    throw new Error(`Evidence ref is not canonical: ${record.ref}`);
+  }
+  const actual = artifactRecord(filePath);
+  if (actual.sha256 !== record.sha256 || actual.bytes !== record.bytes) {
+    throw new Error(`Evidence digest mismatch: ${record.ref}`);
+  }
+  const kinds = portableEvidenceKinds(fs.readFileSync(filePath, "utf8"));
+  if (kinds.length > 0) throw new Error(`Unsafe evidence remains in ${record.ref}: ${kinds.join(", ")}`);
+  return actual;
 }
 
 function verifyCanonicalFileSet(directory, manifest) {

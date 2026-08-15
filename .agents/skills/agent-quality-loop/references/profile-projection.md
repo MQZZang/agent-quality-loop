@@ -28,19 +28,29 @@ status: candidate | active | archived
 last_fired: YYYY-MM-DD | never
 ```
 
-`id` is a stable human-maintained slug. Rewording `value` does not silently create a new id. Do not store raw prompts, secrets, third-party personal data, inferred identity, personality diagnoses, or hidden capability scores.
+`id` is a stable human-maintained slug. Rewording `value` does not silently create a new id. `applies_when` must be concrete; placeholders such as `appropriate`, `when relevant`, `适用时`, `TBD`, and `<specific condition>` are incomplete. Dates are real UTC calendar dates, not regex-shaped strings.
 
-Existing profile sections map to lanes as follows:
+Conditional structured fields are:
 
-| Profile section | Lane |
+- `conflict_key` when entries can express competing values for one preference;
+- `confirmation_ref` for active explicit-confirm-only entries; it is a stable non-secret task/evidence ref, not a raw prompt;
+- `writing_posture: deliver | co-create | coach` when a writing preference controls collaboration posture;
+- `trigger_phrase` and `route_id: diagnose | accept | release-check | resume` for a route alias;
+- `source_ref` and `observed_at` for a To Confirm candidate.
+
+An active route alias, rejected option, Growth Focus, or writing posture requires both `source: explicit_confirmation` and `confirmation_ref`. A model/caller assertion such as `explicitly_confirmed: true` has no standing. Do not store raw prompts, secrets, third-party personal data, inferred identity, personality diagnoses, or hidden capability scores.
+
+The compact profile template maps user-facing examples to lanes as follows:
+
+| Preference type | Lane |
 |---|---|
-| Communication, Good vs Bad Responses | `communication` |
-| Question Threshold, Risk Tolerance, Quality Bar, Decision Habits | `collaboration_habit` |
-| Writing Collaboration Preferences | `writing_preference` |
-| Growth Focus | `growth_focus` |
-| Phrase Lexicon | `phrase_lexicon` |
-| Rejected Options | `rejected_option` |
-| Route Aliases | `route_alias` |
+| Language, density, result order, reusable good/bad guidance | `communication` |
+| Question threshold, risk, quality, and decision habits | `collaboration_habit` |
+| Audience, medium, source strictness, structured posture | `writing_preference` |
+| Transferable practice intention | `growth_focus` |
+| Operational phrase meaning | `phrase_lexicon` |
+| Stable project-scoped rejection | `rejected_option` |
+| Confirmed phrase to existing route id | `route_alias` |
 
 Good/bad response examples may justify a plain-language candidate, but the profile stores the reusable default rather than a raw conversation excerpt.
 
@@ -54,6 +64,8 @@ Projection may read only:
 - a user-level collaboration profile only after explicit opt-in for this host/session.
 
 Do not use third-party descriptions, model-authored user summaries, complete chat history as a hidden profile, or ungrounded repository prose that says what the user likes.
+
+When an opted-in user carrier actually participates, record `{kind: user_profile_opt_in, enabled: true, scope: current_session, source_ref: <safe current-turn ref>}` in the existing Task Contract `assumptions`; do not create a persistent opt-in field or infer consent merely because the path exists. Production projection validation and full-envelope validation both require that structured assumption; source binding additionally requires the runtime opt-in gate and canonical-suffix user carrier path.
 
 ## Fresh Mode
 
@@ -82,9 +94,10 @@ the current turn did not override it
 the authority firewall permits it
 the entry is not stale or archived
 the match is operational, not a quoted title or unrelated mention
+user scope was explicitly enabled for this host/session
 ```
 
-`phrase_lexicon`, `route_alias`, `rejected_option`, writing posture, and `growth_focus` additionally require the confirmation rules in [personalization.md](personalization.md). Do not weaken the filter to fill the two-entry budget.
+`route_alias`, `rejected_option`, writing posture, and `growth_focus` additionally require structural explicit-confirmation provenance. `phrase_lexicon` retains the narrow second-hit rule in [personalization.md](personalization.md). Do not weaken the filter to fill the two-entry budget.
 
 Legacy entries missing `id`, `lane`, `scope`, `applies_when`, `source`, `status`, or `last_fired` remain human-readable but are not automatically projected. Preserve them until the user confirms or a field-level edit normalizes them; never delete or wholesale-rewrite them during migration.
 
@@ -92,14 +105,16 @@ Legacy entries missing `id`, `lane`, `scope`, `applies_when`, `source`, `status`
 
 After semantic matching and current-turn override removal, prefer:
 
-1. exact `project` scope;
-2. exact `domain:<name>` or `task_class:<name>` scope;
-3. matching `user` scope;
-4. `explicit_confirmation`;
-5. `explicit_statement`;
-6. `repeated_correction` or `repeated_choice`;
-7. the more specific `applies_when` condition;
-8. stable `id` as the final deterministic tie-breaker.
+1. exact `task_class:<name>` scope;
+2. exact `domain:<name>` scope;
+3. exact `project` scope;
+4. matching opted-in `user` scope;
+5. `explicit_confirmation`;
+6. `explicit_statement`;
+7. `repeated_correction` or `repeated_choice`;
+8. the more specific declared `applies_when` receipt.
+
+Group competing entries by `conflict_key`. First compare scope and source strength. If the best scope/source tier contains different values or effects, mark a conflict and skip them regardless of caller-declared `specificity`; ask only when that unresolved default changes the task outcome. Specificity and stable code-point `id` order may order equivalent same-effect records and emitted refs only. They must never decide between different user preferences. Select the first two remaining candidates; priority enforcement is not optional.
 
 The current-turn instruction is not a ranking input: it removes conflicting entries before ranking. Semantic scope and condition matching remain agent judgment grounded in the current task; do not replace them with keyword scores or claim mathematical user understanding.
 
@@ -122,15 +137,17 @@ Every selected entry that actually changes the contract or result expression get
 - kind: profile
   class: learned
   ref: .ai/knowledge/collaboration-profile.md#<entry-id>
-  content_sha256: <sha256 of the exact single-entry Markdown block, UTF-8 with CRLF normalized to LF>
+  content_sha256: <sha256 of the canonical single-entry Markdown block from the readable carrier>
   reason: <one line naming the matched scope/condition and the Guided default affected>
 ```
+
+The canonical block begins at `### <entry-id>` and ends before the next `###`, `##`, or EOF. Decode UTF-8, normalize CRLF/CR to LF, strip blank lines only from block edges, preserve internal whitespace/field order, and append exactly one LF. Hash the block opened by the validator from the canonical project path under `baseDir`, or from an explicit opted-in user carrier path with the same `.ai/knowledge/collaboration-profile.md` suffix. Raw caller-supplied Markdown or `entry_content` is never source-binding input. When a measured selection lacks its carrier, source binding is `NOT_RUN` and machine validation fails closed; it is not a projection PASS.
 
 For an opted-in user-level profile, use `~/.ai/knowledge/collaboration-profile.md#<entry-id>` rather than an absolute home path in shared statistics or reports. The existing envelope budget permits at most two profile refs. Do not merge several entries behind one ref.
 
 Reasons such as `Relevant`, `Applied profile`, or `User prefers this` are invalid because they do not explain the match or effect. An entry that did not affect the contract is not injected and did not fire.
 
-Update `last_fired` only when the entry affected the contract and profile field-level write authority is available. Read-only work, Fresh Mode, skipped entries, and current-turn overrides do not update it.
+Update `last_fired` only when the entry affected the contract and profile field-level write authority is available. The receipt carries `{id, new_date}` with a real date no later than the task `as_of`. Read-only work, Fresh Mode, skipped entries, and current-turn overrides do not update it.
 
 ## Explicit Feedback Candidates
 
@@ -151,6 +168,6 @@ When the user asks what was applied or why, answer from the recorded `injected_r
 
 ## Mechanical Validation Boundary
 
-The bundled fixture validator checks declared projection receipts for metadata completeness, filtering invariants, budgets, source tracking, authority/evidence preservation, Fresh Mode, and low-noise output. It deliberately does not decide whether a natural-language scope or `applies_when` condition semantically matches. Fresh-context behavior probes own that evidence.
+The bundled fixture validator checks declared projection-receipt shape for metadata completeness, real dates, placeholder lint, structural confirmation provenance, deterministic priority/conflict handling, budgets, authority/evidence preservation, Fresh Mode, and low-noise output. Production `validateProjection()` does not use that fixture exception: any measured selected profile ref must bind through a canonical carrier path or fail with source binding `NOT_RUN`. Neither validator decides whether a concrete natural-language scope or `applies_when` condition truly matches. Fresh-context behavior probes own that evidence.
 
 Stop rather than expand the design when progress would require a persistent User Lens, a second contract, a profile database/event ledger/ranker/embedding, a keyword-score selector presented as semantic understanding, wholesale profile migration, or a lowered trust boundary.

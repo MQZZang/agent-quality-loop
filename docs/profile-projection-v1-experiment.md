@@ -109,6 +109,8 @@ Run after smoke passes:
 
 Current decision: do not start this pilot until the B control is redesigned and preregistered under a new protocol version. The bound 12+4 runs establish only named mechanism behavior on one host/model; they cannot satisfy the product decision gate because B does not isolate the projection step.
 
+The replacement is the separately versioned [A/B/C v3 preregistration](profile-projection-v1-abc-preregistration-v3.md). It is `PRE-REGISTERED` / `NOT_RUN`; it does not alter or upgrade any version-2 evidence above.
+
 Profile-sensitive classes:
 
 1. ambiguous product goal;

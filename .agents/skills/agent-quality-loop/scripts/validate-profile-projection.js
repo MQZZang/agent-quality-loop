@@ -5,8 +5,18 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const {
+  hasUserProfileOptInAssumption,
+  isCalendarDate,
+  isConcreteCondition,
+  readProfile,
+  verifyProfileRefs,
+} = require("./validate-profile");
 
 const DEFAULT_FIXTURE = path.resolve(__dirname, "..", "fixtures", "profile-projection-v1.json");
+const DEFAULT_PROFILE_FIXTURE_ROOT = path.resolve(__dirname, "..", "fixtures", "profile-project");
+const DEFAULT_PROFILE_CARRIER_FIXTURE = path.join(DEFAULT_PROFILE_FIXTURE_ROOT, ".ai", "knowledge", "collaboration-profile.md");
+const DEFAULT_USER_PROFILE_CARRIER_FIXTURE = path.resolve(__dirname, "..", "fixtures", "profile-user", ".ai", "knowledge", "collaboration-profile.md");
 const LANES = new Set([
   "phrase_lexicon",
   "communication",
@@ -26,6 +36,8 @@ const STATUSES = new Set(["candidate", "active", "archived"]);
 const AUTHORITIES = new Set(["read", "local_write", "external_write", "destructive", "release"]);
 const ASSURANCES = new Set(["fast", "standard", "formal"]);
 const CONFIRM_ONLY_LANES = new Set(["route_alias", "rejected_option", "growth_focus"]);
+const WRITING_POSTURES = new Set(["deliver", "co-create", "coach"]);
+const ROUTE_IDS = new Set(["diagnose", "accept", "release-check", "resume"]);
 const FORBIDDEN_ORDINARY_SURFACE = [
   "User Lens",
   "Profile Projection",
@@ -71,9 +83,10 @@ function sha256(value) {
 }
 
 function scopeRank(scope) {
-  if (scope === "project") return 0;
-  if (typeof scope === "string" && (scope.startsWith("domain:") || scope.startsWith("task_class:"))) return 1;
-  if (scope === "user") return 2;
+  if (typeof scope === "string" && scope.startsWith("task_class:")) return 0;
+  if (typeof scope === "string" && scope.startsWith("domain:")) return 1;
+  if (scope === "project") return 2;
+  if (scope === "user") return 3;
   return 99;
 }
 
@@ -101,13 +114,37 @@ function hasMeaningfulInjectedRefReason(value) {
   return normalized.length >= 12 && !GENERIC_INJECTED_REF_REASONS.has(normalized);
 }
 
-function comparePriority(left, right) {
+function compareScopeSourcePriority(left, right) {
   return (
     scopeRank(left.scope) - scopeRank(right.scope) ||
-    sourceRank(left.source) - sourceRank(right.source) ||
+    sourceRank(left.source) - sourceRank(right.source)
+  );
+}
+
+function comparePriority(left, right) {
+  return (
+    compareScopeSourcePriority(left, right) ||
     (right.semantic.specificity || 0) - (left.semantic.specificity || 0) ||
     compareCodePointStrings(left.id, right.id)
   );
+}
+
+function entryEffectSignature(entry) {
+  return JSON.stringify({
+    lane: entry.lane,
+    value: entry.value,
+    writing_posture: entry.writing_posture || null,
+    trigger_phrase: entry.trigger_phrase || null,
+    route_id: entry.route_id || null,
+  });
+}
+
+function isConfirmationOnly(entry) {
+  return CONFIRM_ONLY_LANES.has(entry.lane) || nonEmptyString(entry.writing_posture);
+}
+
+function safeConfirmationRef(value) {
+  return nonEmptyString(value) && !/[\r\n]/.test(value) && !/^[A-Za-z]:[\\/]/.test(value) && !path.isAbsolute(value);
 }
 
 function resolveCase(suite, spec) {
@@ -121,7 +158,7 @@ function resolveCase(suite, spec) {
     entry.selected = use.selected === true;
     entry.skip_reason = use.skip_reason;
     entry.legacy = use.legacy === true;
-    entry.preference_key = use.preference_key || entry.preference_key || entry.id;
+    entry.conflict_key = use.conflict_key || entry.conflict_key || entry.preference_key || entry.id;
     return entry;
   });
 
@@ -153,7 +190,8 @@ function resolveCase(suite, spec) {
     fresh_mode: spec.fresh_mode === true,
     task_clear: spec.task_clear !== false,
     audit_requested: spec.audit_requested === true,
-    enforce_priority: spec.enforce_priority === true,
+    as_of: spec.as_of || suite.defaults.as_of,
+    user_profile_opted_in: spec.user_profile_opted_in === true || suite.defaults.user_profile_opted_in === true,
     measurement_status: spec.measurement_status || suite.defaults.measurement_status,
     entries: uses,
     injected_refs: injectedRefs,
@@ -161,8 +199,8 @@ function resolveCase(suite, spec) {
   };
 }
 
-function validateEntryMetadata(entry, label, errors) {
-  for (const field of ["id", "lane", "value", "scope", "applies_when", "source", "status", "last_fired", "entry_content"]) {
+function validateEntryMetadata(entry, label, asOf, errors) {
+  for (const field of ["id", "lane", "value", "scope", "applies_when", "source", "status", "last_fired"]) {
     if (!nonEmptyString(entry[field])) errors.push(`${label}.${field} is required for projectable entries`);
   }
   if (nonEmptyString(entry.lane) && !LANES.has(entry.lane)) errors.push(`${label}.lane is invalid`);
@@ -171,14 +209,33 @@ function validateEntryMetadata(entry, label, errors) {
   if (nonEmptyString(entry.scope) && !/^(?:project|user|domain:[^\s:]+|task_class:[^\s:]+)$/.test(entry.scope)) {
     errors.push(`${label}.scope is invalid`);
   }
-  if (nonEmptyString(entry.last_fired) && entry.last_fired !== "never" && !/^\d{4}-\d{2}-\d{2}$/.test(entry.last_fired)) {
-    errors.push(`${label}.last_fired is invalid`);
+  if (nonEmptyString(entry.last_fired) && entry.last_fired !== "never") {
+    if (!isCalendarDate(entry.last_fired)) errors.push(`${label}.last_fired is not a real calendar date`);
+    else if (isCalendarDate(asOf) && entry.last_fired > asOf) errors.push(`${label}.last_fired cannot be after as_of`);
+  }
+  if (nonEmptyString(entry.applies_when) && !isConcreteCondition(entry.applies_when)) {
+    errors.push(`${label}.applies_when is generic or a placeholder`);
+  }
+  if (nonEmptyString(entry.writing_posture) && !WRITING_POSTURES.has(entry.writing_posture)) {
+    errors.push(`${label}.writing_posture is invalid`);
+  }
+  if (entry.lane === "writing_preference" && WRITING_POSTURES.has(String(entry.value || "").trim().toLowerCase()) && !nonEmptyString(entry.writing_posture)) {
+    errors.push(`${label} posture-shaped writing preference requires writing_posture`);
+  }
+  if (entry.lane === "route_alias") {
+    if (!nonEmptyString(entry.trigger_phrase)) errors.push(`${label}.trigger_phrase is required for route_alias`);
+    if (!ROUTE_IDS.has(entry.route_id)) errors.push(`${label}.route_id is invalid for route_alias`);
+  }
+  if (isConfirmationOnly(entry) && entry.status === "active") {
+    if (entry.source !== "explicit_confirmation") errors.push(`${label} confirmation-only entry requires source explicit_confirmation`);
+    if (!safeConfirmationRef(entry.confirmation_ref)) errors.push(`${label} confirmation-only entry requires a safe confirmation_ref`);
   }
 }
 
-function eligible(entry) {
+function eligible(entry, fixture) {
   const semantic = entry.semantic;
   return (
+    fixture.fresh_mode !== true &&
     entry.status === "active" &&
     SOURCES.has(entry.source) &&
     semantic.scope_matches === true &&
@@ -187,16 +244,18 @@ function eligible(entry) {
     semantic.firewall_safe === true &&
     semantic.stale === false &&
     semantic.operational_match === true &&
-    (!CONFIRM_ONLY_LANES.has(entry.lane) || semantic.explicitly_confirmed === true)
+    (entry.scope !== "user" || fixture.user_profile_opted_in === true) &&
+    (!isConfirmationOnly(entry) || (entry.source === "explicit_confirmation" && safeConfirmationRef(entry.confirmation_ref)))
   );
 }
 
-function validateProjection(fixture) {
+function validateProjectionInternal(fixture, profileOptions = {}, fixtureOnly = false) {
   const errors = [];
   if (!nonEmptyString(fixture.id)) errors.push("case id is required");
   if (!nonEmptyString(fixture.title)) errors.push("case title is required");
   if (!Array.isArray(fixture.entries)) errors.push("entries must be an array");
   if (!isObject(fixture.effect)) errors.push("effect must be an object");
+  if (!isCalendarDate(fixture.as_of)) errors.push("as_of must be a real calendar date");
   if (errors.length > 0) return errors;
 
   const selected = fixture.entries.filter((entry) => entry.selected);
@@ -208,8 +267,11 @@ function validateProjection(fixture) {
 
   for (const [index, entry] of fixture.entries.entries()) {
     const label = `entries[${index}]`;
-    if (!entry.legacy || entry.selected) validateEntryMetadata(entry, label, errors);
+    if (!entry.legacy || entry.selected) validateEntryMetadata(entry, label, fixture.as_of, errors);
     if (!entry.selected && !nonEmptyString(entry.skip_reason)) errors.push(`${label}.skip_reason is required when not selected`);
+    if (entry.semantic && Object.prototype.hasOwnProperty.call(entry.semantic, "explicitly_confirmed")) {
+      errors.push(`${label}.semantic.explicitly_confirmed is forbidden; confirmation derives from source`);
+    }
     if (entry.selected) {
       if (entry.status !== "active") errors.push(`${label}.status must be active when selected`);
       if (entry.semantic.scope_matches !== true) errors.push(`${label} selected despite scope mismatch`);
@@ -218,26 +280,32 @@ function validateProjection(fixture) {
       if (entry.semantic.firewall_safe !== true) errors.push(`${label} selected despite authority firewall`);
       if (entry.semantic.stale !== false) errors.push(`${label} selected despite stale state`);
       if (entry.semantic.operational_match !== true) errors.push(`${label} selected from quoted or unrelated context`);
-      if (CONFIRM_ONLY_LANES.has(entry.lane) && entry.semantic.explicitly_confirmed !== true) {
-        errors.push(`${label} confirm-only lane selected without explicit confirmation`);
-      }
+      if (entry.scope === "user" && fixture.user_profile_opted_in !== true) errors.push(`${label} selected user profile entry without explicit opt-in`);
+      if (isConfirmationOnly(entry) && entry.source !== "explicit_confirmation") errors.push(`${label} confirmation-only entry selected without source explicit_confirmation`);
+      if (isConfirmationOnly(entry) && !safeConfirmationRef(entry.confirmation_ref)) errors.push(`${label} confirmation-only entry selected without confirmation_ref`);
     }
   }
 
-  if (fixture.enforce_priority) {
-    const groups = new Map();
-    for (const entry of fixture.entries.filter(eligible)) {
-      const group = groups.get(entry.preference_key) || [];
-      group.push(entry);
-      groups.set(entry.preference_key, group);
+  const groups = new Map();
+  for (const entry of fixture.entries.filter((candidate) => eligible(candidate, fixture))) {
+    const group = groups.get(entry.conflict_key) || [];
+    group.push(entry);
+    groups.set(entry.conflict_key, group);
+  }
+  const resolvable = [];
+  for (const [key, group] of groups.entries()) {
+    const ordered = [...group].sort(compareScopeSourcePriority);
+    const top = ordered.filter((entry) => compareScopeSourcePriority(entry, ordered[0]) === 0);
+    const signatures = new Set(top.map(entryEffectSignature));
+    if (signatures.size > 1) {
+      if (group.some((entry) => entry.selected)) errors.push(`conflict group ${key} has same-priority different values and must skip all`);
+      continue;
     }
-    for (const group of groups.values()) {
-      const winner = [...group].sort(comparePriority)[0];
-      const selectedInGroup = group.filter((entry) => entry.selected);
-      if (selectedInGroup.length !== 1 || selectedInGroup[0].id !== winner.id) {
-        errors.push(`priority group ${winner.preference_key} must select ${winner.id}`);
-      }
-    }
+    resolvable.push(top.sort(comparePriority)[0]);
+  }
+  const expectedSelection = resolvable.sort(comparePriority).slice(0, 2).map((entry) => entry.id);
+  if (selectedIds.length <= 2 && JSON.stringify(selectedIds) !== JSON.stringify(expectedSelection)) {
+    errors.push(`selected entries must be the first two non-conflicting eligible candidates: ${expectedSelection.join(", ") || "none"}`);
   }
 
   if (fixture.measurement_status === "measured") {
@@ -266,9 +334,6 @@ function validateProjection(fixture) {
             ? "~/.ai/knowledge/collaboration-profile.md"
             : ".ai/knowledge/collaboration-profile.md";
           if (ref.ref !== `${expectedRoot}#${entry.id}`) errors.push(`${label}.ref must identify the exact entry id`);
-          if (nonEmptyString(entry.entry_content) && ref.content_sha256 !== sha256(entry.entry_content)) {
-            errors.push(`${label}.content_sha256 must bind the exact entry content`);
-          }
         }
         const key = `${ref.kind}|${ref.ref}|${ref.content_sha256}`;
         if (seen.has(key)) errors.push(`${label} duplicates a profile ref`);
@@ -280,6 +345,25 @@ function validateProjection(fixture) {
     if (selected.length > 0) errors.push("selected entries cannot have unknown injection measurement");
   } else {
     errors.push("measurement_status is invalid");
+  }
+
+  if (fixture.measurement_status === "measured" && Array.isArray(fixture.injected_refs) && fixture.injected_refs.some((entry) => entry && entry.kind === "profile") && !fixtureOnly) {
+    const hasUserProfileRef = fixture.injected_refs.some((entry) => (
+      entry && entry.kind === "profile" && typeof entry.ref === "string" && entry.ref.startsWith("~/.ai/knowledge/collaboration-profile.md#")
+    ));
+    const hasStructuredUserOptIn = hasUserProfileOptInAssumption(profileOptions.assumptions);
+    if (hasUserProfileRef && !hasStructuredUserOptIn) {
+      errors.push("user profile refs require a current_session user_profile_opt_in assumption with a safe source_ref");
+    }
+    const binding = verifyProfileRefs({
+      refs: fixture.injected_refs,
+      baseDir: profileOptions.baseDir,
+      projectProfilePath: profileOptions.projectProfilePath,
+      userProfilePath: profileOptions.userProfilePath,
+      userProfileOptedIn: fixture.user_profile_opted_in === true && profileOptions.userProfileOptedIn === true && hasStructuredUserOptIn,
+    });
+    for (const error of binding.errors) errors.push(`source binding: ${error}`);
+    if (binding.status === "NOT_RUN") errors.push("source binding NOT_RUN because a selected carrier was not supplied");
   }
 
   const effect = fixture.effect;
@@ -321,8 +405,13 @@ function validateProjection(fixture) {
     errors.push("last_fired update requires profile write authority");
   }
   if (Array.isArray(effect.last_fired_updates)) {
-    for (const id of effect.last_fired_updates) {
-      if (!selectedIds.includes(id)) errors.push("last_fired may update only a selected entry that affected the contract");
+    for (const update of effect.last_fired_updates) {
+      if (!isObject(update) || !nonEmptyString(update.id) || !isCalendarDate(update.new_date)) {
+        errors.push("last_fired update must include id and a real new_date");
+        continue;
+      }
+      if (update.new_date > fixture.as_of) errors.push("last_fired update cannot be after as_of");
+      if (!selectedIds.includes(update.id)) errors.push("last_fired may update only a selected entry that affected the contract");
     }
   }
   if (fixture.task_clear && effect.user_visible_questions_added !== 0) {
@@ -337,6 +426,10 @@ function validateProjection(fixture) {
     errors.push("Guided deviation requires a concrete professional reason");
   }
   return errors;
+}
+
+function validateProjection(fixture, profileOptions = {}) {
+  return validateProjectionInternal(fixture, profileOptions, false);
 }
 
 function validateSuite(suite) {
@@ -367,7 +460,7 @@ function validateSuite(suite) {
       errors.push(error.message);
       continue;
     }
-    const caseErrors = validateProjection(fixture);
+    const caseErrors = validateProjectionInternal(fixture, {}, true);
     const expected = spec.expected || {};
     if (expected.valid === true) {
       validControls += 1;
@@ -391,6 +484,55 @@ function loadSuite(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
+function validateSourceBindingSelfTest(suite) {
+  const parsed = readProfile(DEFAULT_PROFILE_CARRIER_FIXTURE);
+  const userParsed = readProfile(DEFAULT_USER_PROFILE_CARRIER_FIXTURE);
+  const entry = parsed.byId.get("project-architecture-detail");
+  const otherEntry = parsed.byId.get("project-architecture-concise");
+  const spec = suite.cases.find((item) => item.id === "PP01");
+  const userEntry = userParsed.byId.get("route-review-accept");
+  const userSpec = suite.cases.find((item) => item.id === "PP38");
+  if (!entry || !otherEntry || !spec || !userEntry || !userSpec) return ["source binding self-test fixture is incomplete"];
+  const fixture = resolveCase(suite, spec);
+  fixture.injected_refs[0].content_sha256 = entry.content_sha256;
+  const passErrors = validateProjection(fixture, { baseDir: DEFAULT_PROFILE_FIXTURE_ROOT });
+  const forged = deepClone(fixture);
+  forged.injected_refs[0].content_sha256 = otherEntry.content_sha256;
+  const forgedErrors = validateProjection(forged, { baseDir: DEFAULT_PROFILE_FIXTURE_ROOT });
+  const missingCarrierErrors = validateProjection(fixture, { baseDir: path.join(DEFAULT_PROFILE_FIXTURE_ROOT, "missing") });
+  const userFixture = resolveCase(suite, userSpec);
+  userFixture.injected_refs[0].content_sha256 = userEntry.content_sha256;
+  const userWithoutAssumptionErrors = validateProjection(userFixture, {
+    userProfilePath: DEFAULT_USER_PROFILE_CARRIER_FIXTURE,
+    userProfileOptedIn: true,
+  });
+  const userWithAssumptionErrors = validateProjection(userFixture, {
+    userProfilePath: DEFAULT_USER_PROFILE_CARRIER_FIXTURE,
+    userProfileOptedIn: true,
+    assumptions: [{
+      kind: "user_profile_opt_in",
+      enabled: true,
+      scope: "current_session",
+      source_ref: "current-turn:user-profile-opt-in",
+    }],
+  });
+  const errors = [];
+  if (passErrors.length > 0) errors.push(`real carrier binding expected valid: ${passErrors.join("; ")}`);
+  if (!forgedErrors.some((error) => error.includes("digest does not match canonical entry block"))) {
+    errors.push(`forged caller content was not rejected: ${forgedErrors.join("; ") || "none"}`);
+  }
+  if (!missingCarrierErrors.some((error) => error.includes("source binding NOT_RUN"))) {
+    errors.push(`missing carrier did not fail closed: ${missingCarrierErrors.join("; ") || "none"}`);
+  }
+  if (!userWithoutAssumptionErrors.some((error) => error.includes("current_session user_profile_opt_in assumption"))) {
+    errors.push(`user carrier passed without structured current-session assumption: ${userWithoutAssumptionErrors.join("; ") || "none"}`);
+  }
+  if (userWithAssumptionErrors.length > 0) {
+    errors.push(`user carrier with all three opt-in gates expected valid: ${userWithAssumptionErrors.join("; ")}`);
+  }
+  return errors;
+}
+
 function main(argv = process.argv.slice(2)) {
   const fixtureArg = argv.find((arg) => arg !== "--self-test");
   const fixturePath = path.resolve(fixtureArg || DEFAULT_FIXTURE);
@@ -402,6 +544,7 @@ function main(argv = process.argv.slice(2)) {
     return 1;
   }
   const errors = validateSuite(suite);
+  errors.push(...validateSourceBindingSelfTest(suite));
   if (errors.length > 0) {
     for (const error of errors) console.error(`FAIL ${error}`);
     return 1;
@@ -411,6 +554,7 @@ function main(argv = process.argv.slice(2)) {
   console.log(`PASS Profile Projection v1 fixture contract (${suite.cases.length} cases: ${valid} valid, ${negative} negative controls)`);
   console.log(`fixture_version: ${suite.fixture_version}`);
   console.log(`fixture_sha256: ${sha256(fs.readFileSync(fixturePath, "utf8"))}`);
+  console.log("PASS profile source binding uses canonical carrier bytes and requires Task Contract assumption plus runtime opt-in for user carriers; fixture-only receipts remain NOT_RUN for source binding");
   return 0;
 }
 
@@ -419,6 +563,7 @@ if (require.main === module) process.exitCode = main();
 module.exports = {
   validateProjection,
   validateSuite,
+  validateSourceBindingSelfTest,
   resolveCase,
   sha256,
 };

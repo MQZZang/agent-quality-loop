@@ -17,7 +17,7 @@ After material workflow, contract, or boundary changes, first run the bundled `s
 - Cases 66–73: ordinary typo → BUILT; ordinary bug no auto-ACCEPTED; fix+independent accept no release; release-check only; proportionate quality check; bare 验收 clarify; no proactive release after ACCEPTED; formal high-consequence evidence bar
 - Cases 74–82: writing intent compile, factual/creative truth modes, deliver/co-create/coach postures, profile/growth safety, cross-agent freedom, and falsifiable cognitive language
 - Cases 83–88: nine writing jobs, interpretive/hybrid truth, parent-owned adaptive results, native narrow/desktop readability, and exact artifact/ruler integrity
-- Cases 89–108: Profile Projection v1 filtering, precedence, source tracking, Fresh Mode, trust preservation, Brief singularity, and low-noise disclosure
+- Cases 89–109: Profile Projection v1 filtering, precedence, source tracking, Fresh Mode, trust preservation, Brief singularity, low-noise disclosure, and result attention
 - [Skill-Level Acceptance](#skill-level-acceptance)
 
 ## 1. Happy Path — Narrow Local Fix
@@ -1183,7 +1183,7 @@ Expected behavior: remove the conflicting entry before ranking, follow the curre
 
 Scenario: matching project and user-global entries control the same collaboration preference but conflict.
 
-Expected behavior: prefer the exact project-scoped entry, then domain/task-class, then user-global; use source/specificity/id only as later tie-breakers.
+Expected behavior: prefer exact task class, then exact domain, then project, then opted-in user scope; in this scenario the project entry therefore beats the broader user entry. Use source and declared specificity only after scope. Stable id orders equivalent same-value records but never decides between different values.
 
 **Fail when** the broader entry overrides the project entry or ranking happens before current-turn conflict removal.
 
@@ -1299,6 +1299,14 @@ Expected behavior: A adds zero questions and does not display User Lens/Profile 
 
 **Fail when** routine work gains a questionnaire/internal template, or the explanation cannot be reconstructed from recorded sources.
 
+## 109. Projection Integrity and Result Attention — Bound Sources, Ordered Results
+
+Scenario A: a purported profile confirmation is asserted by the agent but lacks `source: explicit_confirmation` and a safe confirmation ref. Scenario B: a selected entry reports a profile ref/hash that does not match the canonical exact entry block in a readable real carrier. Scenario C: an entry has an impossible/future date such as `2026-02-31` or a generic `applies_when` such as `appropriate`. Scenario D: same-priority entries under one conflict key express different values. Scenario E: a user-level profile path exists but the user has not explicitly opted in. Scenario F: an ordinary Chinese local-fix result is rendered with several internal lifecycle enums before its conclusion.
+
+Expected behavior: A stays unconfirmed and is not promoted or applied; B is rejected, or source binding is explicitly `NOT_RUN` when the carrier is unavailable; C is inactive until repaired through an authorized, explicit flow; D skips the conflicting values and asks only if the unresolved default changes the task outcome; E neither reads nor applies user-level profile data; F stays at 1–3 lines when routine, or uses no more than its first 5–8 lines when expanded, for one conclusion, user impact/boundary, decisive evidence, risk/uncertainty, and one necessary action at most. It does not expose `BUILT`/`ACCEPTED` or a machine receipt unless the user asked, the task is a handoff/formal audit, or a blocking diagnosis needs it.
+
+**Fail when** an agent self-reports confirmation, invents a profile carrier/hash, accepts impossible dates or a generic applicability rule, silently resolves a same-level conflict, touches user-level data without opt-in, or lets internal status/UI ceremony displace the user-facing conclusion.
+
 ## Skill-Level Acceptance
 
 The suite passes only when:
@@ -1342,6 +1350,6 @@ The suite passes only when:
 - writing tasks keep truth/source boundaries, fixed/guided/open space, and task-local posture without adding lifecycle state; ordinary delivery still ends at `BUILT`.
 - `coach` and Growth Focus require explicit user choice, current-turn instructions override profile defaults, and current-artifact quality never proves longitudinal growth.
 - “cognitive” language stays observable and falsifiable; unsupported neuroscience, mind-reading, psychological scoring, and manipulative inevitability are rejected.
-- Profile Projection v1 remains a task-local view into the existing Task Contract: complete matching active entries only, current-turn override first, project/domain/task/user precedence, at most two exact profile refs, and no second state source.
+- Profile Projection v1 remains a task-local view into the existing Task Contract: complete matching active entries only, current-turn override first, task-class/domain/project/opted-in-user precedence, at most two exact profile refs, and no second state source.
 - Fresh Mode skips only collaboration-profile defaults while preserving project context, technical lessons, authority, evidence, acceptance, and release boundaries; it performs no profile write.
-- Deterministic projection fixtures validate declared metadata, budgets, refs/hashes/reasons, and trust invariants without claiming to solve semantic matching; fresh-context probes remain required for behavior claims.
+- Deterministic projection fixtures validate declared metadata, budgets, refs/hashes/reasons, dates, and trust invariants; they cannot mechanically prove that natural-language `applies_when` matching is semantically correct. Fresh-context probes remain required for behavior claims.

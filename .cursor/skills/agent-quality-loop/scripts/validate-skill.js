@@ -23,10 +23,14 @@ const requiredFiles = [
   "references/multi-agent-leverage.md",
   "references/personalization.md",
   "references/profile-projection.md",
+  "references/result-attention.md",
   "references/writing-collaboration-adapter.md",
+  "fixtures/profile-project/.ai/knowledge/collaboration-profile.md",
+  "fixtures/profile-user/.ai/knowledge/collaboration-profile.md",
   "fixtures/profile-projection-v1.json",
   "manifest.json",
   "scripts/validate-envelope.js",
+  "scripts/validate-profile.js",
   "scripts/validate-profile-projection.js",
   "scripts/validate-skill.js",
   "scripts/aql-envelope.js",
@@ -232,6 +236,16 @@ requireAll("references/contracts.md", [
   "### Collaboration Brief / Dispatch Brief",
 ], ["## Trust Badge", "[AQL <version> |"]);
 
+requireAll("references/result-attention.md", [
+  "# Result Attention Rendering",
+  "## Information Order",
+  "## Attention Budget",
+  "does not control hidden reasoning",
+  "does not control hidden reasoning, create a second contract",
+  "Routine success is normally 1–3 lines",
+  "Machine receipts appear only",
+]);
+
 requireAll("references/profile-projection.md", [
   "# Profile Projection v1",
   "## Fresh Mode",
@@ -267,6 +281,7 @@ requireAll("references/evaluation-cases.md", [
   "## 87.",
   "## 88.",
   "## 108.",
+  "## 109.",
 ]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");
@@ -353,6 +368,15 @@ const profileProjectionCheck = spawnSync(
 );
 if (profileProjectionCheck.status !== 0) {
   errors.push(`profile projection self-test failed: ${(profileProjectionCheck.stderr || profileProjectionCheck.stdout).trim()}`);
+}
+
+const profileCheck = spawnSync(
+  process.execPath,
+  [path.join(root, "scripts", "validate-profile.js"), "--self-test"],
+  { cwd: root, encoding: "utf8" },
+);
+if (profileCheck.status !== 0) {
+  errors.push(`profile carrier self-test failed: ${(profileCheck.stderr || profileCheck.stdout).trim()}`);
 }
 
 const writerCheck = spawnSync(process.execPath, [path.join(root, "scripts", "aql-envelope.js"), "--self-test"], {

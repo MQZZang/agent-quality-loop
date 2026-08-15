@@ -26,7 +26,9 @@ const COMMANDS = [
   ["integrations/cursor-hooks/test.js"],
   ["probes/make-fixtures.js", "--self-test"],
   ["probes/run-profile-projection-smoke.js", "--self-test"],
+  ["probes/run-profile-projection-abc-v3.js", "--self-test"],
   ["probes/run-profile-projection-review.js", "--self-test"],
+  ["probes/profile-projection-portable-evidence.js", "--self-test"],
   ["probes/verify-profile-projection-evidence.js"],
   ["scripts/sync-skills.js", "--check"],
 ];

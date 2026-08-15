@@ -50,6 +50,17 @@ injected_refs: optional source records for lessons, profile entries, presets, do
 
 Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
 
+When an opted-in user collaboration profile contributes any `injected_refs`, record the current-session consent inside the existing `assumptions` collection; no new persistent field is created:
+
+```yaml
+- kind: user_profile_opt_in
+  enabled: true
+  scope: current_session
+  source_ref: current-turn:user-profile-opt-in
+```
+
+The source ref must be a safe non-secret task/evidence ref. A home-profile path, caller boolean, or file existence alone is not the assumption record.
+
 `target_user_or_system` means the **final consumer of the artifact plus the consumption medium** (e.g. end user in the shipped UI, reader of the published doc, player in the build)—not merely the requester or implementer. For experiential work (narrative, design, UI, games, docs), write `success_observables` and `counterexamples` in that consumer's perceptible terms.
 
 Identifier, request, goal, target, problem, workspace, reconstruction, and expiry fields are non-empty scalar strings; do not serialize one-item arrays in their place. Collection fields are explicitly named as lists in the full envelope.
@@ -407,6 +418,12 @@ When the loop is active, the parent AQL leads with exactly one adaptive result s
 
 This is an information grammar, not a fixed long template. Omit empty sections. Routine success is normally one natural-language conclusion plus one evidence line; standard work adds only decision-changing evidence and a necessary next step. Expand formal, `FAIL`, `BLOCKED`, `PENDING`, handoff/resume, and release results. A useful expanded shape is:
 
+### Result Attention Rendering
+
+Within the existing User Result Summary and Result Detail Budget, apply [result-attention.md](result-attention.md): make the first 5–8 lines answer, in order, the conclusion, user impact or boundary, decisive evidence, risk or uncertainty, and any necessary user action. Render at most one primary conclusion, one key caution, and one necessary action. This is presentation of the existing Task Contract, not a Result Attention Contract or another persisted state source.
+
+Machine receipts belong in the visible result only when the user explicitly asks, or for handoff, formal audit, or blocking diagnosis. In ordinary Chinese results, do not default to internal enums such as `BUILT` or `ACCEPTED`; use the precise plain-language status only when it changes the user's decision. Do not add cards, emoji, or UI chrome to create attention hierarchy.
+
 ```markdown
 ## Result: {plain-language conclusion}
 
@@ -566,4 +583,4 @@ Before release preflight, `release_gate` is `null`. After preflight begins, both
 | `standard` | Conclusion, decision-changing evidence, and a necessary next step |
 | `formal`, failure, blocker, pending, handoff/resume, release | Expanded summary with required audit/evidence boundaries |
 
-When result ceremony clearly exceeds the size of the change, compress the rendering without lowering the inherited assurance or evidence bar.
+When result ceremony clearly exceeds the size of the change, compress the rendering without lowering the inherited assurance or evidence bar. The first-screen attention order remains conclusion, user impact/boundary, decisive evidence, risk/uncertainty, and necessary action; detailed receipts remain later unless their visibility is required by the User Result Summary rules.
