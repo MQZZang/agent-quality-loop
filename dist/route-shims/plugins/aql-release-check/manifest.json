@@ -1,9 +1,9 @@
 {
   "name": "aql-release-check",
-  "version": "2.7.0",
-  "generated_at": "2026-08-13T12:42:04.154Z",
+  "version": "2.8.0",
+  "generated_at": "2026-08-15T09:39:29.385Z",
   "files": {
-    "SKILL.md": "5035ae4a63f47224f836788d52361035ead4468f058ab78f3344dfef686d59d0",
+    "SKILL.md": "582365fe12c6834c0fd104d180686f95324c657f18a586066c1f9d4fdc0d0e9d",
     "agents/openai.yaml": "86ca5f720b10a43e035576fb13c80cd1ea422ea5e493aacc2224f03f34643f4b"
   },
   "depends_on": [

@@ -20,6 +20,7 @@ const SOURCES = new Set(["explicit_statement", "explicit_confirmation", "repeate
 const STATUSES = new Set(["candidate", "active", "archived"]);
 const WRITING_POSTURES = new Set(["deliver", "co-create", "coach"]);
 const ROUTE_IDS = new Set(["diagnose", "accept", "release-check", "resume"]);
+const GROWTH_OUTCOMES = new Set(["PILOT", "PASS", "FAIL", "NOT_RUN"]);
 const CONFIRM_ONLY_LANES = new Set(["route_alias", "rejected_option", "growth_focus"]);
 const PROJECT_PROFILE_RELATIVE = path.join(".ai", "knowledge", "collaboration-profile.md");
 const PROJECT_PROFILE_REF = ".ai/knowledge/collaboration-profile.md";
@@ -151,9 +152,31 @@ function validateEntry(blockRecord) {
     if (!STATUSES.has(fields.status)) errors.push("status is invalid");
     if (!/^(?:project|user|domain:[^\s:]+|task_class:[^\s:]+)$/.test(fields.scope)) errors.push("scope is invalid");
     if (fields.last_fired !== "never" && !isCalendarDate(fields.last_fired)) errors.push("last_fired is not a real calendar date");
-    if (fields.observed_at && !isCalendarDate(fields.observed_at)) errors.push("observed_at is not a real calendar date");
     if (!isConcreteCondition(fields.applies_when)) errors.push("applies_when is generic or a placeholder");
     if (fields.conflict_key && !/^[a-z0-9][a-z0-9._-]*$/.test(fields.conflict_key)) errors.push("conflict_key is invalid");
+
+    if (fields.status === "candidate") {
+      if (!safeReference(fields.source_ref)) errors.push("candidate requires a safe source_ref");
+      if (!isCalendarDate(fields.observed_at)) errors.push("candidate requires observed_at as a real calendar date");
+    } else if (fields.observed_at && !isCalendarDate(fields.observed_at)) {
+      errors.push("observed_at is not a real calendar date");
+    }
+
+    if (fields.lane === "rejected_option" && fields.scope !== "project") {
+      errors.push("rejected_option scope must be project");
+    }
+
+    if (fields.lane === "growth_focus") {
+      for (const field of ["capability", "observable_behavior", "review_or_expiry"]) {
+        if (!fields[field]) missing.push(field);
+      }
+      if (!fields.collaboration_posture && !fields.agent_support) {
+        missing.push("collaboration_posture|agent_support");
+      }
+      if (fields.outcome && !GROWTH_OUTCOMES.has(fields.outcome)) {
+        errors.push("growth_focus outcome is invalid");
+      }
+    }
 
     const posture = fields.writing_posture;
     if (posture && !WRITING_POSTURES.has(posture)) errors.push("writing_posture is invalid");
@@ -301,6 +324,20 @@ function runSelfTest() {
   const userText = fs.readFileSync(USER_FIXTURE_PATH, "utf8");
   const parsed = parseProfile(projectText);
   const userParsed = parseProfile(userText);
+  const repositoryRoot = path.resolve(__dirname, "..", "..", "..", "..");
+  const repositoryTemplatePath = path.resolve(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "..",
+    ".ai",
+    "knowledge",
+    "collaboration-profile.template.md",
+  );
+  const repositoryTemplate = fs.existsSync(path.join(repositoryRoot, "plugin.json")) && fs.existsSync(repositoryTemplatePath)
+    ? parseProfile(fs.readFileSync(repositoryTemplatePath, "utf8"))
+    : null;
   const first = parsed.byId.get("project-architecture-detail");
   const refs = [{
     kind: "profile",
@@ -312,6 +349,55 @@ function runSelfTest() {
     ref: `${USER_PROFILE_REF}#route-review-accept`,
     content_sha256: userParsed.byId.get("route-review-accept").content_sha256,
   }];
+  const validCandidate = [
+    "### candidate-entry",
+    "",
+    "- id: candidate-entry",
+    "- lane: communication",
+    "- value: Put the decision first.",
+    "- scope: project",
+    "- applies_when: presenting an architecture decision",
+    "- source: explicit_statement",
+    "- status: candidate",
+    "- last_fired: never",
+    "- source_ref: task:candidate-observation",
+    "- observed_at: 2026-08-15",
+  ].join("\n");
+  const validRejectedOption = [
+    "### reject-redis",
+    "",
+    "- id: reject-redis",
+    "- lane: rejected_option",
+    "- value: Do not re-propose Redis as this project's local cache.",
+    "- scope: project",
+    "- applies_when: choosing this project's local cache",
+    "- source: explicit_confirmation",
+    "- status: active",
+    "- last_fired: never",
+    "- confirmation_ref: task:reject-redis-confirmation",
+  ].join("\n");
+  const validGrowthFocus = [
+    "### growth-causal-claims",
+    "",
+    "- id: growth-causal-claims",
+    "- lane: growth_focus",
+    "- value: Practice traceable causal claims.",
+    "- scope: project",
+    "- applies_when: reviewing architecture evidence in this project",
+    "- source: explicit_confirmation",
+    "- status: active",
+    "- last_fired: never",
+    "- confirmation_ref: task:growth-focus-confirmation",
+    "- capability: causal reasoning",
+    "- observable_behavior: separates observed facts from causal inference",
+    "- collaboration_posture: request bounded counterevidence",
+    "- review_or_expiry: review after three applicable tasks",
+    "- outcome: NOT_RUN",
+  ].join("\n");
+  const removeField = (text, field) => text
+    .split("\n")
+    .filter((line) => !line.startsWith(`- ${field}:`))
+    .join("\n");
   const checks = [
     [parsed.errors.length === 0 && parsed.projectable.length === 2, "valid carrier parses two projectable entries"],
     [canonicalizeBlock(first.block.replace(/\n/g, "\r\n")) === first.block, "CRLF and LF canonicalize identically"],
@@ -327,6 +413,23 @@ function runSelfTest() {
     [parseProfile(projectText.replace("the task is an architecture decision in this project", "appropriate")).errors.some((e) => e.includes("generic or a placeholder")), "generic applies_when is rejected"],
     [parseProfile(`${projectText}\n### project-architecture-detail\n\n- id: project-architecture-detail\n`).errors.some((e) => e.includes("duplicate profile entry id")), "duplicate ids are rejected"],
     [parseProfile("### legacy-entry\n\n- applies_when: appropriate\n").errors.length === 0, "incomplete legacy entry stays readable and inactive"],
+    [parseProfile("```markdown\n### fenced-example\n\n- id: fenced-example\n- lane: communication\n- value: ignored\n- scope: project\n- applies_when: presenting an architecture decision\n- source: explicit_confirmation\n- status: active\n- last_fired: never\n```\n").entries.length === 0, "fenced profile examples are ignored"],
+    [repositoryTemplate === null || (repositoryTemplate.errors.length === 0 && repositoryTemplate.entries.length === 0 && repositoryTemplate.projectable.length === 0 && repositoryTemplate.inactive.length === 0), "repository template copied unchanged is inert"],
+    [parseProfile(validCandidate).complete.length === 1 && parseProfile(validCandidate).projectable.length === 0, "complete candidate remains inactive"],
+    [parseProfile(removeField(validCandidate, "source_ref")).errors.some((e) => e.includes("candidate requires a safe source_ref")), "candidate missing source_ref is invalid"],
+    [parseProfile(validCandidate.replace("task:candidate-observation", "raw-prompt:secret")).errors.some((e) => e.includes("candidate requires a safe source_ref")), "candidate unsafe source_ref is invalid"],
+    [parseProfile(removeField(validCandidate, "observed_at")).errors.some((e) => e.includes("candidate requires observed_at")), "candidate missing observed_at is invalid"],
+    [parseProfile(validCandidate.replace("2026-08-15", "2026-02-31")).errors.some((e) => e.includes("candidate requires observed_at")), "candidate impossible observed_at is invalid"],
+    [parseProfile(validRejectedOption).projectable.length === 1, "project-scoped rejected_option is valid"],
+    [parseProfile(validRejectedOption.replace("scope: project", "scope: user")).errors.some((e) => e.includes("rejected_option scope must be project")), "user-scoped rejected_option is invalid"],
+    [parseProfile(validRejectedOption.replace("scope: project", "scope: domain:architecture")).errors.some((e) => e.includes("rejected_option scope must be project")), "domain-scoped rejected_option is invalid"],
+    [parseProfile(validRejectedOption.replace("scope: project", "scope: task_class:code")).errors.some((e) => e.includes("rejected_option scope must be project")), "task-scoped rejected_option is invalid"],
+    [parseProfile(validGrowthFocus).projectable.length === 1, "complete growth_focus is valid"],
+    [parseProfile(removeField(validGrowthFocus, "capability")).projectable.length === 0, "growth_focus missing capability is inactive"],
+    [parseProfile(removeField(validGrowthFocus, "observable_behavior")).projectable.length === 0, "growth_focus missing observable_behavior is inactive"],
+    [parseProfile(removeField(validGrowthFocus, "review_or_expiry")).projectable.length === 0, "growth_focus missing review_or_expiry is inactive"],
+    [parseProfile(removeField(validGrowthFocus, "collaboration_posture")).projectable.length === 0, "growth_focus missing collaboration support is inactive"],
+    [parseProfile(validGrowthFocus.replace("outcome: NOT_RUN", "outcome: UNKNOWN")).errors.some((e) => e.includes("growth_focus outcome is invalid")), "growth_focus invalid outcome is rejected"],
   ];
   const failures = checks.filter(([ok]) => !ok).map(([, label]) => label);
   if (failures.length > 0) {
@@ -411,6 +514,7 @@ module.exports = {
   parseProfile,
   readProfile,
   runSelfTest,
+  safeReference,
   sha256,
   verifyProfileRefs,
 };

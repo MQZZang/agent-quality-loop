@@ -181,15 +181,33 @@ jobs:
         shell: bash
         run: |
           TAG="${{ steps.ref.outputs.tag }}"
-          {
-            echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
-            echo
-            echo "Longitudinal user-value evidence remains under evaluation."
-            if [ "$TAG" = "v2.6.1" ]; then
+          if [ "$TAG" = "v2.8.0" ]; then
+            {
+              echo "AQL 2.8.0"
               echo
-              echo "v2.6.0 exact-tag CI failed and is superseded by this v2.6.1 release."
-            fi
-          } > release-notes.md
+              echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
+              echo
+              echo '- Added experimental, opt-in Profile Projection v1.'
+              echo '- Applies at most two complete matching active profile entries.'
+              echo '- Added Fresh Mode for one-task profile bypass without weakening trust boundaries.'
+              echo '- Added canonical profile carrier validation and source-bound hashes.'
+              echo '- Added explicit confirmation provenance and session-gated user profile access.'
+              echo '- Added Result Attention Rendering for lower-noise, decision-first output.'
+              echo '- Project templates are inert until the user creates or confirms entries.'
+              echo '- Mechanism validation passed on exact-tag Ubuntu and Windows CI.'
+              echo '- Product effect, longitudinal value, full cross-host behavior, and preregistered v3 A/B/C execution remain NOT_RUN.'
+            } > release-notes.md
+          else
+            {
+              echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
+              echo
+              echo "Longitudinal user-value evidence remains under evaluation."
+              if [ "$TAG" = "v2.6.1" ]; then
+                echo
+                echo "v2.6.0 exact-tag CI failed and is superseded by this v2.6.1 release."
+              fi
+            } > release-notes.md
+          fi
           cat release-notes.md
 
       - name: Create GitHub Release

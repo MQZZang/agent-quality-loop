@@ -36,9 +36,11 @@ Conditional structured fields are:
 - `confirmation_ref` for active explicit-confirm-only entries; it is a stable non-secret task/evidence ref, not a raw prompt;
 - `writing_posture: deliver | co-create | coach` when a writing preference controls collaboration posture;
 - `trigger_phrase` and `route_id: diagnose | accept | release-check | resume` for a route alias;
-- `source_ref` and `observed_at` for a To Confirm candidate.
+- a safe `source_ref` and real UTC-calendar `observed_at` for a To Confirm candidate;
+- `capability`, `observable_behavior`, `review_or_expiry`, and at least one of `collaboration_posture` or `agent_support` for Growth Focus;
+- optional Growth Focus `outcome: PILOT | PASS | FAIL | NOT_RUN`.
 
-An active route alias, rejected option, Growth Focus, or writing posture requires both `source: explicit_confirmation` and `confirmation_ref`. A model/caller assertion such as `explicitly_confirmed: true` has no standing. Do not store raw prompts, secrets, third-party personal data, inferred identity, personality diagnoses, or hidden capability scores.
+An active route alias, rejected option, Growth Focus, or writing posture requires both `source: explicit_confirmation` and `confirmation_ref`. A rejected option is valid only with `scope: project`; narrower one-task exclusions stay in the Task Contract `non_goals`. Missing Growth Focus conditional fields keep historical content readable but incomplete and non-projectable. A model/caller assertion such as `explicitly_confirmed: true` has no standing. `confirmation_ref` is an auditable structured source pointer; when the original session or evidence is unreadable it is not mechanical proof that the user made the statement. Do not store raw prompts, secrets, third-party personal data, inferred identity, personality diagnoses, or hidden capability scores.
 
 The compact profile template maps user-facing examples to lanes as follows:
 

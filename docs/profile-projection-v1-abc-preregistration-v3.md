@@ -1,6 +1,6 @@
 # Profile Projection v1 A/B/C v3 Preregistration
 
-Status: `PRE-REGISTERED` / `NOT_RUN`. This protocol is frozen before execution. It does not modify, replace, or upgrade the invalid version-2 A/B/C comparison or its evidence.
+Status: `PRE-REGISTERED` / `NOT_RUN`. This protocol is frozen before execution. The mechanism digest below was re-frozen after the v2.8.0 sealing edits and before any v3 outcome or audit run; the earlier `9efdd42` digest remains only in its historical closure. This protocol does not modify, replace, or upgrade the invalid version-2 A/B/C comparison or its evidence.
 
 Executable frozen inputs:
 
@@ -15,7 +15,7 @@ Frozen protocol identity from `node probes/run-profile-projection-abc-v3.js --pr
 ```text
 suite_sha256: 60f06b11f46fc2b44be6fe409acb4fe730f837facf56abdee684a7f3a9b0faaa
 baseline_sha256: 0ebcd4f5cc8baf2d67f2f2670a0fa8cf4de6b8adbc8212a2750d135317d041ef
-mechanism_sha256: 9730dc96477364e5bd0608a9363dc146d77346d36fbf7d2ba1a0622502f4b27a
+mechanism_sha256: 000dd6a9cd23c115101186f5ac9a76b234645cea9665d781e2f6d7524576db75
 runner_sha256: d9d4e187c01619b8052029d9671048d7ac2beaed15bd6448abdb3f001a942679
 ```
 

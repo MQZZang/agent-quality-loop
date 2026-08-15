@@ -2,13 +2,13 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) 2.7.0** is a portable workflow for AI coding agents. It keeps you and the model on one checkable goal during long work: what the agent understood, what it did, what evidence supports the claim, why it stopped, and whether the next step needs your authorization.
+**Agent Quality Loop (AQL) 2.8.0** is a portable workflow for AI coding agents. It keeps you and the model on one checkable goal during long work: what the agent understood, what it did, what evidence supports the claim, why it stopped, and whether the next step needs your authorization.
 
 It is not a new IDE, panel, or standalone app. After you install the skills, the agent’s **default habits** change for non-trivial tasks. Writing is the first vertical scenario, not the product boundary.
 
 中文一页速览：[docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)。规范文本以英文为准。
 
-Profile Projection v1 is an unreleased, opt-in experiment. For one task, AQL may apply at most two confirmed, genuinely relevant collaboration defaults. It does not turn the full profile into a second prompt contract, raise authority, or constrain the agent's professional method. Product effect and longitudinal value remain `NOT_RUN`.
+Profile Projection v1 is an experimental, opt-in capability in AQL 2.8.0. For one task, AQL may apply at most two confirmed, genuinely relevant collaboration defaults. It does not turn the full profile into a second prompt contract, raise authority, or constrain the agent's professional method. Product effect and longitudinal value remain `NOT_RUN`.
 
 ## What changes for you
 
@@ -117,7 +117,7 @@ Check whether this is releasable. Do not release yet.
 Write the evidence-bound report and give me a usable draft; no coaching.
 ```
 
-After a project-level copy, a read-only diagnosis should restate goal, boundary, and likely misunderstanding, then stop without editing. After a user-level install, look for `/agent-quality-loop` (Cursor / Claude Code) or `$agent-quality-loop` (Codex).
+After a project-level copy, the unchanged collaboration-profile template is inert: it parses zero entries and opts into nothing. Project Profile Projection begins only when the user creates a non-empty profile containing at least one complete, valid `status: active` entry. A read-only diagnosis should restate goal, boundary, and likely misunderstanding, then stop without editing. After a user-level install, look for `/agent-quality-loop` (Cursor / Claude Code) or `$agent-quality-loop` (Codex).
 
 **Before / after.** You ask for a bugfix and hear “done,” then still have to check tests, local-only scope, and whether self-QA was treated as sign-off. With AQL, the same request is expected to align the goal, stay inside the boundary, attach firsthand evidence, and stop without publishing unless you authorize that exact action in the **current** turn.
 
@@ -142,7 +142,7 @@ Profile Projection v1 is experimental and opt-in. Its current evidence is limite
 | Profile Projection v1 probes | Sanitized, exact-byte-bound one-host evidence and a neutral raw-first review covered ten named mechanism behaviors with zero hard-gate events. The old A/B/C control is `INVALID`; a replacement protocol is preregistered but `NOT_RUN`, so product effect and longitudinal value remain `NOT_RUN`. Protocol and evidence: [profile-projection-v1-experiment.md](docs/profile-projection-v1-experiment.md), [v3 preregistration](docs/profile-projection-v1-abc-preregistration-v3.md). |
 | Corpus research | 397 files inventoried; fourteen AQL-relevant claims distilled. Not semantic coverage of the whole corpus. Licenses remain `unknown`. |
 
-CI runs the structural checks on every push and pull request. Structural checks are not semantic acceptance.
+CI runs the structural checks on every pull request and on pushes to `master`. Structural checks are not semantic acceptance.
 
 **机制已实现；长期、因果和跨宿主效果仍在持续验证，不影响当前合同、权限和证据机制的使用。** The collaboration contract, authority split, and evidence rules in this package are implemented and locally validated. Longitudinal user growth, causal improvement on real projects, and live behavior on every advertised host remain `NOT_RUN` or screening-only. That gap does not block using the current contract. This package is not claimed to make you grow, and installing it does not auto-publish.
 
@@ -170,7 +170,7 @@ Do not collapse neighboring rows.
 
 `skill-factory` is optional authoring, not part of the quality loop. Optional routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
 
-Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, content-bound to the readable carrier, and never a source of authority. The Unreleased experimental Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; it creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed its recorded raw-first review; the old A/B/C value control remains `INVALID`, and the executable v3 replacement is only preregistered. Product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
+Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, content-bound to the readable carrier, and never a source of authority. AQL 2.8.0's experimental, opt-in Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; copying the template unchanged creates no active or candidate entry. It creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed its recorded raw-first review; the old A/B/C value control remains `INVALID`, and the executable v3 replacement is only preregistered. Product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
 
 Optional envelope cache and stats: [docs/guide.md](docs/guide.md).
 

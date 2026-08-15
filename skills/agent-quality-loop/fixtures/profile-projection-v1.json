@@ -1,6 +1,6 @@
 {
   "schema_version": "profile-projection-fixtures/v1",
-  "fixture_version": "profile-projection-v1-fixtures/2",
+  "fixture_version": "profile-projection-v1-fixtures/3",
   "defaults": {
     "as_of": "2026-08-15",
     "user_profile_opted_in": false,
@@ -82,6 +82,8 @@
       "source": "explicit_statement",
       "status": "candidate",
       "last_fired": "never",
+      "source_ref": "task:candidate-density-observation",
+      "observed_at": "2026-08-15",
       "entry_content": "candidate-density",
       "preference_key": "output_density"
     },
@@ -197,6 +199,37 @@
       "last_fired": "never",
       "entry_content": "writing-posture-coach",
       "preference_key": "writing_posture"
+    },
+    "rejected_redis": {
+      "id": "reject-redis-cache",
+      "lane": "rejected_option",
+      "value": "Do not re-propose Redis as this project's local cache.",
+      "scope": "project",
+      "applies_when": "choosing this project's local cache",
+      "source": "explicit_confirmation",
+      "confirmation_ref": "task:reject-redis-confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "entry_content": "reject-redis-cache",
+      "preference_key": "local_cache"
+    },
+    "growth_causal_claims": {
+      "id": "growth-causal-claims",
+      "lane": "growth_focus",
+      "value": "Practice traceable causal claims.",
+      "scope": "project",
+      "applies_when": "reviewing architecture evidence in this project",
+      "source": "explicit_confirmation",
+      "confirmation_ref": "task:growth-focus-confirmation",
+      "status": "active",
+      "last_fired": "never",
+      "capability": "causal reasoning",
+      "observable_behavior": "separates observed facts from causal inference",
+      "collaboration_posture": "request bounded counterevidence",
+      "review_or_expiry": "review after three applicable tasks",
+      "outcome": "NOT_RUN",
+      "entry_content": "growth-causal-claims",
+      "preference_key": "growth_causal_claims"
     },
     "phrase_accept": {
       "id": "phrase-independent-accept",
@@ -675,6 +708,90 @@
         "semantic": { "explicitly_confirmed": true }
       }],
       "expected": { "valid": false, "error_contains": "confirmation-only entry requires source explicit_confirmation" }
+    },
+    {
+      "id": "PP45",
+      "title": "candidate requires source_ref",
+      "entry_uses": [{ "entry": "candidate_density", "selected": false, "skip_reason": "Candidate entries do not project.", "omit_fields": ["source_ref"] }],
+      "expected": { "valid": false, "error_contains": "source_ref must be a safe reference for candidate" }
+    },
+    {
+      "id": "PP46",
+      "title": "candidate source_ref must be safe",
+      "entry_uses": [{ "entry": "candidate_density", "selected": false, "skip_reason": "Candidate entries do not project.", "entry_overrides": { "source_ref": "raw-prompt:secret" } }],
+      "expected": { "valid": false, "error_contains": "source_ref must be a safe reference for candidate" }
+    },
+    {
+      "id": "PP47",
+      "title": "candidate requires observed_at",
+      "entry_uses": [{ "entry": "candidate_density", "selected": false, "skip_reason": "Candidate entries do not project.", "omit_fields": ["observed_at"] }],
+      "expected": { "valid": false, "error_contains": "observed_at must be a real calendar date for candidate" }
+    },
+    {
+      "id": "PP48",
+      "title": "candidate observed_at must be a real date",
+      "entry_uses": [{ "entry": "candidate_density", "selected": false, "skip_reason": "Candidate entries do not project.", "entry_overrides": { "observed_at": "2026-02-31" } }],
+      "expected": { "valid": false, "error_contains": "observed_at must be a real calendar date for candidate" }
+    },
+    {
+      "id": "PP49",
+      "title": "rejected option cannot use user scope",
+      "entry_uses": [{ "entry": "rejected_redis", "selected": false, "skip_reason": "Rejected options are project-scoped.", "entry_overrides": { "scope": "user" } }],
+      "expected": { "valid": false, "error_contains": "scope must be project for rejected_option" }
+    },
+    {
+      "id": "PP50",
+      "title": "rejected option cannot use domain scope",
+      "entry_uses": [{ "entry": "rejected_redis", "selected": false, "skip_reason": "Rejected options are project-scoped.", "entry_overrides": { "scope": "domain:architecture" } }],
+      "expected": { "valid": false, "error_contains": "scope must be project for rejected_option" }
+    },
+    {
+      "id": "PP51",
+      "title": "rejected option cannot use task class scope",
+      "entry_uses": [{ "entry": "rejected_redis", "selected": false, "skip_reason": "Rejected options are project-scoped.", "entry_overrides": { "scope": "task_class:code" } }],
+      "expected": { "valid": false, "error_contains": "scope must be project for rejected_option" }
+    },
+    {
+      "id": "PP52",
+      "title": "growth focus requires capability",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": false, "skip_reason": "Incomplete Growth Focus cannot project.", "omit_fields": ["capability"] }],
+      "expected": { "valid": false, "error_contains": "capability is required for growth_focus" }
+    },
+    {
+      "id": "PP53",
+      "title": "growth focus requires observable behavior",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": false, "skip_reason": "Incomplete Growth Focus cannot project.", "omit_fields": ["observable_behavior"] }],
+      "expected": { "valid": false, "error_contains": "observable_behavior is required for growth_focus" }
+    },
+    {
+      "id": "PP54",
+      "title": "growth focus requires review or expiry",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": false, "skip_reason": "Incomplete Growth Focus cannot project.", "omit_fields": ["review_or_expiry"] }],
+      "expected": { "valid": false, "error_contains": "review_or_expiry is required for growth_focus" }
+    },
+    {
+      "id": "PP55",
+      "title": "growth focus requires collaboration support",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": false, "skip_reason": "Incomplete Growth Focus cannot project.", "omit_fields": ["collaboration_posture", "agent_support"] }],
+      "expected": { "valid": false, "error_contains": "growth_focus requires collaboration_posture or agent_support" }
+    },
+    {
+      "id": "PP56",
+      "title": "growth focus outcome is enumerated",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": false, "skip_reason": "Invalid Growth Focus cannot project.", "entry_overrides": { "outcome": "UNKNOWN" } }],
+      "expected": { "valid": false, "error_contains": "outcome is invalid for growth_focus" }
+    },
+    {
+      "id": "PP57",
+      "title": "complete growth focus is selectable",
+      "entry_uses": [{ "entry": "growth_causal_claims", "selected": true }],
+      "expected": { "valid": true }
+    },
+    {
+      "id": "PP58",
+      "title": "complete candidate is valid but inactive",
+      "entry_uses": [{ "entry": "candidate_density", "selected": false, "skip_reason": "Candidate entries do not project." }],
+      "expected": { "valid": true }
     }
   ]
 }

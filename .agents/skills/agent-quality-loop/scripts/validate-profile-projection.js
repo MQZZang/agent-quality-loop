@@ -10,6 +10,7 @@ const {
   isCalendarDate,
   isConcreteCondition,
   readProfile,
+  safeReference,
   verifyProfileRefs,
 } = require("./validate-profile");
 
@@ -38,6 +39,7 @@ const ASSURANCES = new Set(["fast", "standard", "formal"]);
 const CONFIRM_ONLY_LANES = new Set(["route_alias", "rejected_option", "growth_focus"]);
 const WRITING_POSTURES = new Set(["deliver", "co-create", "coach"]);
 const ROUTE_IDS = new Set(["diagnose", "accept", "release-check", "resume"]);
+const GROWTH_OUTCOMES = new Set(["PILOT", "PASS", "FAIL", "NOT_RUN"]);
 const FORBIDDEN_ORDINARY_SURFACE = [
   "User Lens",
   "Profile Projection",
@@ -144,7 +146,7 @@ function isConfirmationOnly(entry) {
 }
 
 function safeConfirmationRef(value) {
-  return nonEmptyString(value) && !/[\r\n]/.test(value) && !/^[A-Za-z]:[\\/]/.test(value) && !path.isAbsolute(value);
+  return safeReference(value);
 }
 
 function resolveCase(suite, spec) {
@@ -215,6 +217,26 @@ function validateEntryMetadata(entry, label, asOf, errors) {
   }
   if (nonEmptyString(entry.applies_when) && !isConcreteCondition(entry.applies_when)) {
     errors.push(`${label}.applies_when is generic or a placeholder`);
+  }
+  if (entry.status === "candidate") {
+    if (!safeReference(entry.source_ref)) errors.push(`${label}.source_ref must be a safe reference for candidate`);
+    if (!isCalendarDate(entry.observed_at)) errors.push(`${label}.observed_at must be a real calendar date for candidate`);
+  } else if (nonEmptyString(entry.observed_at) && !isCalendarDate(entry.observed_at)) {
+    errors.push(`${label}.observed_at is not a real calendar date`);
+  }
+  if (entry.lane === "rejected_option" && entry.scope !== "project") {
+    errors.push(`${label}.scope must be project for rejected_option`);
+  }
+  if (entry.lane === "growth_focus") {
+    for (const field of ["capability", "observable_behavior", "review_or_expiry"]) {
+      if (!nonEmptyString(entry[field])) errors.push(`${label}.${field} is required for growth_focus`);
+    }
+    if (!nonEmptyString(entry.collaboration_posture) && !nonEmptyString(entry.agent_support)) {
+      errors.push(`${label} growth_focus requires collaboration_posture or agent_support`);
+    }
+    if (entry.outcome !== undefined && !GROWTH_OUTCOMES.has(entry.outcome)) {
+      errors.push(`${label}.outcome is invalid for growth_focus`);
+    }
   }
   if (nonEmptyString(entry.writing_posture) && !WRITING_POSTURES.has(entry.writing_posture)) {
     errors.push(`${label}.writing_posture is invalid`);

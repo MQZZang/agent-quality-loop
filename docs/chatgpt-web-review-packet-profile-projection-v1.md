@@ -4,9 +4,9 @@ Review target: the GitHub pull request whose base is commit
 `3fceb261175930e0b975b78c2f56a857701b7bb4` on `master` and whose head is the
 current PR revision.
 
-Package contract version: `2.7.0`. This pull request does not authorize a
-version bump, default-install change, merge, release, deployment, or profile
-mutation.
+Package contract version under review: `2.8.0`. Opening or reviewing the pull
+request does not itself merge, tag, release, deploy, or mutate a consumer
+profile; those actions remain bound to the repository's explicit release flow.
 
 ## Review Objective
 

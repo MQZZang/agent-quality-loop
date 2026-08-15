@@ -32,8 +32,11 @@ Use these conditional fields only where they apply:
 | `writing_posture` | A writing posture, exactly `deliver`, `co-create`, or `coach` |
 | `trigger_phrase` + `route_id` | A route alias; `route_id` is exactly `diagnose`, `accept`, `release-check`, or `resume` |
 | `source_ref` + `observed_at` | A To Confirm candidate; `observed_at` is `YYYY-MM-DD` |
+| `capability` + `observable_behavior` + `review_or_expiry` | A Growth Focus |
+| `collaboration_posture` or `agent_support` | At least one is required for a Growth Focus |
+| `outcome` | Optional Growth Focus review result: `PILOT`, `PASS`, `FAIL`, or `NOT_RUN` |
 
-An active confirmation-only entry must use `source: explicit_confirmation` and a safe `confirmation_ref`. A caller/model boolean cannot substitute for that provenance. `coach` is never inferred from repetition.
+An active confirmation-only entry must use `source: explicit_confirmation` and a safe `confirmation_ref`. A caller/model boolean cannot substitute for that provenance. The reference remains an auditable pointer rather than mechanical proof when its source cannot be opened. `coach` is never inferred from repetition. A `rejected_option` is valid only with `scope: project`.
 
 ## Canonical Entry Bytes
 
@@ -69,6 +72,19 @@ A project ref is `.ai/knowledge/collaboration-profile.md#<stable-entry-id>`. Sha
 
 Only complete `status: active` entries may be projected. At most two may affect one task.
 
+## To Confirm
+
+Candidates are visible but never auto-applied or promoted in their creation turn.
+
+## Archived
+
+Archived entries remain readable for manual review and revival but are not projected. Age or mismatch may propose review; without measured injection history or explicit user confirmation, it does not silently archive an entry.
+
+## Examples
+
+The parser ignores fenced examples. Remove the fence and replace every placeholder only after the user supplies or confirms a real entry.
+
+```markdown
 ### comm-decision-first
 
 - id: comm-decision-first
@@ -80,10 +96,6 @@ Only complete `status: active` entries may be projected. At most two may affect 
 - status: active
 - last_fired: never
 - conflict_key: result_order
-
-## To Confirm
-
-Candidates are visible but never auto-applied or promoted in their creation turn.
 
 ### candidate-writing-posture
 
@@ -98,19 +110,7 @@ Candidates are visible but never auto-applied or promoted in their creation turn
 - writing_posture: coach
 - source_ref: task:example-observation
 - observed_at: 2026-08-15
-
-## Archived
-
-Archived entries remain readable for manual review and revival but are not projected. Age or mismatch may propose review; without measured injection history or explicit user confirmation, it does not silently archive an entry.
-
-## Lane Examples
-
-These are values, not a second data source:
-
-- `phrase_lexicon`: `验收` means independent read-only acceptance when used as an operation.
-- `rejected_option`: do not re-propose Redis as this project's local cache.
-- `route_alias`: `trigger_phrase: 帮我过一遍`, `route_id: accept`.
-- `growth_focus`: practice traceable causal claims with bounded feedback and an explicit review date.
+```
 
 ## Legacy Compatibility
 

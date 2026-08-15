@@ -54,7 +54,7 @@ last_fired: YYYY-MM-DD | never
 
 `id` is a stable human-maintained slug, not a line number or a hash of wording. `applies_when` is concrete, not `appropriate`, `when relevant`, `适用时`, `TBD`, or a template marker. Dates must round-trip as real UTC calendar dates.
 
-Candidates additionally record `source_ref` and `observed_at`. Competing preferences use `conflict_key`. A writing posture uses `writing_posture: deliver | co-create | coach`; a route alias uses separate `trigger_phrase` and canonical `route_id`. When any confirmation-only entry becomes active, record `source: explicit_confirmation` plus a stable non-secret `confirmation_ref`; a caller/model confirmation boolean is not provenance. Never store a raw full prompt. Only `active` entries with the complete contract above may enter task projection.
+Candidates additionally require a safe `source_ref` and a real UTC-calendar `observed_at`; missing fields make the entry incomplete, and unsafe or impossible values make it invalid. Competing preferences use `conflict_key`. A writing posture uses `writing_posture: deliver | co-create | coach`; a route alias uses separate `trigger_phrase` and canonical `route_id`. A rejected option is always `scope: project`. Growth Focus additionally requires `capability`, `observable_behavior`, `review_or_expiry`, and at least one of `collaboration_posture` or `agent_support`; when `outcome` is present it is exactly `PILOT` | `PASS` | `FAIL` | `NOT_RUN`. When any confirmation-only entry becomes active, record `source: explicit_confirmation` plus a stable non-secret `confirmation_ref`; a caller/model confirmation boolean is not provenance. Never store a raw full prompt. Only `active` entries with the complete contract above may enter task projection.
 
 ## Profile Projection v1
 
@@ -85,6 +85,8 @@ Growth Focus lives in this same collaboration profile; do not create a learner m
 - when reviewed longitudinally, an `outcome` of `PILOT` | `PASS` | `FAIL` | `NOT_RUN`, linked to existing envelope history, adapter receipts, or evidence.
 
 A Growth Focus is a user-controlled practice intention, not evidence that the user or agent has improved. Do not create one from observed performance or an agent suggestion alone: the user must explicitly choose or confirm the focus. It is never second-hit inferred, and a candidate never activates in its creation turn. `NOT_RUN` means no longitudinal conclusion may be claimed. Keep current-work quality separate: judge the present artifact against its contract and evidence whether or not a growth focus fired.
+
+Historical Growth Focus blocks that lack the conditional fields remain readable as incomplete profile content, but they are not projectable until the user supplies or confirms a complete field-level update.
 
 Outcome associations are descriptive only. Do not score, rank, run bandit-style optimization, embed, or infer capability from them, and do not optimize for engagement. The user may inspect, override, edit, archive, or delete every entry.
 
@@ -149,6 +151,8 @@ Project-scoped, confirm-first stable rejections the user does not want re-propos
 - Promote to `active` **only** after explicit user confirmation — no second-hit auto-promote for stable rejected options.
 - Never infer a standing rejection from one non-choice among options.
 - Never convert “don't ask push permission” into a rejected-option or standing-authority entry.
+
+`rejected_option` entries with `scope: user`, `domain:*`, or `task_class:*` are invalid; use the current Task Contract `non_goals` for narrower one-task exclusions.
 
 ## Route Alias Lane
 

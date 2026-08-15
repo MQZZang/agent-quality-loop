@@ -1,9 +1,9 @@
 {
   "name": "ask-plan-code-qa",
-  "version": "2.7.0",
-  "generated_at": "2026-08-15T08:14:45.952Z",
+  "version": "2.8.0",
+  "generated_at": "2026-08-15T09:39:29.895Z",
   "files": {
-    "SKILL.md": "1f5da4ecfa6ae2236865eafffae452e01b4411a08155e4649fe7ae1194eba1e3",
+    "SKILL.md": "6037f5fad777af8d14029be914113bd81ec79242bff77c71e8f04e3d82d601d2",
     "agents/openai.yaml": "ecc449af79981725b72ffd761b79e82142c736ba03db1572b41a6cf46d2a2bfa",
     "examples.md": "b3f0dfe25ce589531f5cd0256794dec3d9fc3bba834502060bdbed8eede43f97"
   }

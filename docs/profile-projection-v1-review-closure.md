@@ -1,13 +1,13 @@
-# Profile Projection v1 Review Closure
+# Profile Projection v1 Historical Local Closure (`9efdd42`)
 
 Date: 2026-08-15  
 Branch: `review/profile-projection-v1-20260815`  
-Review baseline: `3e32a4e94d1fb8bceff21dc83c76bfa4ce8935e2`  
-Target status: local experimental review candidate; the mechanism merge gate is not yet met; no push, PR, merge, tag, release, publish, or deploy.
+Review baseline: `9efdd42bee96c4b6ee5d7ade9115487b05452eb0`  
+Document status: historical local closure for `9efdd42`; the review branch was subsequently pushed at this exact commit. This document is not PR, merge, tag, exact-tag CI, attestation, or GitHub Release evidence.
 
 ## Decision
 
-The three original P0 defects and the named deterministic P1 defects are closed on the local validator, fixture, and Windows evidence surfaces. This is not a merge or release verdict: the v3 product comparison, its independent auditability arm, Ubuntu execution on these exact bytes, a real consumer project carrier, product value, and longitudinal value are `NOT_RUN`.
+The three original P0 defects and the named deterministic P1 defects were closed on the `9efdd42` local validator, fixture, and Windows evidence surfaces. This was not a merge or release verdict: the v3 product comparison, its independent auditability arm, Ubuntu execution on those exact bytes, a real consumer project carrier, product value, and longitudinal value were `NOT_RUN`.
 
 ## P0 Closure
 
@@ -73,12 +73,14 @@ Example:
 
 Before: multiple heterogeneous tables, free-form To Confirm bullets, merged metadata columns, and no stable way to derive exact entry refs/digests.
 
-After: one compact eight-field block contract, conditional fields in the same block, canonical byte/hash rules, one active example, and one inactive candidate example. The template currently parses as one active projectable entry and one complete inactive candidate:
+At `9efdd42`, the compact template still contained one live active example and one live inactive candidate. That historical state parsed as:
 
 ```text
 comm-decision-first  7a1e7b32d6295adbba87c4bec51849231bb47a2c0f8a7be60e57bdca9c43f680
 candidate-writing-posture  754ddd8703c2b8538ed6cef4321b73b44af47b885c0ea8b030b999978fff765c
 ```
+
+The v2.8.0 sealing delta removes both live records, leaves Active Defaults / To Confirm / Archived empty, and moves grammar-shaped examples into parser-ignored fenced blocks. The copied template is required to parse zero entries and project nothing; final proof belongs to the sealing commit and release evidence, not to this historical report.
 
 ## A/B/C v3
 
@@ -135,7 +137,7 @@ Ubuntu raw execution on these exact local bytes is `NOT_RUN`:
 ubuntu_validate_all: NOT_RUN
 ```
 
-The instructions prohibit pushing the changed branch without explicit authorization. The repository CI is configured for `ubuntu-latest` and `windows-latest`, but configuration is not execution evidence.
+The branch was later pushed at exact commit `9efdd42`. No PR existed for this branch at the time this historical closure was superseded, so the repository's configured `ubuntu-latest` and `windows-latest` jobs were not execution evidence for `9efdd42`.
 
 ## Independent Review Dimensions
 
@@ -156,7 +158,7 @@ Independent review covered portable verification, real carrier binding, confirma
 | `profile_visual_usability` | `LOCAL PASS` for one canonical block format and parser coverage; longitudinal usability is `NOT_RUN`. |
 | `experiment_validity` | v2 `INVALID`; v3 `PRE-REGISTERED` / `NOT_RUN`. |
 | `cross_host_behavior` | `NOT_RUN`. |
-| `documentation_accuracy` | `LOCAL PASS`; no stable-release claim is made. |
+| `documentation_accuracy` | `LOCAL PASS` only for this explicitly historical `9efdd42` scope; it is not current release metadata. |
 
 ## Explicit NOT_RUN
 
@@ -165,7 +167,7 @@ actual project collaboration-profile source binding
 v3 12-run smoke execution
 v3 independent auditability replay
 two-model/two-host full pilot
-Ubuntu validate-all on the unpushed candidate
+Ubuntu validate-all on `9efdd42` through PR CI
 product-value verdict
 longitudinal-value verdict
 release verdict
@@ -175,4 +177,8 @@ release verdict
 
 Before the local closure commit, the intended change set contained 48 tracked modifications and 18 new files across the canonical package, generated mirrors/manifests, root documentation, validators, and v3 protocol files. The final staged summary was `66 files changed, 4307 insertions(+), 483 deletions(-)`. `git diff --cached --check` passed. Historical v2 evidence directories, the v2 runner, and its evidence utility were unchanged.
 
-The remote review branch still points to the baseline commit until a maintainer explicitly authorizes push or PR creation.
+The remote review branch now points to `9efdd42`. No PR, merge, tag, attestation, or Release result is asserted by this document.
+
+## Final Release Evidence Authority
+
+The final v2.8.0 release verdict must come from the exact PR head and its Ubuntu/Windows checks, the `master` merge commit, the immutable `v2.8.0` tag on that commit, and the release workflow's exact-tag attestation. Future results must not be backfilled into this historical closure before they exist.
