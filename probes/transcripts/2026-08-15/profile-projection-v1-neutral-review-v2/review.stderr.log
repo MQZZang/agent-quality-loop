@@ -1,0 +1,22 @@
+2026-08-15T05:07:38.490622Z  WARN codex_core_plugins::remote::remote_installed_plugin_sync: remote installed plugin bundle sync failed error=chatgpt authentication required for remote plugin catalog; api key auth is not supported
+2026-08-15T05:07:38.539442Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-08-15T05:07:38.539475Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-08-15T05:07:38.547313Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
+2026-08-15T05:07:38.645486Z  WARN codex_skills::interface: ignoring interface.default_prompt: exceeds maximum length of 1024 characters
+2026-08-15T05:07:38.926121Z  WARN codex_core_plugins::manager: failed to warm featured plugin ids cache error=remote featured plugin request to https://chatgpt.com/backend-api/plugins/featured?platform=codex failed with status 401 Unauthorized: {"detail":"Unauthorized"}
+2026-08-15T05:07:39.578124Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///<USER_HOME>/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
+2026-08-15T05:07:39.583806Z  WARN codex_core::session_startup_prewarm: startup websocket prewarm setup failed: stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:39.584502Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///<USER_HOME>/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
+2026-08-15T05:07:40.568477Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (1/5 in 198ms)... turn_id=01a003d1-881f-78a3-9172-1974d0b8c5f9 retries=1 max_retries=5 sampling_error=stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:41.763051Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (2/5 in 424ms)... turn_id=01a003d1-881f-78a3-9172-1974d0b8c5f9 retries=2 max_retries=5 sampling_error=stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:43.165015Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (3/5 in 762ms)... turn_id=01a003d1-881f-78a3-9172-1974d0b8c5f9 retries=3 max_retries=5 sampling_error=stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:44.926544Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (4/5 in 1.476s)... turn_id=01a003d1-881f-78a3-9172-1974d0b8c5f9 retries=4 max_retries=5 sampling_error=stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:47.398323Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (5/5 in 3.303s)... turn_id=01a003d1-881f-78a3-9172-1974d0b8c5f9 retries=5 max_retries=5 sampling_error=stream disconnected before completion: websocket closed by server before response.completed
+2026-08-15T05:07:51.692839Z  WARN codex_core::client: falling back to HTTP
+2026-08-15T05:14:22.909351Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.7 seconds
+Output:
+rg: probes/transcripts/2026-08-15/profile-projection-v1-smoke-v2/t*.md: 文件名、目录名或卷标语法不正确。 (os error 123)
+rg: probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t*.md: 文件名、目录名或卷标语法不正确。 (os error 123)
+rg: probes/transcripts/2026-08-15/profile-projection-v1-opt-in-boundary-v2/t*.md: 文件名、目录名或卷标语法不正确。 (os error 123)
+

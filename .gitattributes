@@ -4,6 +4,7 @@
 # leftover conflict markers.
 *.md whitespace=-trailing-space
 *.mdc whitespace=-trailing-space
+/.gitattributes text eol=lf
 
 # Route shim generator emits LF; keep working-tree text LF even with core.autocrlf.
 dist/route-shims/** text eol=lf
@@ -25,3 +26,13 @@ skills/**/*.md text eol=lf
 skills/**/*.json text eol=lf
 skills/**/*.yaml text eol=lf
 skills/**/*.yml text eol=lf
+
+# Content-addressed probe inputs and published evidence retain exact LF bytes.
+probes/generated/** text eol=lf
+probes/transcripts/2026-08-15/** text eol=lf
+probes/profile-projection-* text eol=lf
+probes/run-profile-projection-*.js text eol=lf
+probes/verify-profile-projection-evidence.js text eol=lf
+
+# Stderr captures are immutable byte evidence, not source files.
+probes/transcripts/**/*.stderr.log binary

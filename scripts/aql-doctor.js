@@ -300,6 +300,38 @@ function checkUserProfileOptIn() {
   ];
 }
 
+function checkProjectProfileCarrier(workspaceRoot) {
+  const profilePath = path.join(workspaceRoot, ".ai", "knowledge", "collaboration-profile.md");
+  if (!fs.existsSync(profilePath)) {
+    return [finding("project_profile_carrier", STATUS.NOT_APPLICABLE, "project collaboration profile not present")];
+  }
+  const validators = [
+    path.join(workspaceRoot, ".cursor", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
+    path.join(workspaceRoot, "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
+    path.join(workspaceRoot, ".agents", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
+    path.join(packageRepoRoot(), ".cursor", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
+  ];
+  const validatorPath = validators.find((candidate) => fs.existsSync(candidate));
+  if (!validatorPath) {
+    return [finding("project_profile_carrier", STATUS.FAIL, "project profile exists but validate-profile.js was not found")];
+  }
+  try {
+    const { readProfile } = require(validatorPath);
+    const result = readProfile(profilePath);
+    if (result.errors.length > 0) {
+      return [finding("project_profile_carrier", STATUS.FAIL, "project profile has invalid canonical entries", { errors: result.errors })];
+    }
+    const status = result.legacy.length > 0 ? STATUS.WARN : STATUS.PASS;
+    return [finding(
+      "project_profile_carrier",
+      status,
+      `project profile readable: ${result.projectable.length} active projectable, ${result.inactive.length} complete inactive, ${result.legacy.length} legacy/incomplete`,
+    )];
+  } catch (error) {
+    return [finding("project_profile_carrier", STATUS.FAIL, `cannot validate project profile: ${error.message}`)];
+  }
+}
+
 function checkEnvelopeChain(workspaceRoot) {
   const aqlDir = path.join(workspaceRoot, ".agent-quality-loop");
   if (!fs.existsSync(aqlDir)) {
@@ -439,6 +471,7 @@ function runDoctor(workspaceRoot) {
     ...checkManifestHelpers(workspaceRoot),
     ...checkHooksAndGates(workspaceRoot),
     ...checkMcpPolicyCoverage(workspaceRoot),
+    ...checkProjectProfileCarrier(workspaceRoot),
     ...checkUserProfileOptIn(),
     ...checkEnvelopeChain(workspaceRoot),
   ];

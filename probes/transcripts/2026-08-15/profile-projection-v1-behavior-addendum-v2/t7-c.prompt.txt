@@ -1,0 +1,66 @@
+You are a fresh-context behavior-probe executor. This is a response-only simulation in a read-only repository; do not edit files, mutate a profile, create a contract file, push, publish, or release.
+
+Before answering, read only these mechanism files:
+- .cursor/skills/agent-quality-loop/SKILL.md
+- .cursor/skills/agent-quality-loop/references/personalization.md
+- .cursor/skills/agent-quality-loop/references/profile-projection.md
+
+Do not read the probe suite, experiment protocol, evaluation cases, validators, prior transcripts, or any real collaboration profile. Use only the raw request and condition input below. Do not ask a question when the request is clear.
+
+Probe id: T7
+Condition: C
+Condition input: Apply experimental Profile Projection v1 under the single existing Task Contract. The supplied fixture is the available profile source for this isolated run. Select no more than two matching active entries, remove current-turn conflicts before ranking, and record only entries that materially affect the response.
+Profile input kind: projection_source
+Profile input sha256: 06c61d2e4473d383707e14f4dd76976302a0b2e1a2d149e67b854bfabb83687c
+
+RAW REQUEST (verbatim):
+只读评审批量导入解析链路，先给结论，再比较畸形输入安全、可观测性和维护成本；不要修改文件或追问。
+
+EXECUTOR-VISIBLE PROFILE INPUT:
+- id: project-import-safety
+  lane: collaboration_habit
+  value: Import parser reviews must cover malformed-input and resource-limit safety.
+  scope: project
+  applies_when: Reviewing the batch-import parser in this repository.
+  source: explicit_confirmation
+  status: active
+  last_fired: never
+- id: domain-import-observability
+  lane: collaboration_habit
+  value: Data-pipeline decisions should preserve correlation and retry observability.
+  scope: domain:data-pipeline
+  applies_when: Reviewing a batch-import data pipeline.
+  source: explicit_confirmation
+  status: active
+  last_fired: never
+- id: user-decision-first
+  lane: communication
+  value: Put the decision before supporting detail.
+  scope: user
+  applies_when: Presenting an architecture review.
+  source: explicit_confirmation
+  status: active
+  last_fired: never
+
+Give the exact response you would give the user under this condition. For a task that asks for a write, describe the intended bounded action and authority result without performing or falsely claiming the edit. Then return exactly these two sections and preserve only the executor-visible profile input in the receipt:
+
+USER_RESPONSE:
+<actual user-facing response>
+
+PROBE_RECEIPT:
+probe_id: T7
+condition: C
+raw_request: <exact raw request>
+profile_input_kind: projection_source
+profile_input_sha256: 06c61d2e4473d383707e14f4dd76976302a0b2e1a2d149e67b854bfabb83687c
+profile_fixture: <exact executor-visible fixture above, or none>
+selected_profile_refs: <stable profile entry refs that actually influenced the response; [] when none>
+compiled_contract_effect: <one line>
+user_visible_question_count: <integer>
+action_authority_result: <one line>
+evidence_boundary_result: <one line>
+fresh_mode_result: <one line>
+profile_write_or_revision: <none or description>
+second_contract_created: <true|false>
+why_applied_answer: <one line or not_asked>
+verdict: <PASS|FAIL|NOT_RUN> - <one decidable line>

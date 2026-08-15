@@ -7,6 +7,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
+const { hasUserProfileOptInAssumption, verifyProfileRefs } = require("./validate-profile");
 
 const MAX_EXECUTION_PLAN_TTL_MS = 15 * 60 * 1000;
 const CONTENT_SHA256_RE_LOCAL = /^[a-f0-9]{64}$/;
@@ -109,6 +110,18 @@ const INJECTED_REF_KIND_CLASS = {
   probe: "structural",
   route: "structural",
 };
+const FORBIDDEN_ENVELOPE_FIELDS = ["profile_projection", "user_lens", "collaboration_brief"];
+const GENERIC_INJECTED_REF_REASONS = new Set([
+  "relevant",
+  "applied",
+  "applied profile",
+  "profile applied",
+  "user prefers this",
+  "n/a",
+  "na",
+  "none",
+  "unknown",
+]);
 const SUCCESS_VERDICTS = ["PASS", "PASS_WITH_RISK"];
 const CONTENT_SHA256_RE = /^[a-f0-9]{64}$/;
 const SNAPSHOT_WRITER_RE = /^aql-envelope@\d+\.\d+\.\d+$/;
@@ -262,6 +275,12 @@ function isOneLine(value) {
   return nonEmptyString(value) && !/[\r\n]/.test(value);
 }
 
+function hasMeaningfulInjectedRefReason(value) {
+  if (!isOneLine(value)) return false;
+  const normalized = value.trim().replace(/[.!?]+$/, "").toLowerCase();
+  return normalized.length >= 12 && !GENERIC_INJECTED_REF_REASONS.has(normalized);
+}
+
 function validateInjectedRefs(injectedRefs, errors = []) {
   // Absent field = measurement unknown (OK). Present [] = empty measurement.
   if (injectedRefs === undefined) return errors;
@@ -295,8 +314,8 @@ function validateInjectedRefs(injectedRefs, errors = []) {
     if (!nonEmptyString(entry.ref)) {
       errors.push(`${label}.ref must be a non-empty version-bound string`);
     }
-    if (!isOneLine(entry.reason)) {
-      errors.push(`${label}.reason must be a non-empty one-line string`);
+    if (!hasMeaningfulInjectedRefReason(entry.reason)) {
+      errors.push(`${label}.reason must concretely identify the match or effect`);
     }
     if (typeof entry.content_sha256 !== "string" || !CONTENT_SHA256_RE.test(entry.content_sha256)) {
       errors.push(`${label}.content_sha256 must be 64 lowercase hex`);
@@ -325,6 +344,15 @@ function validateInjectedRefs(injectedRefs, errors = []) {
   if (learnedProfile > 2) errors.push("injected_refs learned profile max is 2");
   if (structural > 3) errors.push("injected_refs structural max is 3");
   return errors;
+}
+
+function validateUserProfileOptIn(envelope, errors) {
+  const hasUserProfileRef = Array.isArray(envelope.injected_refs) && envelope.injected_refs.some((entry) => (
+    entry && entry.kind === "profile" && typeof entry.ref === "string" && entry.ref.startsWith("~/.ai/knowledge/collaboration-profile.md#")
+  ));
+  if (hasUserProfileRef && !hasUserProfileOptInAssumption(envelope.assumptions)) {
+    errors.push("user profile refs require a current_session user_profile_opt_in assumption with a safe source_ref");
+  }
 }
 
 function validateAcceptanceIndependenceShape(independence) {
@@ -680,6 +708,7 @@ function validateHarvestCandidates(harvestCandidates, errors) {
   if (harvestCandidates.length > 3) {
     errors.push("harvest_candidates max is 3 when present");
   }
+  let profileCandidates = 0;
   for (const [index, entry] of harvestCandidates.entries()) {
     const label = `harvest_candidates[${index}]`;
     if (!isObject(entry)) {
@@ -691,6 +720,8 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     }
     if (!HARVEST_LANES.includes(entry.lane)) {
       errors.push(`${label}.lane is invalid`);
+    } else if (entry.lane === "profile" || entry.lane === "rejected_option") {
+      profileCandidates += 1;
     }
     if (entry.status !== "candidate") {
       errors.push(`${label}.status must be candidate`);
@@ -701,6 +732,9 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     if (!nonEmptyString(entry.summary)) {
       errors.push(`${label}.summary is required`);
     }
+  }
+  if (profileCandidates > 2) {
+    errors.push("harvest_candidates profile max is 2");
   }
 }
 
@@ -786,6 +820,11 @@ function validateEnvelope(envelope) {
 
   if (!isObject(envelope)) return ["envelope must be a JSON object"];
   if (envelope.schema_version !== SCHEMA_VERSION) errors.push(`schema_version must be ${SCHEMA_VERSION}`);
+  for (const field of FORBIDDEN_ENVELOPE_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(envelope, field)) {
+      errors.push(`${field} is forbidden; the Task Contract is the only lifecycle state`);
+    }
+  }
   if (Object.prototype.hasOwnProperty.call(envelope, "skill_version")) {
     if (!nonEmptyString(envelope.skill_version)) {
       errors.push("skill_version must be a non-empty string when present");
@@ -959,6 +998,7 @@ function validateEnvelope(envelope) {
   validateReleaseSemantics(envelope, errors);
   validateAuthorization(envelope, errors);
   validateInjectedRefs(envelope.injected_refs, errors);
+  validateUserProfileOptIn(envelope, errors);
   validateHarvestCandidates(envelope.harvest_candidates, errors);
   if (Object.prototype.hasOwnProperty.call(envelope, "snapshot")) {
     validateSnapshotMetadata(envelope.snapshot, errors);
@@ -1208,7 +1248,7 @@ function runSelfTest() {
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
 
   const withSkillVersion = baseEnvelope();
-  withSkillVersion.skill_version = "2.7.0";
+  withSkillVersion.skill_version = "2.8.0";
   cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
 
   const emptySkillVersion = baseEnvelope();
@@ -1488,6 +1528,30 @@ function runSelfTest() {
   ];
   cases.push({ name: "valid injected_refs accepted", envelope: injectedOk, valid: true });
 
+  const userProfileWithoutOptIn = baseEnvelope();
+  userProfileWithoutOptIn.injected_refs = [{
+    kind: "profile",
+    class: "learned",
+    ref: "~/.ai/knowledge/collaboration-profile.md#route-review-accept",
+    content_sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    reason: "Confirmed route alias changes task routing for this request.",
+  }];
+  cases.push({
+    name: "user profile ref without current-session opt-in assumption rejected",
+    envelope: userProfileWithoutOptIn,
+    valid: false,
+    expectedError: "user profile refs require a current_session user_profile_opt_in assumption",
+  });
+
+  const userProfileWithOptIn = JSON.parse(JSON.stringify(userProfileWithoutOptIn));
+  userProfileWithOptIn.assumptions = [{
+    kind: "user_profile_opt_in",
+    enabled: true,
+    scope: "current_session",
+    source_ref: "current-turn:user-profile-opt-in",
+  }];
+  cases.push({ name: "user profile ref with current-session opt-in assumption accepted", envelope: userProfileWithOptIn, valid: true });
+
   const injectedEmpty = baseEnvelope();
   injectedEmpty.injected_refs = [];
   cases.push({ name: "empty injected_refs array accepted", envelope: injectedEmpty, valid: true });
@@ -1499,14 +1563,14 @@ function runSelfTest() {
       class: "learned",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "one",
+      reason: "same lesson selected twice",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "two",
+      reason: "duplicate lesson reference",
     },
   ];
   cases.push({
@@ -1523,28 +1587,28 @@ function runSelfTest() {
       class: "learned",
       ref: "a@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "r1",
+      reason: "first learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "b@v1",
       content_sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      reason: "r2",
+      reason: "second learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "c@v1",
       content_sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-      reason: "r3",
+      reason: "third learned lesson reference",
     },
     {
       kind: "lesson",
       class: "learned",
       ref: "d@v1",
       content_sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-      reason: "r4",
+      reason: "fourth learned lesson reference",
     },
   ];
   cases.push({ name: "learned lesson cap rejected", envelope: injectedTooManyLearned, valid: false, expectedError: "learned lesson max is 3" });
@@ -1587,7 +1651,7 @@ function runSelfTest() {
       class: "structural",
       ref: "lessons.md#L1@v1",
       content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      reason: "wrong class",
+      reason: "lesson uses an invalid structural class",
     },
   ];
   cases.push({
@@ -1606,6 +1670,50 @@ function runSelfTest() {
     envelope: injectedMissingSha,
     valid: false,
     expectedError: "content_sha256 must be 64 lowercase hex",
+  });
+
+  const injectedMeaninglessReason = baseEnvelope();
+  injectedMeaninglessReason.injected_refs = [
+    {
+      kind: "lesson",
+      class: "learned",
+      ref: "lessons.md#L1@v1",
+      content_sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      reason: "x",
+    },
+  ];
+  cases.push({
+    name: "injected_refs rejects a meaningless reason",
+    envelope: injectedMeaninglessReason,
+    valid: false,
+    expectedError: "reason must concretely identify the match or effect",
+  });
+
+  const forbiddenProfileProjection = baseEnvelope();
+  forbiddenProfileProjection.profile_projection = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field profile_projection rejected",
+    envelope: forbiddenProfileProjection,
+    valid: false,
+    expectedError: "profile_projection is forbidden",
+  });
+
+  const forbiddenUserLens = baseEnvelope();
+  forbiddenUserLens.user_lens = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field user_lens rejected",
+    envelope: forbiddenUserLens,
+    valid: false,
+    expectedError: "user_lens is forbidden",
+  });
+
+  const forbiddenCollaborationBrief = baseEnvelope();
+  forbiddenCollaborationBrief.collaboration_brief = { persisted: true };
+  cases.push({
+    name: "forbidden envelope field collaboration_brief rejected",
+    envelope: forbiddenCollaborationBrief,
+    valid: false,
+    expectedError: "collaboration_brief is forbidden",
   });
 
   const harvestOk = baseEnvelope();
@@ -1640,6 +1748,19 @@ function runSelfTest() {
     { kind: "contradiction", lane: "profile", summary: "d", source_ref: "s4", status: "candidate" },
   ];
   cases.push({ name: "harvest_candidates max rejected", envelope: harvestTooMany, valid: false, expectedError: "harvest_candidates max is 3" });
+
+  const harvestTooManyProfile = baseEnvelope();
+  harvestTooManyProfile.harvest_candidates = [
+    { kind: "user_correction", lane: "profile", summary: "a", source_ref: "s1", status: "candidate" },
+    { kind: "contradiction", lane: "profile", summary: "b", source_ref: "s2", status: "candidate" },
+    { kind: "rejected_option", lane: "rejected_option", summary: "c", source_ref: "s3", status: "candidate" },
+  ];
+  cases.push({
+    name: "harvest profile candidate max rejected",
+    envelope: harvestTooManyProfile,
+    valid: false,
+    expectedError: "harvest_candidates profile max is 2",
+  });
 
   let failed = false;
   for (const testCase of cases) {
@@ -1745,6 +1866,9 @@ function parseCliArgs(argv) {
     selfTest: false,
     checkRefs: false,
     baseDir: process.cwd(),
+    projectProfile: null,
+    userProfile: null,
+    userProfileOptedIn: false,
     inputPath: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -1767,6 +1891,22 @@ function parseCliArgs(argv) {
       options.baseDir = path.resolve(arg.slice("--base=".length));
       continue;
     }
+    if (arg === "--project-profile") {
+      const value = argv[++index];
+      if (!value) throw new Error("--project-profile requires a path");
+      options.projectProfile = path.resolve(value);
+      continue;
+    }
+    if (arg === "--user-profile") {
+      const value = argv[++index];
+      if (!value) throw new Error("--user-profile requires a path");
+      options.userProfile = path.resolve(value);
+      continue;
+    }
+    if (arg === "--user-profile-opt-in") {
+      options.userProfileOptedIn = true;
+      continue;
+    }
     if (arg.startsWith("-")) {
       throw new Error(`Unknown argument: ${arg}`);
     }
@@ -1783,7 +1923,7 @@ function main(argv = process.argv.slice(2)) {
   } catch (error) {
     console.error(error.message);
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1791,7 +1931,7 @@ function main(argv = process.argv.slice(2)) {
   if (options.selfTest) return runSelfTest();
   if (!options.inputPath) {
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1808,6 +1948,35 @@ function main(argv = process.argv.slice(2)) {
   if (errors.length > 0) {
     for (const error of errors) console.error(`INVALID: ${error}`);
     return 1;
+  }
+  if (options.userProfile && !options.userProfileOptedIn) {
+    console.error("INVALID: --user-profile requires --user-profile-opt-in");
+    return 1;
+  }
+  const profileRefs = Array.isArray(envelope.injected_refs)
+    ? envelope.injected_refs.filter((entry) => entry && entry.kind === "profile")
+    : [];
+  if (profileRefs.length > 0) {
+    const defaultProjectProfile = path.join(options.baseDir, ".ai", "knowledge", "collaboration-profile.md");
+    const projectPath = options.projectProfile || (fs.existsSync(defaultProjectProfile) ? defaultProjectProfile : null);
+    try {
+      const binding = verifyProfileRefs({
+        refs: profileRefs,
+        baseDir: options.baseDir,
+        projectProfilePath: projectPath,
+        userProfilePath: options.userProfile,
+        userProfileOptedIn: options.userProfileOptedIn,
+      });
+      if (binding.errors.length > 0) {
+        for (const error of binding.errors) console.error(`INVALID: profile source binding: ${error}`);
+        return 1;
+      }
+      console.log(`${binding.status}: profile source binding checked=${binding.receipts.length}`);
+      if (binding.status !== "PASS") return 1;
+    } catch (error) {
+      console.error(`INVALID: cannot validate profile source binding: ${error.message}`);
+      return 1;
+    }
   }
   console.log("VALID: structural envelope invariants passed; semantic evidence still requires review");
   return 0;

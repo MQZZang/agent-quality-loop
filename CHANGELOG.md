@@ -4,6 +4,17 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value shared b
 
 ## Unreleased
 
+
+## 2.8.0 — 2026-08-15
+
+- Added experimental, opt-in Profile Projection v1: complete matching active collaboration-profile entries are projected task-locally into the existing Task Contract (max two) and traced through existing `injected_refs`. Fresh Mode skips stored profile defaults for one task while preserving project facts, lessons, authority, evidence, acceptance, and release boundaries. No persistent User Lens, second Brief contract, score, ranker, or default-suite change was introduced.
+- Made the project collaboration-profile template inert when copied unchanged: it parses zero entries and projects nothing. Candidate entries now require a safe `source_ref` and real `observed_at`; rejected options are project-scoped; Growth Focus requires its declared minimum structure and accepts only `PILOT` / `PASS` / `FAIL` / `NOT_RUN` outcomes when present.
+- Hardened profile integrity: published evidence safety is independent of the verifier's username/hostname; `validate-profile.js` opens canonical carrier paths, parses exact Markdown entry blocks, rejects raw caller Markdown and forged neighboring digests, and makes missing measured carriers machine-failing source-binding `NOT_RUN`. Confirmation-only writing postures/routes/rejections/Growth Focus require structural explicit-confirmation provenance, route ids are enumerated, and user scope requires both current-session assumptions and runtime opt-in.
+- Hardened selection and data rules: task-class → domain → project → opted-in user priority is always enforced; same-scope/source different values conflict and skip instead of letting caller-owned specificity or id act as a semantic tie-breaker; impossible/future dates and generic applicability placeholders fail; elapsed time proposes review rather than silently archiving without measured history.
+- Kept Result Attention Rendering inside the existing parent-owned User Result Summary rather than adding a second output contract. Deterministic Profile Projection coverage is 58 cases (15 valid / 43 negative controls), alongside evaluation cases 89–109.
+- Historical v2 probe artifacts remain unchanged. Their ten named one-host mechanisms retain their recorded result, while the old A/B/C product control remains `INVALID`; the separately versioned v3 replacement remains preregistered and `NOT_RUN`. Product value, longitudinal value, the full cross-host pilot, and v3 outcome/audit execution remain `NOT_RUN` and are not claimed by this release.
+- Package contract version is 2.8.0. Profile Projection v1 remains experimental and opt-in inside the formally released package.
+
 ## 2.7.0 — 2026-08-13
 
 - Parent-owned adaptive user results replace the mandatory pipe-delimited status line: routine success compresses, formal/failure/handoff/release expands, dirty artifacts bind exact identity, and adapters remain receipt-only. Writing now uses nine distinct jobs plus four canonical truth modes; source handling is a separate axis. Probe validation separates structure, identity, and independent semantic grade, retains P-W6 as FAIL, and checks local claim anchors.

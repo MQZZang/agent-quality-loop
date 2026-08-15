@@ -1,0 +1,6 @@
+{
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "manifest_ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/manifest.json",
+  "manifest_sha256": "6eea8c14f72df8b42dc6810e0f5c05185ce51a0075a5757d8d5656c1d2b42ba9",
+  "manifest_bytes": 5516
+}

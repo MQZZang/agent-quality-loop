@@ -4,7 +4,7 @@ description: Use when a user wants an AI coding or workspace agent to turn natur
 license: MIT
 metadata:
   author: MQZZang
-  version: "2.7.0"
+  version: "2.8.0"
 ---
 
 # Agent Quality Loop
@@ -128,7 +128,9 @@ Produce the compact contract defined in [contracts.md](references/contracts.md).
 
 **ALIGN note:** When a lesson, profile, preset, domain profile, probe, or route is actually applied, record stable version-bound refs in envelope `injected_refs`.
 
-**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching **active** phrase-lexicon and preference defaults per [personalization.md](references/personalization.md); To Confirm candidates are not applied. The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority. Writing preferences are narrow, context-qualified defaults. Growth Focus lives in the same profile, is explicit-confirm-only, and is a practice intention—not evidence of growth or a reason to enter `coach`.
+**Profile:** Read `.ai/knowledge/collaboration-profile.md` when present and apply matching **active** phrase-lexicon and preference defaults per [personalization.md](references/personalization.md). Use experimental [Profile Projection v1](references/profile-projection.md) to select at most two complete, relevant active entries into the existing Task Contract; trace only entries that actually affect the task through `injected_refs`. Bind profile refs by having `scripts/validate-profile.js` open canonical carrier paths; raw caller Markdown cannot prove binding, and a missing measured carrier is machine-failing `NOT_RUN`, never a fixture-asserted PASS. User-level carriers require an explicit host/session opt-in plus the structured current-session assumption in the existing Task Contract. To Confirm and incomplete legacy entries are not applied. The explicit current-turn instruction always wins, and a learned preference may tighten but never loosen contract floors, evidence requirements, or authority. Writing preferences are narrow, context-qualified defaults. Growth Focus lives in the same profile, is explicit-confirm-only, and is a practice intention—not evidence of growth or a reason to enter `coach`.
+
+**Fresh Mode:** When the current request asks to ignore historical collaboration preferences for this task, skip project and opted-in user profile entries, including profile phrase/route aliases. Preserve the current request, project facts/rules/context, technical lessons, authority, evidence, acceptance, and release boundaries. Fresh Mode creates no state, performs no profile write, and does not update `last_fired`.
 
 **Observability gate:** For `formal` or high-ambiguity work, ALIGN must emit at least one observable `success_observables` and one decidable `counterexamples` per [contracts.md](references/contracts.md#observability-gate-align); missing either → write `unknowns` and treat as blocking completion judgment.
 
@@ -250,7 +252,7 @@ Before emitting a full envelope, resolve `SKILL_ROOT` as the directory containin
 
 Lead with the result. Show only the structure needed for the active mode.
 
-When the loop is active, lead with exactly one adaptive [User Result Summary](references/contracts.md#user-result-summary). The parent AQL owns that summary; adapters return receipts and never emit a parallel lifecycle/status block. Size detail to the [Result Detail Budget](references/contracts.md#result-detail-budget).
+When the loop is active, lead with exactly one adaptive [User Result Summary](references/contracts.md#user-result-summary). The parent AQL owns that summary; adapters return receipts and never emit a parallel lifecycle/status block. Apply [Result Attention Rendering](references/result-attention.md) in the first 5–8 lines and size detail to the [Result Detail Budget](references/contracts.md#result-detail-budget); this creates no second result contract.
 
 Preserve this information priority: collaboration conclusion → completed work → incomplete work and reason → user impact → whether the user must act → completion standard. This is a semantic order, not a mandatory long Markdown template: omit empty sections and compress routine success. Use plain-language state labels by default (Chinese preferred in Chinese scenarios): 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Never blur adjacent states with vague 完成 / 全部完成 / 正式完成 / 已验收可发布. Show internal phase terms only when they help a decision or handoff. `BLOCKED`, `FAIL`, and `PENDING` are verdicts, not lifecycle phases.
 

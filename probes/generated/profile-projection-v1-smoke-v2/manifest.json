@@ -1,0 +1,168 @@
+{
+  "kind": "generated_prompts",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-smoke/2",
+  "suite_sha256": "0e9fd7044749c4642eff5c624ebd29dfed258ba7b241532aa89b423027165bb0",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "prompts": [
+    {
+      "run_id": "T1-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t1-a.prompt.txt",
+        "sha256": "28b9a83365d163531dfd3e257b15a0bd1bc594dfc578859531e54c81fd82d6ab",
+        "bytes": 2396,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T1-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t1-b.prompt.txt",
+        "sha256": "930e917c593c84210d3ad5caabb2daa686f719de5c9b59fabfd91c7de793c01e",
+        "bytes": 3081,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T1-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t1-c.prompt.txt",
+        "sha256": "9b007a0614462b0c43a1682515d66567d08dc4c106c4f1db107d5a6eb4593a23",
+        "bytes": 3105,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T2-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t2-a.prompt.txt",
+        "sha256": "b51e42bea54b07c27c207d50afc24bfd3093b89b9bf3a1ab68aabca295c2f950",
+        "bytes": 2398,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T2-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t2-b.prompt.txt",
+        "sha256": "c13b8c192df23a938356cfad41b21ce93abcca7acdf0b375f1ec28c01725f04f",
+        "bytes": 3417,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T2-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t2-c.prompt.txt",
+        "sha256": "c064b4c378cd22f06f053d20755eb87337a0258599d1ee88afb12016e8bd2b54",
+        "bytes": 3441,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T3-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t3-a.prompt.txt",
+        "sha256": "a8b7e7fe29215995768a15326f19f0dc17bc97943d698bc5918be8deb47a553e",
+        "bytes": 2348,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T3-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t3-b.prompt.txt",
+        "sha256": "0d4db767786c9dafa9a840316e2ca08fd18c1986d02106544e00df69be49c123",
+        "bytes": 2956,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T3-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t3-c.prompt.txt",
+        "sha256": "17edfe4566a759776d163096b763f88b3b694f3f91351c2da2d842902ae43ee3",
+        "bytes": 2980,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T4-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t4-a.prompt.txt",
+        "sha256": "75374f24b20fe92cd5dcc7251bb3346426438038e6c6edcbd2b9865330179868",
+        "bytes": 2422,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T4-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t4-b.prompt.txt",
+        "sha256": "b516a40cd9f0594af10caff72c15956328a56c481b82c579b624e0b2d1a0b1ab",
+        "bytes": 3407,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T4-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-smoke-v2/t4-c.prompt.txt",
+        "sha256": "b9ad1f32816dff91a9a9e2ce75c6864ea68fec654cf6765daf0f24cfd3239d4e",
+        "bytes": 3431,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    }
+  ]
+}

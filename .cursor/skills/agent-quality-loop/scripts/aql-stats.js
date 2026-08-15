@@ -683,7 +683,7 @@ function fixtureSha(label) {
 
 function makeBuiltEnvelope(overrides = {}) {
   const envelope = baseEnvelope();
-  envelope.skill_version = "2.7.0";
+  envelope.skill_version = "2.8.0";
   Object.assign(envelope, overrides);
   if (typeof envelope.contract_id === "string" && envelope.implementation_receipt) {
     envelope.implementation_receipt.input_contract_ref = `${envelope.contract_id}@tree`;
@@ -708,7 +708,7 @@ function makeAcceptedEnvelope(overrides = {}) {
     separation_evidence_ref: "source:fresh-acceptor-handoff",
     raw_evidence_before_implementer_narrative: true,
   };
-  envelope.skill_version = "2.7.0";
+  envelope.skill_version = "2.8.0";
   Object.assign(envelope, overrides);
   if (typeof envelope.contract_id === "string" && envelope.implementation_receipt) {
     envelope.implementation_receipt.input_contract_ref = `${envelope.contract_id}@tree`;
@@ -726,7 +726,7 @@ function writeSnapshotFile(filePath, envelope, sequence, previousDigest, recorde
       recorded_at: recordedAt || `2026-08-12T10:00:${String(sequence).padStart(2, "0")}.000Z`,
       sequence,
       previous_digest: previousDigest,
-      writer: "aql-envelope@2.7.0",
+      writer: "aql-envelope@2.8.0",
     },
   };
   const raw = `${JSON.stringify(prepared, null, 2)}\n`;
@@ -831,7 +831,7 @@ function runSelfTest() {
           class: "learned",
           ref: "lessons.md#L1@v1",
           content_sha256: lessonSha,
-          reason: "pause dirty",
+          reason: "pause on a dirty workspace",
         },
       ],
     });
@@ -859,7 +859,7 @@ function runSelfTest() {
         class: "learned",
         ref: "lessons.md#reopen@v1",
         content_sha256: fixtureSha("reopen"),
-        reason: "r",
+        reason: "reopen lesson influenced the task",
       },
     ];
     const r1 = writeSnapshotFile(path.join(aqlHistory, "reopen-1.json"), reopenAccepted, 1, null);

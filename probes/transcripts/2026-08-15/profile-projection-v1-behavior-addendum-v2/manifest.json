@@ -1,0 +1,236 @@
+{
+  "kind": "behavior_batch_environment",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-behavior-addendum/2",
+  "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "runner": "codex exec --ephemeral --sandbox read-only --json",
+  "suite_ref": "probes/profile-projection-v1-behavior-addendum.md",
+  "seed": 20260818,
+  "model": "gpt-5.6-sol",
+  "requested_concurrency": 3,
+  "codex_version": "codex-cli 0.148.0-alpha.9",
+  "node_version": "v25.3.0",
+  "platform": "win32",
+  "arch": "x64",
+  "git_head": "3fceb261175930e0b975b78c2f56a857701b7bb4",
+  "git_dirty": true,
+  "git_status_sha256": "0742c546b58a08642cd7d786007dda2d27dd8b7f881e8b70cdaf0b41faf19016",
+  "run_order": [
+    "T8-C",
+    "T7-C",
+    "T6-C"
+  ],
+  "expected_run_count": 3,
+  "completed_at": "2026-08-15T04:58:27.252Z",
+  "environment_artifact": {
+    "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/environment.json",
+    "sha256": "69bc4e5ffea0bba5cd314e013309a06e89c25e8219d015c121f06f0b3c39f2e8",
+    "bytes": 1139,
+    "redactions": {
+      "sanitizer_version": "machine-local-redaction/v1",
+      "total": 0,
+      "by_token": {}
+    }
+  },
+  "runs": [
+    {
+      "run_id": "T6-C",
+      "task_id": "T6",
+      "condition": "C",
+      "model": "gpt-5.6-sol",
+      "started_at": "2026-08-15T04:56:35.837Z",
+      "ended_at": "2026-08-15T04:58:27.252Z",
+      "elapsed_ms": 111415,
+      "exit_code": 0,
+      "profile_input_kind": "projection_source",
+      "profile_input_sha256": "7c15e21b739802ab61834c26e5a34ded38115502b324f2b932a8b1c70a19676a",
+      "source_profile_sha256": "7c15e21b739802ab61834c26e5a34ded38115502b324f2b932a8b1c70a19676a",
+      "withheld_profile_bytes": false,
+      "protocol_version": "profile-projection-v1-behavior-addendum/2",
+      "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+      "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+      "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+      "artifacts": {
+        "prompt": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t6-c.prompt.txt",
+          "sha256": "bb21123378ed6eaf54c7ac8322bc2e96671758e2f08659ef2f854abde101d9a7",
+          "bytes": 3211,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "transcript": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t6-c.md",
+          "sha256": "82eadf51fb89bd602beb0eff3b008c75548ffd6ed4ee3b121983337b44adfe96",
+          "bytes": 3018,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "jsonl": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t6-c.jsonl",
+          "sha256": "7d51de79ce06d94b74cd37c8b559c899053b99387c96b90660dda4a9924da981",
+          "bytes": 195179,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 52,
+            "by_token": {
+              "<LOCAL_USER>": 26,
+              "<ABSOLUTE_PATH>": 26
+            }
+          }
+        },
+        "stderr": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t6-c.stderr.log",
+          "sha256": "0cbc9878417c5b7a152fc5cb701ec461c8e67798023d0f540b20f96a419cfa02",
+          "bytes": 3350,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 2,
+            "by_token": {
+              "<USER_HOME>": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "run_id": "T7-C",
+      "task_id": "T7",
+      "condition": "C",
+      "model": "gpt-5.6-sol",
+      "started_at": "2026-08-15T04:56:35.790Z",
+      "ended_at": "2026-08-15T04:58:25.377Z",
+      "elapsed_ms": 109587,
+      "exit_code": 0,
+      "profile_input_kind": "projection_source",
+      "profile_input_sha256": "06c61d2e4473d383707e14f4dd76976302a0b2e1a2d149e67b854bfabb83687c",
+      "source_profile_sha256": "06c61d2e4473d383707e14f4dd76976302a0b2e1a2d149e67b854bfabb83687c",
+      "withheld_profile_bytes": false,
+      "protocol_version": "profile-projection-v1-behavior-addendum/2",
+      "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+      "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+      "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+      "artifacts": {
+        "prompt": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t7-c.prompt.txt",
+          "sha256": "8d71b9d35ebe2a4c708c8542341fb05439ece99628c56c76d5960107c1386a95",
+          "bytes": 3283,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "transcript": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t7-c.md",
+          "sha256": "4f76cbb561a419fe8e04b359fcc6fbb58bac25b0c9e7d3210ae213925bc5936c",
+          "bytes": 3238,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "jsonl": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t7-c.jsonl",
+          "sha256": "a39675f01af8cfaa50dd55667176bbdbe9cb57a16b248ffc1165aca9c74aa78d",
+          "bytes": 194119,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 48,
+            "by_token": {
+              "<LOCAL_USER>": 24,
+              "<ABSOLUTE_PATH>": 24
+            }
+          }
+        },
+        "stderr": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t7-c.stderr.log",
+          "sha256": "6c9a76bd950634862b5fe1cdaab7191c28e44b2468b6de7c588a33454da31286",
+          "bytes": 3349,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 2,
+            "by_token": {
+              "<USER_HOME>": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "run_id": "T8-C",
+      "task_id": "T8",
+      "condition": "C",
+      "model": "gpt-5.6-sol",
+      "started_at": "2026-08-15T04:56:35.748Z",
+      "ended_at": "2026-08-15T04:57:40.726Z",
+      "elapsed_ms": 64978,
+      "exit_code": 0,
+      "profile_input_kind": "projection_source",
+      "profile_input_sha256": "d3c3dbffaf1f952a3f453165d7976d8338c0916edaa45185ba04887b2534ea74",
+      "source_profile_sha256": "d3c3dbffaf1f952a3f453165d7976d8338c0916edaa45185ba04887b2534ea74",
+      "withheld_profile_bytes": false,
+      "protocol_version": "profile-projection-v1-behavior-addendum/2",
+      "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+      "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+      "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+      "artifacts": {
+        "prompt": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t8-c.prompt.txt",
+          "sha256": "85aa164c0442e53566104b07a1ca919074c14fca40ffdbd3eca2da92371848e2",
+          "bytes": 2940,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "transcript": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t8-c.md",
+          "sha256": "e5f1c61e4b5b805bbac11029589c8cfad286aca745cb7d6d652abd5d3c17d55d",
+          "bytes": 2537,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 0,
+            "by_token": {}
+          }
+        },
+        "jsonl": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t8-c.jsonl",
+          "sha256": "0c20e3b6ba886d0c9df0b662b88e6646dc03da2d095f70f1c1ac94517ffc10fa",
+          "bytes": 131121,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 24,
+            "by_token": {
+              "<LOCAL_USER>": 12,
+              "<ABSOLUTE_PATH>": 12
+            }
+          }
+        },
+        "stderr": {
+          "ref": "probes/transcripts/2026-08-15/profile-projection-v1-behavior-addendum-v2/t8-c.stderr.log",
+          "sha256": "ff0e8a154f2ce1daf08bcb2da958b050f1f410c0512b1ddcec3b80096ff9824c",
+          "bytes": 3350,
+          "redactions": {
+            "sanitizer_version": "machine-local-redaction/v1",
+            "total": 2,
+            "by_token": {
+              "<USER_HOME>": 2
+            }
+          }
+        }
+      }
+    }
+  ]
+}

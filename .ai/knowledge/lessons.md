@@ -79,7 +79,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `gh pr view <n> --json state` before pushing; `git diff <merge-commit> <old-head> --stat` for squash parity
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-12
+**Last fired:** 2026-08-15
 **Applies when:** Long-running turns that push repeatedly to a PR branch, resume after user activity, or interpret sudden CI silence on pushes
 
 ### 2026-08-12 — Budget-tier single-shot compile can fabricate a missing referent despite explicit prose
@@ -103,7 +103,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `git log -1 --format=%H` against the commit named in the report, then a fresh `sha256sum` of each shipped `manifest.json` against the report's value
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-13
+**Last fired:** 2026-08-15
 **Applies when:** Writing or trusting acceptance, release-readiness, or install-parity claims for artifacts that get regenerated, committed, or installed after verification
 
 ### 2026-08-11 — A repository's publishable surface is larger than its working tree

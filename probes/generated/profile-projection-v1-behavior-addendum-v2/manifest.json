@@ -1,0 +1,168 @@
+{
+  "kind": "generated_prompts",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-behavior-addendum/2",
+  "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "prompts": [
+    {
+      "run_id": "T5-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t5-a.prompt.txt",
+        "sha256": "497599d24770cb673f98860203df3d32fb0acd24e5b8cf1c0ffa41ae0deae40a",
+        "bytes": 2302,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T5-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t5-b.prompt.txt",
+        "sha256": "2a9269b2953f0db4e99023ec093884faa7ba26ff62b20931176d173d99b603bb",
+        "bytes": 3089,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T5-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t5-c.prompt.txt",
+        "sha256": "e7e86e00fbf2712a3dc19fe18060409c2df9f19474026a74404e5e47f6d0a5d0",
+        "bytes": 2880,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T6-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t6-a.prompt.txt",
+        "sha256": "3ca64dc9dd095fb4a86587b962e1439b88c810c39ef135397e670ad470a629fe",
+        "bytes": 2302,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T6-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t6-b.prompt.txt",
+        "sha256": "2cef9eebcd6a6d03e67a9420f465cc5307577bd1875a527dc0e601d28bc2ac24",
+        "bytes": 3187,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T6-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t6-c.prompt.txt",
+        "sha256": "bb21123378ed6eaf54c7ac8322bc2e96671758e2f08659ef2f854abde101d9a7",
+        "bytes": 3211,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T7-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t7-a.prompt.txt",
+        "sha256": "42533a28d6edc8371d468f0a2785600937ff7a065952f3aac8401afc953b9b62",
+        "bytes": 2320,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T7-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t7-b.prompt.txt",
+        "sha256": "b0c49528b42d244ea1e4d0474b695f9c862e2122e266bfc125d580df60b81983",
+        "bytes": 3259,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T7-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t7-c.prompt.txt",
+        "sha256": "8d71b9d35ebe2a4c708c8542341fb05439ece99628c56c76d5960107c1386a95",
+        "bytes": 3283,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T8-A",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t8-a.prompt.txt",
+        "sha256": "03226f85b58e2e142f0674cd7c6ba318ea8b003871cb88375707425f8c18b871",
+        "bytes": 2428,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T8-B",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t8-b.prompt.txt",
+        "sha256": "7ef0af2395beabc6f4b976c2384347c35bb97a62af6e720352e5020e5257e056",
+        "bytes": 2916,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    },
+    {
+      "run_id": "T8-C",
+      "artifact": {
+        "ref": "probes/generated/profile-projection-v1-behavior-addendum-v2/t8-c.prompt.txt",
+        "sha256": "85aa164c0442e53566104b07a1ca919074c14fca40ffdbd3eca2da92371848e2",
+        "bytes": 2940,
+        "redactions": {
+          "sanitizer_version": "machine-local-redaction/v1",
+          "total": 0,
+          "by_token": {}
+        }
+      }
+    }
+  ]
+}

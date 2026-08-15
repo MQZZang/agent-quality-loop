@@ -1,0 +1,487 @@
+validate-all env summary
+  node: v25.3.0
+  platform: win32 (Windows_NT 10.0.19045)
+  arch: x64
+  cwd: <WORKSPACE>
+  repo_root: <WORKSPACE>
+
+=== node scripts/gen-manifest.js --self-test ===
+
+PASS raw LF and CRLF differ
+PASS valid UTF-8 LF and CRLF share digest
+PASS invalid UTF-8 bytes retain distinct digests
+PASS utf8ValidityError flags invalid UTF-8 text
+PASS utf8ValidityError accepts valid UTF-8 text
+PASS rejects unsafe or non-walked manifest path ""
+PASS rejects unsafe or non-walked manifest path "/absolute"
+PASS rejects unsafe or non-walked manifest path "<ABSOLUTE_PATH>"
+PASS rejects unsafe or non-walked manifest path "sub\\file.txt"
+PASS rejects unsafe or non-walked manifest path "sub//file.txt"
+PASS rejects unsafe or non-walked manifest path "./file.txt"
+PASS rejects unsafe or non-walked manifest path "sub/../file.txt"
+PASS rejects unsafe or non-walked manifest path "nul\u0000file.txt"
+PASS rejects unsafe or non-walked manifest path "missing.txt"
+PASS rejects skill package text files with invalid UTF-8
+PASS rejects a symlink or junction in package tree
+
+--- exit code: 0 (node scripts/gen-manifest.js --self-test) ---
+
+
+=== node scripts/install.js --self-test ===
+
+PASS agents routes from generated .agents source
+PASS cursor routes from authoritative .cursor source
+PASS claude routes from generated .agents source
+PASS routes suite agents sources from dist/route-shims/agents
+PASS routes suite cursor sources from dist/route-shims/cursor
+PASS routes suite parent agent-quality-loop sources from core .agents tree
+PASS --to all targets agents, cursor, and claude user trees
+Usage: node scripts/install.js [--suite core|full|routes] [--to agents|cursor|claude|both|all] [--dry-run] [--home <dir>] [--help]
+  --to picks user-level destinations: agents -> ~/.agents/skills (Codex), cursor -> ~/.cursor/skills, claude -> ~/.claude/skills; both = agents+cursor, all = all three.
+  --home overrides the user home directory for destination roots (testing only).
+  The installer copies skills only; project rules and AGENTS.md ship via the project-level copy (see README).
+  --suite routes also installs agent-quality-loop (parent contract). Remove route packages manually from the destination trees to uninstall.
+PASS --help prints usage and exits 0
+PASS dry-run writes no destination files
+PASS ordinary destination is a real-file snapshot, not a live link
+PASS later linked destination aborts batch before earlier ordinary destination changes
+
+--- exit code: 0 (node scripts/install.js --self-test) ---
+
+
+=== node scripts/gen-route-shims.js --check ===
+
+PASS route shim generation matches catalog
+
+--- exit code: 0 (node scripts/gen-route-shims.js --check) ---
+
+
+=== node scripts/test-route-shims.js ===
+
+PASS catalog exposes exactly four routes
+PASS catalog route names match expected bindings
+PASS aql-diagnose catalog validates
+PASS aql-accept catalog validates
+PASS aql-release-check catalog validates
+PASS aql-resume catalog validates
+PASS aql-diagnose forbids local implementation writes
+PASS aql-diagnose terminal ceiling is EVIDENCED
+PASS aql-accept forbids repair
+PASS aql-accept requires fresh acceptor context
+PASS aql-release-check forbids release act
+PASS aql-release-check release_intent is preflight
+PASS aql-resume forbids inherited elevated authority
+PASS aql-resume initial authority is read
+PASS generated fixture passes checkGenerated
+PASS aql-diagnose Cursor variant includes disable-model-invocation
+PASS aql-diagnose Codex variant excludes disable-model-invocation
+PASS aql-accept Cursor variant includes disable-model-invocation
+PASS aql-accept Codex variant excludes disable-model-invocation
+PASS aql-release-check Cursor variant includes disable-model-invocation
+PASS aql-release-check Codex variant excludes disable-model-invocation
+PASS aql-resume Cursor variant includes disable-model-invocation
+PASS aql-resume Codex variant excludes disable-model-invocation
+PASS aql-accept discloses independence is not automatic
+PASS aql-accept rejects different_role as fresh-context evidence
+PASS --check detects SKILL.md drift
+PASS manifest check detects deleted manifest entry
+PASS manifest check detects tampered manifest hash only
+PASS package check detects SKILL.md tamper
+PASS --check detects extra generated file
+PASS Cursor generated body stays within line cap
+PASS generated body avoids lifecycle dump
+PASS core mirror check ignores route packages
+PASS dist route package exists cursor/aql-diagnose
+PASS dist route package exists cursor/aql-accept
+PASS dist route package exists cursor/aql-release-check
+PASS dist route package exists cursor/aql-resume
+PASS dist route package exists agents/aql-diagnose
+PASS dist route package exists agents/aql-accept
+PASS dist route package exists agents/aql-release-check
+PASS dist route package exists agents/aql-resume
+PASS dist route package exists plugins/aql-diagnose
+PASS dist route package exists plugins/aql-accept
+PASS dist route package exists plugins/aql-release-check
+PASS dist route package exists plugins/aql-resume
+PASS route host variants differ between Cursor and Codex dist trees
+PASS no legacy route package under .cursor/skills/aql-diagnose
+PASS no legacy route package under .cursor/skills/aql-accept
+PASS no legacy route package under .cursor/skills/aql-release-check
+PASS no legacy route package under .cursor/skills/aql-resume
+PASS no legacy route package under .agents/skills/aql-diagnose
+PASS no legacy route package under .agents/skills/aql-accept
+PASS no legacy route package under .agents/skills/aql-release-check
+PASS no legacy route package under .agents/skills/aql-resume
+PASS no legacy route package under skills/aql-diagnose
+PASS no legacy route package under skills/aql-accept
+PASS no legacy route package under skills/aql-release-check
+PASS no legacy route package under skills/aql-resume
+PASS routes install agents sources from dist/route-shims/agents
+PASS routes install cursor sources from dist/route-shims/cursor
+PASS routes install claude route sources from dist/route-shims/cursor variant
+PASS routes suite auto-includes agent-quality-loop parent
+PASS routes install plan includes parent for agents destination
+PASS core suite excludes route packages
+PASS full suite excludes route packages
+PASS temp HOME routes plan includes parent and four routes
+PASS install routes dry-run exits 0
+PASS install routes dry-run plans agent-quality-loop parent
+PASS install routes dry-run plans all four route packages per destination
+PASS gen-route-shims --check exits 0 on repo tree
+
+--- exit code: 0 (node scripts/test-route-shims.js) ---
+
+
+=== node .cursor/skills/agent-quality-loop/scripts/validate-skill.js ===
+
+PASS skill package structure, links, portability, metadata, and 54 envelope regression cases
+
+--- exit code: 0 (node .cursor/skills/agent-quality-loop/scripts/validate-skill.js) ---
+
+
+=== node scripts/validate-workflow.js ===
+
+PASS single-entry routing, adapter policies, skill mirrors, portability, and bundled validator
+
+--- exit code: 0 (node scripts/validate-workflow.js) ---
+
+
+=== node scripts/validate-claims.js ===
+
+PASS claim consistency: 108 evaluation cases, 54 envelope regressions, 4 routes, 4 core skills, manifests ok
+
+--- exit code: 0 (node scripts/validate-claims.js) ---
+
+
+=== node scripts/corpus-inventory.js --self-test ===
+
+corpus-inventory self-test: PASS
+
+--- exit code: 0 (node scripts/corpus-inventory.js --self-test) ---
+
+
+=== node scripts/validate-corpus-claims.js --self-test ===
+
+validate-corpus-claims self-test: PASS
+
+--- exit code: 0 (node scripts/validate-corpus-claims.js --self-test) ---
+
+
+=== node scripts/validate-corpus-claims.js --claims docs/research/llm-learning-corpus/claim-ledger.json --inventory docs/research/llm-learning-corpus/inventory.json --check ===
+
+validate-corpus-claims: PASS (14 claims)
+
+--- exit code: 0 (node scripts/validate-corpus-claims.js --claims docs/research/llm-learning-corpus/claim-ledger.json --inventory docs/research/llm-learning-corpus/inventory.json --check) ---
+
+
+=== node scripts/validate-writing-probes.js ===
+
+validate-writing-probes: STRUCTURAL PASS (22 transcripts); independent semantic grades PASS 8 / FAIL 4 / NOT_RUN 10; no self-check or transcript count was promoted into a semantic aggregate
+
+--- exit code: 0 (node scripts/validate-writing-probes.js) ---
+
+
+=== node scripts/aql-doctor.js --self-test ===
+
+PASS aql-doctor --self-test
+
+--- exit code: 0 (node scripts/aql-doctor.js --self-test) ---
+
+
+=== node scripts/test-release-workflow-logic.js ===
+
+PASS aligned tag-push accepts
+PASS workflow_dispatch accepts when markers match tag even if githubSha differs
+PASS ubuntu/windows mismatch refuses (Ubuntu and Windows validated SHAs differ; refusing release)
+PASS checkout/tag mismatch refuses (Tag / checkout / validated SHA mismatch; refusing release)
+PASS tag-push githubSha mismatch refuses (GITHUB_SHA does not match validated tag SHA on tag push; refusing release)
+PASS empty marker refuses (Missing platform validation markers)
+
+--- exit code: 0 (node scripts/test-release-workflow-logic.js) ---
+
+
+=== node integrations/cursor-hooks/test.js ===
+
+PASS  hooks fixture uses canonical field names and declares incompleteness
+PASS  non-external: exit 0
+PASS  non-external: permission allow
+PASS  external-no-envelope: exit 0
+PASS  external-no-envelope: permission deny
+PASS  external-no-envelope-preToolUse-tool_input: exit 0
+PASS  external-no-envelope-preToolUse-tool_input: permission deny
+PASS  external-no-envelope-missing-hook_event_name: exit 0
+PASS  external-no-envelope-missing-hook_event_name: permission deny
+PASS  external-malformed-envelope: exit 0
+PASS  external-malformed-envelope: permission deny
+PASS  external-schema-invalid: exit 0
+PASS  external-schema-invalid: permission deny
+PASS  read-deny-push: permission deny for external under read/incomplete envelope
+PASS  local_write-deny-publish: exit 0
+PASS  local_write-deny-publish: permission deny
+PASS  disable-env: permission allow
+PASS  release-deny-push-without-current-authorization
+PASS  release-deny-wrong-intent
+PASS  release-deny-wrong-mode
+PASS  release-deny-wrong-phase
+PASS  release-deny-wrong-authority
+PASS  release-deny-wrong-release-intent
+PASS  release-deny-missing-environment
+PASS  release-deny-empty-targets
+PASS  release-deny-empty-manual-checks
+PASS  release-deny-nested-empty-manual-checks
+PASS  release-deny-nested-empty-rollback
+PASS  release-deny-expired-iso
+PASS  release-ask-complete-nested-authorization: exit 0
+PASS  release-ask-complete-nested-authorization: permission ask + messages
+PASS  release-ask-complete-explicit-route: exit 0
+PASS  release-ask-complete-explicit-route: permission ask + messages
+PASS  same-command-different-cwd: exit 0
+PASS  same-command-different-cwd: permission deny
+PASS  different-command: exit 0
+PASS  different-command: permission deny
+PASS  extra-whitespace: exit 0
+PASS  extra-whitespace: permission deny
+PASS  different-remote: exit 0
+PASS  different-remote: permission deny
+PASS  different-branch: exit 0
+PASS  different-branch: permission deny
+PASS  git-push-auth-npm-publish: exit 0
+PASS  git-push-auth-npm-publish: permission deny
+PASS  git-push-auth-aws-destructive: exit 0
+PASS  git-push-auth-aws-destructive: permission deny
+PASS  non-ISO-expires_at: exit 0
+PASS  non-ISO-expires_at: permission deny
+PASS  expired-expires_at: exit 0
+PASS  expired-expires_at: permission deny
+PASS  expires_at-beyond-15m-TTL: exit 0
+PASS  expires_at-beyond-15m-TTL: permission deny
+PASS  authorized_this_turn-alone: exit 0
+PASS  authorized_this_turn-alone: permission deny
+PASS  config-missing: exit 2
+PASS  config-missing: permission deny
+PASS  config-malformed: exit 2
+PASS  config-malformed: permission deny
+PASS  validator-unavailable: exit 2
+PASS  validator-unavailable: permission deny
+PASS  canonical-invalid-independence: exit 0
+PASS  canonical-invalid-independence: permission deny
+PASS  stale-head: exit 0
+PASS  stale-head: permission deny
+PASS  invalid-policy-regex: exit 2
+PASS  invalid-policy-regex: permission deny
+PASS  invalid-stdin-JSON: exit 2
+PASS  invalid-stdin-JSON: permission deny
+PASS  unexpected-internal-exception: exit 2
+PASS  unexpected-internal-exception: permission deny
+PASS  read-deny-Write-tool: permission deny
+PASS  local_write-allow-Write-tool: permission allow
+PASS  extended-external-docker-push: deny without plan
+PASS  extended-external-docker-push: never allow
+PASS  extended-external-helm-upgrade: deny without plan
+PASS  extended-external-helm-upgrade: never allow
+PASS  extended-external-helm-install: deny without plan
+PASS  extended-external-helm-install: never allow
+PASS  extended-external-helm-uninstall: deny without plan
+PASS  extended-external-helm-uninstall: never allow
+PASS  extended-external-firebase-deploy: deny without plan
+PASS  extended-external-firebase-deploy: never allow
+PASS  extended-external-curl-X-POST: deny without plan
+PASS  extended-external-curl-X-POST: never allow
+PASS  extended-external-curl-request-DELETE: deny without plan
+PASS  extended-external-curl-request-DELETE: never allow
+PASS  extended-external-scp: deny without plan
+PASS  extended-external-scp: never allow
+PASS  extended-external-rsync-remote: deny without plan
+PASS  extended-external-rsync-remote: never allow
+PASS  compat-unknown-shell: exit 0
+PASS  compat-unknown-shell: permission allow (compatibility heuristic)
+PASS  strict-unknown-shell-ask: exit 0
+PASS  strict-unknown-shell-ask: permission ask
+PASS  strict-unknown-shell-ask: never allow
+PASS  strict-unknown-shell-deny: permission deny
+PASS  strict-unknown-shell-deny: never allow
+PASS  strict-safe-read-git-status: allow
+PASS  docker-push-release-ask: exit 0
+PASS  docker-push-release-ask: permission ask + messages
+PASS  docker-push-release-ask: external path never allow
+PASS  mcp-known-read: allow
+PASS  mcp-known-mutation: ask or deny
+PASS  mcp-known-mutation: never allow
+PASS  mcp-unknown-compat: allow
+PASS  mcp-unknown-compat: disclosure note
+PASS  mcp-unknown-strict: ask
+PASS  mcp-unknown-strict: never allow
+PASS  stop-bounce: exit 0
+PASS  stop-bounce: followup_message exact
+PASS  stop-bounce: no .stop-gate-fired marker
+PASS  stop-anti-loop: no followup bounce
+PASS  stop-anti-loop: note present
+PASS  stop-anti-loop: no .stop-gate-fired marker
+PASS  stop-bounce-contract-b: followup_message exact
+PASS  stop-bounce-contract-b: no .stop-gate-fired marker
+PASS  stop-missing-loop: allow (no bounce)
+PASS  stop-missing-loop: disclosure note
+PASS  stop-missing-loop: no .stop-gate-fired marker
+PASS  stop-with-evidence: allow (no followup)
+PASS  stop-with-evidence: no .stop-gate-fired marker
+PASS  stop-no-envelope: allow
+PASS  stop-no-envelope: no .stop-gate-fired marker
+
+Passed: 124  Failed: 0
+Fixture root cleaned: true
+
+--- exit code: 0 (node integrations/cursor-hooks/test.js) ---
+
+
+=== node probes/make-fixtures.js --self-test ===
+
+PASS fixture projects are byte-identical across target directories
+PASS regeneration at the same path is byte-stable
+PASS fixture tree contains exactly the declared files plus PROMPTS.md
+PASS prompt sheet is blind (no grading language leaked)
+PASS verify passes on an untouched fixture tree
+PASS prompt sheet paths are POSIX-normalized
+PASS PROBES.md names the same protocol version as this generator
+PASS fixture and prompt bytes match the pinned v1 digest (a content change requires a protocol bump and a new pin)
+PASS verify detects fixture drift after a probe run
+Self-test passed
+
+--- exit code: 0 (node probes/make-fixtures.js --self-test) ---
+
+
+=== node probes/run-profile-projection-smoke.js --self-test ===
+
+PASS suite has at least one task family
+PASS suite expands every task across A/B/C
+PASS run ids are unique
+PASS condition A excludes profile fixture bytes
+PASS condition B includes the complete profile fixture
+PASS condition C includes only its declared executor-visible fixture
+PASS executor prompt contains no absolute workspace path
+PASS executor prompt excludes grading expectations
+PASS executor prompt does not reveal the suite path
+PASS suite declares a protocol version
+{
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-smoke/2",
+  "suite_sha256": "0e9fd7044749c4642eff5c624ebd29dfed258ba7b241532aa89b423027165bb0",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612"
+}
+
+--- exit code: 0 (node probes/run-profile-projection-smoke.js --self-test) ---
+
+
+=== node probes/run-profile-projection-review.js --self-test ===
+
+PASS review output declares raw_evidence_first
+PASS review output declares prior_narratives_read
+PASS review excludes prior narrative files
+PASS review requires evidence verification before grading
+PASS review reads the v2 smoke evidence
+PASS review reads the v2 addendum evidence
+PASS review reads the isolated opt-in-boundary evidence
+
+--- exit code: 0 (node probes/run-profile-projection-review.js --self-test) ---
+
+
+=== node probes/verify-profile-projection-evidence.js ===
+
+PASS generated_prompts probes\generated\profile-projection-v1-smoke-v2 sha256=77319af82ec5114c58d728b03776954766758106c93c37b83629bcfbcf7c82a6
+PASS generated_prompts probes\generated\profile-projection-v1-behavior-addendum-v2 sha256=6eea8c14f72df8b42dc6810e0f5c05185ce51a0075a5757d8d5656c1d2b42ba9
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-smoke-v2 sha256=8cd2fbc41548e8480f7222e0671fba00e6f846feb95234e589dded27e443145f
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-behavior-addendum-v2 sha256=77297fd534dcca52d00d648f8160cf5f4abf1c6ddf0bf2fcd331ca453878f92b
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-opt-in-boundary-v2 sha256=990a416f3fdaf206fb0efa2a35f09f40e8ace5d86f9d081dea538ad9ea9ef0fe
+PASS profile_projection_neutral_review probes\transcripts\2026-08-15\profile-projection-v1-neutral-review-v2 sha256=e0561b19816c632da23fed304aa9aee2675f01fe83231c71c05e5707fb11379d
+PASS profile projection evidence sets=6
+
+--- exit code: 0 (node probes/verify-profile-projection-evidence.js) ---
+
+
+=== node scripts/sync-skills.js --check ===
+
+PASS skill mirror and manifest consistency
+
+--- exit code: 0 (node scripts/sync-skills.js --check) ---
+
+validate-all: all steps passed
+
+=== final focused checks ===
+PASS Profile Projection v1 fixture contract (29 cases: 10 valid, 19 negative controls)
+fixture_version: profile-projection-v1-fixtures/1
+fixture_sha256: 975d054e6a14a24c495702c9706af010b8e953dd0b853ae6b4d925ee40ec5eed
+PASS valid built envelope
+PASS optional skill_version accepted
+PASS empty skill_version rejected: skill_version must be a non-empty string when present
+PASS full cannot reach release-ready: mode full cannot advance beyond ACCEPTED; next_allowed_phase must be DEPLOYED from RELEASE_READY; acceptance_gate must be an object; ACCEPTED or later requires evidenced independent acceptance; release_gate must be an object
+PASS adapter cannot accept: implementation_receipt.result_phase must be BUILT
+PASS receipt must bind selected adapter: implementation_receipt.adapter must match executor_adapter
+PASS full cannot raise authority: mode full cannot have authority above local_write; action_authority release requires complete current-turn authorization
+PASS partial dry-run is rejected: side_effect_coverage.paths[0] must be short-circuited for simulation; simulation requires all_external_effects_short_circuited true
+PASS elevated authority requires authorization: mode execute cannot have authority above local_write; action_authority external_write requires complete current-turn authorization
+PASS release gate cannot appear before preflight: release_gate must remain null until release preflight begins from ACCEPTED; release_gate.canonical_set must be release_v1; release_gate.required_dimensions must be non-empty
+PASS contract id must be scalar: contract_id must be a non-empty string
+PASS coverage requires exact command: side_effect_coverage.command must be an exact non-empty command or operation
+PASS evidence terminal requires stop reason: mode evidence requires action_authority read; evidence-only terminal requires stop_reason evidence_only_complete
+PASS authority revocation must invalidate authority: user stop, scope change, or authority revocation requires verdict BLOCKED or PENDING; action_state_at_stop must record at least one concrete action, invalidated authority, or local-edit disposition; user stop, scope change, or authority revocation requires external_authority_invalidated true
+PASS blocker must be actionable: blocker.reason is required for BLOCKED; blocker.missing is required for BLOCKED; blocker.owner is required for BLOCKED; blocker.minimal_unlock is required for BLOCKED; blocker.side_effects_not_taken is required for BLOCKED
+PASS blocked dimension requires missing evidence: acceptance_gate.status_by_dimension.tests.missing_evidence is required for BLOCKED
+PASS release act starts only from release-ready: DEPLOYED or PRODUCTION_VERIFIED must clear active authority to read; DEPLOYED or PRODUCTION_VERIFIED must clear release_authorization; DEPLOYED or PRODUCTION_VERIFIED must clear release_intent; release_intent act requires phase exactly RELEASE_READY
+PASS incomplete resume cannot execute: incomplete reconstruction cannot advance beyond EVIDENCED; incomplete reconstruction requires action_authority read; incomplete reconstruction requires verdict BLOCKED or PENDING
+PASS evidence mode is read-only: mode evidence requires action_authority read
+PASS accept mode is read-only: mode accept requires action_authority read
+PASS full cannot enter release preflight: release_intent requires intent release and mode release; release preflight must keep action_authority read; release preflight requires phase ACCEPTED or RELEASE_READY
+PASS resume cannot consume release act: release_intent requires intent release and mode release
+PASS different_role cannot ACCEPTED: ACCEPTED or later requires evidenced independent acceptance
+PASS fresh_context without separation evidence cannot ACCEPTED: ACCEPTED or later requires evidenced independent acceptance
+PASS fresh_context with separation evidence can ACCEPTED
+PASS deployed envelope clears active release authority
+PASS deployed envelope rejects reusable authority: DEPLOYED or PRODUCTION_VERIFIED must clear active authority to read; DEPLOYED or PRODUCTION_VERIFIED must clear release_authorization
+PASS stop clears elevated authority: mode execute cannot have authority above local_write; user stop, scope change, or authority revocation must clear elevated action authority; user stop, scope change, or authority revocation must clear release_authorization
+PASS valid injected_refs accepted
+PASS empty injected_refs array accepted
+PASS duplicate injected_refs kind+ref+content_sha256 rejected: injected_refs[1] duplicates kind+ref+content_sha256
+PASS learned lesson cap rejected: injected_refs learned lesson max is 3
+PASS ACCEPTED + FAIL verdict rejected: phase ACCEPTED requires verdict in success set (PASS or PASS_WITH_RISK); verdict FAIL forbids phase ACCEPTED
+PASS ACCEPTED + required dimension FAIL rejected: acceptance_gate.tests must PASS for this phase
+PASS injected_refs wrong kind/class mapping rejected: injected_refs[0].class must be learned for kind lesson
+PASS injected_refs missing content_sha256 rejected: injected_refs[0].content_sha256 must be 64 lowercase hex
+PASS injected_refs rejects a meaningless reason: injected_refs[0].reason must concretely identify the match or effect
+PASS forbidden envelope field profile_projection rejected: profile_projection is forbidden; the Task Contract is the only lifecycle state
+PASS forbidden envelope field user_lens rejected: user_lens is forbidden; the Task Contract is the only lifecycle state
+PASS forbidden envelope field collaboration_brief rejected: collaboration_brief is forbidden; the Task Contract is the only lifecycle state
+PASS valid harvest_candidates accepted
+PASS harvest status must be candidate: harvest_candidates[0].status must be candidate
+PASS harvest_candidates max rejected: harvest_candidates max is 3 when present
+PASS harvest profile candidate max rejected: harvest_candidates profile max is 2
+PASS check-refs accepts existing path refs
+PASS check-refs rejects missing path refs: missing path refs: artifact_refs[0]=./missing.txt; evidence_refs[0]=file:./also-missing.txt
+PASS check-refs rejects missing bare relative digest path: missing path refs: artifact_refs[0]=sub/missing.js@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee
+PASS check-refs accepts present bare filename
+PASS check-refs accepts present bare README
+PASS check-refs rejects missing bare README: missing path refs: artifact_refs[0]=missing/README
+PASS check-refs rejects missing bare LICENSE digest path: missing path refs: artifact_refs[0]=sub/LICENSE@e49c81e2d2f84e259d40e2fb8192f3bcd198b355184845d76d8f58807d0d78ee
+PASS check-refs accepts file URI with digest
+PASS check-refs ignores ordinary prose
+PASS check-refs ignores ordinary words
+PASS skill mirror and manifest consistency
+PASS generated_prompts probes\generated\profile-projection-v1-smoke-v2 sha256=77319af82ec5114c58d728b03776954766758106c93c37b83629bcfbcf7c82a6
+PASS generated_prompts probes\generated\profile-projection-v1-behavior-addendum-v2 sha256=6eea8c14f72df8b42dc6810e0f5c05185ce51a0075a5757d8d5656c1d2b42ba9
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-smoke-v2 sha256=8cd2fbc41548e8480f7222e0671fba00e6f846feb95234e589dded27e443145f
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-behavior-addendum-v2 sha256=77297fd534dcca52d00d648f8160cf5f4abf1c6ddf0bf2fcd331ca453878f92b
+PASS behavior_batch_environment probes\transcripts\2026-08-15\profile-projection-v1-opt-in-boundary-v2 sha256=990a416f3fdaf206fb0efa2a35f09f40e8ace5d86f9d081dea538ad9ea9ef0fe
+PASS profile_projection_neutral_review probes\transcripts\2026-08-15\profile-projection-v1-neutral-review-v2 sha256=e0561b19816c632da23fed304aa9aee2675f01fe83231c71c05e5707fb11379d
+PASS profile projection evidence sets=6
+warning: in the working copy of '.ai/knowledge/collaboration-profile.template.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'CHANGELOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/claim-evidence-matrix.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/guide.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/validate-all.js', LF will be replaced by CRLF the next time Git touches it
+=== package versions ===
+.cursor/skills/agent-quality-loop/manifest.json: 2.7.0
+.agents/skills/agent-quality-loop/manifest.json: 2.7.0
+skills/agent-quality-loop/manifest.json: 2.7.0
+FINAL_FOCUSED_EXIT=0

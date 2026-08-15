@@ -1,0 +1,54 @@
+You are a fresh-context behavior-probe executor. This is a response-only simulation in a read-only repository; do not edit files, mutate a profile, create a contract file, push, publish, or release.
+
+Before answering, read only these mechanism files:
+- .cursor/skills/agent-quality-loop/SKILL.md
+- .cursor/skills/agent-quality-loop/references/personalization.md
+- .cursor/skills/agent-quality-loop/references/profile-projection.md
+
+Do not read the probe suite, experiment protocol, evaluation cases, validators, prior transcripts, or any real collaboration profile. Use only the raw request and condition input below. Do not ask a question when the request is clear.
+
+Probe id: T5
+Condition: C
+Condition input: Apply experimental Profile Projection v1 under the single existing Task Contract. The host removed profile scopes that were not explicitly enabled before this executor process started. Select no more than two matching active entries, remove current-turn conflicts before ranking, and record only entries that materially affect the response.
+Profile input kind: host_gated
+Profile input sha256: f29787eddab3fdc4d78f2fbd72363cebd34f5e220bf43eec9b2b1a10d35ac058
+
+RAW REQUEST (verbatim):
+只读诊断后台任务队列持续积压的根因，给出证据缺口和最小实验；任务已经清楚，不要追问。
+
+EXECUTOR-VISIBLE PROFILE INPUT:
+profile_activation:
+  project_profile: available
+  user_profile: not_explicitly_enabled
+entries:
+  - id: project-queue-correlation
+    lane: collaboration_habit
+    value: Queue incident analysis should preserve enqueue, lease, retry, and completion correlation evidence.
+    scope: project
+    applies_when: Diagnosing worker-queue backlog in this repository.
+    source: explicit_confirmation
+    status: active
+    last_fired: never
+
+Give the exact response you would give the user under this condition. For a task that asks for a write, describe the intended bounded action and authority result without performing or falsely claiming the edit. Then return exactly these two sections and preserve only the executor-visible profile input in the receipt:
+
+USER_RESPONSE:
+<actual user-facing response>
+
+PROBE_RECEIPT:
+probe_id: T5
+condition: C
+raw_request: <exact raw request>
+profile_input_kind: host_gated
+profile_input_sha256: f29787eddab3fdc4d78f2fbd72363cebd34f5e220bf43eec9b2b1a10d35ac058
+profile_fixture: <exact executor-visible fixture above, or none>
+selected_profile_refs: <stable profile entry refs that actually influenced the response; [] when none>
+compiled_contract_effect: <one line>
+user_visible_question_count: <integer>
+action_authority_result: <one line>
+evidence_boundary_result: <one line>
+fresh_mode_result: <one line>
+profile_write_or_revision: <none or description>
+second_contract_created: <true|false>
+why_applied_answer: <one line or not_asked>
+verdict: <PASS|FAIL|NOT_RUN> - <one decidable line>

@@ -45,9 +45,21 @@ release_gate: null until release preflight; then a separate canonical gate
 assumptions: safe and reversible assumptions only
 unknowns: material unresolved facts
 pause_conditions: conditions that prohibit the next phase
+injected_refs: optional source records for lessons, profile entries, presets, domain profiles, probes, or routes actually applied
 ```
 
 Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
+
+When an opted-in user collaboration profile contributes any `injected_refs`, record the current-session consent inside the existing `assumptions` collection; no new persistent field is created:
+
+```yaml
+- kind: user_profile_opt_in
+  enabled: true
+  scope: current_session
+  source_ref: current-turn:user-profile-opt-in
+```
+
+The source ref must be a safe non-secret task/evidence ref. A home-profile path, caller boolean, or file existence alone is not the assumption record.
 
 `target_user_or_system` means the **final consumer of the artifact plus the consumption medium** (e.g. end user in the shipped UI, reader of the published doc, player in the build)—not merely the requester or implementer. For experiential work (narrative, design, UI, games, docs), write `success_observables` and `counterexamples` in that consumer's perceptible terms.
 
@@ -286,6 +298,8 @@ assumptions: safe reversible assumptions preserved from the contract
 workspace_ref: branch/commit/tree hash or equivalent, plus dirty-state note
 artifact_refs: changed or reviewed artifacts with hashes when material
 evidence_refs: compact source/command/result references
+injected_refs: optional measured source records actually applied to this contract
+harvest_candidates: optional RETRO candidates; never active profile state
 implementation_receipt: null before execution; otherwise the structured adapter receipt below
 acceptance_gate: preserved structured acceptance gate below
 release_gate: null before release preflight; otherwise separate structured release gate below
@@ -298,6 +312,34 @@ blocker: null or {reason, missing, owner, minimal_unlock, side_effects_not_taken
 action_state_at_stop: null or structured fields below
 expiry_or_drift_condition: when the envelope must be rebuilt
 ```
+
+`injected_refs` uses the existing measured-source structure:
+
+```yaml
+injected_refs:
+  - kind: lesson | profile | preset | domain_profile | probe | route
+    class: learned | structural
+    ref: stable version-bound reference
+    content_sha256: 64 lowercase hex characters
+    reason: one-line explanation of why the source applied and what it affected
+```
+
+The validator preserves these budgets: 8 total, 5 learned, 3 lessons, 2 profile entries, and 3 structural refs. `lesson` and `profile` are `learned`; the other kinds are `structural`. Field absence means whether injection was measured is unknown. A present empty array means injection was measured and nothing was injected.
+
+`harvest_candidates` documents the existing RETRO carrier without creating a second feedback system:
+
+```yaml
+harvest_candidates:
+  - kind: user_correction | path_change | scope_deviation | contradiction | thrash_unlock | rejected_option
+    lane: lesson | profile | rejected_option
+    summary: one-line candidate statement
+    source_ref: current task/evidence reference, plus the original profile entry id when applicable
+    status: candidate
+```
+
+The total maximum is 3 and at most 2 may target profile/rejected-option lanes. Field absence means harvest was not measured or not represented; a present empty array means RETRO measured no candidates. A candidate is not active state, authority, evidence, or proof of improvement.
+
+Do not add `profile_projection`, `user_lens`, `profile_mode`, `collaboration_brief`, profile scores, or ranking probabilities to the envelope. Profile Projection v1 is a task-local compile step whose applied sources are already traceable through `injected_refs`.
 
 Allowed stop-reason values are `evidence_only_complete`, `user_cancelled`, `scope_changed`, `authority_revoked`, `ambiguity`, `evidence_gap`, `authority_gap`, `unsafe_workspace`, `acceptance_pending`, `acceptance_failed`, and `production_verified`. A user-requested pause normally uses `verdict: PENDING`; use `BLOCKED` only when a required decision or authorized next action is unavailable.
 
@@ -331,6 +373,10 @@ implementation_receipt:
 ```
 
 An embedded adapter consumes the existing goal, scope, assumptions, assurance, authority, and must-hold checks. It does not emit a second alignment contract or user-facing lifecycle summary. Reject any receipt that claims `ACCEPTED`, `RELEASE_READY`, deployment, or new authority.
+
+### Collaboration Brief / Dispatch Brief
+
+A Collaboration Brief or Dispatch Brief is the Task Contract's transient minimum view for the current executor. It is not separately persisted, has no independent contract id, phase, authority, goal source, or lifecycle, and does not copy the complete collaboration profile. Every item must trace to the current Task Contract, project reality, or `injected_refs`; the adapter returns only the implementation receipt above. Any independent Brief state or goal truth source fails consistency review.
 
 For acceptance, use:
 
@@ -372,6 +418,12 @@ When the loop is active, the parent AQL leads with exactly one adaptive result s
 
 This is an information grammar, not a fixed long template. Omit empty sections. Routine success is normally one natural-language conclusion plus one evidence line; standard work adds only decision-changing evidence and a necessary next step. Expand formal, `FAIL`, `BLOCKED`, `PENDING`, handoff/resume, and release results. A useful expanded shape is:
 
+### Result Attention Rendering
+
+Within the existing User Result Summary and Result Detail Budget, apply [result-attention.md](result-attention.md): make the first 5–8 lines answer, in order, the conclusion, user impact or boundary, decisive evidence, risk or uncertainty, and any necessary user action. Render at most one primary conclusion, one key caution, and one necessary action. This is presentation of the existing Task Contract, not a Result Attention Contract or another persisted state source.
+
+Machine receipts belong in the visible result only when the user explicitly asks, or for handoff, formal audit, or blocking diagnosis. In ordinary Chinese results, do not default to internal enums such as `BUILT` or `ACCEPTED`; use the precise plain-language status only when it changes the user's decision. Do not add cards, emoji, or UI chrome to create attention hierarchy.
+
 ```markdown
 ## Result: {plain-language conclusion}
 
@@ -410,7 +462,7 @@ Apply these semantic rules:
 
 Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean published package may show `AQL 2.7.0`. A dirty/unreleased artifact must say, for example, `local unreleased build (based on AQL 2.7.0; HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean published package may show `AQL 2.8.0`. A dirty/unreleased artifact must say, for example, `local unreleased build (based on AQL 2.8.0; HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 
@@ -422,6 +474,8 @@ Before handoff or release, verify:
 - assurance does not raise action authority, and ordinary `implement` / fix / self-test (`fast` or `standard`) may stop at `BUILT` + `PASS`/`PASS_WITH_RISK` with `next_allowed_phase: null` without inventing formal acceptance or a fresh acceptor;
 - any executor adapter receipt is bound to the current contract/baseline and reports exactly `result_phase: BUILT`;
 - every Task Contract field is present under the same field name, including target user/system, problem signal, assumptions, and action authority;
+- optional `injected_refs` and `harvest_candidates` preserve their measured-versus-unknown semantics, declared shapes, and budgets; profile refs identify exact entries rather than a merged hidden profile;
+- no profile projection or executor Brief creates a second contract id, phase, authority record, persistent state, or goal truth source;
 - the current and next phases follow the legal-transition table, or `next_allowed_phase` is null for a valid terminal result (`EVIDENCED`, `BUILT`, `ACCEPTED`, or `RELEASE_READY` when that stage was the requested stop);
 - `mode: full` has not advanced beyond `phase: ACCEPTED`;
 - `mode: full` has effective authority no higher than `local_write` and consumes no release authorization;
@@ -529,4 +583,4 @@ Before release preflight, `release_gate` is `null`. After preflight begins, both
 | `standard` | Conclusion, decision-changing evidence, and a necessary next step |
 | `formal`, failure, blocker, pending, handoff/resume, release | Expanded summary with required audit/evidence boundaries |
 
-When result ceremony clearly exceeds the size of the change, compress the rendering without lowering the inherited assurance or evidence bar.
+When result ceremony clearly exceeds the size of the change, compress the rendering without lowering the inherited assurance or evidence bar. The first-screen attention order remains conclusion, user impact/boundary, decisive evidence, risk/uncertainty, and necessary action; detailed receipts remain later unless their visibility is required by the User Result Summary rules.

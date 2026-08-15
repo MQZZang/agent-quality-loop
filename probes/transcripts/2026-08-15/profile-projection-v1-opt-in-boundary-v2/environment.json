@@ -1,0 +1,25 @@
+{
+  "kind": "behavior_batch_environment",
+  "evidence_format_version": "profile-projection-evidence/v2",
+  "sanitizer_version": "machine-local-redaction/v1",
+  "protocol_version": "profile-projection-v1-behavior-addendum/2",
+  "suite_sha256": "8cb2b1bbed1a1dee87eb81a47a69efd8deb79bdfe5d44e6b14ebc4e25fead95e",
+  "skill_input_sha256": "727c1ee63b61d5a0e11566c477e3213b59a049549df3b22c6eeb38489f29d69f",
+  "runner_sha256": "3c1ea73d791eeb3a645e6efdcb24208521309e9c6e1d4e56c3cf5e7acbcdbcd1",
+  "evidence_utils_sha256": "1df1db1a563a842d86908faf6d1cc20362618b788a5b705d9d0e8885ac307612",
+  "runner": "codex exec --ephemeral --sandbox read-only --json",
+  "suite_ref": "probes/profile-projection-v1-behavior-addendum.md",
+  "seed": 20260819,
+  "model": "gpt-5.6-sol",
+  "requested_concurrency": 1,
+  "codex_version": "codex-cli 0.148.0-alpha.9",
+  "node_version": "v25.3.0",
+  "platform": "win32",
+  "arch": "x64",
+  "git_head": "3fceb261175930e0b975b78c2f56a857701b7bb4",
+  "git_dirty": true,
+  "git_status_sha256": "0742c546b58a08642cd7d786007dda2d27dd8b7f881e8b70cdaf0b41faf19016",
+  "run_order": [
+    "T5-C"
+  ]
+}
