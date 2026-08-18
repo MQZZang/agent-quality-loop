@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
   "version": "3.0.0",
-  "generated_at": "2026-08-18T10:07:47.488Z",
+  "generated_at": "2026-08-18T10:36:22.442Z",
   "files": {
-    "SKILL.md": "9562314ef5ffa33dd6293837a2424bf8844cf93c299c929ad1dd695c08927038",
+    "SKILL.md": "dd79fa094cd00721904639bbea49fcfad2420d77780c6266a0175b1114b7a09c",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "fixtures/capability-receipt-valid.json": "ad718c2dfa3c471fc2d88c6e1a15a0639a0414f8fec860ac22276109059afb6b",
     "fixtures/gates-g1-g3/g1-derived-lockfile/expected.json": "b8cf2358e8261d6f4d8088cc6ca13c418b454d110eeb76f91966f8a0cd6f8079",

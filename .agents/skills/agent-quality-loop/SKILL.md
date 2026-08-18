@@ -1,6 +1,6 @@
 ---
 name: agent-quality-loop
-description: Use for a non-trivial coding or workspace task that needs scoped alignment, evidence-grounded diagnosis, local implementation, independent acceptance, release preflight, or safe resume. It keeps task authority separate from assurance, supports explicit-only portable collaboration preferences, and stops at the requested terminal. Do not use for trivial factual answers or casual brainstorming.
+description: Use when a coding or workspace task needs scoped alignment, evidence-only diagnosis of a failing test, build, or behavior, local implementation with self-QA, independent acceptance (独立验收), release preflight, or safe resume of interrupted work, and when the user asks to remember or store a lasting collaboration preference (explicit-only). It keeps task authority separate from assurance and stops at the requested terminal. Do not use for trivial factual answers, dictionary definitions, translations, or casual brainstorming.
 license: MIT
 metadata:
   author: MQZZang
