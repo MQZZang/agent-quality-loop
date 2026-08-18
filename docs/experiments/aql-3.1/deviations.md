@@ -117,6 +117,7 @@ Format per directive §7: 触发情形｜决策表条目或"表外"｜所采取�
 - 所采取动作：rev2 树（`1d72894`）安装至两处用户级根；best-of-n 哨兵 `88c34158` 确认可发现后，仅复跑应触发方向 8 query × 3 重复 = 24 run。应沉默方向按反规则不加样，rev1 8/8 结果保留。结果 24/24 触发（全部为用户级 `SKILL.md` 的真实 Read 调用），8/8 过线；套件合并判读 `PASS`。
 - 证据引用：`F:\MySkill\aql31-lab\inventory\phase-c-rev2-map.json`、`phase-c-rev2-grade.json`。
 - 效度影响：rev2 复跑与 rev1 存在运行面差异（best-of-n vs Task），机械触发定义/模型/prompt/query 字节均相同，已如实登记；rev2 措辞仅收窄触发名词，不扩大应沉默侧匹配面。
+- 补充工件（回收后核对转录发现）：(a) 部分 rev2 槽位在 run 启动时工作区为空或尚未落盘（协议夹具本为 scratch 占位 README，触发指标不依赖工作区内容，不影响判定）；(b) 若干 run 执行了 best-of-n 面自带的 `/worktree` 指令并开出 AQL 仓库的 worktree（rev2 版 D-008 类比，如 T4-r1 直接分析了仓库树）。触发计数已核验为 24/24 命中用户级安装路径 `C:\Users\MSI\.(cursor|agents)\skills\`（worktree 位于 `.cursor\worktrees\`，正则不会误匹配），每个 run 的触发均有目录驱动的用户级读取背书，仓库可见性只产生额外命中、不构成触发来源。
 
 ## M-007 B1-F1 blind packet destroyed by anonymization (grading artifact)
 
