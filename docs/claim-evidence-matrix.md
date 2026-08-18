@@ -19,8 +19,9 @@
 | 3.1 G1/G2/G3 vs silent scope/observer/decision drift | SELF_TEST | Bidirectional fixtures: false_block 0/7, missed_block 0/8 on the frozen set. Hook live attach `NOT_RUN`. Shell-indirect uncovered. |
 | 3.1 standard acceptance vs dimension-bookkeeping ceremony | SPEC | `acceptance-review.md` two-tier. Bare「验收」expectation updated. |
 | 3.1 capability qualification matrix vs stale-version inheritance | SPEC + STATIC | `MATRIX.md` binds model (exact) × host × task_class × assurance; unlisted or new versions default `unverified`; 3.1-tree combinations stay `unverified` until their own transcripts land. |
-| 3.1 Phase C trigger control | INCOMPLETE BLIND_RUNTIME | 20/48 valid Task runs; official suite `INCOMPLETE`. Codex runner `EXECUTION_BLOCKED` (no quota). |
-| 3.1 Phase B0 ablation / Phase D candidate gate | EXECUTION_BLOCKED | Clean isolated headless runner unavailable; B0 sentinel contaminated by host skill injection. |
+| 3.1 Phase C trigger control | BLIND_RUNTIME **PASS** | Merged 48/48 runs `BORDERLINE` (6/8 + 8/8) → protocol-allowed rev2 description → rerun of failing direction 24/24 triggered (8/8); silence 8/8 stands from rev1. Runner caveat (Task vs best-of-n) disclosed in `docs/experiments/aql-3.1/phase-c-results.md`. |
+| 3.1 Phase B0 ablation | BLIND_RUNTIME `NO_LARGE_EFFECT_DETECTED` | 18 cells blind-graded; goal parity B0 vs B2 at n=6; qualitative hard-gate-adjacent differences on F1/F2 favor skill arms; not promoted to product value. `docs/experiments/aql-3.1/phase-b0-results.md`. |
+| 3.1 Phase D candidate gate | BLIND_RUNTIME **PASS** | B2 vs B3, 9 families, blind-graded; seven pass conditions PASS on raw numbers; tested tree `9307a60`, final tree `1d72894` spot-verified on hidden fixtures. `docs/experiments/aql-3.1/phase-d-results.md`. |
 | Cross-host automatic profile synchronization | N/A | Not claimed. Same-storage portability and explicit export/import only. |
 
 Structural checks, hashes, and receipts prove only their named mechanism. They do not prove acceptance, release authorization, product benefit, or long-term value.

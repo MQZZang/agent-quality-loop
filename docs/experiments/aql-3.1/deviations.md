@@ -76,7 +76,7 @@ Format per directive §7: 触发情形｜决策表条目或"表外"｜所采取�
 - 决策表：#10（协议内补齐，非事后加样改判）
 - 所采取动作：维护者以同冻结协议/同 prompt/同模型（`cursor-grok-4.5-high-fast`）补齐 28 个独立短 run；合并评分。官方套件判读 `BORDERLINE`：应触发 6/8（C-T2、C-T8 未达 2/3），应沉默 8/8。按协议允许的单次 description-only 修订已提交（rev2）。
 - 证据引用：`F:\MySkill\aql31-lab\inventory\phase-c-completion-map.json`、`phase-c-grade-merged.json`；rev2 见 `aql-3.1-candidate` 分支提交。
-- 效度影响：rev1 判读有效且分母完整；rev2 触发率尚未测量。
+- 效度影响：rev1 判读有效且分母完整；rev2 触发率随后在 M-006 复跑中测得 24/24。
 
 ## M-002 Session-level skill-catalog cache blocks in-session B0/C-rev2 on Task runner
 
@@ -106,6 +106,22 @@ Format per directive §7: 触发情形｜决策表条目或"表外"｜所采取�
 
 - 触发情形：D/B1/B2 叙事评分需盲评。
 - 决策表：#10
-- 所采取动作：冻结 `narrative-rubric-v1.md`；盲评包=任务原文+回复（技能行已脱敏）+文件差异+命令，无臂标签；6 个新鲜上下文 grok-4.6 盲评员，各 5 包；映射在叙事评分回收前不启封。
+- 所采取动作：冻结 `narrative-rubric-v1.md`；盲评包=任务原文+回复（技能行已脱敏）+文件差异+命令，无臂标签；8 个新鲜上下文 grok-4.6 盲评员共 39 包（D 18 + 消融 18 + 点检 3）；映射在叙事评分回收前不启封。
 - 证据引用：`F:\MySkill\aql31-lab\inventory\narrative-rubric-v1.md`、`grader-uuids.json`、`*-packets\`。
 - 效度影响：叙事维盲评成立；机械维（文件/命令）与臂知识无关。
+
+## M-006 Phase C rev2 rerun on best-of-n with user-level installs
+
+- 触发情形：C 套件 `BORDERLINE` 后协议允许单次 description-only 修订并复跑失败方向；Task 面因目录缓存（M-002）无法看到 rev2。
+- 决策表：#10
+- 所采取动作：rev2 树（`1d72894`）安装至两处用户级根；best-of-n 哨兵 `88c34158` 确认可发现后，仅复跑应触发方向 8 query × 3 重复 = 24 run。应沉默方向按反规则不加样，rev1 8/8 结果保留。结果 24/24 触发（全部为用户级 `SKILL.md` 的真实 Read 调用），8/8 过线；套件合并判读 `PASS`。
+- 证据引用：`F:\MySkill\aql31-lab\inventory\phase-c-rev2-map.json`、`phase-c-rev2-grade.json`。
+- 效度影响：rev2 复跑与 rev1 存在运行面差异（best-of-n vs Task），机械触发定义/模型/prompt/query 字节均相同，已如实登记；rev2 措辞仅收窄触发名词，不扩大应沉默侧匹配面。
+
+## M-007 B1-F1 blind packet destroyed by anonymization (grading artifact)
+
+- 触发情形：B1 臂 F1 格的回复文本引用了 kernel 技能名，脱敏规则整行删除后盲评员无法核证其阻断理由，判 goal FAIL。
+- 决策表：#10
+- 所采取动作：不改判、不重评。机械层事实照登：该格 0 文件改动（与 B2 同为阻断行为）。消融汇总中该 FAIL 标注为 harness artifact。
+- 证据引用：`b0-packets\R357ae665.txt`、`b0-mechanical.json`、盲评员 5 评语原文。
+- 效度影响：仅影响 B1 臂 F1 一格的叙事分；不触及 B0 vs B2 主对比与 Phase D。

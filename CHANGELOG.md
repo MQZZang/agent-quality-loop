@@ -13,7 +13,7 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value for the 
 - Profile reference files load only on an explicit projection handle, a receipt-declared profile, or a user memory request.
 - Capability matrix rows bind exact model × host × task class × assurance; new versions default to `unverified`.
 - Evaluation cases 18–21 cover negative trigger, standard accept, formal conjunction, and the observer cap.
-- Phase C/B0/D execution evidence is recorded under `docs/experiments/aql-3.1/`. Isolated ablation and candidate A/B remain blocked where a clean headless runner was unavailable.
+- Phase C/B0/D execution evidence is recorded under `docs/experiments/aql-3.1/`. Final gate results: Phase C suite PASS (rev2 trigger 8/8, silence 8/8), Phase D candidate gate PASS (seven conditions on raw numbers, blind-graded), ablation `NO_LARGE_EFFECT_DETECTED` on goal at n=6 with hard-gate-adjacent qualitative differences favoring the skill arms. Runner-surface caveats and all deviations (D-001..D-008, M-001..M-007) are logged and unresolved confounds stay disclosed rather than claimed away.
 
 ## 3.0.0 — Unreleased
 

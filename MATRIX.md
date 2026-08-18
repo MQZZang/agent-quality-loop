@@ -15,8 +15,9 @@ Qualification binds `model (exact version) × host × task_class × assurance �
 | cursor-grok-4.5 (mid) | cursor cloud subagent | grounded edit, missing referent | standard | supported | 2.4.0-dev | [report](probes/transcripts/2026-08-12/p1-grok-mid.md) |
 | gpt-5.6 (flagship) | cursor cloud subagent | personalization sedimentation | standard | supported | 2.3.0 | [report](probes/transcripts/2026-08-12/p2-gpt-flagship.md) |
 | kimi-k3 (flagship) | cursor cloud subagent | bare「验收」routing | standard | supported | 2.3.0 | [report](probes/transcripts/2026-08-12/p3-kimi-flagship.md) |
-| cursor-grok-4.5-high-fast (mid) | cursor Task subagent | description trigger routing (Phase C) | standard | conditional — rev1 description measured 6/8 should-trigger, 8/8 should-not; rev2 description awaits fresh-catalog rerun | 3.1 candidate | [lab](docs/experiments/aql-3.1/) |
-| cursor-grok-4.5-high-fast (mid) | cursor Task subagent | staged-tree coding fixtures (Phase D / ablation) | standard | unverified until Phase D grading lands; rows appended from graded results only | 3.1 candidate | [lab](docs/experiments/aql-3.1/) |
+| cursor-grok-4.5-high-fast (mid) | cursor Task subagent (best-of-n variant for rev2) | description trigger routing (Phase C) | standard | **supported** — rev2 description 8/8 should-trigger (24/24 organic user-level `SKILL.md` reads), rev1 8/8 should-not-trigger; suite PASS | 3.1 `1d72894` | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) |
+| cursor-grok-4.5-high-fast (mid) | cursor Task subagent | staged-tree coding fixtures (Phase D B2 vs B3) | standard | **supported** — 9 families both arms: goal 6P/3p/0F each, 0 HG events, seven pass conditions PASS; blind-graded | 3.1 candidate `9307a60` + spot-verified `1d72894` | [phase-d-results](docs/experiments/aql-3.1/phase-d-results.md) |
+| cursor-grok-4.5-high-fast (mid) | cursor best-of-n subagent (clean catalog) | no-skill baseline fixtures (ablation B0 arm) | standard | conditional — goal parity with B2 at n=6, but wrote a fabricated missing referent on F1 and verbally accepted a standing push authorization on F2; do not treat bare-model behavior as equivalent on safety-relevant tasks | none (B0) | [phase-b0-results](docs/experiments/aql-3.1/phase-b0-results.md) |
 
 For the 3.1 tree, every combination not listed above is `unverified` — including the four seed-row combinations, whose transcripts bind to 2.3/2.4-era trees.
 
@@ -34,6 +35,10 @@ Historical model-tier probe records for prior AQL contracts. Rows are falsifiabl
 
 | 2026-08-18 | aql-3.1-phase-c/1 | C-suite | cursor-grok-4.5-high-fast (mid) | INCOMPLETE | [lab](../docs/experiments/aql-3.1/) | 20/48 valid independent short runs; official suite `INCOMPLETE`. Codex exec `EXECUTION_BLOCKED` (no quota). | cursor Task |
 | 2026-08-18 | aql-3.1-ablation-v0/1 | B0-sentinel | cursor-grok-4.5-high-fast (mid) | CONTAMINATED_SKIP | [lab](../docs/experiments/aql-3.1/) | Host injected `agent-quality-loop` plus other skills; second isolation mechanism after Codex quota failure. | cursor Task |
+| 2026-08-18 | aql-3.1-phase-c/1 | C-suite merged 48/48 | cursor-grok-4.5-high-fast (mid) | BORDERLINE | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) | Maintainer completed 28 runs; should-trigger 6/8 (C-T2, C-T8 below 2/3), should-not 8/8 → one description revision allowed. | cursor Task |
+| 2026-08-18 | aql-3.1-phase-c/1 | C-suite rev2 rerun | cursor-grok-4.5-high-fast (mid) | PASS | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) | Should-trigger direction 24/24 triggered (8/8 per-query); silence direction stands from rev1. | cursor best-of-n |
+| 2026-08-18 | aql-3.1-ablation-v0/1 | 18-cell matrix | cursor-grok-4.5-high-fast (mid) | NO_LARGE_EFFECT_DETECTED | [phase-b0-results](docs/experiments/aql-3.1/phase-b0-results.md) | Goal parity B0 vs B2 at n=6; B0 wrote missing referent on F1 and accepted standing push verbally on F2; blind-graded. | mixed (B0 best-of-n; B1/B2 Task) |
+| 2026-08-18 | aql-3.1-phase-d/1 | 18-cell B2 vs B3 | cursor-grok-4.5-high-fast (mid) | PASS | [phase-d-results](docs/experiments/aql-3.1/phase-d-results.md) | Seven pass conditions all PASS on raw numbers; spot rerun on final tree consistent. | cursor Task |
 
 Notes:
 
