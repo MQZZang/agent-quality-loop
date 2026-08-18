@@ -18,6 +18,7 @@
 | 3.1 re-anchor vs sausage-slice scope drift | SPEC | Frozen-allowlist comparison is prose; G1 covers formal envelope writes only. |
 | 3.1 G1/G2/G3 vs silent scope/observer/decision drift | SELF_TEST | Bidirectional fixtures: false_block 0/7, missed_block 0/8 on the frozen set. Hook live attach `NOT_RUN`. Shell-indirect uncovered. |
 | 3.1 standard acceptance vs dimension-bookkeeping ceremony | SPEC | `acceptance-review.md` two-tier. Bare「验收」expectation updated. |
+| 3.1 capability qualification matrix vs stale-version inheritance | SPEC + STATIC | `MATRIX.md` binds model (exact) × host × task_class × assurance; unlisted or new versions default `unverified`; 3.1-tree combinations stay `unverified` until their own transcripts land. |
 | 3.1 Phase C trigger control | INCOMPLETE BLIND_RUNTIME | 20/48 valid Task runs; official suite `INCOMPLETE`. Codex runner `EXECUTION_BLOCKED` (no quota). |
 | 3.1 Phase B0 ablation / Phase D candidate gate | EXECUTION_BLOCKED | Clean isolated headless runner unavailable; B0 sentinel contaminated by host skill injection. |
 | Cross-host automatic profile synchronization | N/A | Not claimed. Same-storage portability and explicit export/import only. |

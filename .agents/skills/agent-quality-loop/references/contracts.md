@@ -182,7 +182,7 @@ production verification
 
 Evidence can support a higher-level decision only when an explicit contract says so. Names such as `PASS`, `ready`, `production`, or `current` do not raise authority by themselves.
 
-Observer class is orthogonal to the environment ladder. Valid values: `implementer_self`, `agent_review`, `mechanical_runtime`, and `human` (with `human_role`: `reviewer` | `operator_tester` | `target_user`). There is no total order. `agent_review` supports artifact-bounded claims only and cannot upgrade them into environment, target-user, or production claims. `user_observable_result: PASS` requires both a native-medium / runtime `evidence_kind` and an observation source of `mechanical_runtime` or `human` with an applicable role.
+Observer class is orthogonal to the environment ladder. Valid values: `implementer_self`, `agent_review`, `mechanical_runtime`, and `human` (with `human_role`: `reviewer` | `operator_tester` | `target_user`). There is no total order; each claim type declares its valid observation-source set. `agent_review` supports artifact-bounded claims only — consistency with a frozen rubric, diff-vs-scope checks, internal contradictions, missing named counterexamples, observable properties of the supplied artifact, and comparisons of candidates under frozen criteria — and cannot upgrade them into environment, target-user, or production claims. `user_observable_result: PASS` requires both a native-medium / runtime `evidence_kind` and an observation source of `mechanical_runtime` or `human` with an applicable role.
 
 ## Phrase Translation
 

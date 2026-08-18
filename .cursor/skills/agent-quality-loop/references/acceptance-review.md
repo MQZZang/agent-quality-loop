@@ -30,8 +30,6 @@ A bare request containing「验收」routes here unless the user asked for `form
 
 Use this method only when `assurance: formal` or the accept is bound to a later release gate.
 
-Use this method only when `assurance: formal` or the accept is bound to a later release gate.
-
 Classify every canonical dimension as `required` or evidence-backed `not_applicable`. The required set is never empty and always includes:
 
 ```text

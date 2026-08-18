@@ -31,7 +31,7 @@ Expand with one sentence when a row is ambiguous (e.g. "design doc for a live ga
 
 ## Canonical Mapping Notes
 
-Always-required acceptance dimensions (`goal_fidelity`, `semantic_invariants`, `user_observable_result`, `reproducibility`) apply in every domain. Domain rows only clarify how to interpret them - especially `user_observable_result`.
+In conjunctive review (`assurance: formal` or release-bound only), the always-required dimensions (`goal_fidelity`, `semantic_invariants`, `user_observable_result`, `reproducibility`) apply in every domain; standard acceptance keeps its three free-form questions and no dimension bookkeeping. Domain rows only clarify interpretation - especially `user_observable_result`.
 
 - `user_observable_result` PASS needs consumer-language evidence from the probe (or explicit `NOT_RUN`/`BLOCKED` with why). Implementer self-description is not sufficient.
 - `not_applicable` on optional dimensions (`source_static`, `tests`, `runtime_native`, `privacy_security`) still needs a task-specific rationale and evidence ref; unavailable evidence is never `not_applicable`.

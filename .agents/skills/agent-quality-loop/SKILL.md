@@ -95,7 +95,7 @@ Capability Receipt is temporary mechanical evidence, not profile data or lifecyc
 
 Remain read-only by default. Separate static, generated, simulated, runtime/native, deployment, and release evidence. Counts, hashes, tests, and reviews are supporting evidence, not user-outcome proof.
 
-`observer_class`: `implementer_self` | `agent_review` | `mechanical_runtime` | `human` (with `human_role`: `reviewer` | `operator_tester` | `target_user`). There is no total order. `agent_review` supports only artifact-bounded claims and never upgrades them into environment, target-user, or production claims. `user_observable_result: PASS` requires both a native-medium / runtime `evidence_kind` and a valid observation source (`mechanical_runtime`, or `human` with an applicable role).
+`observer_class`: `implementer_self` | `agent_review` | `mechanical_runtime` | `human` (with `human_role`: `reviewer` | `operator_tester` | `target_user`). There is no total order; each claim type declares its valid observation-source set. `agent_review` supports only artifact-bounded claims — rubric consistency, diff-vs-scope, internal contradictions, missing named counterexamples, observable properties of the supplied artifact, and candidate comparisons under frozen criteria — and never upgrades them into environment, target-user, or production claims. `user_observable_result: PASS` requires both a native-medium / runtime `evidence_kind` and a valid observation source (`mechanical_runtime`, or `human` with an applicable role).
 
 ### EXECUTE
 
@@ -103,7 +103,7 @@ Require aligned and evidenced inputs. Protect unrelated dirty work. Use the high
 
 For code, use [code-implementation-adapter.md](references/code-implementation-adapter.md). For writing, use [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). Domain tools inherit the same contract and authority ceiling.
 
-Re-anchor on resume/compaction, path change, repeated same-shape failure, first read-to-write, scope expansion, release preflight, or a premise contradiction. Compare touched surfaces to the ALIGN-frozen allowlist, never to the previous increment. Re-anchor cannot raise phase or authority, adds no badge, and fires at most once per event.
+Re-anchor on resume/compaction, path change, repeated same-shape failure, first read-to-write, scope expansion, release preflight, or a premise contradiction. Compare touched surfaces to the ALIGN-frozen allowlist, never to the previous increment. Re-anchor cannot raise phase or authority, adds no badge, fires at most once per event, and keeps no ledger of its own: if it surfaces a material decision, the note lives in that decision's three-line record.
 
 A decision is material iff any of: a public/exported symbol, schema, or persisted shape changes; recovery needs more than reverting files this session authored; the frozen allowlist names two or more systems; a requested mechanism is contradicted by workspace evidence; two mutually exclusive causal hypotheses remain; or an algorithm/data change alters external choice policy, ranking, economic outcomes, public behavior, or persistence semantics. Plain display/content fixes and internal-only tweaks do not trigger. The three-line record (chosen / strongest credible alternative including no-change–delete–reuse / overturning observation) is internal only. Goal-field forks must be asked; same after-state implementation forks are recorded, not asked.
 

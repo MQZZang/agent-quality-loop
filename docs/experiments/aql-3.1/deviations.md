@@ -65,3 +65,47 @@ Format per directive §7: 触发情形｜决策表条目或"表外"｜所采取�
 - 所采取动作：机械触发仍只计 `SKILL.md`；套件保持 `INCOMPLETE`；不把 7/8 快照升级为通过。
 - 证据引用：`inventory/transcript-inventory.json` 字段 `saw_aql_repo`
 - 效度影响：触发命中不能解释为纯 description 自动挂载。
+
+---
+
+以下为维护者验收阶段（同日晚间）新增偏差，编号 M-*。
+
+## M-001 Phase C completed to protocol floor by maintainer
+
+- 触发情形：执行器停在 20/48；协议要求每 query 3 独立重复。
+- 决策表：#10（协议内补齐，非事后加样改判）
+- 所采取动作：维护者以同冻结协议/同 prompt/同模型（`cursor-grok-4.5-high-fast`）补齐 28 个独立短 run；合并评分。官方套件判读 `BORDERLINE`：应触发 6/8（C-T2、C-T8 未达 2/3），应沉默 8/8。按协议允许的单次 description-only 修订已提交（rev2）。
+- 证据引用：`F:\MySkill\aql31-lab\inventory\phase-c-completion-map.json`、`phase-c-grade-merged.json`；rev2 见 `aql-3.1-candidate` 分支提交。
+- 效度影响：rev1 判读有效且分母完整；rev2 触发率尚未测量。
+
+## M-002 Session-level skill-catalog cache blocks in-session B0/C-rev2 on Task runner
+
+- 触发情形：两处用户级安装（`C:\Users\MSI\.agents\skills`、`C:\Users\MSI\.cursor\skills`）全部移入 hold 目录后，Task 子代理目录仍列出 `agent-quality-loop`（宿主进程级缓存），但字节已不可读。三次哨兵一致。
+- 决策表：#10
+- 所采取动作：B0 臂 Task 格按协议记 `CONTAMINATED_SKIP`；B1/B2 与 Phase D 照常执行——缓存目录行是跨臂常量背景，且技能字节仅来自 run 内 staged 树，不构成臂间差异。
+- 证据引用：哨兵 run 三次（含 `b6643457`）；`phase-bd-staging-freeze.md`。
+- 效度影响：B1/B2/D 的臂间比较效度保持；B0 与 C-rev2 需新鲜目录扫描的运行面。
+
+## M-003 best-of-n runner provides a fresh skill catalog (true isolation found)
+
+- 触发情形：验收阶段发现 `best-of-n-runner` 子代理的技能目录为新鲜扫描：hold 状态下其目录不含 `agent-quality-loop`，与磁盘状态一致。
+- 决策表：表外（新增可用隔离机制，非改判据）
+- 所采取动作：以 best-of-n 作为第三运行机制补跑 B0 臂（冒烟 1 格先行，通过后全 6 格）；B1/B2 的 Task 结果保留为面稳健性重复。运行面差异（目录常量行存在与否）如实登记。
+- 证据引用：best-of-n 哨兵 `0a902d64`；B0 冒烟 `e6bdd5aa`。
+- 效度影响：B0 五项隔离硬条件可满足；B0 与 B1/B2 之间存在运行面差异（Task vs best-of-n），判读时不得忽略。
+
+## M-004 Conformance gaps fixed after D staging (tested tree vs release tree)
+
+- 触发情形：独立核查（V1 `38c6ec83`）判 WP6 FAIL、WP3/WP4 PARTIAL、两处低危残留；修复发生在 Phase D 矩阵 staging/运行之后。
+- 决策表：#10
+- 所采取动作：落实 WP3 缺句（每类 claim 声明有效观察来源集合 + artifact-bounded 六类枚举）、WP4 缺句（重锚无独立台账、并入 material_decision 三行记录）、WP6 资格矩阵重写（历史行逐字保留）、acceptance-review 重复句删除、domain-profiles 四维条款限定至 formal。发布树因此与 D 已测 B3 树相差数句 formal 路径散文。
+- 证据引用：本提交 diff；V1 报告原文。
+- 效度影响：判定为不影响 routine 夹具行为的措辞级差异；缓解措施=用最终树对隐藏夹具 B3 臂做点检重跑，若行为一致则 D 结论对发布树成立。
+
+## M-005 Blind narrative grading harness
+
+- 触发情形：D/B1/B2 叙事评分需盲评。
+- 决策表：#10
+- 所采取动作：冻结 `narrative-rubric-v1.md`；盲评包=任务原文+回复（技能行已脱敏）+文件差异+命令，无臂标签；6 个新鲜上下文 grok-4.6 盲评员，各 5 包；映射在叙事评分回收前不启封。
+- 证据引用：`F:\MySkill\aql31-lab\inventory\narrative-rubric-v1.md`、`grader-uuids.json`、`*-packets\`。
+- 效度影响：叙事维盲评成立；机械维（文件/命令）与臂知识无关。

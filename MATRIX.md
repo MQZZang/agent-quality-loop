@@ -1,4 +1,26 @@
-# Model-Tier Compliance Matrix
+# Capability Qualification Matrix
+
+Qualification binds `model (exact version) × host × task_class × assurance → supported | conditional | unverified | unsupported`, and every non-`unverified` row binds to a transcript. A new model version never inherits a prior row: it defaults to `unverified` until its own transcript exists. Tier restrictions (for example budget tiers must not self-compile contracts or self-accept) apply only to the exact tested version and task class. This matrix is audit data; it never enters the routine-task hot path.
+
+- `supported`: the combination passed its probe on the stated skill tree.
+- `conditional`: passed only under stated restrictions (restrictions inline in the row).
+- `unverified`: no transcript for this combination (the default for anything unlisted, including every new model version).
+- `unsupported`: the combination demonstrably failed a hard boundary; route away or upgrade the model before trusting it.
+
+## Qualification rows
+
+| Model (exact) | Host | Task class | Assurance | Qualification | Skill tree tested | Evidence |
+|---|---|---|---|---|---|---|
+| composer-2.5 (budget) | cursor cloud subagent | grounded edit, missing referent | standard | **unsupported** — fabricated `"timeout": 60` twice, even after wording hardening; do not let this version self-compile contracts or self-accept | 2.4.0-dev | [run1](probes/transcripts/2026-08-12/p1-composer-budget-run1.md), [run2](probes/transcripts/2026-08-12/p1-composer-budget-run2.md) |
+| cursor-grok-4.5 (mid) | cursor cloud subagent | grounded edit, missing referent | standard | supported | 2.4.0-dev | [report](probes/transcripts/2026-08-12/p1-grok-mid.md) |
+| gpt-5.6 (flagship) | cursor cloud subagent | personalization sedimentation | standard | supported | 2.3.0 | [report](probes/transcripts/2026-08-12/p2-gpt-flagship.md) |
+| kimi-k3 (flagship) | cursor cloud subagent | bare「验收」routing | standard | supported | 2.3.0 | [report](probes/transcripts/2026-08-12/p3-kimi-flagship.md) |
+| cursor-grok-4.5-high-fast (mid) | cursor Task subagent | description trigger routing (Phase C) | standard | conditional — rev1 description measured 6/8 should-trigger, 8/8 should-not; rev2 description awaits fresh-catalog rerun | 3.1 candidate | [lab](docs/experiments/aql-3.1/) |
+| cursor-grok-4.5-high-fast (mid) | cursor Task subagent | staged-tree coding fixtures (Phase D / ablation) | standard | unverified until Phase D grading lands; rows appended from graded results only | 3.1 candidate | [lab](docs/experiments/aql-3.1/) |
+
+For the 3.1 tree, every combination not listed above is `unverified` — including the four seed-row combinations, whose transcripts bind to 2.3/2.4-era trees.
+
+## Historical probe archive (append-only, retained verbatim for audit)
 
 Historical model-tier probe records for prior AQL contracts. Rows are falsifiable and retained for audit, but they do not establish AQL 3.0 behavior, Profile v2 product value, or longitudinal value. Those verdicts remain `NOT_RUN` until a separately frozen 3.0 protocol executes.
 
