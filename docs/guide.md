@@ -2,7 +2,7 @@
 
 ## Core
 
-AQL 3.0 is one Skill, `agent-quality-loop`. It compiles the request into one Task Contract containing the goal, scope, evidence, assurance, and authority for that task. Natural language remains the normal interface.
+AQL 3.1 is one Skill, `agent-quality-loop`. It compiles the request into one Task Contract containing the goal, scope, evidence, assurance, and authority for that task. Natural language remains the normal interface.
 
 ```text
 request -> Task Contract -> proportionate work/evidence -> optional independent acceptance -> separately authorized release
@@ -53,8 +53,8 @@ The receipt reports observed capability states and sources; it does not prove ta
 
 ## Installation Lifecycle
 
-The default branch is the AQL 3.1 source candidate until an exact `v3.1.0` release
-tag exists. Use a release tag when you require an immutable published artifact.
+The AQL 3.1 source candidate lives on the `aql-3.1-candidate` branch and the `v3.1.0`
+tag. Use a release tag when you require an immutable published artifact.
 Node.js 22 is the tested CI baseline. Install only to the host targets you actually
 use; choose `all` only for an intentional multi-host setup.
 
@@ -73,6 +73,8 @@ For package-local controls, invoke `node <SKILL_ROOT>/scripts/aql.js`; there is 
 
 ## Evidence
 
-Historical Profile Projection v1 mechanism evidence is retained for audit. Its v1 A/B/C value control is `INVALID`; it does not support AQL 3.0 product claims. The [preregistered 3.0 product screening](aql-3.0-product-screening-preregistration.md) and longitudinal-value verdicts remain `NOT_RUN`. Static validation, manifests, and receipts establish only their named mechanics.
+The 3.1 changes were checked by running them on one model and host pair (`cursor-grok-4.5-high-fast`): trigger and silence gates passed 8/8 and 8/8, and the candidate-acceptance gate passed its seven conditions under blind grading. The same suite's ablation returned `NO_LARGE_EFFECT_DETECTED` on goal correctness against a minimal kernel, so the Skill is not claimed to outperform a kernel. Runner-surface caveats stay disclosed in [the experiment records](experiments/aql-3.1/phase-c-results.md).
+
+Historical Profile Projection v1 mechanism evidence is retained for audit. Its v1 A/B/C value control is `INVALID`; it does not support product-value claims. The [preregistered product screening](aql-3.0-product-screening-preregistration.md) and longitudinal-value verdicts remain `NOT_RUN`. Static validation, manifests, and receipts establish only their named mechanics.
 
 External actions require a fresh, explicit current-turn authorization naming the target and operation. Independent acceptance is read-only and requires demonstrable context separation.

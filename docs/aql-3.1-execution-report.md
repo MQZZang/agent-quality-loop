@@ -2,7 +2,7 @@
 
 Final state (maintainer acceptance 2026-08-18 evening): **`ACCEPTED`** — see `docs/aql-3.1-acceptance-record.md`. All frozen release gates green on raw numbers: Phase C suite PASS (rev2 8/8 trigger + 8/8 silence), Phase D seven conditions PASS (blind-graded), ablation `NO_LARGE_EFFECT_DETECTED`, load −75.5%, conformance gaps closed (M-004). Release preparation authorized; pushing to the public remote remains with the repository owner.
 
-Executor stage below is retained verbatim for audit.
+Executor stage below is retained verbatim for audit. Its stage verdicts, package version, and CHANGELOG wording describe that moment, not the released state.
 
 ---
 

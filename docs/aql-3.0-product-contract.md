@@ -4,6 +4,13 @@ Status: frozen implementation contract for the accepted AQL `3.0.0` development
 baseline. It governed the local build and acceptance phase; publication is a later,
 separately authorized release task.
 
+Amended by AQL `3.1.0`. This document stays frozen as the 3.0 record; 3.1 changed the
+hot-path structure, added the observation axis, added the G1-G3 mechanical gates, and
+narrowed four-dimension acceptance to formal or release-bound work. For shipped
+behavior read the Skill source under `.cursor/skills/agent-quality-loop/` and the
+3.1.0 entries in [CHANGELOG.md](../CHANGELOG.md); where they disagree with this
+document, the Skill source is authoritative.
+
 Baseline: published AQL `2.8.0`, Git commit `9af3923`.
 
 This document is the executable instruction for AQL 3.0. It replaces conflicting

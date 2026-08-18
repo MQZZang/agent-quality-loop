@@ -1,8 +1,8 @@
 # Contributing
 
-AQL 3.0 has one product Skill and one Task Contract. Keep changes inside that model: do not add route shims, separate adapter packages, a second profile/task truth, or implicit cross-task memory.
+AQL has one product Skill and one Task Contract. Keep changes inside that model: do not add route shims, separate adapter packages, a second profile/task truth, or implicit cross-task memory.
 
-Changes must remain consistent with [the frozen 3.0 product contract](docs/aql-3.0-product-contract.md).
+Changes must remain consistent with [the frozen 3.0 product contract](docs/aql-3.0-product-contract.md) as amended by the 3.1.0 entries in [CHANGELOG.md](CHANGELOG.md).
 
 1. Edit canonical package files under `.cursor/skills/agent-quality-loop/` only.
 2. Update schemas, focused tests, and public claims with the behavior change.

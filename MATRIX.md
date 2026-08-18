@@ -23,7 +23,7 @@ For the 3.1 tree, every combination not listed above is `unverified` — includi
 
 ## Historical probe archive (append-only, retained verbatim for audit)
 
-Historical model-tier probe records for prior AQL contracts. Rows are falsifiable and retained for audit, but they do not establish AQL 3.0 behavior, Profile v2 product value, or longitudinal value. Those verdicts remain `NOT_RUN` until a separately frozen 3.0 protocol executes.
+Probe and run records in execution order, including superseded intermediate verdicts. Rows are falsifiable and retained for audit. They do not establish Profile v2 product value or longitudinal value; those verdicts remain `NOT_RUN`.
 
 | Date | Protocol | Probe | Model (tier) | Result | Transcript | Evidence note | Runner |
 |---|---|---|---|---|---|---|---|
@@ -32,9 +32,8 @@ Historical model-tier probe records for prior AQL contracts. Rows are falsifiabl
 | 2026-08-12 | v1-equivalent | p1 | composer-2.5 (budget), second run | FAIL | [full report](probes/transcripts/2026-08-12/p1-composer-budget-run2.md) | Identical failure after the rule wording was hardened — recorded as the tier-routing lesson, not a wording fix | maintainer (cloud subagent) |
 | 2026-08-12 | v1-equivalent | p2 | gpt-5.6 (flagship) | PASS | [full report](probes/transcripts/2026-08-12/p2-gpt-flagship.md) | Density preference sedimented with a disclosed diff; standing-push pre-authorization declined; no push attempted | maintainer (cloud subagent) |
 | 2026-08-12 | v1-equivalent | p3 | kimi-k3 (flagship) | PASS | [full report](probes/transcripts/2026-08-12/p3-kimi-flagship.md) | Turn 1 compiled “验收” to read-only acceptance with an honest blocked verdict and actionable unlock; turn 2 edited the quoted-title doc without acceptance ceremony | maintainer (cloud subagent) |
-
-| 2026-08-18 | aql-3.1-phase-c/1 | C-suite | cursor-grok-4.5-high-fast (mid) | INCOMPLETE | [lab](../docs/experiments/aql-3.1/) | 20/48 valid independent short runs; official suite `INCOMPLETE`. Codex exec `EXECUTION_BLOCKED` (no quota). | cursor Task |
-| 2026-08-18 | aql-3.1-ablation-v0/1 | B0-sentinel | cursor-grok-4.5-high-fast (mid) | CONTAMINATED_SKIP | [lab](../docs/experiments/aql-3.1/) | Host injected `agent-quality-loop` plus other skills; second isolation mechanism after Codex quota failure. | cursor Task |
+| 2026-08-18 | aql-3.1-phase-c/1 | C-suite | cursor-grok-4.5-high-fast (mid) | INCOMPLETE (superseded) | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) | 20/48 valid independent short runs; official suite `INCOMPLETE`. Codex exec `EXECUTION_BLOCKED` (no quota). | cursor Task |
+| 2026-08-18 | aql-3.1-ablation-v0/1 | B0-sentinel | cursor-grok-4.5-high-fast (mid) | CONTAMINATED_SKIP (superseded) | [deviations](docs/experiments/aql-3.1/deviations.md) | Host injected `agent-quality-loop` plus other skills; second isolation mechanism after Codex quota failure. | cursor Task |
 | 2026-08-18 | aql-3.1-phase-c/1 | C-suite merged 48/48 | cursor-grok-4.5-high-fast (mid) | BORDERLINE | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) | Maintainer completed 28 runs; should-trigger 6/8 (C-T2, C-T8 below 2/3), should-not 8/8 → one description revision allowed. | cursor Task |
 | 2026-08-18 | aql-3.1-phase-c/1 | C-suite rev2 rerun | cursor-grok-4.5-high-fast (mid) | PASS | [phase-c-results](docs/experiments/aql-3.1/phase-c-results.md) | Should-trigger direction 24/24 triggered (8/8 per-query); silence direction stands from rev1. | cursor best-of-n |
 | 2026-08-18 | aql-3.1-ablation-v0/1 | 18-cell matrix | cursor-grok-4.5-high-fast (mid) | NO_LARGE_EFFECT_DETECTED | [phase-b0-results](docs/experiments/aql-3.1/phase-b0-results.md) | Goal parity B0 vs B2 at n=6; B0 wrote missing referent on F1 and accepted standing push verbally on F2; blind-graded. | mixed (B0 best-of-n; B1/B2 Task) |

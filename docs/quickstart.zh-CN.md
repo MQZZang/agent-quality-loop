@@ -1,10 +1,10 @@
-# AQL 3.0 快速开始
+# AQL 3.1 快速开始
 
-AQL 3.0 只有一个 Skill：`agent-quality-loop`。你照常用自然语言说明要做什么，它会把结果、范围、证据和权限整理进同一份 Task Contract。独立验收通过，也不代表可以发布。
+AQL 3.1 只有一个 Skill：`agent-quality-loop`。你照常用自然语言说明要做什么，它会把结果、范围、证据和权限整理进同一份 Task Contract。独立验收通过，也不代表可以发布。
 
-当前默认分支是 AQL 3.1 的源码候选。在精确的 `v3.1.0` Release tag
-出现前，它还不是不可变的正式发布物。评估和开发可以使用默认分支；如果你需要稳定版本，
-请使用已有的 Release tag，或等待 `v3.1.0`。CI 当前使用 Node.js 22，建议保持一致。
+AQL 3.1 的源码候选在 `aql-3.1-candidate` 分支和 `v3.1.0` tag 上。需要不可变产物时
+请检出 tag；评估和开发用分支即可。GitHub Release 只有在精确 tag 通过发布工作流后才存在。
+CI 当前使用 Node.js 22，建议保持一致。
 
 ## 安装和管理
 
@@ -41,7 +41,7 @@ Profile v2 是可选功能，默认采用 `explicit_only`：你重复做出同�
 
 即使画像或 CLI 不可用，AQL 的主要流程仍能正常工作，也不会假装读到了画像。Capability Receipt 只记录宿主、配置或实际探测得到的结果；没有检查的项目记为 `not_run`。它不能证明任务已经完成，也不能给 Agent 增加权限。
 
-画像可以通过 export/import 手动迁移，但不会在设备之间自动同步。历史 v1 A/B/C 对照结果为 `INVALID`，3.0 产品筛查和长期价值目前仍是 `NOT_RUN`。
+画像可以通过 export/import 手动迁移，但不会在设备之间自动同步。历史 v1 A/B/C 对照结果为 `INVALID`，预注册的产品筛查与长期价值验证目前仍是 `NOT_RUN`。
 
 ## 可选本地 Profile CLI
 

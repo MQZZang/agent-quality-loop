@@ -6,17 +6,17 @@
 
 AQL is not another IDE or hosted service, and it does not publish anything on its own. The main workflow works without Profile v2, the optional CLI, Cursor hooks, or access to your user directory.
 
-中文速览：[AQL 3.0 快速开始](docs/quickstart.zh-CN.md)。For the exact implementation rules, see the [AQL 3.0 product and execution contract](docs/aql-3.0-product-contract.md).
+中文速览：[AQL 3.1 快速开始](docs/quickstart.zh-CN.md)。The exact implementation rules are the [3.0 product and execution contract](docs/aql-3.0-product-contract.md) as amended by the 3.1.0 entries in [CHANGELOG.md](CHANGELOG.md); where a document and the shipped bytes disagree, the Skill source under `.cursor/skills/agent-quality-loop/` is authoritative.
 
 | Where this repository stands | Status |
 |---|---|
 | Source package version | `3.1.0` |
 | Product surface | One Skill: `agent-quality-loop` |
 | Contract for each task | One Task Contract |
-| GitHub release | Unreleased until an exact `v3.1.0` tag passes the release workflow |
+| GitHub release | Created only after an exact `v3.1.0` tag passes the release workflow |
 | License | MIT |
 
-> **Before you install:** the default branch is the AQL 3.1 source candidate. Use it for evaluation or development. If you need an immutable release, install an existing release tag instead, or wait for `v3.1.0`.
+> **Before you install:** the AQL 3.1 source candidate lives on the `aql-3.1-candidate` branch and the `v3.1.0` tag. Check out the tag when you need an immutable artifact; use a branch when you are evaluating or developing.
 
 ## Why AQL exists
 
@@ -83,12 +83,13 @@ The main workflow runs from the Skill instructions and starts no background serv
 ```bash
 git clone https://github.com/MQZZang/agent-quality-loop.git
 cd agent-quality-loop
+git checkout v3.1.0   # or stay on a branch to evaluate the source candidate
 node --version
 node scripts/install.js install --to cursor --dry-run
 node scripts/install.js install --to cursor
 ```
 
-Replace `cursor` with the host you actually use. Choose `all` only when you really want three separate copies. `--dry-run` shows the plan without changing files. For the same environment used by CI, `node --version` should report Node.js 22.
+Replace `cursor` with the host you actually use. Choose `all` only when you really want three separate copies. `--dry-run` shows the plan without changing files.
 
 Choose the matching install target:
 
@@ -149,24 +150,6 @@ Profile v2 lets you save a small number of preferences you explicitly choose. It
 
 The optional CLI lets you create, inspect, use, and remove these preferences. Revision checks prevent one command from silently overwriting a newer change:
 
-Before running `profile project`, create `projection-context.json` with observations from the current task. This minimal example matches the `concise` preference below; replace `as_of` with the task date:
-
-```json
-{
-  "as_of": "2026-08-18",
-  "scopes": [{ "level": "global" }],
-  "semantic": {
-    "concise": {
-      "applies_when_matches": true,
-      "suppress_when_matches": false,
-      "material_effect": true,
-      "reason": "The current result needs the saved concise presentation default.",
-      "effect": "Use concise result presentation in Guided choices."
-    }
-  }
-}
-```
-
 ```bash
 node <SKILL_ROOT>/scripts/aql.js profile init --profile ./profile.json
 node <SKILL_ROOT>/scripts/aql.js profile remember --profile ./profile.json --id concise --key result.concise --kind communication --value-text concise --applies-when "the task needs a result" --reference "task:instruction"
@@ -179,7 +162,7 @@ node <SKILL_ROOT>/scripts/aql.js receipt --profile ./profile.json
 node <SKILL_ROOT>/scripts/aql.js profile forget --profile ./profile.json --id concise --expected-revision 2
 ```
 
-If a preference needs confirmation, use `propose` and then `confirm --confirmation-ref ...`. Moving a Profile to another machine is always an explicit export/import. The [projection context rules](.cursor/skills/agent-quality-loop/references/profile-projection.md#cli-projection-context) explain the full task-local input accepted by `profile project`.
+If a preference needs confirmation, use `propose` and then `confirm --confirmation-ref ...`. Moving a Profile to another machine is always an explicit export/import. `profile project` reads a task-local `projection-context.json`: the [projection context rules](.cursor/skills/agent-quality-loop/references/profile-projection.md#cli-projection-context) define its fields and the [Chinese quickstart](docs/quickstart.zh-CN.md) has a minimal example.
 
 ## Capability Receipt and conformance
 
@@ -208,6 +191,8 @@ The [21 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluatio
 | Is the single-Skill package internally consistent? | Static checks, matching manifests, installer/runtime self-tests, and offline conformance cover the mechanics they name. |
 | Are the Task Contract, Profile v2, and Receipt boundaries implemented? | The specification and repeatable tests cover those boundaries. This says nothing about product benefit. |
 | Will every listed host load and behave identically? | The package layouts pass validation. Live behavior still has to be checked in each host. |
+| Were the 3.1 behavior changes checked by running them? | Yes, on one model and host pair (`cursor-grok-4.5-high-fast`). Skill trigger and silence gates passed 8/8 and 8/8, and the candidate-acceptance gate passed its seven conditions under blind grading. See the [3.1 acceptance record](docs/aql-3.1-acceptance-record.md). |
+| Does the full Skill beat a minimal kernel? | Not shown. The ablation returned `NO_LARGE_EFFECT_DETECTED` on goal correctness at n=6 per arm; only hard-gate-adjacent qualitative differences favored the Skill arms. |
 | Is AQL 3.0 better than 2.8, or is Profile v2 product-effective? | Both preregistered screenings remain `NOT_RUN`. |
 | Did the historical Profile v1 experiment prove value? | No. Its mechanism evidence is historical and its A/B/C value control is `INVALID`. |
 | Does AQL prove long-term user or productivity improvement? | No. Longitudinal and causal claims remain `NOT_RUN`. |
@@ -216,7 +201,7 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 
 ## Version and release model
 
-`manifest.json`, the Skill metadata, and `plugin.json` currently agree on version `3.1.0`. [CHANGELOG.md](CHANGELOG.md) keeps it under **Unreleased** until the exact release tag exists.
+`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.1.0`, and [CHANGELOG.md](CHANGELOG.md) dates that entry. A GitHub Release still exists only after the exact `v3.1.0` tag passes the release workflow.
 
 - Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
 - Creating `v3.1.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
@@ -232,14 +217,14 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 | `.cursor/rules/` | Cursor routing and minimal project guardrails. |
 | `.ai/` | Project lessons and knowledge used during maintenance. |
 | `.github/` | Validation and exact-tag release workflows. |
-| `docs/` | Guide, quickstart, product contract, claim ledger, and preregistered protocols. |
+| `docs/` | Guide, quickstart, product contract, claim ledger, preregistered protocols, and the 3.1 experiment records. |
 | `integrations/` | Optional host integrations; currently the Cursor hooks add-on. |
 | `probes/` | Historical probe fixtures and transcripts, not installation payload. |
 | `scripts/` | Installer, synchronization, CLI wrappers, validation, packaging, and release tooling. |
 | `AGENTS.md` | Repository architecture and editing rules. |
 | `CHANGELOG.md` | Package history and unreleased changes. |
 | `CONTRIBUTING.md` | Contribution workflow and release boundary. |
-| `MATRIX.md` | Historical model-tier probe records. |
+| `MATRIX.md` | Capability qualification rows (model × host × task class × assurance) plus the historical probe archive. |
 | `plugin.json` | Agent Plugins metadata. |
 | `README.md`, `LICENSE`, `.gitattributes`, `.gitignore` | Public entry, license, and repository metadata. |
 
@@ -258,11 +243,11 @@ git diff --check
 
 ## Further reading
 
-- [AQL 3.0 quickstart in Chinese](docs/quickstart.zh-CN.md)
 - [Day-to-day guide](docs/guide.md)
-- [AQL 3.0 product and execution contract](docs/aql-3.0-product-contract.md)
+- [快速开始（中文）](docs/quickstart.zh-CN.md)
 - [Claim evidence matrix](docs/claim-evidence-matrix.md)
-- [Historical model-tier matrix](MATRIX.md)
+- [Capability qualification matrix](MATRIX.md)
+- [3.1 acceptance record](docs/aql-3.1-acceptance-record.md) and [3.1 execution report](docs/aql-3.1-execution-report.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
