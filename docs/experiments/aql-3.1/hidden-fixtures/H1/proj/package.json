@@ -1,0 +1,7 @@
+{
+  "name": "note-stamp",
+  "version": "0.3.1",
+  "description": "Tiny helper that stamps ISO dates onto note titles",
+  "main": "stamp.js",
+  "license": "MIT"
+}
