@@ -176,6 +176,16 @@ node integrations/cursor-hooks/test.js
 
 Exit code `0` means the scripted protocol cases passed.
 
+## Formal scope / observer / decision gates (3.1 Scheme A)
+
+Ordinary tasks stay prose-constrained. When a frozen envelope has `assurance: formal`, call the packaged checker instead of inventing a second hook:
+
+```text
+node .cursor/skills/agent-quality-loop/scripts/gates-g1-g3.js <input.json>
+```
+
+G1 compares write/changed paths to `scope_allowlist` plus optional `derived_surfaces`. G2 rejects `user_observable_result: PASS` from `agent_review`. G3 requires a non-empty, non-equivalent, pre-write `material_decision` on high-risk `change_class`. Shell-indirect writes are not mechanically covered. Live hook attach of these three gates is `NOT_RUN` until a host wires the script; bidirectional fixtures live under `fixtures/gates-g1-g3/`.
+
 ## Known limits (honest)
 
 - Heuristic shell regex; not a sandbox or capability system.

@@ -1,0 +1,16 @@
+{
+  "envelope": {
+    "assurance": "formal",
+    "change_class": "data",
+    "scope_allowlist": [
+      "src/app.js",
+      "docs/note.md"
+    ]
+  },
+  "write_paths": [
+    "src/app.js"
+  ],
+  "changed_paths": [
+    "../outside.js"
+  ]
+}

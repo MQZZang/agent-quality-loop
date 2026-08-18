@@ -1,0 +1,17 @@
+{
+  "envelope": {
+    "assurance": "formal",
+    "change_class": "data",
+    "scope_allowlist": [
+      "src/app.js",
+      "docs/note.md"
+    ],
+    "material_decision": {
+      "chosen": "same",
+      "strongest_alternative": "same",
+      "overturning_observation": "x",
+      "recorded_before_first_implementing_write": true
+    }
+  },
+  "first_implementing_write": true
+}

@@ -1,0 +1,12 @@
+{
+  "envelope": {
+    "assurance": "standard",
+    "change_class": "content",
+    "scope_allowlist": [
+      "src/app.js"
+    ]
+  },
+  "write_paths": [
+    "any/path.js"
+  ]
+}

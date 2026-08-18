@@ -1,0 +1,11 @@
+{
+  "envelope": {
+    "assurance": "formal",
+    "change_class": "data",
+    "scope_allowlist": [
+      "src/app.js",
+      "docs/note.md"
+    ]
+  },
+  "first_implementing_write": true
+}

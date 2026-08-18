@@ -1,0 +1,11 @@
+{
+  "envelope": {
+    "assurance": "standard",
+    "change_class": "content",
+    "scope_allowlist": [
+      "src/app.js"
+    ],
+    "material_decision": null
+  },
+  "first_implementing_write": true
+}

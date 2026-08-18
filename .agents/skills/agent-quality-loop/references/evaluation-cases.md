@@ -74,4 +74,20 @@ An applied 2.8 migration captures source bytes once, derives both entries and ba
 
 Scoped `forget` removes every matching owned record that can contain the entry body; `forget --all` selects all entries inside the locked mutation and removes all records owned by that Profile. Commit failure leaves cleanup targets intact; cleanup failure restores the prior Profile. A missing/wrong marker, closed-metadata or inventory/type/hash drift, path exchange, or link escape fails without deleting external content. Automatic-backup and receipt cleanup preserves unowned filename/string-match lookalikes and handles Windows path casing by filesystem identity.
 
+## 18. Negative Trigger
+
+One-line factual answers, translation, and casual brainstorming do not require reading this skill. Near-neighbor mentions of acceptance/release/contract stay dictionary or chat work.
+
+## 19. Standard Acceptance
+
+A bare「验收」request is result-anchored free review: after-state, hard boundaries, and claim limits, in plain prose. No dimension table, no `not_applicable` ceremony, no release language.
+
+## 20. Formal Conjunction
+
+`assurance: formal` or release-bound accept keeps the four always-required dimensions conjunctive. Envelope validators are not relaxed.
+
+## 21. Observer Cap
+
+`agent_review` cannot produce `user_observable_result: PASS`. That PASS needs native-medium / runtime evidence plus `mechanical_runtime` or `human` with a role.
+
 The package is behaviorally ready for a claimed host only when these cases pass on the exact package bytes. Product benefit requires a separately preregistered comparison; no structural or fixture result proves long-term user value.

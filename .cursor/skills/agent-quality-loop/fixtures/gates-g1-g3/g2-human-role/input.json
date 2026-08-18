@@ -1,0 +1,16 @@
+{
+  "envelope": {
+    "assurance": "formal",
+    "acceptance_gate": {
+      "status_by_dimension": {
+        "user_observable_result": {
+          "status": "PASS",
+          "observer_class": "human",
+          "human_role": "target_user",
+          "evidence_kind": "native_medium",
+          "observation_source": "human"
+        }
+      }
+    }
+  }
+}

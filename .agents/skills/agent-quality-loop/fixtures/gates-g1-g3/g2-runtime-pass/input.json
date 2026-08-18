@@ -1,0 +1,15 @@
+{
+  "envelope": {
+    "assurance": "formal",
+    "acceptance_gate": {
+      "status_by_dimension": {
+        "user_observable_result": {
+          "status": "PASS",
+          "observer_class": "mechanical_runtime",
+          "evidence_kind": "runtime_native",
+          "observation_source": "mechanical_runtime"
+        }
+      }
+    }
+  }
+}

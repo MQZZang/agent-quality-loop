@@ -17,7 +17,7 @@ Turn a natural-language request into one source-grounded Task Contract, then wor
 RAW -> ALIGNED -> EVIDENCED -> BUILT -> ACCEPTED -> RELEASE_READY
 ```
 
-`DEPLOYED` and `PRODUCTION_VERIFIED` are later observed facts, not synonyms for `RELEASE_READY`. Keep interaction natural: ask only when a material choice cannot be resolved from the request and readable context. No evidence claim without evidence; acceptance never authorizes release.
+`DEPLOYED` and `PRODUCTION_VERIFIED` are later observed facts, not synonyms for `RELEASE_READY`. Default professional freedom: no template, bookkeeping, or ceremony on ordinary tasks. Structured rigor enters only for `assurance: formal`, irreversible/release actions, or an explicit user request.
 
 ## When to Use
 
@@ -34,6 +34,13 @@ Do not invoke for one-line factual answers or casual brainstorming. Do not use A
 - AQL Core works without a profile, CLI, user directory, hooks, or host-specific shortcut. Do not claim unavailable capabilities.
 - Keep output decision-first under [Result Attention](references/result-attention.md). Ordinary results do not expose internal contracts, profile projections, or capability receipts.
 - `full` means safe local alignment, evidence, execution, and independent acceptance only. It never publishes, deploys, uploads, purchases, or changes production data.
+- Never fabricate a missing referent to satisfy the letter of a request. A mechanical edit that cannot produce the user-observable outcome is a miscompile, not a resolution. On contradiction, disclose the mismatch, then stop or ask. Adding a missing referent is never a resolution.
+- Claim labels: `observed` / `inferred` / `assumption` / `unknown`. Do not silently convert `unknown` into a fact. Names such as `PASS`, `ready`, or `production` do not raise authority.
+- Semantic-risk words (删除/去掉/开放/上线/当前/正式/完成) must have a change class before execution. Quantifiers (全部/所有/每个) and negative-scope markers (不要动/保持/除了) belong in `scope_allowlist` / `non_goals`.
+- Keep a six-field card internally (phase, verdict, goal, scope, evidence, next). Do not print the full contract on routine turns.
+- Fixed constraints, Guided defaults, and Open professional choices stay distinct. The allowlist is the ALIGN-frozen surface set.
+- Chinese status stays precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过. Do not write 已验收可发布.
+- Mini phrase map: 验收 → read-only independent accept; 正式质量 → formal conjunctive accept; 上线/发布 → separate current-turn release; 苏格拉底式 → at most two conclusion-changing questions after read-only grounding.
 
 ## Workflow (Operating Procedure)
 
@@ -60,61 +67,67 @@ Ordinary implementation stops at `BUILT`; do not create an independent acceptor 
 
 When outcome-changing ambiguity remains, align read-only instead of silently selecting an interpretation. When an earlier phase is missing or stale, reconstruct it read-only. Never invent phase completion or reuse old release authority.
 
+Mechanical scope/decision gates exist only for `assurance: formal` when a frozen envelope is present (`scripts/gates-g1-g3.js`). Routine tasks stay prose-constrained. External-write / destructive commands still never auto-allow.
+
 ### ALIGN
 
-Compile a compact Task Contract per [contracts.md](references/contracts.md). State the goal, relevant scope/non-goals, and any material semantic or authority uncertainty in natural prose when it helps the user decide; there is no required opening template. Resolve discoverable questions by read-only inspection first. Ask at most two questions only when the answer changes the outcome and cannot be safely derived.
+Compile a compact internal Task Contract. For routine work, keep the six-field card; do not load the full [contracts.md](references/contracts.md) machine protocol. Expand that file only for formal, handoff, resume, release, or envelope writes. State the goal, relevant scope/non-goals, and any material semantic or authority uncertainty in natural prose when it helps the user decide. Resolve discoverable questions by read-only inspection first.
 
-For non-trivial work, use [alignment-compiler.md](references/alignment-compiler.md): define an observable after-state, distinguish fixed constraints from guided defaults and open professional choices, ground load-bearing terms, and preserve bidirectional traceability. Treat a requested mechanism as an assumption, not the goal. On contradiction, disclose the evidence and resolution before editing.
+Ask only when, after read-only grounding, at least two credible interpretations remain AND they lead to different after-states, authority, scope, or success criteria. Do not ask to fill a contract field for its own sake. Prefer a closed choice when the credible options are exhaustive; otherwise ask one bounded open question that names the decision boundary. No broad questionnaires. At most two questions in one early checkpoint. External-write, destructive, and release authorization remain a separate checkpoint.
 
-Read applicable project rules, facts, and lessons. A matching active lesson may enter the Task Contract; lessons remain separate project knowledge and do not turn into user profile data automatically.
+When the user's single message already supplies goal, scope, target, operation, and current-turn authorization, act on it; do not re-split a combined authorization into ceremonial confirmations.
+
+For non-trivial work, define an observable after-state, distinguish fixed / guided / open choices, and ground load-bearing terms. Treat a requested mechanism as an assumption, not the goal. On contradiction, disclose the mismatch, then stop or ask.
+
+Read applicable project rules, facts, and lessons. A matching active lesson may enter the Task Contract; lessons remain separate project knowledge.
 
 ### Profile v2
 
-The optional profile is `$AQL_HOME/profile.json`; its memory policy is `explicit_only`, with rules in [personalization.md](references/personalization.md) and [profile-projection.md](references/profile-projection.md).
+The optional profile is `$AQL_HOME/profile.json` (`explicit_only`). Persistent writes need an unambiguous memory request or confirmation. At most two complete, active, relevant entries may enter Guided. A profile cannot grant authority, relax evidence or acceptance, authorize release, or override repository rules.
 
-- Persistent profile writes require an unambiguous user memory request or explicit confirmation. Ordinary repeat behavior, corrections, silence, or accepted output never accumulates across tasks, creates a candidate, or prompts for memory.
-- At most two complete, active, relevant entries may be projected into **Guided** in the existing Task Contract. Suppress conflict, unknown applicability, review-due, incomplete, superseded, archived, or current-turn-conflicting entries.
-- Fresh Mode skips stored preferences for one task, but preserves current instructions, project facts/rules, lessons, authority, evidence, acceptance, and release boundaries. It writes nothing.
-- A profile cannot grant authority, relax evidence or acceptance, authorize release, prove an outcome, or override repository rules. Profile/CLI/directory failure means no profile use, not Core failure; report it only for an explicit profile-management request.
-- The JSON format is portable for Agents that can access the same machine-local store. Other devices use explicit export/import; there is no default sync, upload, or background service. Create `.aql/project.json` only after confirmed project-scoped preference save, and only with schema plus opaque project identity.
+Read [personalization.md](references/personalization.md) / [profile-projection.md](references/profile-projection.md) only when the task explicitly attaches a projection handle, a capability receipt declares a profile this turn, or the user explicitly requests a memory operation. Do not scan directories looking for a profile.
 
 ### Capability Receipt
 
-Capability Receipt is temporary mechanical evidence, not profile data, Task Contract state, or a lifecycle source. Its facts must come from an installer, host/version feature report, explicit configuration, local probe, or actual call result. Model self-report and host-name inference are invalid. Unknown/unrun is `NOT_RUN`; regenerate after relevant host/version/configuration changes. Disclose a receipt only when capability availability changes the task result.
+Capability Receipt is temporary mechanical evidence, not profile data or lifecycle state. Facts must come from an installer, host/version report, configuration, local probe, or actual call. Model self-report is invalid. Unknown/unrun is `NOT_RUN`.
 
 ### EVIDENCE
 
-Remain read-only by default. Record the relevant baseline, observed versus inferred claims, sources/currentness, causal hypothesis and alternatives, the smallest falsification probe, and the proposed acceptance method. Separate static, generated, simulated, runtime/native, deployment, and release evidence. Counts, hashes, tests, screenshots, and reviews are supporting evidence, not user-outcome proof by themselves.
+Remain read-only by default. Separate static, generated, simulated, runtime/native, deployment, and release evidence. Counts, hashes, tests, and reviews are supporting evidence, not user-outcome proof.
 
-Stop when authority conflicts, evidence cannot support the requested conclusion, a live write would be required, or baseline contamination prevents attribution. Evidence-only work may end at `EVIDENCED`; do not propose later phases merely to complete a chain.
+`observer_class`: `implementer_self` | `agent_review` | `mechanical_runtime` | `human` (with `human_role`: `reviewer` | `operator_tester` | `target_user`). There is no total order. `agent_review` supports only artifact-bounded claims and never upgrades them into environment, target-user, or production claims. `user_observable_result: PASS` requires both a native-medium / runtime `evidence_kind` and a valid observation source (`mechanical_runtime`, or `human` with an applicable role).
 
 ### EXECUTE
 
-Require aligned and evidenced inputs, supplied or reconstructed. Define the allowlist and non-goals, protect unrelated dirty work, and create semantic must-holds only where meaning could drift. Use the highest-value falsification probe before broadening a change.
+Require aligned and evidenced inputs. Protect unrelated dirty work. Use the highest-value falsification probe before broadening a change.
 
-For code, use [code-implementation-adapter.md](references/code-implementation-adapter.md): inspect before edit, choose the smallest root-cause change, preserve semantic invariants, run proportionate checks, and return one implementation receipt capped at `BUILT`. For writing, use [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). Domain tools may execute their specialty but inherit the same contract and authority ceiling.
+For code, use [code-implementation-adapter.md](references/code-implementation-adapter.md). For writing, use [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). Domain tools inherit the same contract and authority ceiling.
 
-Pause on scope or authority drift, dirty-file collision, generated/source ambiguity, missing prerequisite, destructive effect, external write, or production action. A different implementation path inside unchanged goal/scope/authority may proceed after disclosing the observed reason; otherwise return to ALIGN. Repeated same-shape failure stops retries and reports the smallest actionable unblock.
+Re-anchor on resume/compaction, path change, repeated same-shape failure, first read-to-write, scope expansion, release preflight, or a premise contradiction. Compare touched surfaces to the ALIGN-frozen allowlist, never to the previous increment. Re-anchor cannot raise phase or authority, adds no badge, and fires at most once per event.
+
+A decision is material iff any of: a public/exported symbol, schema, or persisted shape changes; recovery needs more than reverting files this session authored; the frozen allowlist names two or more systems; a requested mechanism is contradicted by workspace evidence; two mutually exclusive causal hypotheses remain; or an algorithm/data change alters external choice policy, ranking, economic outcomes, public behavior, or persistence semantics. Plain display/content fixes and internal-only tweaks do not trigger. The three-line record (chosen / strongest credible alternative including no-change–delete–reuse / overturning observation) is internal only. Goal-field forks must be asked; same after-state implementation forks are recorded, not asked.
+
+Pause on scope or authority drift, dirty-file collision, generated/source ambiguity, missing prerequisite, destructive effect, external write, or production action. Repeated same-shape failure (same check, error class, or missing referent) stops retries.
 
 ### ACCEPT
 
-Acceptance is an AQL Core function. Use a fresh context that reads the frozen Task Contract, artifacts/diff, and raw evidence before the implementer narrative. The full conjunctive method is [acceptance-review.md](references/acceptance-review.md).
+Acceptance is an AQL Core function: fresh context, read-only, contract → artifact/diff → raw evidence → implementer narrative. It does not self-certify, repair, or authorize release. Ordinary tasks stay at `BUILT`.
 
-`ACCEPTED` requires evidence-bound `PASS` for every required acceptance dimension. A demonstrated defect is `FAIL`; unavailable evidence, authority, or fresh-context independence is `BLOCKED`/`PENDING` at the last valid phase. The acceptor identifies findings but does not repair them without a new execute authorization. `ACCEPTED` ends the task unless the user separately requests release work.
+Standard acceptance is result-anchored free review. Answer three questions with whatever probes professional judgment selects, in any order, with no dimension bookkeeping: (1) Does the frozen goal's observable after-state hold? (2) Is any hard boundary violated? (3) Is every claim within its evidence and observer limits? Report findings result-first in plain prose, ordered by consequence.
+
+The four-dimension conjunctive method in [acceptance-review.md](references/acceptance-review.md) is `assurance: formal` or release-bound acceptance only.
 
 ### RELEASE
 
-Release preflight begins from the exact accepted artifact and uses a separate release gate. It must establish artifact identity, accepted baseline, target environment, rollback/recovery, and every other applicable requirement with current evidence. Do not overwrite the acceptance gate. Publishing, pushing, tagging, deploying, uploading, or creating a Release requires complete current-turn authorization for exact targets and operation; otherwise stop after preflight or handoff.
+Release preflight begins from the exact accepted artifact and uses a separate gate. Publishing, pushing, tagging, deploying, uploading, or creating a Release requires complete current-turn authorization for exact targets and operation; otherwise stop after preflight or handoff.
 
 ### Result And Resume
 
-Render one user-facing result, not phase templates. Lead with conclusion, user impact/boundary, decisive evidence, material uncertainty, then at most one needed action. Use precise language such as evidence conclusion complete, implementation/self-check complete, independent acceptance complete, or release preflight complete; do not blur adjacent states.
-
-Resume reconstructs the Task Contract and baseline from readable artifacts and evidence. A transcript, profile, or prior claim is not enough to restore authority, acceptance, or release permission. Reconcile dirty state and changed files before any write.
+Render one user-facing result. Lead with conclusion, user impact/boundary, decisive evidence, material uncertainty, then at most one needed action. Resume reconstructs the Task Contract from readable artifacts and evidence. A transcript or prior claim is not enough to restore authority, acceptance, or release permission.
 
 ## Output Contract
 
-Lead with exactly one adaptive [User Result Summary](references/contracts.md#user-result-summary). Preserve this order when relevant: conclusion, user impact and boundary, decisive evidence, incomplete evidence or risk, required user action, and exact completion standard. Routine success is normally 1-3 lines. Expand only for formal acceptance, failure, blocker, handoff, audit, or release safety. Adapters emit receipts, not parallel user-facing status blocks.
+Lead with exactly one adaptive [User Result Summary](references/contracts.md#user-result-summary). Preserve this order when relevant: conclusion, user impact and boundary, decisive evidence, incomplete evidence or risk, required user action, and exact completion standard. Routine success is normally 1-3 lines. Expand only for formal acceptance, failure, blocker, handoff, audit, or release safety. Do not read the full contracts file for routine output; the order is inlined here. Adapters emit receipts, not parallel user-facing status blocks.
 
 ## Acceptance Criteria
 
@@ -122,10 +135,11 @@ Lead with exactly one adaptive [User Result Summary](references/contracts.md#use
 - Current instructions outrank profile defaults; profile entries affect Guided only and never exceed two.
 - Missing profile, CLI, hooks, or user-directory access degrades to normal Core behavior.
 - Execution reads before editing, protects scope, and stops at `BUILT` after self-QA.
-- Formal acceptance is fresh-context, raw-evidence-first, conjunctive, and bound to exact artifacts.
+- Formal acceptance is fresh-context, raw-evidence-first, conjunctive, and bound to exact artifacts. Standard acceptance is result-anchored free review.
 - Capability claims have mechanical sources; unknown capability remains `NOT_RUN`.
 - No local mode performs or implies an external, destructive, deploy, publish, or release action.
 - Results follow Result Attention and do not expose internal profile/receipt machinery by default.
+- Mechanical gates, when present, check only fields, timing, paths, authority, and state invariants.
 
 ## Failure Modes
 
@@ -138,6 +152,7 @@ Lead with exactly one adaptive [User Result Summary](references/contracts.md#use
 | A test/hash is treated as product outcome proof | Narrow the claim and run the declared behavioral/consumer probe |
 | Acceptance is treated as release permission | Stop; require a separate current-turn release request |
 | Ceremony exceeds the task | Keep the contract internal and render only the adaptive result |
+| Mechanical gate used as a semantic judge | Return quality, alternative-strength, and evidence-sufficiency questions to the brain/accept layers |
 
 ## Evaluation Cases
 

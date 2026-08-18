@@ -548,6 +548,15 @@ function validateAcceptanceSemantics(envelope, errors = []) {
       errors.push("ACCEPTED or later requires evidenced independent acceptance");
     }
   }
+  if (envelope.acceptance_gate && isObject(envelope.acceptance_gate.status_by_dimension)) {
+    const uor = envelope.acceptance_gate.status_by_dimension.user_observable_result;
+    if (isObject(uor) && uor.status === "PASS") {
+      const observer = uor.observer_class || uor.observation_source;
+      if (observer === "agent_review") {
+        errors.push("user_observable_result PASS forbids observer_class agent_review");
+      }
+    }
+  }
   return errors;
 }
 

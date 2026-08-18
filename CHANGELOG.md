@@ -2,6 +2,19 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## 3.1.0 — Unreleased
+
+- Slimmed the ordinary-task hot path: SKILL.md now carries never-fabricate, claim labels, semantic-risk words, the internal six-field card, and a mini phrase map. Routine turns no longer force-load the full contracts machine protocol.
+- De-ritualized questions and material decisions: ask only when two credible after-states remain; combined current-turn authorization is not re-split; material records stay internal.
+- Added an observer axis (`implementer_self` / `agent_review` / `mechanical_runtime` / `human`+`human_role`). `agent_review` cannot PASS `user_observable_result`.
+- Merged re-anchor onto the ALIGN-frozen allowlist; same-shape failure is decidable.
+- Scheme A mechanical gates G1/G2/G3: formal/envelope only, shipped as `scripts/gates-g1-g3.js` with bidirectional false-block / missed-block fixtures. Routine tasks stay prose-constrained. Shell-indirect writes are not mechanically covered.
+- Standard acceptance is result-anchored free review; four-dimension conjunction is formal/release-bound only.
+- Profile reference files load only on an explicit projection handle, a receipt-declared profile, or a user memory request.
+- Capability matrix rows bind exact model × host × task class × assurance; new versions default to `unverified`.
+- Evaluation cases 18–21 cover negative trigger, standard accept, formal conjunction, and the observer cap.
+- Phase C/B0/D execution evidence is recorded under `docs/experiments/aql-3.1/`. Isolated ablation and candidate A/B remain blocked where a clean headless runner was unavailable.
+
 ## 3.0.0 — Unreleased
 
 - Rebuilt the public README around the user journey: product status, trust architecture, lifecycle boundaries, safe installation, optional Profile/Receipt controls, evidence limits, release semantics, and a complete repository map.

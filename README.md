@@ -201,7 +201,7 @@ Optional [Cursor hooks](integrations/cursor-hooks/README.md) handle only rules a
 
 ## What the current evidence supports
 
-The [17 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
+The [21 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
 
 | Adoption question | Current evidence boundary |
 |---|---|

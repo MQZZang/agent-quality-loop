@@ -54,7 +54,7 @@ Do not fan out for ritual coverage, consensus theater, or averaging opinions.
 
 1. Independent agent receives **only** the artifact (or runnable pointer) and the declared consumer perspective/medium. Isolate implementer narrative and detailed `success_observables` / acceptance criteria from the blind agent.
 2. Blind agent cold-consumes once and returns an experience report (breaks, confusion, finished-quality gaps, what was actually tried).
-3. Main/acceptor context compares that report to `success_observables` and binds the result as `user_observable_result` evidence.
+3. Main/acceptor context compares that report to `success_observables` and records it as an `agent_review` finding. A blind-consumer report cannot by itself set `user_observable_result: PASS`.
 4. The blind consumer supplies experience evidence while the independent acceptor reviews goal, semantics, and dimensions. On conflict -> conservative map to `FAIL` or `BLOCKED`; never average.
 
 If the host cannot isolate a blind agent, the acceptor still cold-consumes first, then reads the implementer narrative (see Degradation Ladder).

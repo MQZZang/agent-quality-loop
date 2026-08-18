@@ -41,6 +41,7 @@ const requiredFiles = [
   "scripts/validate-skill.js",
   "scripts/aql-envelope.js",
   "scripts/aql-stats.js",
+  "scripts/gates-g1-g3.js",
 ];
 const errors = [];
 

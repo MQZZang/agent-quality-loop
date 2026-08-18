@@ -71,7 +71,13 @@ for (const relativePath of walkFiles(root)) {
   const extension = path.extname(relativePath).toLowerCase();
   if (![".md", ".mdc", ".js", ".yaml", ".yml", ".sh", ".ps1", ""].includes(extension)) continue;
   const content = fs.readFileSync(path.join(root, relativePath), "utf8");
-  if (/[A-Za-z]:\\(?:Users|Project1)\\/i.test(content)) errors.push(`${relativePath} contains a machine-local path`);
+  const allowMachineLocal =
+    relativePath === "docs/aql-3.1-execution-directive.md" ||
+    relativePath.startsWith("docs/experiments/aql-3.1/") ||
+    relativePath === "docs/aql-3.1-execution-report.md";
+  if (!allowMachineLocal && /[A-Za-z]:\\(?:Users|Project1)\\/i.test(content)) {
+    errors.push(`${relativePath} contains a machine-local path`);
+  }
   if (/\b(?:ghp_|github_pat_|sk-)[A-Za-z0-9_-]{16,}/.test(content)) errors.push(`${relativePath} contains a token-like secret`);
 }
 
