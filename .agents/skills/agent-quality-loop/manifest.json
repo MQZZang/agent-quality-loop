@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
-  "version": "3.0.0",
-  "generated_at": "2026-08-18T11:22:36.879Z",
+  "version": "3.1.0",
+  "generated_at": "2026-08-18T11:50:41.485Z",
   "files": {
-    "SKILL.md": "f71050b3e8f0ae097c5d4c5e0220961fa8c00e30ba0d341630bf9dd122307c51",
+    "SKILL.md": "3ea168980a127b308631a150fa9ae6898db1d56ea82c77b180e9f4311d0f9c7d",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "fixtures/capability-receipt-valid.json": "ad718c2dfa3c471fc2d88c6e1a15a0639a0414f8fec860ac22276109059afb6b",
     "fixtures/gates-g1-g3/g1-derived-lockfile/expected.json": "b8cf2358e8261d6f4d8088cc6ca13c418b454d110eeb76f91966f8a0cd6f8079",
@@ -43,7 +43,7 @@
     "references/alignment-compiler.md": "46928f2ee531198d4160c042cf3ee7331f6375d8ce532a3cedd55571f9eec8fe",
     "references/code-implementation-adapter.md": "cd43cec2ff7bd585a71c7c431737a8f6449c7cde9a1f0fc105b1b5c84906d132",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "0733c5c972c5471fec2c77a12db4dc906da42d9d9fa0862101e6b6fbcd7cdc71",
+    "references/contracts.md": "c0fb3374b4d8a4b919b20ac90b69c0a76672082a2f3333226296a6e588feee45",
     "references/domain-profiles.md": "e520f3dd651f0f2a5c860feb42cfc385176bcc4c440d0a8cddd97c12093e3099",
     "references/evaluation-cases.md": "9bab64d197546425c45328488072aa17210faaedadf4b43d3e6d0914db5bb6f5",
     "references/multi-agent-leverage.md": "578e233d2d6b3fd0a7598642e35026c1b83f7736663a940eae6a993b047e2868",
@@ -64,6 +64,6 @@
     "scripts/validate-envelope.js": "243a7260233a37bc6cf7e0589e0fde6c542d213c53581a6ae7afc8b6c70d6847",
     "scripts/validate-profile-projection.js": "1919d3338d31874052ce3118def36040c04397034221bc6c948f8ffd668075b4",
     "scripts/validate-profile.js": "e537786dbdcbb77b06b47d1000d8b9130ab7a5b6f68269a0a343baba122d9250",
-    "scripts/validate-skill.js": "d3ace2af3863e5c8af437b8564b0b332bae00ea00d0c738a4dd322fd3bd0d241"
+    "scripts/validate-skill.js": "14a61130a3580b9840b092eb797fb8f3305de7e94bff91a0efa00ba175ab55d6"
   }
 }

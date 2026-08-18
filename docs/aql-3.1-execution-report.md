@@ -1,10 +1,16 @@
 # AQL 3.1 execution report
 
-Recommended execution state: **`PARTIAL_WITH_BLOCKS`**
+Final state (maintainer acceptance 2026-08-18 evening): **`ACCEPTED`** — see `docs/aql-3.1-acceptance-record.md`. All frozen release gates green on raw numbers: Phase C suite PASS (rev2 8/8 trigger + 8/8 silence), Phase D seven conditions PASS (blind-graded), ablation `NO_LARGE_EFFECT_DETECTED`, load −75.5%, conformance gaps closed (M-004). Release preparation authorized; pushing to the public remote remains with the repository owner.
+
+Executor stage below is retained verbatim for audit.
+
+---
+
+Recommended execution state (executor stage): **`PARTIAL_WITH_BLOCKS`**
 
 Executor self-QA terminal: `BUILT` (`docs/experiments/aql-3.1/formal-envelope.yaml`). Maintainer formal acceptance is separate. This report does not authorize publish, tag, or release.
 
-Codex had no quota. Decision #11 → #9: second runner was Cursor Task. Isolation still failed. Remaining work continued to the allowed terminal.
+Codex had no quota. Decision #11 → #9: second runner was Cursor Task. Isolation still failed. Remaining work continued to the allowed terminal. The blocks were subsequently resolved maintainer-side: the best-of-n runner's fresh per-invocation catalog scan provided true isolation for B0 and the Phase C rev2 rerun (M-003/M-006), and constant-background staging unconfounded B1/B2/D on Task (M-002).
 
 ## 1. Stage table
 

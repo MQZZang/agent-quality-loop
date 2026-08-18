@@ -63,25 +63,25 @@ function runSelfTest() {
     check(label, actual, expectedOk);
   }
 
-  checkTag("packaged version tag accepts", "v3.0.0", true);
-  checkTag("mismatched package version refuses", "v3.0.1", false);
-  checkTag("shell substitution tag refuses", "v3.0.0$(id)", false);
-  checkTag("newline tag refuses", "v3.0.0\nextra", false);
-  checkTag("whitespace-padded tag refuses", " v3.0.0 ", false);
+  checkTag("packaged version tag accepts", "v3.1.0", true);
+  checkTag("mismatched package version refuses", "v3.1.1", false);
+  checkTag("shell substitution tag refuses", "v3.1.0$(id)", false);
+  checkTag("newline tag refuses", "v3.1.0\nextra", false);
+  checkTag("whitespace-padded tag refuses", " v3.1.0 ", false);
 
   try {
     const attestation = buildAttestation({
-      tag: "v3.0.0",
+      tag: "v3.1.0",
       commit: shaA,
       ubuntu: "PASS",
       windows: "PASS",
       macos: "PASS",
     });
-    assert.strictEqual(attestation.package_version, "3.0.0");
-    assert.strictEqual(attestation.tag, "v3.0.0");
+    assert.strictEqual(attestation.package_version, "3.1.0");
+    assert.strictEqual(attestation.tag, "v3.1.0");
     assert.throws(
-      () => buildAttestation({ tag: "v3.0.1", commit: shaA, ubuntu: "PASS", windows: "PASS", macos: "PASS" }),
-      /packaged version v3\.0\.0/,
+      () => buildAttestation({ tag: "v3.1.1", commit: shaA, ubuntu: "PASS", windows: "PASS", macos: "PASS" }),
+      /packaged version v3\.1\.0/,
     );
     console.log("PASS attestation binds exact package version tag");
   } catch (error) {

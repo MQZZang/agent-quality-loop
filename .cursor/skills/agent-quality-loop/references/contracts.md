@@ -455,7 +455,7 @@ Apply these semantic rules:
 
 Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.0.0`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.0.0 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.1.0`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.1.0 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 

@@ -2,7 +2,7 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) 3.0.0** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
+**Agent Quality Loop (AQL) 3.1.0** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
 
 AQL is not another IDE or hosted service, and it does not publish anything on its own. The main workflow works without Profile v2, the optional CLI, Cursor hooks, or access to your user directory.
 
@@ -10,13 +10,13 @@ AQL is not another IDE or hosted service, and it does not publish anything on it
 
 | Where this repository stands | Status |
 |---|---|
-| Source package version | `3.0.0` |
+| Source package version | `3.1.0` |
 | Product surface | One Skill: `agent-quality-loop` |
 | Contract for each task | One Task Contract |
-| GitHub release | Unreleased until an exact `v3.0.0` tag passes the release workflow |
+| GitHub release | Unreleased until an exact `v3.1.0` tag passes the release workflow |
 | License | MIT |
 
-> **Before you install:** the default branch is the AQL 3.0 source candidate. Use it for evaluation or development. If you need an immutable release, install an existing release tag instead, or wait for `v3.0.0`.
+> **Before you install:** the default branch is the AQL 3.1 source candidate. Use it for evaluation or development. If you need an immutable release, install an existing release tag instead, or wait for `v3.1.0`.
 
 ## Why AQL exists
 
@@ -130,7 +130,7 @@ Ordinary language is the main interface. If your host lets you select a Skill, c
 
 `status` confirms that the installed copy exists and still matches the installer’s record. It cannot confirm that a running host loaded the Skill. After installation:
 
-1. run `node scripts/install.js status --to <your-target>` and require `OWNED ... @3.0.0`;
+1. run `node scripts/install.js status --to <your-target>` and require `OWNED ... @3.1.0`;
 2. start or reload the target host and use its Skill discovery view to find `agent-quality-loop`;
 3. ask a small read-only task and confirm the result preserves the requested boundary.
 
@@ -216,10 +216,10 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 
 ## Version and release model
 
-`manifest.json`, the Skill metadata, and `plugin.json` currently agree on version `3.0.0`. [CHANGELOG.md](CHANGELOG.md) keeps it under **Unreleased** until the exact release tag exists.
+`manifest.json`, the Skill metadata, and `plugin.json` currently agree on version `3.1.0`. [CHANGELOG.md](CHANGELOG.md) keeps it under **Unreleased** until the exact release tag exists.
 
 - Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
-- Creating `v3.0.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
+- Creating `v3.1.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
 - Passing local checks or an independent review does not publish a release.
 
 ## Repository map

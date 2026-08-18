@@ -53,7 +53,7 @@ The receipt reports observed capability states and sources; it does not prove ta
 
 ## Installation Lifecycle
 
-The default branch is the AQL 3.0 source candidate until an exact `v3.0.0` release
+The default branch is the AQL 3.1 source candidate until an exact `v3.1.0` release
 tag exists. Use a release tag when you require an immutable published artifact.
 Node.js 22 is the tested CI baseline. Install only to the host targets you actually
 use; choose `all` only for an intentional multi-host setup.

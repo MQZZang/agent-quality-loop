@@ -2,7 +2,7 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
-## 3.1.0 — Unreleased
+## 3.1.0 — 2026-08-18
 
 - Slimmed the ordinary-task hot path: SKILL.md now carries never-fabricate, claim labels, semantic-risk words, the internal six-field card, and a mini phrase map. Routine turns no longer force-load the full contracts machine protocol.
 - De-ritualized questions and material decisions: ask only when two credible after-states remain; combined current-turn authorization is not re-split; material records stay internal.
@@ -15,7 +15,7 @@ Versions are the `manifest.json` / frontmatter `metadata.version` value for the 
 - Evaluation cases 18–21 cover negative trigger, standard accept, formal conjunction, and the observer cap.
 - Phase C/B0/D execution evidence is recorded under `docs/experiments/aql-3.1/`. Final gate results: Phase C suite PASS (rev2 trigger 8/8, silence 8/8), Phase D candidate gate PASS (seven conditions on raw numbers, blind-graded), ablation `NO_LARGE_EFFECT_DETECTED` on goal at n=6 with hard-gate-adjacent qualitative differences favoring the skill arms. Runner-surface caveats and all deviations (D-001..D-008, M-001..M-007) are logged and unresolved confounds stay disclosed rather than claimed away.
 
-## 3.0.0 — Unreleased
+## 3.0.0 — Never tagged; its content ships inside 3.1.0
 
 - Rebuilt the public README around the user journey: product status, trust architecture, lifecycle boundaries, safe installation, optional Profile/Receipt controls, evidence limits, release semantics, and a complete repository map.
 - Collapsed the product distribution to the single `agent-quality-loop` Skill. Removed standalone adapter packages and physical route shims; the Task Contract remains the sole task truth.
