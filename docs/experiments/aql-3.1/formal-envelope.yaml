@@ -1,0 +1,50 @@
+schema_version: agent-quality-loop/v2
+contract_id: aql-3.1-candidate-2026-08-18
+intent: implement
+assurance: formal
+mode: execute
+phase: BUILT
+verdict: PASS_WITH_RISK
+raw_request: 读取 aql-3.1-execution-directive.md，按该指令一次性执行到终态。
+first_principles_goal: 3.1 candidate built with honest experiment records; no publish.
+target_user_or_system: AQL maintainer reading the execution report and raw artifacts
+success_observables:
+  - report names DONE or PARTIAL_WITH_BLOCKS
+  - WP prose and G1/G2/G3 scripts exist and validate-all is green after allowed exceptions
+counterexamples:
+  - fabricated Phase C/B0/D pass
+  - push/tag/release
+change_class: mixed
+scope_allowlist:
+  - .cursor/skills/agent-quality-loop/
+  - docs/experiments/aql-3.1/
+  - docs/aql-3.1-execution-report.md
+  - CHANGELOG.md
+  - docs/claim-evidence-matrix.md
+  - MATRIX.md
+  - README.md
+  - scripts/validate-workflow.js
+  - integrations/cursor-hooks/README.md
+non_goals:
+  - git push / tag / GitHub Release
+  - aql-3.0-product-screening-preregistration.md
+  - user global Cursor/Codex homes
+action_authority: local_write
+release_intent: null
+next_allowed_phase: null
+stop_reason: evidence_only_complete
+assumptions:
+  - Codex quota remains unavailable
+  - Cursor Task cannot isolate B0/D
+unknowns:
+  - complete 48-run Phase C suite
+  - B0/D isolated matrix
+pause_conditions:
+  - isolated headless runner required before any release claim
+implementation_receipt:
+  adapter: code-implementation-adapter/v2
+  result_phase: BUILT
+  remaining_risks:
+    - Phase C 20/48 runs; suite INCOMPLETE; several Task runs saw the AQL repo
+    - Phase B0/D EXECUTION_BLOCKED
+    - Hidden fixtures not fully blind to the parent session

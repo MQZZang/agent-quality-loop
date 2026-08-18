@@ -25,3 +25,43 @@ Format per directive §7: 触发情形｜决策表条目或"表外"｜所采取�
 - 所采取动作：不 stash 丢弃、不提交、不读取内容。
 - 证据引用：`git status` on `aql-3.1-candidate`。
 - 效度影响：无。
+
+## D-004 Phase C sample below floor
+
+- 触发情形：48 短 run 下限；Task 逐条可跑但耗时，一次 8 合批破坏 fresh-ephemeral。
+- 决策表：#10 / #9
+- 所采取动作：只计独立 run（20 条）；合批 r2 记 INVALID；套件官方判 `INCOMPLETE`，不改 description、不事后加样改判。
+- 证据引用：`phase-c-results.md`
+- 效度影响：不能宣称 §6.4 双向 ≥7/8。
+
+## D-005 Phase B0/D isolation failed twice
+
+- 触发情形：Codex 无额度；Task 哨兵可见 `agent-quality-loop`。
+- 决策表：#11 → #9 → #5
+- 所采取动作：B0 `INCONCLUSIVE_EXECUTION_BLOCKED`；形态按完整 Core 实施 WP1–WP7；Phase D 矩阵不跑；隐藏夹具仍密封。
+- 证据引用：B0 sentinel `428b20de`；D-001
+- 效度影响：不得发布；不得写 `AQL_SIGNAL`。
+
+## D-006 Late freeze of B0 protocol
+
+- 触发情形：指令要求协议在运行前单独 commit；哨兵在 B0 协议未提交时已跑。
+- 决策表：#10
+- 所采取动作：不回改协议正文；补交冻结 commit 并在此记录时序违规。
+- 证据引用：哨兵 `428b20de` 早于 B0 协议 commit。
+- 效度影响：冻结 hash 不能证明「运行前字节」；B0 本已 `EXECUTION_BLOCKED`，不扩大声明。
+
+## D-007 Hidden-fixture generator not fully blind
+
+- 触发情形：生成器 Task 被要求不读 3.1 diff，但仍查看了 lab Phase C 目录；与 WP 实施处于同一父会话。
+- 决策表：#10
+- 所采取动作：仍密封现有 H1–H3 字节；不声称独立于 3.1 设计。
+- 证据引用：`b6d675d2`；`hidden-fixtures/SHA256SUMS`
+- 效度影响：即使未来跑 D，隐藏夹具独立性减弱。
+
+## D-008 Phase C Task runs could see the AQL repo
+
+- 触发情形：Cursor Task 继承父工作区；多条 should-trigger run 打开了仓库内实验文档。
+- 决策表：#10
+- 所采取动作：机械触发仍只计 `SKILL.md`；套件保持 `INCOMPLETE`；不把 7/8 快照升级为通过。
+- 证据引用：`inventory/transcript-inventory.json` 字段 `saw_aql_repo`
+- 效度影响：触发命中不能解释为纯 description 自动挂载。
