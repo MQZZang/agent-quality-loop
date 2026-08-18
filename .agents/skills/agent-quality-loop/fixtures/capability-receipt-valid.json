@@ -1,0 +1,21 @@
+{
+  "schema": "aql.capability-receipt/v1",
+  "receipt_id": "fixture-receipt",
+  "collected_at": "2026-08-18T00:00:00.000Z",
+  "host": {
+    "name": "fixture-host",
+    "version": "1.0.0",
+    "config_identity": "sha256:fixture"
+  },
+  "capabilities": {
+    "skill_arguments": { "status": "not_run", "source": { "kind": "local_probe", "reference": "not probed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "fresh_context": { "status": "not_run", "source": { "kind": "local_probe", "reference": "not probed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "subagents": { "status": "not_run", "source": { "kind": "local_probe", "reference": "not probed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "hooks": { "status": "observed_false", "source": { "kind": "host_api", "reference": "fixture host feature list", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "profile_access": { "status": "observed_true", "source": { "kind": "actual_call", "reference": "fixture profile opened", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "tool_receipts": { "status": "not_run", "source": { "kind": "local_probe", "reference": "not probed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "filesystem_write": { "status": "observed_true", "source": { "kind": "local_probe", "reference": "temporary create-delete probe", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "external_action_gate": { "status": "not_run", "source": { "kind": "local_probe", "reference": "not probed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } },
+    "local_scripts": { "status": "observed_true", "source": { "kind": "actual_call", "reference": "packaged runtime executed", "observed_at": "2026-08-18T00:00:00.000Z", "host": "fixture-host", "version": "1.0.0", "config_identity": "sha256:fixture" } }
+  }
+}

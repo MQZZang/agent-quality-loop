@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aql.capability-receipt/v1",
+  "title": "AQL mechanically sourced host capability receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "collected_at", "host", "capabilities"],
+  "properties": {
+    "schema": { "const": "aql.capability-receipt/v1" },
+    "receipt_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "collected_at": { "type": "string", "format": "date-time" },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "config_identity"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "config_identity": { "type": "string", "minLength": 1 }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_arguments", "fresh_context", "subagents", "hooks", "profile_access", "tool_receipts", "filesystem_write", "external_action_gate", "local_scripts"],
+      "properties": {
+        "skill_arguments": { "$ref": "#/$defs/observation" },
+        "fresh_context": { "$ref": "#/$defs/observation" },
+        "subagents": { "$ref": "#/$defs/observation" },
+        "hooks": { "$ref": "#/$defs/observation" },
+        "profile_access": { "$ref": "#/$defs/observation" },
+        "tool_receipts": { "$ref": "#/$defs/observation" },
+        "filesystem_write": { "$ref": "#/$defs/observation" },
+        "external_action_gate": { "$ref": "#/$defs/observation" },
+        "local_scripts": { "$ref": "#/$defs/observation" }
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference", "observed_at", "host", "version", "config_identity"],
+      "properties": {
+        "kind": { "enum": ["actual_call", "explicit_config", "host_api", "installer_receipt", "local_probe"] },
+        "reference": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "host": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "config_identity": { "type": "string", "minLength": 1 }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source"],
+      "properties": {
+        "status": { "enum": ["observed_true", "observed_false", "not_run"] },
+        "source": { "$ref": "#/$defs/source" }
+      }
+    }
+  }
+}

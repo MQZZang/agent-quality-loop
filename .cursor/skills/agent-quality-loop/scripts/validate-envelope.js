@@ -7,7 +7,8 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
-const { hasUserProfileOptInAssumption, verifyProfileRefs } = require("./validate-profile");
+const { verifyProfileRefs } = require("./validate-profile");
+const { defaultProfilePath } = require("./profile-v2");
 
 const MAX_EXECUTION_PLAN_TTL_MS = 15 * 60 * 1000;
 const CONTENT_SHA256_RE_LOCAL = /^[a-f0-9]{64}$/;
@@ -133,7 +134,7 @@ const HARVEST_KINDS = [
   "thrash_unlock",
   "rejected_option",
 ];
-const HARVEST_LANES = ["lesson", "profile", "rejected_option"];
+const HARVEST_LANES = ["lesson"];
 
 function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -347,12 +348,10 @@ function validateInjectedRefs(injectedRefs, errors = []) {
 }
 
 function validateUserProfileOptIn(envelope, errors) {
-  const hasUserProfileRef = Array.isArray(envelope.injected_refs) && envelope.injected_refs.some((entry) => (
-    entry && entry.kind === "profile" && typeof entry.ref === "string" && entry.ref.startsWith("~/.ai/knowledge/collaboration-profile.md#")
+  const hasLegacyProfileRef = Array.isArray(envelope.injected_refs) && envelope.injected_refs.some((entry) => (
+    entry && entry.kind === "profile" && typeof entry.ref === "string" && /collaboration-profile\.md#/i.test(entry.ref)
   ));
-  if (hasUserProfileRef && !hasUserProfileOptInAssumption(envelope.assumptions)) {
-    errors.push("user profile refs require a current_session user_profile_opt_in assumption with a safe source_ref");
-  }
+  if (hasLegacyProfileRef) errors.push("legacy Markdown profile refs are invalid in Profile v2; bind an exact profile:<profile_id>#<entry_id>@<revision> ref");
 }
 
 function validateAcceptanceIndependenceShape(independence) {
@@ -708,7 +707,6 @@ function validateHarvestCandidates(harvestCandidates, errors) {
   if (harvestCandidates.length > 3) {
     errors.push("harvest_candidates max is 3 when present");
   }
-  let profileCandidates = 0;
   for (const [index, entry] of harvestCandidates.entries()) {
     const label = `harvest_candidates[${index}]`;
     if (!isObject(entry)) {
@@ -718,11 +716,7 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     if (!HARVEST_KINDS.includes(entry.kind)) {
       errors.push(`${label}.kind is invalid`);
     }
-    if (!HARVEST_LANES.includes(entry.lane)) {
-      errors.push(`${label}.lane is invalid`);
-    } else if (entry.lane === "profile" || entry.lane === "rejected_option") {
-      profileCandidates += 1;
-    }
+    if (!HARVEST_LANES.includes(entry.lane)) errors.push(`${label}.lane is invalid`);
     if (entry.status !== "candidate") {
       errors.push(`${label}.status must be candidate`);
     }
@@ -732,9 +726,6 @@ function validateHarvestCandidates(harvestCandidates, errors) {
     if (!nonEmptyString(entry.summary)) {
       errors.push(`${label}.summary is required`);
     }
-  }
-  if (profileCandidates > 2) {
-    errors.push("harvest_candidates profile max is 2");
   }
 }
 
@@ -1081,7 +1072,7 @@ function baseEnvelope() {
     evidence_authority: "source/static -> focused local runtime",
     pause_conditions: ["scope expansion"],
     action_authority: "local_write",
-    executor_adapter: "ask-plan-code-qa/embedded",
+    executor_adapter: "code-execution",
     release_intent: null,
     release_authorization: null,
     side_effect_coverage: null,
@@ -1090,7 +1081,7 @@ function baseEnvelope() {
     artifact_refs: ["src/handler.js@hash"],
     evidence_refs: ["focused-test@result"],
     implementation_receipt: {
-      adapter: "ask-plan-code-qa/embedded",
+      adapter: "code-execution",
       input_contract_ref: "self-test@tree",
       changed_artifacts: ["src/handler.js"],
       verification_performed: ["focused test: pass"],
@@ -1248,7 +1239,7 @@ function runSelfTest() {
   cases.push({ name: "valid built envelope", envelope: baseEnvelope(), valid: true });
 
   const withSkillVersion = baseEnvelope();
-  withSkillVersion.skill_version = "2.8.0";
+  withSkillVersion.skill_version = "3.0.0";
   cases.push({ name: "optional skill_version accepted", envelope: withSkillVersion, valid: true });
 
   const emptySkillVersion = baseEnvelope();
@@ -1537,20 +1528,15 @@ function runSelfTest() {
     reason: "Confirmed route alias changes task routing for this request.",
   }];
   cases.push({
-    name: "user profile ref without current-session opt-in assumption rejected",
+    name: "legacy Markdown user profile ref rejected",
     envelope: userProfileWithoutOptIn,
     valid: false,
-    expectedError: "user profile refs require a current_session user_profile_opt_in assumption",
+    expectedError: "legacy Markdown profile refs are invalid",
   });
 
   const userProfileWithOptIn = JSON.parse(JSON.stringify(userProfileWithoutOptIn));
-  userProfileWithOptIn.assumptions = [{
-    kind: "user_profile_opt_in",
-    enabled: true,
-    scope: "current_session",
-    source_ref: "current-turn:user-profile-opt-in",
-  }];
-  cases.push({ name: "user profile ref with current-session opt-in assumption accepted", envelope: userProfileWithOptIn, valid: true });
+  userProfileWithOptIn.injected_refs[0].ref = "profile:00000000-0000-4000-8000-000000000001#result-tone@1";
+  cases.push({ name: "Profile v2 opaque entry ref accepted structurally", envelope: userProfileWithOptIn, valid: true });
 
   const injectedEmpty = baseEnvelope();
   injectedEmpty.injected_refs = [];
@@ -1745,21 +1731,19 @@ function runSelfTest() {
     { kind: "user_correction", lane: "lesson", summary: "a", source_ref: "s1", status: "candidate" },
     { kind: "path_change", lane: "lesson", summary: "b", source_ref: "s2", status: "candidate" },
     { kind: "scope_deviation", lane: "lesson", summary: "c", source_ref: "s3", status: "candidate" },
-    { kind: "contradiction", lane: "profile", summary: "d", source_ref: "s4", status: "candidate" },
+    { kind: "contradiction", lane: "lesson", summary: "d", source_ref: "s4", status: "candidate" },
   ];
   cases.push({ name: "harvest_candidates max rejected", envelope: harvestTooMany, valid: false, expectedError: "harvest_candidates max is 3" });
 
-  const harvestTooManyProfile = baseEnvelope();
-  harvestTooManyProfile.harvest_candidates = [
+  const harvestProfileLane = baseEnvelope();
+  harvestProfileLane.harvest_candidates = [
     { kind: "user_correction", lane: "profile", summary: "a", source_ref: "s1", status: "candidate" },
-    { kind: "contradiction", lane: "profile", summary: "b", source_ref: "s2", status: "candidate" },
-    { kind: "rejected_option", lane: "rejected_option", summary: "c", source_ref: "s3", status: "candidate" },
   ];
   cases.push({
-    name: "harvest profile candidate max rejected",
-    envelope: harvestTooManyProfile,
+    name: "profile harvest lane rejected",
+    envelope: harvestProfileLane,
     valid: false,
-    expectedError: "harvest_candidates profile max is 2",
+    expectedError: "harvest_candidates[0].lane is invalid",
   });
 
   let failed = false;
@@ -1866,9 +1850,7 @@ function parseCliArgs(argv) {
     selfTest: false,
     checkRefs: false,
     baseDir: process.cwd(),
-    projectProfile: null,
-    userProfile: null,
-    userProfileOptedIn: false,
+    profile: null,
     inputPath: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -1891,20 +1873,10 @@ function parseCliArgs(argv) {
       options.baseDir = path.resolve(arg.slice("--base=".length));
       continue;
     }
-    if (arg === "--project-profile") {
+    if (arg === "--profile" || arg === "--user-profile") {
       const value = argv[++index];
-      if (!value) throw new Error("--project-profile requires a path");
-      options.projectProfile = path.resolve(value);
-      continue;
-    }
-    if (arg === "--user-profile") {
-      const value = argv[++index];
-      if (!value) throw new Error("--user-profile requires a path");
-      options.userProfile = path.resolve(value);
-      continue;
-    }
-    if (arg === "--user-profile-opt-in") {
-      options.userProfileOptedIn = true;
+      if (!value) throw new Error(`${arg} requires a path`);
+      options.profile = path.resolve(value);
       continue;
     }
     if (arg.startsWith("-")) {
@@ -1923,7 +1895,7 @@ function main(argv = process.argv.slice(2)) {
   } catch (error) {
     console.error(error.message);
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--profile <profile.json>] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1931,7 +1903,7 @@ function main(argv = process.argv.slice(2)) {
   if (options.selfTest) return runSelfTest();
   if (!options.inputPath) {
     console.error(
-      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--project-profile <path>] [--user-profile <path> --user-profile-opt-in] | --self-test | --check-refs [--base <dir>] <envelope.json>",
+      "Usage: node scripts/validate-envelope.js <envelope.json> [--base <dir>] [--profile <profile.json>] | --self-test | --check-refs [--base <dir>] <envelope.json>",
     );
     return 2;
   }
@@ -1949,23 +1921,14 @@ function main(argv = process.argv.slice(2)) {
     for (const error of errors) console.error(`INVALID: ${error}`);
     return 1;
   }
-  if (options.userProfile && !options.userProfileOptedIn) {
-    console.error("INVALID: --user-profile requires --user-profile-opt-in");
-    return 1;
-  }
   const profileRefs = Array.isArray(envelope.injected_refs)
     ? envelope.injected_refs.filter((entry) => entry && entry.kind === "profile")
     : [];
   if (profileRefs.length > 0) {
-    const defaultProjectProfile = path.join(options.baseDir, ".ai", "knowledge", "collaboration-profile.md");
-    const projectPath = options.projectProfile || (fs.existsSync(defaultProjectProfile) ? defaultProjectProfile : null);
     try {
       const binding = verifyProfileRefs({
         refs: profileRefs,
-        baseDir: options.baseDir,
-        projectProfilePath: projectPath,
-        userProfilePath: options.userProfile,
-        userProfileOptedIn: options.userProfileOptedIn,
+        profilePath: options.profile || defaultProfilePath(),
       });
       if (binding.errors.length > 0) {
         for (const error of binding.errors) console.error(`INVALID: profile source binding: ${error}`);

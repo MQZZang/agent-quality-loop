@@ -1,6 +1,6 @@
 # Model-Tier Compliance Matrix
 
-Which of this package's rules actually hold, on which model tiers, measured by the blind behavioral probes in [probes/PROBES.md](probes/PROBES.md). Rows are falsifiable: regenerate the fixtures, run the prompt on a fresh executor, grade by the checklist, and PR your row — FAIL rows included. This table is the measurement input for the capability re-baseline policy in [CONTRIBUTING.md](CONTRIBUTING.md); prose that every tier obeys without the rule is a deletion candidate, and prose that a tier ignores is a routing fact, not a wording problem.
+Historical model-tier probe records for prior AQL contracts. Rows are falsifiable and retained for audit, but they do not establish AQL 3.0 behavior, Profile v2 product value, or longitudinal value. Those verdicts remain `NOT_RUN` until a separately frozen 3.0 protocol executes.
 
 | Date | Protocol | Probe | Model (tier) | Result | Transcript | Evidence note | Runner |
 |---|---|---|---|---|---|---|---|

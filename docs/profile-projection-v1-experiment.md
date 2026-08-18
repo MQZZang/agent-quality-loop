@@ -1,5 +1,7 @@
 # Profile Projection v1 Experiment Protocol
 
+> **Historical AQL 2.8 document.** This protocol describes Profile Projection v1, not the Profile v2 behavior shipped in the AQL 3.0 source candidate. Use the current [Profile v2 contract](../.cursor/skills/agent-quality-loop/references/profile-projection.md) for implementation and the [AQL 3.0 product screening](aql-3.0-product-screening-preregistration.md) for current product claims. The v1 results below remain historical evidence only.
+
 Status: Gate 1 mechanism, deterministic fixtures, and one-host behavior coverage are complete. Canonical behavior evidence uses sanitized, content-bound version-2 manifests and a neutral raw-first review. Gate 2 product comparison is `NOT_RUN`: B is not a valid no-projection effect control.
 
 ## Frozen Inputs

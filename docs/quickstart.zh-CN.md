@@ -1,72 +1,87 @@
-# 中文速览（一页）
+# AQL 3.0 快速开始
 
-> 本页是入门便览；规范文本以英文文档（README 与 docs/guide.md）为准。
+AQL 3.0 只有一个 Skill：`agent-quality-loop`。你照常用自然语言说明要做什么，它会把结果、范围、证据和权限整理进同一份 Task Contract。独立验收通过，也不代表可以发布。
 
-**这是什么**：一个开放 `SKILL.md` 格式、用户主权的认知协作编译器，适用于 Cursor、Codex CLI、Claude Code 及任何兼容宿主。它不加界面，只改变 agent 处理非琐碎任务的**默认工作习惯**：从可观察信息编译真实目标，证据先行，保留 AI 专业自由，验收独立，发布另批。“认知”不是读心、人格诊断或伪脑科学。
+当前默认分支是 AQL 3.0 的源码候选。在精确的 `v3.0.0` Release tag
+出现前，它还不是不可变的正式发布物。评估和开发可以使用默认分支；如果你需要稳定版本，
+请使用已有的 Release tag，或等待 `v3.0.0`。CI 当前使用 Node.js 22，建议保持一致。
 
-## 三条不变量
+## 安装和管理
 
-1. **措辞不升权**——"认真点、全面点、正式点"不会解锁部署、发布或任何外部副作用。
-2. **无证据不称完成**——"done / 通过 / 全绿"只有在本轮亲自运行或查验过证据时才允许说。
-3. **验收 ≠ 发布**——独立验收冻结的是本地结果；上线永远需要你在当轮明确授权那个具体动作。
-
-## 安装（任一系统，一条命令）
-
-已装 skills.sh CLI 的话，一条命令直接装（skills.sh 会发现并安装全部四个技能；下方安装器的 `core` 套件只装三件核心环。该 CLI 没有 `--dry-run`，只想查看清单用 `-l`）：
+在仓库克隆目录执行：
 
 ```bash
-npx skills add MQZZang/agent-quality-loop
+node --version
+node scripts/install.js install --to agents --dry-run
+node scripts/install.js install --to agents
+node scripts/install.js status --to agents
+node scripts/install.js update --to agents --dry-run
+node scripts/install.js uninstall --to agents --dry-run
 ```
 
-或在本仓库克隆目录下：
+将 `agents` 换成你实际使用的 `cursor` 或 `claude`；只有明确需要同时维护三份
+用户级快照时才使用 `--to all`。`status` 只证明快照存在且归属/清单匹配，不能替代
+真实宿主的交互式加载验证；安装后应在目标宿主的 Skill 发现界面确认
+`agent-quality-loop`，再运行一个只读小任务检查边界是否生效。
+
+安装器只管理自己有记录的 Skill 副本。它不会覆盖或删除不属于自己的目录；安装后的文件如果被改过，更新和卸载会先停下来让你检查；用户画像不归安装器管理，卸载后仍会保留。
+
+已安装后使用：
 
 ```bash
-node scripts/install.js --suite core --to all
+node <SKILL_ROOT>/scripts/aql.js --help
+node <SKILL_ROOT>/scripts/conformance.js --self-test
 ```
 
-`--to` 可选 `agents`（Codex）、`cursor`、`claude`、`both`、`all`；`--suite full` 额外安装 `skill-factory`；`--suite routes` 从 `dist/route-shims/` 安装四个显式路由并带上兼容的 `agent-quality-loop` 父包（不属于 core/full；**卸载需手动删除**各宿主目录下的对应文件夹）。项目级安装（规则 + AGENTS.md + 知识模板）见 [README 安装节](../README.md#install)。
+没有 `npx aql` 命令。
 
-可选本地信封缓存写入（需 `local_write` 及以上）：
+## 画像和能力记录
+
+Profile v2 是可选功能，默认采用 `explicit_only`：你重复做出同样的选择，不会被自动记录。只有明确要求“记住”时才会保存；意思不清楚或涉及敏感内容时，需要你确认。当前任务的要求始终优先，Fresh Mode 会在这一轮忽略已保存的偏好。
+
+即使画像或 CLI 不可用，AQL 的主要流程仍能正常工作，也不会假装读到了画像。Capability Receipt 只记录宿主、配置或实际探测得到的结果；没有检查的项目记为 `not_run`。它不能证明任务已经完成，也不能给 Agent 增加权限。
+
+画像可以通过 export/import 手动迁移，但不会在设备之间自动同步。历史 v1 A/B/C 对照结果为 `INVALID`，3.0 产品筛查和长期价值目前仍是 `NOT_RUN`。
+
+## 可选本地 Profile CLI
+
+CLI 是可选工具。帮助命令只读，即使没有画像或用户目录也能运行：
 
 ```bash
-node scripts/aql-envelope.js --workspace <项目目录> --input envelope.json
+node <SKILL_ROOT>/scripts/aql.js --help
+node <SKILL_ROOT>/scripts/aql.js profile remember --help
 ```
 
-已安装技能则用该技能包内的同名脚本（通过 `SKILL_ROOT`，不要相对项目 cwd）。`.agent-quality-loop/` 是否进 `.gitignore` 由你决定。
+在运行 `profile project` 前，先创建 `projection-context.json`。下面的最小示例与随后保存的 `concise` 偏好对应；实际使用时请把 `as_of` 换成任务当天的日期：
 
-## 日常怎么用
-
-自然语言即可，说清楚要什么、不要什么：
-
-```text
-修复本地超时，不部署。
-只诊断根因，不改文件。
-修复并做独立正式验收，不发布。
-继续上个任务。
-直接给我一版有来源边界的可用成稿，不要教学。
-这次我想练开头，请明确用 coach 姿态。
+```json
+{
+  "as_of": "2026-08-18",
+  "scopes": [{ "level": "global" }],
+  "semantic": {
+    "concise": {
+      "applies_when_matches": true,
+      "suppress_when_matches": false,
+      "material_effect": true,
+      "reason": "The current result needs the saved concise presentation default.",
+      "effect": "Use concise result presentation in Guided choices."
+    }
+  }
+}
 ```
 
-你会看到的习惯：动手前的**三行对齐**（目标 / 边界 / 最可能的误解）；目标会先对照你项目的真实现状核验（你点名的文件、行为会先被只读查证，说错了前提会在动手前被指出来）；回复开头只有一份由父 AQL 统一编排的**自适应结果摘要**。
+下面是一套完整操作：明确保存、启用、查看、使用和删除偏好。它不会从重复行为中自行学习：
 
-```text
-本地修改和自检已通过；3 条相关命令均以退出码 0 完成，未发布。
+```bash
+node <SKILL_ROOT>/scripts/aql.js profile init --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile remember --profile ./profile.json --id concise --key result.concise --kind communication --value-text concise --applies-when "the task needs a result" --reference "task:instruction"
+node <SKILL_ROOT>/scripts/aql.js profile enable --profile ./profile.json --expected-revision 1
+node <SKILL_ROOT>/scripts/aql.js profile show --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile project --profile ./profile.json --context ./projection-context.json
+node <SKILL_ROOT>/scripts/aql.js profile export --profile ./profile.json --out ./profile-export.json
+node <SKILL_ROOT>/scripts/aql.js profile import --profile ./profile.json --in ./profile-export.json --dry-run
+node <SKILL_ROOT>/scripts/aql.js receipt --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile forget --profile ./profile.json --id concise --expected-revision 2
 ```
 
-统一的是信息优先级，不是固定长模板：协作结论 → 已完成 → 未完成/原因 → 用户影响 → 是否需要用户行动 → 完成标准。日常成功压缩为 1–3 行；正式验收、失败、阻塞、待补证据、交接/恢复和发布才展开阶段、裁决、构建身份与证据边界。`实现与自检通过` 和 `独立质量验收通过` 是两回事；后者也不等于 `发布准备检查通过` 或 `已发布`。adapter 只返回 receipt，不再并行输出状态条。
-
-## 它会越用越合你
-
-反复出现的说法（比如你说"验收"就是指只读独立评审）和稳定偏好会按 [个性化协议](../.cursor/skills/agent-quality-loop/references/personalization.md) 沉淀进同一协作画像：一行披露、可随时查看/覆盖/删除、**永远不能作为权限或验收来源**——"以后都直接推送"会被拒绝记录。写作偏好必须有情境边界；协作姿态和 Growth Focus 必须显式确认，首次候选**不会当轮生效**。它不建立隐藏评分、推荐算法、embedding 画像或第二事件仓。
-
-当前作品质量与用户长期成长分开报告。一篇好稿可以到 `BUILT`/`ACCEPTED`，但不能证明用户能力已经增长；没有连续真实任务时，长期结论必须是 `NOT_RUN`。
-
-信封里的 `injected_refs` / 统计脚本给出的是**可观察、可证伪的关联**，不是因果证明；字段缺失表示「未测量」，不等于「什么都没注入」。统计只对合法、有序（`snapshot.sequence`）快照做合格关联；曝光来自同一 contract 全时间线并集；当前 phase 取最大 sequence，不是历史上最高 phase。只读任务可能没有本地信封缓存，统计仍应报告覆盖情况。外部写入：信封里的 release plan **不等于**当次工具授权；精确匹配后仍由宿主原生确认（`ask`），AQL hook 不会自动 `allow`。
-
-## 别轻信，去验证
-
-本包的行为声明是可复现的：[probes/PROBES.md](../probes/PROBES.md) 是盲测协议，[MATRIX.md](../MATRIX.md) 是各档模型的实测结果（包含失败行）。用 `node probes/make-fixtures.js` 生成夹具，在你自己的模型上跑一遍，欢迎把结果行提交回来。
-
-更多细节：[docs/guide.md](guide.md)（英文完整指南）· [README](../README.md)。
-
-维护者改包后本地验证：`node scripts/validate-all.js`（CI 同款入口）。
+需要确认的条目先用 `propose`，再用 `confirm --confirmation-ref ...` 确认。[投影 context 完整说明](../.cursor/skills/agent-quality-loop/references/profile-projection.md#cli-projection-context)解释了 `projection-context.json` 的全部输入规则。这个文件只描述当前任务，不是长期用户数据。Capability Receipt 的状态只有 `observed_true`、`observed_false` 和 `not_run`，并会写明观察来源。Profile 只会影响可调整的默认选择，不会改变任务约束、证据要求、权限、验收或发布边界。

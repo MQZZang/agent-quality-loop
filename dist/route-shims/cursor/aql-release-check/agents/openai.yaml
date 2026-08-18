@@ -1,6 +1,0 @@
-interface:
-  display_name: "AQL Release Check"
-  short_description: "Release readiness check without performing release"
-  default_prompt: "Use $aql-release-check to assess release readiness read-only and report blockers without performing a release act."
-policy:
-  allow_implicit_invocation: false

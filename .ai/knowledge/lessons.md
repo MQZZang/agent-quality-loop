@@ -16,21 +16,21 @@ Verified, reusable experience from past agent sessions on this project. Not a ch
    - **Decay / archive (RETRO)** — every entry carries `last_fired` (`YYYY-MM-DD` or `never`) and may use `status: archived`. During RETRO, set `status: archived` when a lesson has not matched for **90 consecutive days** or has never matched inside the most recent **10** ALIGN injection windows. `archived` entries stay in this file for manual revival but do **not** participate in ALIGN injection or ACCEPT recidivism checks. Reviving means setting `status: active` and updating `last_fired` when it next matches. On a successful ALIGN inject of an `active` lesson, patch `last_fired` to today's date.
 6. **Status and scope on every entry** — each lesson carries `status` (`active` | `merged` | `promoted` | `expired` | `archived`), `scope` (`project` | `global`), and `last_fired` (`YYYY-MM-DD` | `never`). New writes to this file default to `scope: project`, `status: active`, and `last_fired: never`.
 7. **Active cap** — prefer ≤ **30** `active` entries. When over the cap, **merge** near-duplicates, **expire** stale ones, or **archive** by the decay rule before adding more; do not grow an unbounded list.
-8. **Promotion on recurrence** — if the same lesson recurs ≥ **2** times (same trigger/root cause), promote via **skill-factory** into a rule/skill (or other durable mechanism) change; mark the lesson `promoted` and link the resulting artifact.
+8. **Promotion on recurrence** — if the same lesson recurs >= **2** times (same trigger/root cause), absorb it into the narrowest durable AQL rule, reference, validator, or accepted residual-risk decision; mark the lesson `promoted` and link the resulting artifact.
 9. **Harvest triggers** — RETRO and Self-QA may produce candidates (or direct writes when policy §5 allows). Global candidates follow the same template and cite this format; no migration tooling in this change.
 10. **Evidence to read is required** — every entry must name a concrete retrieval surface (file, command, or output) to check first when the trigger reappears; vague “be careful” text does not satisfy the field.
 11. **Applies-when match before inject** — Before ALIGN injects an `active` lesson, compare that entry's `Applies when` to the current task. On mismatch: skip inject this round; in RETRO emit one sentence marking it `retire_candidate`. Skip `archived` (and non-`active`) entries entirely. The only allowed date field for decay is `last_fired`; do not add hit counters or other date ledgers (runtime writeback goes stale).
 12. **Field-level patch only** — Merge, expire, archive, and revise by patching named fields on the affected entry. Never rewrite this file wholesale (a full-file rewrite silently erases other entries).
 13. **`promoted` needs an observable diff** — Mark `promoted` only when a rule, skill, or script already shows an observable diff that absorbs the lesson; otherwise keep `status: active`.
 
-## Feedback Loop (from ask-plan-code-qa QA / RETRO)
+## Feedback Loop (from AQL Self-QA / RETRO)
 
 After verified implementation work (or RETRO), if a lesson is reusable:
 
 1. Classify **scope** (`project` vs `global`) and check **authority**.
 2. If **project** and authority ≥ `local_write`: write (or update) the entry with the template below, keep newest `active` entries near the top of **Lessons**, disclose the diff, and note revocability.
 3. If **global** or **read-only**: put a full candidate (template fields) in QA **Next Step** / RETRO output for confirmation; do not treat “propose first” as the only path when §5 allows a direct write.
-4. On recurrence ≥ 2, open a skill-factory promotion path instead of only appending another near-duplicate.
+4. On recurrence >= 2, open a durable AQL promotion path instead of only appending another near-duplicate.
 
 ## Entry Template
 
@@ -57,6 +57,54 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 ## Lessons
 
 <!-- Add entries below. Keep newest active entries near the top of the Lessons section. -->
+
+### 2026-08-18 — Logical deletion must cover every managed artifact producer
+
+**Trigger:** Adding a backup, cache, receipt, migration copy, quarantine, or temporary artifact that can contain user-controlled persistent data
+**Root cause:** The 2.8 migration path copied the legacy source beside the input, but `forget` only searched Profile-adjacent automatic backups and caches. Both paths were locally correct in isolation, yet there was no mechanical ownership link from the producer to the deletion boundary, so the CLI reported success while an AQL-created copy retained the forgotten body.
+**Rule:** At artifact creation, record closed ownership, exact inventory/digest, and every affected opaque entry id in a location discoverable from the owning Profile without embedding machine paths in the portable Profile. Derive parsed state and backup from one captured byte source. Scoped forget and forget-all must exercise every producer-to-cleaner edge, select complete-clear ids inside the lock, preserve unowned lookalikes, and preflight ownership/type/link/inventory/hash before commit. Commit failure leaves cleanup targets intact; cleanup failure restores the Profile.
+**Evidence:** `.cursor/skills/agent-quality-loop/scripts/profile-v2.js` now creates Profile-local hash-bound migration records and ownership-checks automatic backups/receipts; the 93-check `profile-v2.test.js` covers legacy and v2 scoped forget, multi-record/all cleanup, concurrent complete-clear, unowned lookalikes, commit/cleanup failure, byte binding, drift, path exchange, and Windows casing after `/root/final_acceptor_v3` demonstrated the retained migration body.
+**Evidence to read:** `node .cursor/skills/agent-quality-loop/scripts/profile-v2.test.js`; inspect `createMigrationBackupRecord`, `cleanMigrationBackups`, and the migrate-then-forget fixtures
+**Scope:** project
+**Status:** promoted
+**Last fired:** 2026-08-18
+**Applies when:** Editing any AQL path that creates or deletes an artifact containing Profile entry bodies, preference text, pending state, or other user-controlled persistent data
+
+### 2026-08-18 — Transaction rollback ends at commit, not at result rendering
+
+**Trigger:** One CLI command mutates two related state carriers and then emits a receipt or user-visible result
+**Root cause:** Migration created project identity, committed a project-scoped Profile entry, and printed the result inside one catch block. A stdout failure was misclassified as a mutation failure, so rollback deleted the identity after the Profile commit had made it required.
+**Rule:** Name the commit point explicitly. Roll back prerequisite state only when the primary mutation fails before commit; after commit, reporting/output failures propagate without undoing state required by the committed artifact. Conversely, stage deletion cleanup after the primary commit and restore the primary state if required cleanup fails.
+**Evidence:** `.cursor/skills/agent-quality-loop/scripts/aql.js` now separates `applyMigration` failure handling from `print`; `.cursor/skills/agent-quality-loop/scripts/profile-v2.js` runs forget cleanup after commit with rollback; `profile-v2.test.js` injects stdout, commit, and cleanup failures.
+**Evidence to read:** `node .cursor/skills/agent-quality-loop/scripts/profile-v2.test.js`; inspect the migration `try/catch` in `aql.js` and `mutateProfile` `afterWrite` rollback
+**Scope:** project
+**Status:** promoted
+**Last fired:** 2026-08-18
+**Applies when:** Editing a command that couples Profile, project identity, installer receipt, owned backup, cleanup, or output across one claimed transaction
+
+### 2026-08-18 — Optional state needs zero-payload and failed-commit counterexamples
+
+**Trigger:** Adding or changing a command that creates optional persistent state as part of a larger mutation
+**Root cause:** The migration flow created `.aql/project.json` before proving that the input contained a migratable project-scoped preference. Positive lifecycle tests passed while empty, global-only, incomplete, and failed-import paths could leave state that the user never asked to persist.
+**Rule:** Gate optional state creation on the validated payload that requires it. Add counterexamples for empty input, irrelevant input, invalid/incomplete input, and a downstream commit failure; each must assert that newly created identity, backup, and temporary state are absent or rolled back. Preserve pre-existing state and distinguish it from state created by the current process before rollback.
+**Evidence:** `.cursor/skills/agent-quality-loop/scripts/aql.js`; `.cursor/skills/agent-quality-loop/scripts/profile-v2.js`; the 93-check `profile-v2.test.js` suite covers empty/global/incomplete/project inputs, absent-target CAS, commit/output failure, and project path exchange after `/root/final_fresh_acceptor` demonstrated the empty-input defect.
+**Evidence to read:** `node .cursor/skills/agent-quality-loop/scripts/profile-v2.test.js`, especially the empty/global/incomplete/project/CAS migration checks
+**Scope:** project
+**Status:** promoted
+**Last fired:** 2026-08-18
+**Applies when:** Editing profile migration, project identity, installer ownership, or another workflow where an optional artifact is created before a larger mutation commits
+
+### 2026-08-18 — Machine-bind duplicated contract enums to their validator constants
+
+**Trigger:** A normative Markdown contract and executable validator both enumerate the same allowed kinds, lanes, phases, or statuses
+**Root cause:** Profile v2 still used `injected_refs.kind=profile`, but the updated Task Contract example omitted `profile` while the validator accepted it. Manual review and broad tests checked each surface independently, so the cross-surface contradiction survived until independent acceptance.
+**Rule:** When a normative enum is duplicated in prose and code, add a validator that parses the documented declaration and compares it to the exported runtime constants. Apply the comparison to adjacent enums in the same contract so the repair covers the inconsistency class, not only the reported row.
+**Evidence:** `.cursor/skills/agent-quality-loop/scripts/validate-skill.js` now binds documented injected-ref kinds, harvest kinds, and harvest lanes to `validate-envelope.js`; envelope self-tests reject non-lesson harvest lanes.
+**Evidence to read:** `node .cursor/skills/agent-quality-loop/scripts/validate-skill.js`; inspect `requireMatchingDocumentedEnum` and `INJECTED_REF_KINDS`/`HARVEST_*`
+**Scope:** project
+**Status:** promoted
+**Last fired:** 2026-08-18
+**Applies when:** Editing a contract/reference and a validator that independently describe the same closed vocabulary
 
 ### 2026-08-12 — Copy-paste instructions are release-grade: verify external CLI flags or mark them unverified
 
@@ -103,7 +151,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `git log -1 --format=%H` against the commit named in the report, then a fresh `sha256sum` of each shipped `manifest.json` against the report's value
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-15
+**Last fired:** 2026-08-18
 **Applies when:** Writing or trusting acceptance, release-readiness, or install-parity claims for artifacts that get regenerated, committed, or installed after verification
 
 ### 2026-08-11 — A repository's publishable surface is larger than its working tree
@@ -127,7 +175,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `git ls-files | ForEach-Object { ($_ -split '/')[0] } | Sort-Object -Unique`, diffed against the `## Repository layout` table in `README.md` — every tracked top-level path must appear there or be excluded on purpose
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-11
+**Last fired:** 2026-08-18
 **Applies when:** Correcting any document that enumerates files, directories, fields, options, or steps — especially when the correction request named exactly one wrong item
 
 ### 2026-08-11 — Deterministic hooks cannot enforce a semantic gate; that branch is closed
@@ -163,7 +211,7 @@ After verified implementation work (or RETRO), if a lesson is reusable:
 **Evidence to read:** `Get-ChildItem "$env:USERPROFILE\.codex\skills" -Force | ForEach-Object { $_.Name, $_.LinkType }` — every entry from this repo must show a blank `LinkType`, and no `_backup*` entry may exist; then the same listing for `~/.cursor/skills`, where each must be a `Junction` onto `.cursor/skills`
 **Scope:** project
 **Status:** active
-**Last fired:** 2026-08-11
+**Last fired:** 2026-08-18
 **Applies when:** Installing, refreshing, or backing up this repo's skills into user-level Cursor/Codex on Windows, or diagnosing “the agent is not seeing my skill edits”
 
 ### 2026-08-10 — Forward-test skill changes across the executor model matrix

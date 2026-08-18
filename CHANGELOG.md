@@ -1,8 +1,17 @@
 # Changelog
 
-Versions are the `manifest.json` / frontmatter `metadata.version` value shared by all four packaged skills. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
+Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
-## Unreleased
+## 3.0.0 — Unreleased
+
+- Rebuilt the public README around the user journey: product status, trust architecture, lifecycle boundaries, safe installation, optional Profile/Receipt controls, evidence limits, release semantics, and a complete repository map.
+- Collapsed the product distribution to the single `agent-quality-loop` Skill. Removed standalone adapter packages and physical route shims; the Task Contract remains the sole task truth.
+- Added Profile v2 as an optional `explicit_only` control plane with current-turn override, Fresh Mode, bounded Guided projection, explicit export/import, and no implicit repeated-behavior retention.
+- Added the optional packaged `aql.js` CLI and mechanical Capability Receipt contract. AQL Core degrades normally when profile storage, CLI execution, or user-directory access is unavailable.
+- Added receipt-owned snapshot lifecycle commands: install, status, update, and uninstall refuse unowned or drifted targets and preserve profile data.
+- Expanded validation and exact-tag release gates to Ubuntu, Windows, and macOS; platform results remain evidence only after those jobs run on the exact tag.
+- Hardened release input handling: tag values reach shell only through environment variables, must name an exact tag ref, and must equal the packaged version before attestation or release creation.
+- Historical Profile Projection v1 evidence remains historical. Its old A/B/C control is `INVALID`; AQL 3.0 product screening and longitudinal value remain `NOT_RUN`.
 
 
 ## 2.8.0 — 2026-08-15

@@ -82,7 +82,7 @@
       "freshness": "2023 research; local source checked 2026-08-13",
       "copyright_status": "license-unknown; paraphrase-only",
       "decision": "accepted",
-      "integration_target": "references/personalization.md#application-order"
+      "integration_target": "references/profile-projection.md#selection"
     },
     {
       "claim_id": "C-005",
@@ -182,7 +182,7 @@
       "freshness": "2022 research; local source checked 2026-08-13",
       "copyright_status": "license-unknown; paraphrase-only",
       "decision": "accepted",
-      "integration_target": "references/personalization.md#never-learn-authority-firewall"
+      "integration_target": "references/profile-projection.md#availability-and-boundaries"
     },
     {
       "claim_id": "C-010",
@@ -202,7 +202,7 @@
       "freshness": "2023 research; local source checked 2026-08-13",
       "copyright_status": "license-unknown; paraphrase-only",
       "decision": "rejected",
-      "integration_target": "references/personalization.md#growth-focus"
+      "integration_target": "references/personalization.md#persistent-writes"
     },
     {
       "claim_id": "C-011",
@@ -222,7 +222,7 @@
       "freshness": "2026 survey; local source checked 2026-08-13",
       "copyright_status": "license-unknown; paraphrase-only",
       "decision": "accepted",
-      "integration_target": "SKILL.md#adapter-router"
+      "integration_target": "SKILL.md#workflow-operating-procedure"
     },
     {
       "claim_id": "C-012",
@@ -262,7 +262,7 @@
       "freshness": "2024 survey; local source checked 2026-08-13",
       "copyright_status": "license-unknown; paraphrase-only",
       "decision": "accepted",
-      "integration_target": "SKILL.md#4-accept--run-an-independent-goal-achievement-review"
+      "integration_target": "references/acceptance-review.md#conjunctive-review"
     },
     {
       "claim_id": "C-014",

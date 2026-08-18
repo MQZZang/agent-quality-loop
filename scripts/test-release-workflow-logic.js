@@ -8,6 +8,8 @@
  */
 
 const assert = require("assert");
+const { validateReleaseTag } = require("./release-version");
+const { buildAttestation } = require("./gen-release-attestation");
 
 /**
  * Mirror of the release job's refuse conditions.
@@ -17,18 +19,19 @@ const assert = require("assert");
  *   tagSha: string,
  *   ubuntuSha: string,
  *   windowsSha: string,
+ *   macosSha: string,
  *   githubSha: string,
  * }} input
  * @returns {{ ok: boolean, reason?: string }}
  */
 function evaluateShaAlignment(input) {
-  const { eventName, checkoutSha, tagSha, ubuntuSha, windowsSha, githubSha } = input;
+  const { eventName, checkoutSha, tagSha, ubuntuSha, windowsSha, macosSha, githubSha } = input;
 
-  if (!ubuntuSha || !windowsSha) {
+  if (!ubuntuSha || !windowsSha || !macosSha) {
     return { ok: false, reason: "Missing platform validation markers" };
   }
-  if (ubuntuSha !== windowsSha) {
-    return { ok: false, reason: "Ubuntu and Windows validated SHAs differ; refusing release" };
+  if (ubuntuSha !== windowsSha || ubuntuSha !== macosSha) {
+    return { ok: false, reason: "Ubuntu, Windows, and macOS validated SHAs differ; refusing release" };
   }
   if (checkoutSha !== tagSha || checkoutSha !== ubuntuSha) {
     return { ok: false, reason: "Tag / checkout / validated SHA mismatch; refusing release" };
@@ -50,6 +53,42 @@ function runSelfTest() {
     if (!pass) failed += 1;
   }
 
+  function checkTag(label, tag, expectedOk) {
+    let actual;
+    try {
+      actual = validateReleaseTag(tag);
+    } catch (error) {
+      actual = { ok: false, reason: error.message };
+    }
+    check(label, actual, expectedOk);
+  }
+
+  checkTag("packaged version tag accepts", "v3.0.0", true);
+  checkTag("mismatched package version refuses", "v3.0.1", false);
+  checkTag("shell substitution tag refuses", "v3.0.0$(id)", false);
+  checkTag("newline tag refuses", "v3.0.0\nextra", false);
+  checkTag("whitespace-padded tag refuses", " v3.0.0 ", false);
+
+  try {
+    const attestation = buildAttestation({
+      tag: "v3.0.0",
+      commit: shaA,
+      ubuntu: "PASS",
+      windows: "PASS",
+      macos: "PASS",
+    });
+    assert.strictEqual(attestation.package_version, "3.0.0");
+    assert.strictEqual(attestation.tag, "v3.0.0");
+    assert.throws(
+      () => buildAttestation({ tag: "v3.0.1", commit: shaA, ubuntu: "PASS", windows: "PASS", macos: "PASS" }),
+      /packaged version v3\.0\.0/,
+    );
+    console.log("PASS attestation binds exact package version tag");
+  } catch (error) {
+    console.log(`FAIL attestation binds exact package version tag (${error.message})`);
+    failed += 1;
+  }
+
   check(
     "aligned tag-push accepts",
     evaluateShaAlignment({
@@ -58,6 +97,7 @@ function runSelfTest() {
       tagSha: shaA,
       ubuntuSha: shaA,
       windowsSha: shaA,
+      macosSha: shaA,
       githubSha: shaA,
     }),
     true,
@@ -71,19 +111,21 @@ function runSelfTest() {
       tagSha: shaA,
       ubuntuSha: shaA,
       windowsSha: shaA,
+      macosSha: shaA,
       githubSha: shaB,
     }),
     true,
   );
 
   check(
-    "ubuntu/windows mismatch refuses",
+    "platform mismatch refuses",
     evaluateShaAlignment({
       eventName: "push",
       checkoutSha: shaA,
       tagSha: shaA,
       ubuntuSha: shaA,
       windowsSha: shaB,
+      macosSha: shaA,
       githubSha: shaA,
     }),
     false,
@@ -97,6 +139,7 @@ function runSelfTest() {
       tagSha: shaB,
       ubuntuSha: shaA,
       windowsSha: shaA,
+      macosSha: shaA,
       githubSha: shaA,
     }),
     false,
@@ -110,6 +153,7 @@ function runSelfTest() {
       tagSha: shaA,
       ubuntuSha: shaA,
       windowsSha: shaA,
+      macosSha: shaA,
       githubSha: shaB,
     }),
     false,
@@ -123,12 +167,14 @@ function runSelfTest() {
       tagSha: shaA,
       ubuntuSha: "",
       windowsSha: shaA,
+      macosSha: shaA,
       githubSha: shaA,
     }),
     false,
   );
 
   assert.strictEqual(typeof evaluateShaAlignment, "function");
+  assert.strictEqual(typeof validateReleaseTag, "function");
   return failed === 0 ? 0 : 1;
 }
 

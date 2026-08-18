@@ -1,6 +1,6 @@
 # Code Implementation Adapter
 
-Read this reference only for code implementation. It is the self-contained embedded contract for `agent-quality-loop`; an installed `ask-plan-code-qa` may implement the same contract in embedded profile.
+Read this reference only for code implementation. It is the self-contained implementation contract for `agent-quality-loop`.
 
 ## Input
 
@@ -60,7 +60,7 @@ Return exactly one receipt to the parent lifecycle:
 
 ```yaml
 implementation_receipt:
-  adapter: code-implementation-adapter/v1 or ask-plan-code-qa/embedded
+  adapter: code-implementation-adapter/v2
   input_contract_ref: contract id plus workspace baseline
   changed_artifacts: exact paths
   verification_performed: exact commands/checks and results

@@ -50,16 +50,7 @@ injected_refs: optional source records for lessons, profile entries, presets, do
 
 Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
 
-When an opted-in user collaboration profile contributes any `injected_refs`, record the current-session consent inside the existing `assumptions` collection; no new persistent field is created:
-
-```yaml
-- kind: user_profile_opt_in
-  enabled: true
-  scope: current_session
-  source_ref: current-turn:user-profile-opt-in
-```
-
-The source ref must be a safe non-secret task/evidence ref. A home-profile path, caller boolean, or file existence alone is not the assumption record.
+When a Profile v2 entry materially contributes, record its opaque entry id in `injected_refs`. This records use, not a second contract, profile copy, or authority grant. Do not record raw profile content, user-directory paths, or capability receipts in the Task Contract.
 
 `target_user_or_system` means the **final consumer of the artifact plus the consumption medium** (e.g. end user in the shipped UI, reader of the published doc, player in the build)—not merely the requester or implementer. For experiential work (narrative, design, UI, games, docs), write `success_observables` and `counterexamples` in that consumer's perceptible terms.
 
@@ -299,7 +290,7 @@ workspace_ref: branch/commit/tree hash or equivalent, plus dirty-state note
 artifact_refs: changed or reviewed artifacts with hashes when material
 evidence_refs: compact source/command/result references
 injected_refs: optional measured source records actually applied to this contract
-harvest_candidates: optional RETRO candidates; never active profile state
+harvest_candidates: optional RETRO lesson candidates; never profile state
 implementation_receipt: null before execution; otherwise the structured adapter receipt below
 acceptance_gate: preserved structured acceptance gate below
 release_gate: null before release preflight; otherwise separate structured release gate below
@@ -324,22 +315,22 @@ injected_refs:
     reason: one-line explanation of why the source applied and what it affected
 ```
 
-The validator preserves these budgets: 8 total, 5 learned, 3 lessons, 2 profile entries, and 3 structural refs. `lesson` and `profile` are `learned`; the other kinds are `structural`. Field absence means whether injection was measured is unknown. A present empty array means injection was measured and nothing was injected.
+The validator preserves these source budgets: 8 total, 5 learned, 3 lessons, 2 profile entries, and 3 structural refs. `lesson` and `profile` are learned; presets, domain profiles, probes, and routes are structural. Field absence means whether injection was measured is unknown. A present empty array means injection was measured and nothing was injected.
 
-`harvest_candidates` documents the existing RETRO carrier without creating a second feedback system:
+`harvest_candidates` documents lesson RETRO without creating a second feedback system:
 
 ```yaml
 harvest_candidates:
   - kind: user_correction | path_change | scope_deviation | contradiction | thrash_unlock | rejected_option
-    lane: lesson | profile | rejected_option
+    lane: lesson
     summary: one-line candidate statement
-    source_ref: current task/evidence reference, plus the original profile entry id when applicable
+    source_ref: current task/evidence reference
     status: candidate
 ```
 
-The total maximum is 3 and at most 2 may target profile/rejected-option lanes. Field absence means harvest was not measured or not represented; a present empty array means RETRO measured no candidates. A candidate is not active state, authority, evidence, or proof of improvement.
+The total maximum is 3. Field absence means harvest was not measured or not represented; a present empty array means RETRO measured no candidates. A candidate is not active state, authority, evidence, or proof of improvement. Profile writes are governed solely by the explicit user request/confirmation rule in `personalization.md`.
 
-Do not add `profile_projection`, `user_lens`, `profile_mode`, `collaboration_brief`, profile scores, or ranking probabilities to the envelope. Profile Projection v1 is a task-local compile step whose applied sources are already traceable through `injected_refs`.
+Do not add `profile_projection`, `user_lens`, `profile_mode`, `collaboration_brief`, profile scores, or ranking probabilities to the envelope. Profile Projection v2 is a task-local compile step whose applied sources are already traceable through `injected_refs`.
 
 Allowed stop-reason values are `evidence_only_complete`, `user_cancelled`, `scope_changed`, `authority_revoked`, `ambiguity`, `evidence_gap`, `authority_gap`, `unsafe_workspace`, `acceptance_pending`, `acceptance_failed`, and `production_verified`. A user-requested pause normally uses `verdict: PENDING`; use `BLOCKED` only when a required decision or authorized next action is unavailable.
 
@@ -462,7 +453,7 @@ Apply these semantic rules:
 
 Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean published package may show `AQL 2.8.0`. A dirty/unreleased artifact must say, for example, `local unreleased build (based on AQL 2.8.0; HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.0.0`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.0.0 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 

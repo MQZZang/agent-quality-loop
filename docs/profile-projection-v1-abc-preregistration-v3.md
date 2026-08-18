@@ -1,5 +1,7 @@
 # Profile Projection v1 A/B/C v3 Preregistration
 
+> **Historical AQL 2.8 protocol.** This frozen, unrun comparison covers Profile Projection v1; it is not the Profile v2 mechanism in the AQL 3.0 source candidate. Use the current [Profile v2 contract](../.cursor/skills/agent-quality-loop/references/profile-projection.md) for implementation and the [AQL 3.0 product screening](aql-3.0-product-screening-preregistration.md) for current product claims. Nothing in this document is AQL 3.0 outcome evidence.
+
 Status: `PRE-REGISTERED` / `NOT_RUN`. This protocol is frozen before execution. The mechanism digest below was re-frozen after the v2.8.0 sealing edits and before any v3 outcome or audit run; the earlier `9efdd42` digest remains only in its historical closure. This protocol does not modify, replace, or upgrade the invalid version-2 A/B/C comparison or its evidence.
 
 Executable frozen inputs:

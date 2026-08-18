@@ -12,8 +12,9 @@ const REPO_ROOT = path.resolve(__dirname, "..");
 const COMMANDS = [
   ["scripts/gen-manifest.js", "--self-test"],
   ["scripts/install.js", "--self-test"],
-  ["scripts/gen-route-shims.js", "--check"],
-  ["scripts/test-route-shims.js"],
+  [".cursor/skills/agent-quality-loop/scripts/profile-v2.test.js"],
+  [".cursor/skills/agent-quality-loop/scripts/validate-profile-projection.js", "--self-test"],
+  [".cursor/skills/agent-quality-loop/scripts/conformance.js", "--self-test"],
   [".cursor/skills/agent-quality-loop/scripts/validate-skill.js"],
   ["scripts/validate-workflow.js"],
   ["scripts/validate-claims.js"],

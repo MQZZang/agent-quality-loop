@@ -11,11 +11,9 @@
  */
 
 const fs = require("fs");
-const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { checkManifestConsistency, listPackageSkillDirs, MANIFEST_VERSION } = require("./gen-manifest");
-const { routePackageNames, ROUTE_PARENT, ROUTE_SHIMS_DIST } = require("./package-catalog");
 
 const STATUS = {
   PASS: "PASS",
@@ -24,7 +22,7 @@ const STATUS = {
   NOT_APPLICABLE: "NOT_APPLICABLE",
 };
 
-const CORE_HINT = ["agent-quality-loop", "ask-plan-code-qa", "review-gate", "skill-factory"];
+const CORE_HINT = ["agent-quality-loop"];
 
 function finding(id, status, message, detail = null) {
   const item = { id, status, message };
@@ -115,57 +113,6 @@ function checkCorePackageVersions(workspaceRoot) {
   } else {
     findings.push(
       finding("core_versions", STATUS.PASS, `core/package versions observed: ${unique[0]}`, { versions }),
-    );
-  }
-  return findings;
-}
-
-function checkRouteParentDependencies(workspaceRoot) {
-  const distRoot = path.join(workspaceRoot, ROUTE_SHIMS_DIST);
-  if (!fs.existsSync(distRoot)) {
-    return [
-      finding(
-        "route_depends_on",
-        STATUS.NOT_APPLICABLE,
-        `${ROUTE_SHIMS_DIST} not present (consumer install or routes not generated)`,
-      ),
-    ];
-  }
-
-  const findings = [];
-  let checked = 0;
-  for (const host of ["cursor", "agents", "plugins"]) {
-    const hostRoot = path.join(distRoot, host);
-    if (!fs.existsSync(hostRoot)) continue;
-    for (const name of fs.readdirSync(hostRoot)) {
-      const manifestPath = path.join(hostRoot, name, "manifest.json");
-      if (!fs.existsSync(manifestPath)) continue;
-      checked += 1;
-      const parsed = readJsonSafe(manifestPath);
-      if (!parsed.ok) {
-        findings.push(finding("route_depends_on", STATUS.FAIL, `${host}/${name}: ${parsed.error}`));
-        continue;
-      }
-      const deps = parsed.value.depends_on;
-      if (!Array.isArray(deps) || !deps.includes(ROUTE_PARENT)) {
-        findings.push(
-          finding(
-            "route_depends_on",
-            STATUS.FAIL,
-            `${host}/${name}: depends_on must include ${ROUTE_PARENT}`,
-            { depends_on: deps || null },
-          ),
-        );
-      }
-    }
-  }
-
-  if (checked === 0) {
-    return [finding("route_depends_on", STATUS.WARN, "dist/route-shims present but no route manifests found")];
-  }
-  if (findings.length === 0) {
-    findings.push(
-      finding("route_depends_on", STATUS.PASS, `route manifests declare depends_on ${ROUTE_PARENT} (${checked} checked)`),
     );
   }
   return findings;
@@ -279,56 +226,46 @@ function checkMcpPolicyCoverage(workspaceRoot) {
   ];
 }
 
-function checkUserProfileOptIn() {
-  const homeKnowledge = path.join(os.homedir(), ".ai", "knowledge");
-  if (fs.existsSync(homeKnowledge)) {
-    return [
-      finding(
-        "user_profile_opt_in",
-        STATUS.WARN,
-        "~/.ai/knowledge exists (user-level opt-in path present); doctor did not read or modify it",
-        { path: homeKnowledge },
-      ),
-    ];
+function checkProfileV2() {
+  const runtimePath = path.join(
+    packageRepoRoot(),
+    ".cursor",
+    "skills",
+    "agent-quality-loop",
+    "scripts",
+    "profile-v2.js",
+  );
+  if (!fs.existsSync(runtimePath)) {
+    return [finding("profile_v2", STATUS.FAIL, "Profile v2 validator is unavailable; AQL Core remains usable without profile application")];
   }
-  return [
-    finding(
-      "user_profile_opt_in",
-      STATUS.NOT_APPLICABLE,
-      "~/.ai/knowledge absent (installer never seeds user-level knowledge; opt-in only)",
-    ),
-  ];
-}
 
-function checkProjectProfileCarrier(workspaceRoot) {
-  const profilePath = path.join(workspaceRoot, ".ai", "knowledge", "collaboration-profile.md");
-  if (!fs.existsSync(profilePath)) {
-    return [finding("project_profile_carrier", STATUS.NOT_APPLICABLE, "project collaboration profile not present")];
-  }
-  const validators = [
-    path.join(workspaceRoot, ".cursor", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
-    path.join(workspaceRoot, "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
-    path.join(workspaceRoot, ".agents", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
-    path.join(packageRepoRoot(), ".cursor", "skills", "agent-quality-loop", "scripts", "validate-profile.js"),
-  ];
-  const validatorPath = validators.find((candidate) => fs.existsSync(candidate));
-  if (!validatorPath) {
-    return [finding("project_profile_carrier", STATUS.FAIL, "project profile exists but validate-profile.js was not found")];
-  }
+  let runtime;
   try {
-    const { readProfile } = require(validatorPath);
-    const result = readProfile(profilePath);
-    if (result.errors.length > 0) {
-      return [finding("project_profile_carrier", STATUS.FAIL, "project profile has invalid canonical entries", { errors: result.errors })];
-    }
-    const status = result.legacy.length > 0 ? STATUS.WARN : STATUS.PASS;
-    return [finding(
-      "project_profile_carrier",
-      status,
-      `project profile readable: ${result.projectable.length} active projectable, ${result.inactive.length} complete inactive, ${result.legacy.length} legacy/incomplete`,
-    )];
+    runtime = require(runtimePath);
   } catch (error) {
-    return [finding("project_profile_carrier", STATUS.FAIL, `cannot validate project profile: ${error.message}`)];
+    return [finding("profile_v2", STATUS.FAIL, `cannot load Profile v2 validator: ${error.message}; AQL Core remains usable`)];
+  }
+
+  const profilePath = runtime.defaultProfilePath();
+  const carrier = process.env.AQL_HOME ? "$AQL_HOME/profile.json" : "~/.aql/profile.json";
+  if (!fs.existsSync(profilePath)) {
+    return [finding("profile_v2", STATUS.NOT_APPLICABLE, `${carrier} is absent; no profile is applied and AQL Core remains usable`, { profile_access: "not_run" })];
+  }
+
+  try {
+    const profile = runtime.readProfile(profilePath);
+    return [finding("profile_v2", STATUS.PASS, `${carrier} is readable and schema-valid`, {
+      schema: profile.schema,
+      revision: profile.revision,
+      enabled: profile.enabled,
+      paused: profile.paused,
+      active: profile.entries.filter((entry) => entry.state === "active").length,
+      pending: profile.entries.filter((entry) => entry.state === "candidate").length,
+      archived: profile.archived_entries.length,
+      profile_access: "observed_true",
+    })];
+  } catch (error) {
+    return [finding("profile_v2", STATUS.FAIL, `${carrier} is unreadable or invalid: ${error.message}; AQL Core remains usable without profile application`, { profile_access: "observed_false" })];
   }
 }
 
@@ -467,12 +404,10 @@ function aggregateStatus(findings) {
 function runDoctor(workspaceRoot) {
   const findings = [
     ...checkCorePackageVersions(workspaceRoot),
-    ...checkRouteParentDependencies(workspaceRoot),
     ...checkManifestHelpers(workspaceRoot),
     ...checkHooksAndGates(workspaceRoot),
     ...checkMcpPolicyCoverage(workspaceRoot),
-    ...checkProjectProfileCarrier(workspaceRoot),
-    ...checkUserProfileOptIn(),
+    ...checkProfileV2(),
     ...checkEnvelopeChain(workspaceRoot),
   ];
 

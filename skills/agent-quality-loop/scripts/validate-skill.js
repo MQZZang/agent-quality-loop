@@ -8,13 +8,14 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "2.8.0";
+const MANIFEST_VERSION = "3.0.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
   "SKILL.md",
   "agents/openai.yaml",
   "references/code-implementation-adapter.md",
+  "references/acceptance-review.md",
   "references/contract-presets.md",
   "references/contracts.md",
   "references/domain-profiles.md",
@@ -25,13 +26,18 @@ const requiredFiles = [
   "references/profile-projection.md",
   "references/result-attention.md",
   "references/writing-collaboration-adapter.md",
-  "fixtures/profile-project/.ai/knowledge/collaboration-profile.md",
-  "fixtures/profile-user/.ai/knowledge/collaboration-profile.md",
-  "fixtures/profile-projection-v1.json",
+  "fixtures/profile-v2-empty.json",
+  "fixtures/capability-receipt-valid.json",
+  "schemas/profile-v2.schema.json",
+  "schemas/capability-receipt.schema.json",
   "manifest.json",
   "scripts/validate-envelope.js",
   "scripts/validate-profile.js",
   "scripts/validate-profile-projection.js",
+  "scripts/profile-v2.js",
+  "scripts/profile-v2.test.js",
+  "scripts/aql.js",
+  "scripts/conformance.js",
   "scripts/validate-skill.js",
   "scripts/aql-envelope.js",
   "scripts/aql-stats.js",
@@ -209,6 +215,18 @@ if (fs.existsSync(skillPath)) {
     }
   }
   if (skill.split(/\r?\n/).length > 500) errors.push("SKILL.md exceeds 500 lines");
+  for (const heading of [
+    "## Purpose",
+    "## When to Use",
+    "## When Not to Use",
+    "## Workflow (Operating Procedure)",
+    "## Output Contract",
+    "## Acceptance Criteria",
+    "## Failure Modes",
+    "## Evaluation Cases",
+  ]) {
+    if (!skill.includes(heading)) errors.push(`SKILL.md must include ${heading}`);
+  }
   if (!skill.includes("references/contracts.md#user-result-summary")) {
     errors.push("SKILL.md must link the parent-owned User Result Summary contract");
   }
@@ -229,12 +247,32 @@ function requireAll(relativePath, requiredTerms, forbiddenTerms = []) {
 requireAll("references/contracts.md", [
   "## User Result Summary",
   "1–3 lines",
-  "local unreleased build",
+  "local unreleased AQL 3.0.0 build",
   "## Result Detail Budget",
   "injected_refs:",
+  "kind: lesson | profile | preset | domain_profile | probe | route",
+  "`lesson` and `profile` are learned",
   "harvest_candidates:",
   "### Collaboration Brief / Dispatch Brief",
 ], ["## Trust Badge", "[AQL <version> |"]);
+
+const contractsReference = fs.readFileSync(path.join(root, "references", "contracts.md"), "utf8");
+const envelopeValidator = require("./validate-envelope");
+function requireMatchingDocumentedEnum(label, pattern, implementedValues) {
+  const match = contractsReference.match(pattern);
+  if (!match) {
+    errors.push(`references/contracts.md must declare the ${label} enum`);
+    return;
+  }
+  const documented = match[1].split("|").map((value) => value.trim()).sort();
+  const implemented = [...implementedValues].sort();
+  if (JSON.stringify(documented) !== JSON.stringify(implemented)) {
+    errors.push(`references/contracts.md ${label} differs from validate-envelope.js: documented=${documented.join(",")} implemented=${implemented.join(",")}`);
+  }
+}
+requireMatchingDocumentedEnum("injected_refs kinds", /injected_refs:\s*\r?\n\s*-\s+kind:\s+([^\r\n]+)/, envelopeValidator.INJECTED_REF_KINDS);
+requireMatchingDocumentedEnum("harvest_candidates kinds", /harvest_candidates:\s*\r?\n\s*-\s+kind:\s+([^\r\n]+)/, envelopeValidator.HARVEST_KINDS);
+requireMatchingDocumentedEnum("harvest_candidates lanes", /harvest_candidates:\s*\r?\n\s*-\s+kind:[^\r\n]+\r?\n\s+lane:\s+([^\r\n]+)/, envelopeValidator.HARVEST_LANES);
 
 requireAll("references/result-attention.md", [
   "# Result Attention Rendering",
@@ -247,13 +285,12 @@ requireAll("references/result-attention.md", [
 ]);
 
 requireAll("references/profile-projection.md", [
-  "# Profile Projection v1",
+  "# Profile Projection v2",
+  "## Availability And Boundaries",
   "## Fresh Mode",
-  "## Candidate Filter",
-  "## Selection Order",
-  "## Contract Effects",
-  "## Source Tracking",
-  "## Mechanical Validation Boundary",
+  "## Selection",
+  "## Capability Receipt",
+  "## Portability And Project Identity",
 ]);
 
 requireAll("references/writing-collaboration-adapter.md", [
@@ -274,14 +311,8 @@ requireAll("references/writing-collaboration-adapter.md", [
 ]);
 
 requireAll("references/evaluation-cases.md", [
-  "## 83.",
-  "## 84.",
-  "## 85.",
-  "## 86.",
-  "## 87.",
-  "## 88.",
-  "## 108.",
-  "## 109.",
+  "## 1.",
+  "## 16.",
 ]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");
@@ -376,7 +407,25 @@ const profileCheck = spawnSync(
   { cwd: root, encoding: "utf8" },
 );
 if (profileCheck.status !== 0) {
-  errors.push(`profile carrier self-test failed: ${(profileCheck.stderr || profileCheck.stdout).trim()}`);
+  errors.push(`Profile v2 binding self-test failed: ${(profileCheck.stderr || profileCheck.stdout).trim()}`);
+}
+
+const profileRuntimeCheck = spawnSync(
+  process.execPath,
+  [path.join(root, "scripts", "profile-v2.test.js")],
+  { cwd: root, encoding: "utf8" },
+);
+if (profileRuntimeCheck.status !== 0) {
+  errors.push(`Profile v2 runtime self-test failed: ${(profileRuntimeCheck.stderr || profileRuntimeCheck.stdout).trim()}`);
+}
+
+const conformanceCheck = spawnSync(
+  process.execPath,
+  [path.join(root, "scripts", "conformance.js"), "--self-test"],
+  { cwd: root, encoding: "utf8" },
+);
+if (conformanceCheck.status !== 0) {
+  errors.push(`conformance self-test failed: ${(conformanceCheck.stderr || conformanceCheck.stdout).trim()}`);
 }
 
 const writerCheck = spawnSync(process.execPath, [path.join(root, "scripts", "aql-envelope.js"), "--self-test"], {

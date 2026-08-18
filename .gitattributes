@@ -6,9 +6,6 @@
 *.mdc whitespace=-trailing-space
 /.gitattributes text eol=lf
 
-# Route shim generator emits LF; keep working-tree text LF even with core.autocrlf.
-dist/route-shims/** text eol=lf
-
 # Skill package text must stay LF so invalid-UTF-8 fallback cannot diverge
 # across Windows autocrlf vs Ubuntu LF checkouts (manifest sha256 blind spot).
 .cursor/skills/**/*.js text eol=lf

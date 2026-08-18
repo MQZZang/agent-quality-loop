@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
+const { packageVersion, validateReleaseTag } = require("./release-version");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const EVAL_CASES_PATH = path.join(
@@ -32,7 +33,7 @@ const ENVELOPE_SELF_TEST = path.join(
   "validate-envelope.js",
 );
 const PLATFORM_STATUSES = new Set(["PASS", "FAIL", "NOT_RUN"]);
-const ROUTE_PACKAGES = 4;
+const ROUTE_PACKAGES = 0;
 
 function usage() {
   return [
@@ -43,6 +44,7 @@ function usage() {
     "  --commit <sha>        Commit SHA (or env COMMIT_SHA, else git rev-parse HEAD)",
     "  --ubuntu <status>     PASS | FAIL | NOT_RUN (default: NOT_RUN)",
     "  --windows <status>    PASS | FAIL | NOT_RUN (default: NOT_RUN)",
+    "  --macos <status>      PASS | FAIL | NOT_RUN (default: NOT_RUN)",
     "  --out <path>          Write JSON to file (default: stdout)",
     "  --help                Show this help",
   ].join("\n");
@@ -54,6 +56,7 @@ function parseArgs(argv) {
     commit: process.env.COMMIT_SHA || null,
     ubuntu: "NOT_RUN",
     windows: "NOT_RUN",
+    macos: "NOT_RUN",
     out: null,
   };
 
@@ -100,6 +103,14 @@ function parseArgs(argv) {
     }
     if (arg.startsWith("--windows=")) {
       options.windows = arg.slice("--windows=".length);
+      continue;
+    }
+    if (arg === "--macos") {
+      options.macos = take("--macos");
+      continue;
+    }
+    if (arg.startsWith("--macos=")) {
+      options.macos = arg.slice("--macos=".length);
       continue;
     }
     if (arg === "--out") {
@@ -173,6 +184,9 @@ function buildAttestation(options) {
     throw new Error("tag is required (--tag or env TAG)");
   }
 
+  const tagValidation = validateReleaseTag(options.tag);
+  if (!tagValidation.ok) throw new Error(tagValidation.reason);
+
   const commit = options.commit || gitRevParseHead();
   if (!commit) {
     throw new Error("commit is required (--commit, env COMMIT_SHA, or git HEAD)");
@@ -193,13 +207,15 @@ function buildAttestation(options) {
 
   return {
     schema_version: 1,
-    tag: options.tag,
+    tag: tagValidation.tag,
+    package_version: packageVersion(),
     commit,
     validation_entrypoint: "node scripts/validate-all.js",
     node_version: process.version,
     platforms: {
       ubuntu: normalizePlatformStatus("--ubuntu", options.ubuntu),
       windows: normalizePlatformStatus("--windows", options.windows),
+      macos: normalizePlatformStatus("--macos", options.macos),
     },
     evaluation_cases: evaluationCases,
     envelope_regression_cases: envelopeRegressionCases,
@@ -210,6 +226,8 @@ function buildAttestation(options) {
       codex: "NOT_RUN",
       claude_code: "NOT_RUN",
     },
+    product_screening: "NOT_RUN",
+    legacy_profile_projection_v1_abc: "INVALID",
     longitudinal_value: "NOT_RUN",
   };
 }

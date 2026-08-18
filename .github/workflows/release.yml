@@ -21,16 +21,26 @@ jobs:
       - name: Resolve tag ref
         id: ref
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_TAG: ${{ github.ref_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
           else
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            TAG="$REF_TAG"
           fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Refusing a release tag outside v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.ref.outputs.tag }}
+          ref: refs/tags/${{ steps.ref.outputs.tag }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -57,16 +67,26 @@ jobs:
       - name: Resolve tag ref
         id: ref
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_TAG: ${{ github.ref_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
           else
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            TAG="$REF_TAG"
           fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Refusing a release tag outside v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.ref.outputs.tag }}
+          ref: refs/tags/${{ steps.ref.outputs.tag }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -87,8 +107,54 @@ jobs:
           name: windows-pass
           path: windows-pass.txt
 
+  validate-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Resolve tag ref
+        id: ref
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG="$REF_TAG"
+          fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Refusing a release tag outside v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.ref.outputs.tag }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run full validation suite
+        run: node scripts/validate-all.js
+
+      - name: Write macos pass marker
+        shell: bash
+        run: |
+          git rev-parse HEAD > macos-pass.txt
+          cat macos-pass.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-pass
+          path: macos-pass.txt
+
   release:
-    needs: [validate-ubuntu, validate-windows]
+    needs: [validate-ubuntu, validate-windows, validate-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -96,16 +162,26 @@ jobs:
       - name: Resolve tag ref
         id: ref
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_TAG: ${{ github.ref_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
           else
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            TAG="$REF_TAG"
           fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Refusing a release tag outside v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.ref.outputs.tag }}
+          ref: refs/tags/${{ steps.ref.outputs.tag }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -122,31 +198,43 @@ jobs:
           name: windows-pass
           path: _markers/windows
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-pass
+          path: _markers/macos
+
       - name: Verify exact-tag SHA alignment
         id: verify
         shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.ref.outputs.tag }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          TAG="${{ steps.ref.outputs.tag }}"
+          TAG="$RELEASE_TAG"
           CHECKOUT_SHA="$(git rev-parse HEAD)"
-          TAG_SHA="$(git rev-list -n 1 "$TAG")"
+          TAG_SHA="$(git rev-parse "refs/tags/${TAG}^{commit}")"
           UBUNTU_SHA="$(tr -d '[:space:]' < _markers/ubuntu/ubuntu-pass.txt)"
           WINDOWS_SHA="$(tr -d '[:space:]' < _markers/windows/windows-pass.txt)"
+          MACOS_SHA="$(tr -d '[:space:]' < _markers/macos/macos-pass.txt)"
 
           echo "tag=$TAG"
           echo "checkout_sha=$CHECKOUT_SHA"
           echo "tag_sha=$TAG_SHA"
           echo "ubuntu_sha=$UBUNTU_SHA"
           echo "windows_sha=$WINDOWS_SHA"
+          echo "macos_sha=$MACOS_SHA"
           echo "github_sha=$GITHUB_SHA"
 
-          if [ -z "$UBUNTU_SHA" ] || [ -z "$WINDOWS_SHA" ]; then
+          if [ -z "$UBUNTU_SHA" ] || [ -z "$WINDOWS_SHA" ] || [ -z "$MACOS_SHA" ]; then
             echo "::error::Missing platform validation markers"
             exit 1
           fi
 
-          if [ "$UBUNTU_SHA" != "$WINDOWS_SHA" ]; then
-            echo "::error::Ubuntu and Windows validated SHAs differ; refusing release"
+          node scripts/release-version.js "$TAG"
+
+          if [ "$UBUNTU_SHA" != "$WINDOWS_SHA" ] || [ "$UBUNTU_SHA" != "$MACOS_SHA" ]; then
+            echo "::error::Ubuntu, Windows, and macOS validated SHAs differ; refusing release"
             exit 1
           fi
 
@@ -158,7 +246,7 @@ jobs:
           # On tag-push, GITHUB_SHA must match the exact tagged commit.
           # On workflow_dispatch, GITHUB_SHA is the dispatch branch tip and may differ;
           # exact-tag green still requires checkout/tag/markers to agree (checked above).
-          if [ "${{ github.event_name }}" = "push" ] && [ "$CHECKOUT_SHA" != "$GITHUB_SHA" ]; then
+          if [ "$EVENT_NAME" = "push" ] && [ "$CHECKOUT_SHA" != "$GITHUB_SHA" ]; then
             echo "::error::GITHUB_SHA does not match validated tag SHA on tag push; refusing release"
             exit 1
           fi
@@ -167,39 +255,43 @@ jobs:
 
       - name: Generate release attestation
         shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.ref.outputs.tag }}
+          VERIFIED_SHA: ${{ steps.verify.outputs.sha }}
         run: |
           node scripts/gen-release-attestation.js \
-            --tag "${{ steps.ref.outputs.tag }}" \
-            --commit "${{ steps.verify.outputs.sha }}" \
+            --tag "$RELEASE_TAG" \
+            --commit "$VERIFIED_SHA" \
             --ubuntu PASS \
             --windows PASS \
+            --macos PASS \
             --out attestation.json
           cat attestation.json
 
       - name: Compose release notes
         id: notes
         shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.ref.outputs.tag }}
+          VERIFIED_SHA: ${{ steps.verify.outputs.sha }}
         run: |
-          TAG="${{ steps.ref.outputs.tag }}"
-          if [ "$TAG" = "v2.8.0" ]; then
+          TAG="$RELEASE_TAG"
+          if [ "$TAG" = "v3.0.0" ]; then
             {
-              echo "AQL 2.8.0"
+              echo "AQL 3.0.0"
               echo
-              echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
+              echo "Exact-tag three-platform validation passed (Ubuntu + Windows + macOS) for \`${TAG}\` @ \`${VERIFIED_SHA}\`."
               echo
-              echo '- Added experimental, opt-in Profile Projection v1.'
-              echo '- Applies at most two complete matching active profile entries.'
-              echo '- Added Fresh Mode for one-task profile bypass without weakening trust boundaries.'
-              echo '- Added canonical profile carrier validation and source-bound hashes.'
-              echo '- Added explicit confirmation provenance and session-gated user profile access.'
-              echo '- Added Result Attention Rendering for lower-noise, decision-first output.'
-              echo '- Project templates are inert until the user creates or confirms entries.'
-              echo '- Mechanism validation passed on exact-tag Ubuntu and Windows CI.'
-              echo '- Product effect, longitudinal value, full cross-host behavior, and preregistered v3 A/B/C execution remain NOT_RUN.'
+              echo '- Ships one product Skill and one Task Contract; standalone adapters and physical route shims are removed.'
+              echo '- Adds optional explicit-only Profile v2 with current-turn override, Fresh Mode, bounded Guided projection, and export/import.'
+              echo '- Adds mechanically sourced Capability Receipts and an offline structural conformance runner.'
+              echo '- Adds receipt-owned install, status, update, and uninstall while preserving profile data.'
+              echo '- AQL Core remains usable without profile storage, the packaged CLI, hooks, or user-directory access.'
+              echo '- Profile v2 product screening, unevidenced cross-host live behavior, and longitudinal value remain NOT_RUN.'
             } > release-notes.md
           else
             {
-              echo "Exact-tag dual-platform validation passed (Ubuntu + Windows) for \`${TAG}\` @ \`${{ steps.verify.outputs.sha }}\`."
+              echo "Exact-tag three-platform validation passed (Ubuntu + Windows + macOS) for \`${TAG}\` @ \`${VERIFIED_SHA}\`."
               echo
               echo "Longitudinal user-value evidence remains under evaluation."
               if [ "$TAG" = "v2.6.1" ]; then

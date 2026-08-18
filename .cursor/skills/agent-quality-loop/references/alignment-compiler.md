@@ -14,10 +14,10 @@ L0 words used -> L1 situation/problem signal -> L2 consumer/medium
 -> L5 constraints/non-goals/risks -> L6 decision criteria/trade-offs
 -> L7 facts/sources/unknowns/counterevidence -> L8 delegated AI solution space
 -> L9 success observables/counterexamples/minimum sufficient terminal
--> L10 explicitly chosen transferable growth focus, when applicable
+-> L10 explicitly requested long-term collaboration preference, when applicable
 ```
 
-This stack is an internal diagnostic, not a required questionnaire or a new contract. Omit layers that would not change scope, execution, evidence, or the terminal. L10 never activates teaching or a profile entry by inference; the user must explicitly choose or confirm it under [personalization.md](personalization.md#growth-focus).
+This stack is an internal diagnostic, not a required questionnaire or a new contract. Omit layers that would not change scope, execution, evidence, or the terminal. L10 never activates teaching or a profile entry by inference; persistent memory follows [personalization.md](personalization.md).
 
 ### 1. Observable after-state
 

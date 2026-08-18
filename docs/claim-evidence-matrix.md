@@ -1,33 +1,17 @@
-# Claim evidence matrix
+# Claim Evidence Matrix
 
-Honest mapping of package claims to evidence types. Evidence is scoped to the named mechanism, host, model tier, and transcript; longitudinal value remains separate.
-
-Evidence types: `SPEC` | `STATIC` | `SELF_TEST` | `BLIND_RUNTIME` | `LONGITUDINAL`.
-
-| Claim | Evidence type | Status |
+| Claim | Evidence | Status |
 | --- | --- | --- |
-| Evaluation cases contiguous and README count matches | STATIC | PASS (via `scripts/validate-claims.js`) |
-| Envelope regression self-test registry runs | SELF_TEST | PASS (via `validate-envelope.js --self-test`) |
-| Four route packages in `routes.json` | STATIC | PASS (via `validate-claims.js`) |
-| Four core skills under `.cursor/skills/` | STATIC | PASS (via `validate-claims.js`) |
-| Manifest file hashes consistent across mirrors | STATIC | PASS (via `sync-skills.js --check`) |
-| Envelope schema / phase invariants | SPEC + SELF_TEST | PASS |
-| Profile Projection v1 specification and declared-receipt fixtures | SPEC + SELF_TEST | PASS only when `validate-profile-projection.js --self-test` and synchronized package validation pass; this is not semantic matching evidence |
-| Profile Markdown carrier / ref / digest binding | STATIC + SELF_TEST | PASS for canonical path opening, canonical parsing, forged-neighbor digest rejection, raw-text rejection, and user opt-in gates. A measured task with no readable real carrier fails validation as source-binding `NOT_RUN`; fixture receipt shape cannot upgrade it. |
-| Profile Projection v1 fresh-context behavior (12 smoke + 4 coverage addendum runs) | BLIND_RUNTIME | PASS for the ten named mechanism behaviors on `gpt-5.6-sol` / `codex-cli 0.148.0-alpha.9`; 16/16 neutral raw-first grades passed and every hard-gate count was zero. Canonical v2 evidence is sanitized and exact-byte bound under `probes/transcripts/2026-08-15/profile-projection-v1-*-v2/`. T5 proves only that the isolated executor prompt withheld the unenabled fixture bytes. This does not establish production `injected_refs` objects or product benefit. |
-| Profile Projection v1 A/B/C incremental-value comparison (v2) | BLIND_RUNTIME | NOT_RUN / `INVALID` control: B permits whole-profile applicability filtering and behaves semantically like C, so no incremental effect can be inferred. The v2 evidence remains unchanged. |
-| Profile Projection v1 A/B/C v3 replacement protocol | SPEC | `PRE-REGISTERED` / `NOT_RUN`: [v3 preregistration](profile-projection-v1-abc-preregistration-v3.md) defines valid A/B/C controls and decision gates; it supplies no product, host, or longitudinal result. |
-| Profile Projection v1 full matched pilot (48 runs) | BLIND_RUNTIME | NOT_RUN (see `docs/profile-projection-v1-experiment.md`) |
-| Profile Projection v1 product/longitudinal value | LONGITUDINAL | NOT_RUN — no causal or long-term value claim |
-| Blind probe protocol packaged (`probes/`) | SPEC | PASS |
-| Blind probe rows on current host/model tiers | BLIND_RUNTIME | NOT_RUN (see `docs/host-probe-matrix-2.6.1.md`) |
-| Host Goal Compiler / profile / route live sessions | BLIND_RUNTIME | NOT_RUN |
-| Terminal-selection host probes A/B/C (Cursor/Codex/Claude) | BLIND_RUNTIME | NOT_RUN (see `docs/host-probe-adaptive-2.6.1.md`; static skill text ≠ live PASS) |
-| Adaptive terminal screening pilot (6 tasks) | LONGITUDINAL | SCREENING only — descriptive, not causal (see `docs/pilot-adaptive-2.6.1.md`) |
-| Longitudinal user-value pilot | LONGITUDINAL | NOT_RUN (see `docs/longitudinal-pilot-2.6.1.md`) |
-| Writing adapter structural and behavior cases | STATIC + SELF_TEST | PASS only when validators and cases 74–88 pass; structural checks are not a semantic oracle |
-| Writing vertical fresh-context host probes | BLIND_RUNTIME | Per-probe only: P-W6 remains **FAIL** under the frozen story ruler; any probe without accessible executor model/version identity is **NOT_RUN**, even when its transcript is structurally complete. Exact raw evidence and independent grades live in `docs/research/llm-learning-corpus/behavior-probes.md`; no universal cross-model claim. |
-| Six-task writing-growth pilot | LONGITUDINAL | NOT_RUN — blocks claims that user growth is proven (see `docs/writing-growth-pilot.md`) |
-| Causal improvement on real projects over time | LONGITUDINAL | NOT_RUN — not claimed |
+| One discoverable product Skill | STATIC | Validated by `scripts/validate-claims.js` after package/mirror synchronization. |
+| Snapshot ownership lifecycle | SELF_TEST | `scripts/install.js --self-test` covers ownership, status, update/uninstall dry-run, drift refusal, unowned refusal, and profile preservation. |
+| Mirror consistency | STATIC | `scripts/sync-skills.js --check`; the check path is read-only. |
+| Task Contract sole truth and Profile v2 projection limits | SPEC + SELF_TEST | Mechanism coverage only; not a user-value result. |
+| Capability Receipt source fields | SPEC + SELF_TEST | Mechanical observed-source contract only; no model self-report. |
+| Historical Profile Projection v1 mechanism probes | HISTORICAL BLIND_RUNTIME | Historical, scoped evidence only. It does not validate Profile v2. |
+| Historical Profile Projection v1 A/B/C value control | HISTORICAL BLIND_RUNTIME | `INVALID`; it must not support AQL 3.0 product claims. |
+| AQL 3.0 Profile v2 product screening | BLIND_RUNTIME | `NOT_RUN`; protocol: [aql-3.0-product-screening/1](aql-3.0-product-screening-preregistration.md). |
+| AQL 3.0 single-Skill non-inferiority | BLIND_RUNTIME | `NOT_RUN`; protocol: [aql-3.0-product-screening/1](aql-3.0-product-screening-preregistration.md). |
+| Longitudinal user value | LONGITUDINAL | `NOT_RUN`. |
+| Cross-host automatic profile synchronization | N/A | Not claimed. Same-storage portability and explicit export/import only. |
 
-Maintainer check: `node scripts/validate-claims.js` (also invoked from `node scripts/validate-all.js`).
+Structural checks, hashes, and receipts prove only their named mechanism. They do not prove acceptance, release authorization, product benefit, or long-term value.

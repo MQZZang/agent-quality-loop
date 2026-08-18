@@ -1,0 +1,13 @@
+{
+  "schema": "aql.collaboration-profile/v2",
+  "profile_id": "00000000-0000-4000-8000-000000000001",
+  "subject": "self",
+  "revision": 0,
+  "memory_policy": "explicit_only",
+  "enabled": false,
+  "paused": false,
+  "created_at": "2026-08-18T00:00:00.000Z",
+  "updated_at": "2026-08-18T00:00:00.000Z",
+  "entries": [],
+  "archived_entries": []
+}

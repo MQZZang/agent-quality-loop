@@ -13,11 +13,9 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { checkSkills } = require("./sync-skills");
-const { routePackageNames, loadCatalog } = require("./package-catalog");
 const { listPackageSkillDirs, repoRoot, checkManifestConsistency } = require("./gen-manifest");
 
-const EXPECTED_CORE_SKILLS = 4;
-const EXPECTED_ROUTE_PACKAGES = 4;
+const EXPECTED_CORE_SKILLS = 1;
 
 const EVAL_CASES_REL = path.join(
   ".cursor",
@@ -158,10 +156,8 @@ function countEnvelopeRegressionCases(root) {
  */
 function listCoreSkillNames(root) {
   const cursorRoot = path.join(root, ".cursor", "skills");
-  const routes = new Set(routePackageNames({ root }));
   return listPackageSkillDirs(cursorRoot)
     .map((dir) => path.basename(dir))
-    .filter((name) => !routes.has(name))
     .sort();
 }
 
@@ -214,25 +210,7 @@ function validateClaims(root = repoRoot()) {
   summary.envelopeRegressionReported = envelope.reportedCount;
   errors.push(...envelope.errors);
 
-  // 3. Route packages = 4
-  try {
-    const catalog = loadCatalog({ catalogRoot: root });
-    const routes = routePackageNames({ catalogRoot: root });
-    summary.routePackageCount = routes.length;
-    summary.routePackages = routes;
-    if (routes.length !== EXPECTED_ROUTE_PACKAGES) {
-      errors.push(
-        `route packages expected ${EXPECTED_ROUTE_PACKAGES} from routes.json, got ${routes.length}: ${routes.join(", ")}`,
-      );
-    }
-    if (!catalog || !Array.isArray(catalog.routes)) {
-      errors.push("routes.json missing routes array");
-    }
-  } catch (error) {
-    errors.push(`routes.json: ${error.message}`);
-  }
-
-  // 4. Core skills = 4
+  // 3. The product distribution has one discoverable skill.
   try {
     const core = listCoreSkillNames(root);
     summary.coreSkillCount = core.length;
@@ -246,7 +224,7 @@ function validateClaims(root = repoRoot()) {
     errors.push(`core skills: ${error.message}`);
   }
 
-  // 5. Manifest hashes consistent (same helper path as sync --check)
+  // 4. Manifest hashes consistent (same helper path as sync --check)
   try {
     const manifestErrors = checkSkills({ root });
     summary.manifestConsistencyErrors = manifestErrors.length;
@@ -255,20 +233,6 @@ function validateClaims(root = repoRoot()) {
     }
   } catch (error) {
     errors.push(`manifest consistency: ${error.message}`);
-  }
-
-  // Dist route manifests (when present) — hash self-consistency
-  const distCursor = path.join(root, "dist", "route-shims", "cursor");
-  if (fs.existsSync(distCursor)) {
-    for (const name of fs.readdirSync(distCursor)) {
-      const pkgDir = path.join(distCursor, name);
-      if (!fs.statSync(pkgDir).isDirectory()) continue;
-      if (!fs.existsSync(path.join(pkgDir, "manifest.json"))) continue;
-      const pkgErrors = checkManifestConsistency(pkgDir);
-      for (const err of pkgErrors) {
-        errors.push(`route manifest ${name}: ${err}`);
-      }
-    }
   }
 
   return {
@@ -294,7 +258,7 @@ function main(argv = process.argv.slice(2)) {
     if (result.ok) {
       const s = result.summary;
       console.log(
-        `PASS claim consistency: ${s.evaluationCaseCount} evaluation cases, ${s.envelopeRegressionReported} envelope regressions, ${s.routePackageCount} routes, ${s.coreSkillCount} core skills, manifests ok`,
+        `PASS claim consistency: ${s.evaluationCaseCount} evaluation cases, ${s.envelopeRegressionReported} envelope regressions, ${s.coreSkillCount} core skills, manifests ok`,
       );
     }
   }
@@ -313,5 +277,4 @@ module.exports = {
   parseReadmeEvaluationCaseClaims,
   countEnvelopeRegressionCases,
   EXPECTED_CORE_SKILLS,
-  EXPECTED_ROUTE_PACKAGES,
 };

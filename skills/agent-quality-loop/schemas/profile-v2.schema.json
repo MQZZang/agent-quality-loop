@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aql.collaboration-profile/v2",
+  "title": "AQL explicit-only collaboration profile v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "profile_id", "subject", "revision", "memory_policy", "enabled", "paused", "created_at", "updated_at", "entries", "archived_entries"],
+  "properties": {
+    "schema": { "const": "aql.collaboration-profile/v2" },
+    "profile_id": { "type": "string", "format": "uuid" },
+    "subject": { "const": "self" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "memory_policy": { "const": "explicit_only" },
+    "enabled": { "type": "boolean" },
+    "paused": { "type": "boolean" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/liveEntry" } },
+    "archived_entries": { "type": "array", "items": { "$ref": "#/$defs/archivedEntry" } }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": { "enum": ["global", "domain", "task_class", "project"] },
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "allOf": [
+        { "if": { "properties": { "level": { "const": "global" } } }, "then": { "not": { "required": ["id"] } } },
+        { "if": { "properties": { "level": { "enum": ["domain", "task_class", "project"] } } }, "then": { "required": ["id"] } }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "refs"],
+      "properties": {
+        "type": { "enum": ["explicit_memory_command", "explicit_confirmation", "migration"] },
+        "refs": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 256 } }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "preference_key", "kind", "value", "scope", "applies_when", "suppress_when", "provenance", "state", "valid_from", "review_after", "valid_until", "supersedes", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "preference_key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+        "kind": { "enum": ["communication", "interaction", "decision", "semantic_alias", "working_context"] },
+        "value": {},
+        "scope": { "$ref": "#/$defs/scope" },
+        "applies_when": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "suppress_when": { "type": ["string", "null"], "minLength": 1, "maxLength": 512 },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "state": { "enum": ["candidate", "active", "superseded", "archived"] },
+        "valid_from": { "type": "string", "format": "date" },
+        "review_after": { "type": ["string", "null"], "format": "date" },
+        "valid_until": { "type": ["string", "null"], "format": "date" },
+        "supersedes": { "type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        { "if": { "properties": { "state": { "const": "active" } } }, "then": { "properties": { "provenance": { "not": { "properties": { "type": { "const": "migration" } }, "required": ["type"] } } } } },
+        { "if": { "properties": { "state": { "const": "candidate" } }, "required": ["state"] }, "then": { "properties": { "provenance": { "properties": { "type": { "enum": ["explicit_memory_command", "migration"] } }, "required": ["type"] } } } },
+        { "if": { "properties": { "kind": { "enum": ["decision", "semantic_alias", "working_context"] }, "state": { "const": "active" } }, "required": ["kind", "state"] }, "then": { "properties": { "provenance": { "properties": { "type": { "const": "explicit_confirmation" } } } } } },
+        { "if": { "properties": { "kind": { "const": "working_context" } }, "required": ["kind"] }, "then": { "anyOf": [{ "properties": { "review_after": { "type": "string" } } }, { "properties": { "valid_until": { "type": "string" } } }] } }
+      ]
+    },
+    "liveEntry": {
+      "allOf": [
+        { "$ref": "#/$defs/entry" },
+        { "properties": { "state": { "enum": ["candidate", "active", "superseded"] } } }
+      ]
+    },
+    "archivedEntry": {
+      "allOf": [
+        { "$ref": "#/$defs/entry" },
+        { "properties": { "state": { "const": "archived" } } }
+      ]
+    }
+  }
+}

@@ -2,184 +2,269 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) 2.8.0** is a portable workflow for AI coding agents. It keeps you and the model on one checkable goal during long work: what the agent understood, what it did, what evidence supports the claim, why it stopped, and whether the next step needs your authorization.
+**Agent Quality Loop (AQL) 3.0.0** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
 
-It is not a new IDE, panel, or standalone app. After you install the skills, the agent’s **default habits** change for non-trivial tasks. Writing is the first vertical scenario, not the product boundary.
+AQL is not another IDE or hosted service, and it does not publish anything on its own. The main workflow works without Profile v2, the optional CLI, Cursor hooks, or access to your user directory.
 
-中文一页速览：[docs/quickstart.zh-CN.md](docs/quickstart.zh-CN.md)。规范文本以英文为准。
+中文速览：[AQL 3.0 快速开始](docs/quickstart.zh-CN.md)。For the exact implementation rules, see the [AQL 3.0 product and execution contract](docs/aql-3.0-product-contract.md).
 
-Profile Projection v1 is an experimental, opt-in capability in AQL 2.8.0. For one task, AQL may apply at most two confirmed, genuinely relevant collaboration defaults. It does not turn the full profile into a second prompt contract, raise authority, or constrain the agent's professional method. Product effect and longitudinal value remain `NOT_RUN`.
+| Where this repository stands | Status |
+|---|---|
+| Source package version | `3.0.0` |
+| Product surface | One Skill: `agent-quality-loop` |
+| Contract for each task | One Task Contract |
+| GitHub release | Unreleased until an exact `v3.0.0` tag passes the release workflow |
+| License | MIT |
 
-## What changes for you
-
-1. **One visible goal** — the agent states the outcome, edit boundary, and likely misunderstanding before substantial work.
-2. **Claims stay attached to evidence** — local self-QA, independent acceptance, and release permission remain separate.
-3. **Results lead with the decision** — the conclusion, practical boundary, evidence strength, and any required action appear before internal receipts.
-
-## A 60-second example
-
-```text
-Review this architecture change, fix the root cause, and verify it locally.
-Use my confirmed project defaults where they fit. Do not push or publish.
-```
-
-For a non-trivial task, the expected behavior is: align one Task Contract, let the current request override stored defaults, apply no more than two source-bound profile entries when their real carrier is readable, run proportionate checks, report the result and remaining uncertainty, then stop before any remote action.
-
-## Fit / not a fit
-
-**Fit:** long or ambiguous agent work; implementation that must stop locally; independent review; evidence-bound or creative writing; teams that need a readable separation between “built,” “accepted,” and “released.”
-
-**Not a fit:** one-line facts, casual brainstorming, replacing human product judgment, hidden personalization, or treating test counts as proof of user value.
-
-## Install
-
-```bash
-npx skills add MQZZang/agent-quality-loop
-```
-
-This installs skills, not probe transcripts or a runtime service. See [Installation details](#installation-details) for the bundled installer, suites, hosts, and project-level setup.
+> **Before you install:** the default branch is the AQL 3.0 source candidate. Use it for evaluation or development. If you need an immutable release, install an existing release tag instead, or wait for `v3.0.0`.
 
 ## Why AQL exists
 
-Agents made producing a change cheap. The cost moved onto whoever has to decide whether “done” is true. Mechanical gates help when a command can settle the question. AQL covers the part a command cannot: whether the goal was the right goal, whether the evidence bears on the claim, whether “hide it” meant delete it, and whether local self-QA was silently treated as publish permission.
+Getting an answer or patch from an agent is easy. The harder part is deciding whether it solved the right problem, whether the checks support its claim, and whether a local change is about to turn into an action you never approved.
 
-## How it behaves on non-trivial work
+AQL keeps those decisions visible without asking you to fill out a form:
 
-For the same kind of request you already make:
+- **You can see what “done” means.** Before substantial work, the agent states the result, the edit boundary, and the most likely misunderstanding.
+- **The plan starts from the real project.** Files, behavior, and key assumptions are checked before the agent commits to a plan. If the request rests on a false premise, you hear that first.
+- **Each claim has matching evidence.** A test, receipt, or review proves only what it actually checked.
+- **You get the result before the process details.** Routine replies lead with the outcome, the important evidence, and anything you still need to do.
+- **You stay in control of external actions.** “Be thorough” does not mean “push this,” and an accepted change is not automatically a released change.
 
-1. **A shared goal before heavy edits** — outcome, edit boundary, and the most likely misunderstanding, with named files or behaviors checked before the goal freezes.
-2. **Claims with evidence attached** — a pass or “done” is only claimable when the agent ran or inspected that evidence in this turn.
-3. **A visible stop** — diagnosis can end as diagnosis; ordinary implementation can end after self-QA.
-4. **Separated authority** — self-QA, independent acceptance, and publish permission are different asks. Installing AQL never auto-publishes.
-5. **Honest writing work** — prose names the reader job and truth boundary. A good draft is not proof that you “grew.”
+## How it works
 
-## From a fuzzy request to a checkable result
-
-```text
-Natural-language request
-        → align a checkable scope
-        → execute only from evidence
-        → independently accept only when asked
-        → authorize release separately, if at all
+```mermaid
+flowchart LR
+    U["Your request in ordinary language"] --> A["agent-quality-loop"]
+    P["Optional saved preferences<br/>Profile v2"] -. Guided defaults only .-> A
+    H["Checks from this host<br/>Capability Receipt"] -. Observed capabilities only .-> A
+    A --> T["One Task Contract<br/>result · scope · proof · permission"]
+    T --> W["Work and relevant checks"]
+    W --> R["Result with evidence"]
+    R --> D{"What did you ask for?"}
+    D -->|Diagnosis| E["Diagnosis complete<br/>EVIDENCED"]
+    D -->|Implementation| B["Local change complete<br/>BUILT"]
+    D -->|Independent review| C["Fresh review passed<br/>ACCEPTED"]
+    C -. Separate release request .-> L["RELEASE_READY<br/>or an authorized external action"]
 ```
 
-You keep typing ordinary language. The agent infers what outcome you want now, how much evidence the risk warrants, and what side effects are allowed. Those three stay independent: asking for a thorough job does not authorize a deploy.
+Saved preferences and host checks can add useful context to the same Task Contract. They cannot rewrite your request, weaken the checks, approve the result, or give the agent more permission.
 
-**Self-QA, independent acceptance, and release stay apart on purpose.**
+For example, this request should lead to a boundary this clear before the work begins:
 
-| You asked for | What “done” may mean | What it is not |
+```text
+You: Fix the local timeout and verify it. Do not deploy.
+AQL goal: The timeout failure is fixed and repeatable checks pass.
+Working boundary: Local files and tests only; no push, publish, or deploy.
+First thing to confirm: Which timeout setting actually controls runtime behavior?
+Stopping point: BUILT after local checks. Independent review was not requested.
+```
+
+### Know where the work stopped
+
+| State | What it means | What it does not mean |
 |---|---|---|
-| Fix / implement / self-test | Local changes plus the implementer’s own checks (`BUILT`) | Not independently accepted; not releasable |
-| Independently accept this | A fresh-context review of raw evidence (`ACCEPTED`) | Not permission to push, tag, or deploy |
-| Check whether this can ship / publish this | Read-only preflight, or a separately authorized external action | Not implied by a local fix, a green self-check, or formal wording |
+| `EVIDENCED` | You asked for a diagnosis or evidence review, and that work is complete. | No implementation is implied. |
+| `BUILT` | The local change is complete and the implementer’s own checks passed. | It has not passed an independent review and is not ready to release. |
+| `ACCEPTED` | A separate, fresh review checked the frozen result against every required acceptance item. | There is still no permission to push, tag, publish, or deploy. |
+| `RELEASE_READY` | The accepted result passed a separate, read-only release preflight. | Nothing has changed on the external target. |
+| `DEPLOYED` | The named external target changed after you authorized that exact action in the current request. | The real-world outcome has not yet been proven. |
+| `PRODUCTION_VERIFIED` | The required outcome was checked on the real target after deployment. | The claim goes no further than the named target and checks. |
 
-`full` stops at most at independent acceptance. Publishing always needs a later, exact current-turn authorization.
+## When it fits
 
-**Routine output stays short; formal, failed, or blocked work expands.** Everyday success is normally 1–3 lines: conclusion, decisive evidence, and whether you must act. Formal acceptance, failure, blocking, pending evidence, handoff, and release expose phase, missing evidence, required action, and completion standard. Adapters return receipts only. There is no dashboard, HTML card, or decorative status chrome.
+**Use AQL for:** long or ambiguous tasks, root-cause diagnosis, local work that must not be deployed, writing with clear source boundaries, independent review, resumable work, and release preparation where you want to keep final control.
 
-Three invariants do not move: style never escalates authority; no completion claim without evidence; accepted is not released.
+**Do not use AQL for:** one-line facts or casual brainstorming. It also does not replace domain judgment, prove that a product is valuable, learn silently from repeated behavior, sandbox shell commands, or provide standing permission for external actions.
 
-## Installation details
+## Start in 60 seconds
 
-Nothing to build and no runtime dependency. Installing copies Markdown rules and skills.
-
-### Fastest: via the skills.sh CLI
-
-```bash
-npx skills add MQZZang/agent-quality-loop
-```
-
-Verified 2026-08-12: the CLI finds all four skills and installs from `.agents/skills/`. It has no `--dry-run`; list only with `npx skills add MQZZang/agent-quality-loop -l`. This path installs all four skills. The bundled installer below defaults to the three-skill `core` suite.
-
-### Installer (one command, any OS)
+The main workflow runs from the Skill instructions and starts no background service. You need Node.js to use the installer, optional Profile and Receipt commands, conformance checker, and maintainer checks. CI currently tests with Node.js 22, so that is the recommended version.
 
 ```bash
-node scripts/install.js --suite core --to agents
+git clone https://github.com/MQZZang/agent-quality-loop.git
+cd agent-quality-loop
+node --version
+node scripts/install.js install --to cursor --dry-run
+node scripts/install.js install --to cursor
 ```
 
-- `core`: `agent-quality-loop`, `ask-plan-code-qa`, `review-gate`. `--suite full` adds `skill-factory`. `--suite routes` adds explicit shims from `dist/route-shims/` (**uninstall manually**).
-- `--to`: `agents` (Codex), `cursor`, `claude`, `both`, or `all`.
-- `--dry-run` prints the plan. The installer never creates a live junction.
+Replace `cursor` with the host you actually use. Choose `all` only when you really want three separate copies. `--dry-run` shows the plan without changing files. For the same environment used by CI, `node --version` should report Node.js 22.
 
-This repository also ships an [Agent Plugins](https://agent-plugins.org) layout. That is layout compatibility, verified by validators — not live-behavior PASS on every announced client.
+Choose the matching install target:
 
-The installer writes **user-level skills only**. For Cursor project rules, copy `.cursor/`, `AGENTS.md`, and renamed knowledge templates into the project. Do **not** copy this repository’s `lessons.md`. Details: [docs/guide.md](docs/guide.md#project-level-install).
+| `--to` value | Snapshot destination |
+|---|---|
+| `agents` | `~/.agents/skills/agent-quality-loop` |
+| `cursor` | `~/.cursor/skills/agent-quality-loop` |
+| `claude` | `~/.claude/skills/agent-quality-loop` |
+| `both` | `agents` and `cursor` |
+| `all` | `agents`, `cursor`, and `claude` |
 
-Optional Cursor hooks check decidable mechanics only and never semantic acceptance: [integrations/cursor-hooks/README.md](integrations/cursor-hooks/README.md).
+The installer copies real files and records what it owns under `~/.aql/install-receipts/`. It will not replace a directory it does not own. If an installed file has changed, update and uninstall stop so you can inspect it first. Your Profile data and project identity are never part of the installed files it owns.
 
-### First use
+```bash
+node scripts/install.js status --to cursor
+node scripts/install.js update --to cursor --dry-run
+node scripts/install.js uninstall --to cursor --dry-run
+```
+
+AQL does not provide an `npx aql` command. In the examples below, `<SKILL_ROOT>` is the installed `agent-quality-loop` directory:
+
+```bash
+node <SKILL_ROOT>/scripts/aql.js --help
+node <SKILL_ROOT>/scripts/conformance.js --self-test
+```
+
+Then ask in ordinary language. For example:
 
 ```text
-Fix the local timeout. Do not deploy.
 Diagnose the root cause only. Do not change files.
-Fix it, then have it independently accepted. Do not publish.
-Check whether this is releasable. Do not release yet.
-Write the evidence-bound report and give me a usable draft; no coaching.
+Fix this locally, run the relevant checks, and do not publish.
+Independently accept the current implementation against its original goal.
+Prepare a release preflight, but do not push or create a Release.
 ```
 
-After a project-level copy, the unchanged collaboration-profile template is inert: it parses zero entries and opts into nothing. Project Profile Projection begins only when the user creates a non-empty profile containing at least one complete, valid `status: active` entry. A read-only diagnosis should restate goal, boundary, and likely misunderstanding, then stop without editing. After a user-level install, look for `/agent-quality-loop` (Cursor / Claude Code) or `$agent-quality-loop` (Codex).
+Ordinary language is the main interface. If your host lets you select a Skill, choose `agent-quality-loop`. No host-specific slash command is required.
 
-**Before / after.** You ask for a bugfix and hear “done,” then still have to check tests, local-only scope, and whether self-QA was treated as sign-off. With AQL, the same request is expected to align the goal, stay inside the boundary, attach firsthand evidence, and stop without publishing unless you authorize that exact action in the **current** turn.
+### Make sure your host can see the Skill
 
-A real grounding example: the user asked to change `timeout` in `config.json`, but that file had no such field. The agent read the files, surfaced the false premise, asked one decidable question, and changed zero files. Transcript: [p1-grok-mid.md](probes/transcripts/2026-08-12/p1-grok-mid.md). A budget-tier model fabricated the field; that failure remains in [MATRIX.md](MATRIX.md).
+`status` confirms that the installed copy exists and still matches the installer’s record. It cannot confirm that a running host loaded the Skill. After installation:
 
-## Fit / not a fit
+1. run `node scripts/install.js status --to <your-target>` and require `OWNED ... @3.0.0`;
+2. start or reload the target host and use its Skill discovery view to find `agent-quality-loop`;
+3. ask a small read-only task and confirm the result preserves the requested boundary.
 
-**Fit:** long or high-ambiguity agent work; local implementation that must not become a deploy; independent review of existing work; evidence-bound or creative writing with visible source and posture.
+If status reports `UNOWNED` or drift, inspect the target before you update or uninstall it. Copied files alone do not prove that every host loaded and used the Skill correctly.
 
-**Not a fit:** one-line facts; replacing human judgment or release authority; a hidden recommender or growth score; treating hooks or test counts as an outcome oracle; expecting AQL to ship itself to GitHub.
+## Optional Profile v2
 
-## What is verified, and what is not
+Profile v2 lets you save a small number of preferences you explicitly choose. It does not watch how you work or learn from repetition. Its default policy is `explicit_only`:
 
-Profile Projection v1 is experimental and opt-in. Its current evidence is limited to named mechanism behavior; product effect and longitudinal value are `NOT_RUN`. Installing this repository still installs only the skill package: probe evidence is not an installation payload.
+- repeating the same choice does not create or save anything;
+- a clear “remember this” instruction can be saved, while unclear or sensitive preferences require confirmation;
+- a new Profile starts disabled and affects work only after you enable it;
+- your current request always wins, and Fresh Mode ignores saved preferences for one task;
+- at most two relevant, source-linked preferences may guide a task;
+- nothing syncs or uploads in the background, and there is no daemon or cloud account.
 
-| Check | What it covers |
+The optional CLI lets you create, inspect, use, and remove these preferences. Revision checks prevent one command from silently overwriting a newer change:
+
+Before running `profile project`, create `projection-context.json` with observations from the current task. This minimal example matches the `concise` preference below; replace `as_of` with the task date:
+
+```json
+{
+  "as_of": "2026-08-18",
+  "scopes": [{ "level": "global" }],
+  "semantic": {
+    "concise": {
+      "applies_when_matches": true,
+      "suppress_when_matches": false,
+      "material_effect": true,
+      "reason": "The current result needs the saved concise presentation default.",
+      "effect": "Use concise result presentation in Guided choices."
+    }
+  }
+}
+```
+
+```bash
+node <SKILL_ROOT>/scripts/aql.js profile init --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile remember --profile ./profile.json --id concise --key result.concise --kind communication --value-text concise --applies-when "the task needs a result" --reference "task:instruction"
+node <SKILL_ROOT>/scripts/aql.js profile enable --profile ./profile.json --expected-revision 1
+node <SKILL_ROOT>/scripts/aql.js profile show --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile project --profile ./profile.json --context ./projection-context.json
+node <SKILL_ROOT>/scripts/aql.js profile export --profile ./profile.json --out ./profile-export.json
+node <SKILL_ROOT>/scripts/aql.js profile import --profile ./profile.json --in ./profile-export.json --dry-run
+node <SKILL_ROOT>/scripts/aql.js receipt --profile ./profile.json
+node <SKILL_ROOT>/scripts/aql.js profile forget --profile ./profile.json --id concise --expected-revision 2
+```
+
+If a preference needs confirmation, use `propose` and then `confirm --confirmation-ref ...`. Moving a Profile to another machine is always an explicit export/import. The [projection context rules](.cursor/skills/agent-quality-loop/references/profile-projection.md#cli-projection-context) explain the full task-local input accepted by `profile project`.
+
+## Capability Receipt and conformance
+
+A Capability Receipt answers a narrow question: what could this host or probe actually observe right now? Each entry is `observed_true`, `observed_false`, or `not_run`, and records where the observation came from. A Receipt cannot prove a task result, report a model’s opinion about itself, or give the agent permission.
+
+```bash
+node <SKILL_ROOT>/scripts/aql.js receipt --help
+node <SKILL_ROOT>/scripts/aql.js receipt --profile ./profile.json
+```
+
+The bundled conformance runner checks a bundle’s structure offline. Passing it does not mean the work itself has passed an independent review:
+
+```bash
+node <SKILL_ROOT>/scripts/conformance.js --self-test
+node <SKILL_ROOT>/scripts/conformance.js ./conformance-bundle.json
+```
+
+Optional [Cursor hooks](integrations/cursor-hooks/README.md) handle only rules a script can decide, such as refusing to auto-allow a matched external-write command. They are an extra guardrail, not a sandbox or an independent review.
+
+## What the current evidence supports
+
+The [17 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
+
+| Adoption question | Current evidence boundary |
 |---|---|
-| 109 evaluation cases | Expected behavior in [evaluation-cases.md](.cursor/skills/agent-quality-loop/references/evaluation-cases.md). Count enforced by `scripts/validate-claims.js`. |
-| Envelope regression suite | An adapter cannot grant itself acceptance; a local-only run cannot reach release state. |
-| Blind forward-testing | Protocol: [probes/PROBES.md](probes/PROBES.md). Results, including failures: [MATRIX.md](MATRIX.md). |
-| Writing probes | Structure, identity, and independent semantic grade are separate. P-W6 remains **FAIL**. Transcripts: [behavior-probes.md](docs/research/llm-learning-corpus/behavior-probes.md). |
-| Profile Projection v1 probes | Sanitized, exact-byte-bound one-host evidence and a neutral raw-first review covered ten named mechanism behaviors with zero hard-gate events. The old A/B/C control is `INVALID`; a replacement protocol is preregistered but `NOT_RUN`, so product effect and longitudinal value remain `NOT_RUN`. Protocol and evidence: [profile-projection-v1-experiment.md](docs/profile-projection-v1-experiment.md), [v3 preregistration](docs/profile-projection-v1-abc-preregistration-v3.md). |
-| Corpus research | 397 files inventoried; fourteen AQL-relevant claims distilled. Not semantic coverage of the whole corpus. Licenses remain `unknown`. |
+| Is the single-Skill package internally consistent? | Static checks, matching manifests, installer/runtime self-tests, and offline conformance cover the mechanics they name. |
+| Are the Task Contract, Profile v2, and Receipt boundaries implemented? | The specification and repeatable tests cover those boundaries. This says nothing about product benefit. |
+| Will every listed host load and behave identically? | The package layouts pass validation. Live behavior still has to be checked in each host. |
+| Is AQL 3.0 better than 2.8, or is Profile v2 product-effective? | Both preregistered screenings remain `NOT_RUN`. |
+| Did the historical Profile v1 experiment prove value? | No. Its mechanism evidence is historical and its A/B/C value control is `INVALID`. |
+| Does AQL prove long-term user or productivity improvement? | No. Longitudinal and causal claims remain `NOT_RUN`. |
 
-CI runs the structural checks on every pull request and on pushes to `master`. Structural checks are not semantic acceptance.
+See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screening preregistration](docs/aql-3.0-product-screening-preregistration.md) for the full record. Missing evidence stays `NOT_RUN`; it is never presented as PASS.
 
-**机制已实现；长期、因果和跨宿主效果仍在持续验证，不影响当前合同、权限和证据机制的使用。** The collaboration contract, authority split, and evidence rules in this package are implemented and locally validated. Longitudinal user growth, causal improvement on real projects, and live behavior on every advertised host remain `NOT_RUN` or screening-only. That gap does not block using the current contract. This package is not claimed to make you grow, and installing it does not auto-publish.
+## Version and release model
 
-Seed probe rows were run by the maintainer’s agents. Treat them as falsifiable starting data. Reproduce a matrix row with `probes/make-fixtures.js`. Envelope statistics are **observable and falsifiable, not causally proven**. Claim mapping: [docs/claim-evidence-matrix.md](docs/claim-evidence-matrix.md).
+`manifest.json`, the Skill metadata, and `plugin.json` currently agree on version `3.0.0`. [CHANGELOG.md](CHANGELOG.md) keeps it under **Unreleased** until the exact release tag exists.
 
-## Status language
+- Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
+- Creating `v3.0.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
+- Passing local checks or an independent review does not publish a release.
 
-Do not collapse neighboring rows.
+## Repository map
 
-| State | What it means in practice |
+| Path | Role |
 |---|---|
-| Implemented with self-QA (`BUILT`) | Local changes exist and the implementer ran its own checks. Not independently accepted. Not releasable. |
-| Independently accepted (`ACCEPTED`) | A separate fresh-context review passed required acceptance evidence. Still not permission to deploy. |
-| Release-ready (`RELEASE_READY`) | A frozen accepted artifact passed read-only release preflight. Still not a deploy. |
-| Deployed (`DEPLOYED`) | A named external target was changed under an authorized release action. |
-| Production-verified (`PRODUCTION_VERIFIED`) | Required outcomes were observed on the real target after deploy. |
+| `.cursor/skills/agent-quality-loop/` | Canonical Skill source. Edit here. |
+| `.agents/skills/` | Generated generic-agent snapshot. |
+| `skills/` | Generated Agent Plugins package snapshot. |
+| `.cursor/rules/` | Cursor routing and minimal project guardrails. |
+| `.ai/` | Project lessons and knowledge used during maintenance. |
+| `.github/` | Validation and exact-tag release workflows. |
+| `docs/` | Guide, quickstart, product contract, claim ledger, and preregistered protocols. |
+| `integrations/` | Optional host integrations; currently the Cursor hooks add-on. |
+| `probes/` | Historical probe fixtures and transcripts, not installation payload. |
+| `scripts/` | Installer, synchronization, CLI wrappers, validation, packaging, and release tooling. |
+| `AGENTS.md` | Repository architecture and editing rules. |
+| `CHANGELOG.md` | Package history and unreleased changes. |
+| `CONTRIBUTING.md` | Contribution workflow and release boundary. |
+| `MATRIX.md` | Historical model-tier probe records. |
+| `plugin.json` | Agent Plugins metadata. |
+| `README.md`, `LICENSE`, `.gitattributes`, `.gitignore` | Public entry, license, and repository metadata. |
 
-## Compatibility and advanced use
+## Maintainer verification
 
-| Surface | What you get |
-|---|---|
-| Cursor project rules (`.cursor/rules/`) | Always-on minimal boundaries plus routing summaries |
-| Cursor / Codex / Claude skills | `agent-quality-loop` owns acceptance and release language; `ask-plan-code-qa` stops at `BUILT`; `review-gate` is read-only findings |
-| Agent Plugins clients | Layout via `plugin.json` and top-level `skills/` |
+Edit the canonical Skill tree, regenerate the two copies, and then validate:
 
-`skill-factory` is optional authoring, not part of the quality loop. Optional routes (`aql-diagnose`, `aql-accept`, `aql-release-check`, `aql-resume`) install only with `--suite routes`. Codex `$aql-…`; Cursor and Claude Code `/aql-…`.
+```bash
+node scripts/sync-skills.js
+node scripts/sync-skills.js --check
+node scripts/validate-all.js
+git diff --check
+```
 
-Confirmed preferences can sediment into `.ai/knowledge/collaboration-profile.md` under a firewall: disclosed, revocable, content-bound to the readable carrier, and never a source of authority. AQL 2.8.0's experimental, opt-in Profile Projection v1 applies at most two complete matching active entries through the existing Task Contract and `injected_refs`; copying the template unchanged creates no active or candidate entry. It creates no User Lens state, ranker, or second contract. Fresh Mode skips stored collaboration defaults for one task without disabling project facts, lessons, authority, or evidence. Sanitized one-host mechanism evidence passed its recorded raw-first review; the old A/B/C value control remains `INVALID`, and the executable v3 replacement is only preregistered. Product and longitudinal value remain `NOT_RUN`. Growth Focus is an explicit practice intention, not evidence of growth.
+`sync-skills.js --check` is read-only. These commands check repository mechanics; they do not approve the product or authorize a release. Contribution rules are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Optional envelope cache and stats: [docs/guide.md](docs/guide.md).
+## Further reading
+
+- [AQL 3.0 quickstart in Chinese](docs/quickstart.zh-CN.md)
+- [Day-to-day guide](docs/guide.md)
+- [AQL 3.0 product and execution contract](docs/aql-3.0-product-contract.md)
+- [Claim evidence matrix](docs/claim-evidence-matrix.md)
+- [Historical model-tier matrix](MATRIX.md)
+- [Changelog](CHANGELOG.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
-## Deeper reading
-
-- Day-to-day routing, project-level copy, envelope cache, and adapter boundaries: [docs/guide.md](docs/guide.md)
-- Repository invariants: [AGENTS.md](AGENTS.md)
-- How to propose a change: [CONTRIBUTING.md](CONTRIBUTING.md)
+MIT. See [LICENSE](LICENSE).

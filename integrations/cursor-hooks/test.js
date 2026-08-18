@@ -73,7 +73,8 @@ function buildFullReleaseActEnvelope(workspace, command, overrides) {
   envelope.action_authority = 'release';
   envelope.release_intent = 'act';
   envelope.next_allowed_phase = 'DEPLOYED';
-  envelope.executor_adapter = 'ask-plan-code-qa/embedded';
+  envelope.executor_adapter = 'code-execution';
+  envelope.implementation_receipt.adapter = 'code-execution';
   envelope.artifact_refs = ['./present.txt'];
   envelope.evidence_refs = ['preflight@evidence'];
   envelope.acceptance_gate = passingGate('acceptance');
