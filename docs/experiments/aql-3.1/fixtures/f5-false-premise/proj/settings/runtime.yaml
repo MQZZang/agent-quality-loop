@@ -1,0 +1,2 @@
+request_timeout_seconds: 45
+max_connections: 10

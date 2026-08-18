@@ -1,0 +1,5 @@
+{
+  "name": "demo-service",
+  "retries": 3,
+  "log_level": "info"
+}
