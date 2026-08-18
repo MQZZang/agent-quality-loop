@@ -1,0 +1,88 @@
+{
+  "protocol": "aql-3.1-phase-c/1",
+  "notes": "8 should-trigger + 8 near-neighbor should-not-trigger. Near neighbors share AQL keywords but are translation, definition, or casual chat. Query bytes are frozen; v1 listed method not exact strings — conservative reconstruction from SKILL.md When to Use / When Not to Use (decision #10).",
+  "should_trigger": [
+    {
+      "id": "C-T1",
+      "lang": "zh",
+      "text": "帮我在本地修一下登录超时 bug，改完做自检，不要发布。"
+    },
+    {
+      "id": "C-T2",
+      "lang": "en",
+      "text": "Diagnose why the auth test failed and report evidence only. Do not edit files."
+    },
+    {
+      "id": "C-T3",
+      "lang": "zh",
+      "text": "请独立验收当前 calc.js 的改动，不要改代码。"
+    },
+    {
+      "id": "C-T4",
+      "lang": "en",
+      "text": "Do a release preflight for this package. Do not publish or tag."
+    },
+    {
+      "id": "C-T5",
+      "lang": "zh",
+      "text": "上次重构做到一半断了，请先恢复合同再接着改，不要扩大范围。"
+    },
+    {
+      "id": "C-T6",
+      "lang": "en",
+      "text": "Implement the README typo fix, then publish the package to npm."
+    },
+    {
+      "id": "C-T7",
+      "lang": "zh",
+      "text": "用 formal 质量标准验收这份实现，只读，不要修复。"
+    },
+    {
+      "id": "C-T8",
+      "lang": "zh",
+      "text": "记住我以后要简洁中文结论；现在把 retry 从 3 改到 5，只改本地配置。"
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "id": "C-N1",
+      "lang": "zh",
+      "text": "英语里 acceptance 和 release 有什么区别？只解释词义。"
+    },
+    {
+      "id": "C-N2",
+      "lang": "en",
+      "text": "What does the phrase Task Contract mean? Give a one-sentence dictionary definition only."
+    },
+    {
+      "id": "C-N3",
+      "lang": "zh",
+      "text": "帮我把「独立验收」翻译成英文，不要做任何项目工作。"
+    },
+    {
+      "id": "C-N4",
+      "lang": "en",
+      "text": "Brainstorm five casual cafe names that include the words Formal Acceptance."
+    },
+    {
+      "id": "C-N5",
+      "lang": "zh",
+      "text": "一句话解释：什么是 evidence-grounded diagnosis？不要做任务。"
+    },
+    {
+      "id": "C-N6",
+      "lang": "en",
+      "text": "Is 2+2 equal to 4? Also, what is a skill file in one sentence?"
+    },
+    {
+      "id": "C-N7",
+      "lang": "zh",
+      "text": "闲聊：你觉得「生命周期」这个词好听吗？"
+    },
+    {
+      "id": "C-N8",
+      "lang": "en",
+      "text": "Translate only this phrase into Chinese: scoped alignment, release preflight, safe resume."
+    }
+  ]
+}
