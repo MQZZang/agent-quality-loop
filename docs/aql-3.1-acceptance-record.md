@@ -41,9 +41,12 @@ Binding sources: `docs/aql-3.1-iteration-plan.md` (WP1–WP7, §6 release standa
 2. Runner-surface differences (Task vs best-of-n; session catalog cache) are constants-within-comparison but logged (M-002/M-003/M-006).
 3. Hook live-attach `NOT_RUN`; gates are fixture-verified only. n=1 per matrix cell family; small effects undetectable (pre-registered power honesty).
 4. B1-F1 narrative grade is a harness artifact (M-007); mechanical facts stand.
+5. This acceptance was measured on 3.1.0 bytes. The `v3.1.0` release later proved to carry a date-rollover defect in two shipped self-tests (fixed in 3.1.1, see CHANGELOG): `validate-all` on those bytes fails on any date after 2026-08-18. The green `validate-all` cited under dimension 2 was therefore date-dependent, which the reproducibility dimension did not catch — the suite was never run under a shifted clock. 3.1.1 changes only date handling inside those two self-test scripts, so every behavioral verdict above still binds, and the gap is recorded here rather than re-scored.
 
 ## Verdict
 
 **ACCEPTED** under formal conjunctive review. All frozen release standards (§6.1–§6.7) are met on raw numbers with caveats disclosed above.
 
 Release authorization boundary: acceptance is not release. This record authorizes release *preparation* (version 3.1.0, changelog, local annotated tag). Pushing the branch/tag to the public remote is an external write and remains with the repository owner.
+
+Release execution: the owner authorized the push in-session. `v3.1.0` was pushed and its release workflow passed on all three platforms; the master validate run on the same bytes then failed after the UTC date rolled over, which surfaced limit 5 above and produced `v3.1.1`.

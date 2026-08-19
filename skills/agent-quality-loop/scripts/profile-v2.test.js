@@ -22,6 +22,13 @@ function captureStdout(operation) {
   try { operation(); } finally { process.stdout.write = original; }
   return output;
 }
+// Entries default to valid_from = today, so projection fixtures must move with the
+// clock: a pinned as_of turns every selection into not_yet_valid after that date.
+function day(offsetDays = 0) {
+  const moment = new Date();
+  moment.setUTCDate(moment.getUTCDate() + offsetDays);
+  return moment.toISOString().slice(0, 10);
+}
 function entry(id, overrides = {}) {
   return {
     id,
@@ -39,7 +46,7 @@ function entry(id, overrides = {}) {
 }
 function contextFor(ids, overrides = {}) {
   return {
-    as_of: "2026-08-18",
+    as_of: day(),
     scopes: [],
     semantic: Object.fromEntries(ids.map((id) => [id, { applies_when_matches: true, suppress_when_matches: false, material_effect: true, effect: `guided-${id}` }])),
     ...overrides,
@@ -96,7 +103,7 @@ async function run() {
     check(projected.selected.every((item) => item.id !== "expanded") && projected.suppressed.some((item) => item.reason === "current_turn_override"), "current-turn override wins");
     projected = runtime.projectProfile(runtime.readProfile(profilePath), contextFor(["expanded", "role"], { fresh_mode: true }));
     check(projected.selected.length === 0 && projected.suppressed.every((item) => ["fresh_mode", "superseded"].includes(item.reason)), "Fresh Mode selects nothing and changes no profile state");
-    projected = runtime.projectProfile(runtime.readProfile(profilePath), { as_of: "2026-08-18", semantic: {} });
+    projected = runtime.projectProfile(runtime.readProfile(profilePath), { as_of: day(), semantic: {} });
     check(projected.selected.length === 0, "unknown applicability suppresses by default");
 
     runtime.remember(profilePath, entry("suppressed", { suppress_when: "the user asks for full detail" }), "task:suppress", 5, false);
@@ -108,13 +115,13 @@ async function run() {
     projected = runtime.projectProfile(runtime.readProfile(profilePath), contextFor(["expanded", "role", "suppressed", "conflict-a", "conflict-b"]));
     check(projected.conflicts.some((item) => item.preference_key === "tone") && projected.selected.length <= 2, "peer conflict suppresses both and selection stays capped at two");
 
-    runtime.remember(profilePath, entry("review", { review_after: "2026-08-18" }), "task:review", 8, false);
+    runtime.remember(profilePath, entry("review", { review_after: day() }), "task:review", 8, false);
     projected = runtime.projectProfile(runtime.readProfile(profilePath), contextFor(["review"]));
     check(projected.suppressed.some((item) => item.id === "review" && item.reason === "review_due"), "review-due preference is suppressed");
     const notYetValid = runtime.readProfile(profilePath);
     const reviewEntry = notYetValid.entries.find((item) => item.id === "review");
     reviewEntry.review_after = null;
-    reviewEntry.valid_from = "2026-08-19";
+    reviewEntry.valid_from = day(1);
     projected = runtime.projectProfile(notYetValid, contextFor(["review"]));
     check(projected.suppressed.some((item) => item.id === "review" && item.reason === "not_yet_valid"), "future-valid preference is suppressed until its validity date");
 

@@ -4,7 +4,7 @@ description: Use when a coding or workspace task needs scoped alignment, evidenc
 license: MIT
 metadata:
   author: MQZZang
-  version: "3.1.0"
+  version: "3.1.1"
 ---
 
 # Agent Quality Loop

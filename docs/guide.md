@@ -53,8 +53,9 @@ The receipt reports observed capability states and sources; it does not prove ta
 
 ## Installation Lifecycle
 
-The AQL 3.1 source candidate lives on the `aql-3.1-candidate` branch and the `v3.1.0`
-tag. Use a release tag when you require an immutable published artifact.
+`v3.1.1` is the current release tag; the branch tip is the working source. Use a
+release tag when you require an immutable published artifact. Avoid `v3.1.0`: its
+bundled self-tests fail on any date after 2026-08-18.
 Node.js 22 is the tested CI baseline. Install only to the host targets you actually
 use; choose `all` only for an intentional multi-host setup.
 

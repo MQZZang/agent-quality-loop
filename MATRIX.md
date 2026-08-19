@@ -21,6 +21,8 @@ Qualification binds `model (exact version) × host × task_class × assurance �
 
 For the 3.1 tree, every combination not listed above is `unverified` — including the four seed-row combinations, whose transcripts bind to 2.3/2.4-era trees.
 
+Rows above were measured on 3.1.0 bytes. 3.1.1 changes only the date handling inside two self-test scripts (`profile-v2.test.js`, `validate-profile-projection.js`), leaving Skill instruction text, contracts, and gates byte-identical, so the rows carry over with that delta disclosed rather than re-measured.
+
 ## Historical probe archive (append-only, retained verbatim for audit)
 
 Probe and run records in execution order, including superseded intermediate verdicts. Rows are falsifiable and retained for audit. They do not establish Profile v2 product value or longitudinal value; those verdicts remain `NOT_RUN`.

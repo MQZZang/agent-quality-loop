@@ -112,6 +112,13 @@ function input(id, overrides = {}) {
     ...overrides,
   };
 }
+// Remembered entries default to valid_from = today, so the self-test context must
+// move with the clock instead of pinning a calendar date.
+function day(offsetDays = 0) {
+  const moment = new Date();
+  moment.setUTCDate(moment.getUTCDate() + offsetDays);
+  return moment.toISOString().slice(0, 10);
+}
 function semantic(ids) {
   return Object.fromEntries(ids.map((id) => [id, { applies_when_matches: true, suppress_when_matches: false, material_effect: true, reason: `Explicit semantic match for ${id}`, effect: `Guide ${id}` }]));
 }
@@ -125,18 +132,18 @@ function selfTest() {
       input("first"), input("second"), input("third"),
       input("conflict-a", { preference_key: "tone", value: "a" }),
       input("conflict-b", { preference_key: "tone", value: "b" }),
-      input("review", { review_after: "2026-08-18" }),
+      input("review", { review_after: day() }),
       input("conditional", { suppress_when: "the current request asks for the opposite" }),
     ]) { runtime.remember(profilePath, item, `task:${item.id}`, revision, false); revision += 1; }
     runtime.setFlag(profilePath, "enabled", true, revision); revision += 1;
     const current = runtime.readProfile(profilePath);
     const allIds = current.entries.map((entry) => entry.id);
-    const base = { as_of: "2026-08-18", scopes: [], semantic: semantic(allIds) };
+    const base = { as_of: day(), scopes: [], semantic: semantic(allIds) };
     const before = fs.readFileSync(profilePath, "utf8");
     const normal = runtime.projectProfile(current, base);
     const fresh = runtime.projectProfile(current, { ...base, fresh_mode: true });
     const overridden = runtime.projectProfile(current, { ...base, current_turn_overrides: ["preference.first"] });
-    const unknown = runtime.projectProfile(current, { as_of: "2026-08-18", scopes: [], semantic: {} });
+    const unknown = runtime.projectProfile(current, { as_of: day(), scopes: [], semantic: {} });
     const policy = runtime.projectProfile(current, { ...base, policy_conflicts: ["preference.first"] });
     const suppressSemantic = semantic(allIds);
     suppressSemantic.conditional.suppress_when_matches = true;

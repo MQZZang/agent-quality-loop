@@ -2,6 +2,13 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## 3.1.1 — 2026-08-19
+
+- Fixed a date-rollover defect in two shipped self-tests: `profile-v2.test.js` and `validate-profile-projection.js --self-test` pinned the projection context to `as_of: 2026-08-18` while remembered entries take `valid_from: today()`, so every projection assertion flipped to `not_yet_valid` once a runner's UTC date passed that day. Both suites now derive their dates from the runtime clock and pass at simulated clock offsets of 0, +1, +45, and +400 days; CI on 2026-08-19 UTC is the end-to-end confirmation on a genuinely later date. The defect entered with the 3.0 packaging commit `f0fdb08`; the released `v3.1.0` bytes carry it, which is why this is a patch release rather than a moved tag.
+- Verification note for future maintainers: running the whole `validate-all` suite under a patched `Date` object fails the profile write-lock race check for a harness reason, not a product reason. `staleLock` compares `Date.now()` against the lock's own `created_at` or the directory mtime, so shifting only the JavaScript clock makes a live lock look stale. Real hosts move clock and filesystem timestamps together; shift dates per suite, or use a runner whose real date is later.
+- No change to Skill instruction text, contracts, gates, or acceptance behavior. The 3.1 gate evidence was collected on 3.1.0 bytes and carries over with that delta disclosed in `MATRIX.md` and `docs/aql-3.1-acceptance-record.md`.
+- Public docs now state which document governs when the frozen 3.0 contract and the shipped Skill disagree, report the measured 3.1 gate results alongside the ablation's null result, and drop README content duplicated from the quickstart.
+
 ## 3.1.0 — 2026-08-18
 
 - Slimmed the ordinary-task hot path: SKILL.md now carries never-fabricate, claim labels, semantic-risk words, the internal six-field card, and a mini phrase map. Routine turns no longer force-load the full contracts machine protocol.

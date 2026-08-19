@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
-  "version": "3.1.0",
-  "generated_at": "2026-08-18T11:50:41.485Z",
+  "version": "3.1.1",
+  "generated_at": "2026-08-19T02:50:57.406Z",
   "files": {
-    "SKILL.md": "3ea168980a127b308631a150fa9ae6898db1d56ea82c77b180e9f4311d0f9c7d",
+    "SKILL.md": "dad62190ab31c9b22ffda8a3f6467b875bc8038b18cd7b75c06e73f64f99ec8e",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "fixtures/capability-receipt-valid.json": "ad718c2dfa3c471fc2d88c6e1a15a0639a0414f8fec860ac22276109059afb6b",
     "fixtures/gates-g1-g3/g1-derived-lockfile/expected.json": "b8cf2358e8261d6f4d8088cc6ca13c418b454d110eeb76f91966f8a0cd6f8079",
@@ -43,7 +43,7 @@
     "references/alignment-compiler.md": "46928f2ee531198d4160c042cf3ee7331f6375d8ce532a3cedd55571f9eec8fe",
     "references/code-implementation-adapter.md": "cd43cec2ff7bd585a71c7c431737a8f6449c7cde9a1f0fc105b1b5c84906d132",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "c0fb3374b4d8a4b919b20ac90b69c0a76672082a2f3333226296a6e588feee45",
+    "references/contracts.md": "3dc8e1a027d7f35b35c6045e7bcf5fd5e8ba789ed7afb81ffa4b4cf967d66cd9",
     "references/domain-profiles.md": "e520f3dd651f0f2a5c860feb42cfc385176bcc4c440d0a8cddd97c12093e3099",
     "references/evaluation-cases.md": "9bab64d197546425c45328488072aa17210faaedadf4b43d3e6d0914db5bb6f5",
     "references/multi-agent-leverage.md": "578e233d2d6b3fd0a7598642e35026c1b83f7736663a940eae6a993b047e2868",
@@ -59,11 +59,11 @@
     "scripts/conformance.js": "db7189561afa3ab39b9543f3ec3a4f6f3800a5646a1995b0272dc4e4b29e7b59",
     "scripts/gates-g1-g3.js": "8fde9f4c19914ab510c4414f1516dcd07fbce968b61fd23aaeaa687e18bd532a",
     "scripts/profile-v2.js": "8c3bc33ff2af203537f98db151d5be1d2a10bc723401b23bdcd5b6e271725f71",
-    "scripts/profile-v2.test.js": "d3ba6cce75e1e1302460857f00e5b4f7df2233d29df472be1c9541ee7039836f",
+    "scripts/profile-v2.test.js": "962caa978eab558c20e82760e2203d74a00151fc2a1af3384c5862a14907b8e0",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
     "scripts/validate-envelope.js": "243a7260233a37bc6cf7e0589e0fde6c542d213c53581a6ae7afc8b6c70d6847",
-    "scripts/validate-profile-projection.js": "1919d3338d31874052ce3118def36040c04397034221bc6c948f8ffd668075b4",
+    "scripts/validate-profile-projection.js": "fc1211a322222c762fbd419d3358d999971c09e976206b238f4667fafc982dbf",
     "scripts/validate-profile.js": "e537786dbdcbb77b06b47d1000d8b9130ab7a5b6f68269a0a343baba122d9250",
-    "scripts/validate-skill.js": "14a61130a3580b9840b092eb797fb8f3305de7e94bff91a0efa00ba175ab55d6"
+    "scripts/validate-skill.js": "c933557e32ca8b71491b667c3620df37f0176a40b9321f2162994815469989a3"
   }
 }
