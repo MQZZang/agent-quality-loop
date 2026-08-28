@@ -2,7 +2,7 @@
 
 ## Core
 
-AQL 3.1 is one Skill, `agent-quality-loop`. It compiles the request into one Task Contract containing the goal, scope, evidence, assurance, and authority for that task. Natural language remains the normal interface.
+AQL 3.2 is one Skill, `agent-quality-loop`. It compiles the request into one Task Contract containing the goal, scope, evidence, assurance, and authority for that task. Natural language remains the normal interface.
 
 ```text
 request -> Task Contract -> proportionate work/evidence -> optional independent acceptance -> separately authorized release
@@ -53,7 +53,7 @@ The receipt reports observed capability states and sources; it does not prove ta
 
 ## Installation Lifecycle
 
-`v3.1.1` is the current release tag; the branch tip is the working source. Use a
+`v3.1.1` is the current release tag; the branch tip is the `3.2.0` working source. Use a
 release tag when you require an immutable published artifact. Avoid `v3.1.0`: its
 bundled self-tests fail on any date after 2026-08-18.
 Node.js 22 is the tested CI baseline. Install only to the host targets you actually

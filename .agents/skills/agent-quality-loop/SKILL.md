@@ -4,7 +4,7 @@ description: Use when a coding or workspace task needs scoped alignment, evidenc
 license: MIT
 metadata:
   author: MQZZang
-  version: "3.1.1"
+  version: "3.2.0"
 ---
 
 # Agent Quality Loop
@@ -77,7 +77,9 @@ Ask only when, after read-only grounding, at least two credible interpretations 
 
 When the user's single message already supplies goal, scope, target, operation, and current-turn authorization, act on it; do not re-split a combined authorization into ceremonial confirmations.
 
-For non-trivial work, define an observable after-state, distinguish fixed / guided / open choices, and ground load-bearing terms. Treat a requested mechanism as an assumption, not the goal. On contradiction, disclose the mismatch, then stop or ask.
+For non-trivial work, define an observable after-state, distinguish fixed / guided / open choices, and ground load-bearing terms. Observable reality calibrates the current state; current-turn instructions and authoritative specifications determine target obligations. Current reality may prove a gap but cannot rewrite the target. Classify a named mechanism by source and wording: Fixed when explicitly required or part of acceptance, Guided when preferred or replaceable, and Open when illustrative or delegated. Do not automatically downgrade it to an assumption. On contradiction, disclose the mismatch, then stop or ask.
+
+On a material user correction or authoritative-source update, recompile the affected obligations. Preserve raw evidence with its original baseline and provenance, but invalidate every current claim or verdict binding that depends on the superseded premise. Rerun only the affected dependency path.
 
 Read applicable project rules, facts, and lessons. A matching active lesson may enter the Task Contract; lessons remain separate project knowledge.
 
@@ -101,7 +103,7 @@ Remain read-only by default. Separate static, generated, simulated, runtime/nati
 
 Require aligned and evidenced inputs. Protect unrelated dirty work. Use the highest-value falsification probe before broadening a change.
 
-For code, use [code-implementation-adapter.md](references/code-implementation-adapter.md). For writing, use [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). Domain tools inherit the same contract and authority ceiling.
+For code, use [code-implementation-adapter.md](references/code-implementation-adapter.md): diagnose/defect work needs causal evidence, while feature/greenfield/outcome-led work is governed by outcome, invariants, and trade-offs. For writing, use [writing-collaboration-adapter.md](references/writing-collaboration-adapter.md). Domain tools inherit the same contract and authority ceiling.
 
 Re-anchor on resume/compaction, path change, repeated same-shape failure, first read-to-write, scope expansion, release preflight, or a premise contradiction. Compare touched surfaces to the ALIGN-frozen allowlist, never to the previous increment. Re-anchor cannot raise phase or authority, adds no badge, fires at most once per event, and keeps no ledger of its own: if it surfaces a material decision, the note lives in that decision's three-line record.
 
@@ -111,9 +113,9 @@ Pause on scope or authority drift, dirty-file collision, generated/source ambigu
 
 ### ACCEPT
 
-Acceptance is an AQL Core function: fresh context, read-only, contract → artifact/diff → raw evidence → implementer narrative. It does not self-certify, repair, or authorize release. Ordinary tasks stay at `BUILT`.
+Acceptance is an AQL Core function: fresh context, read-only, available authoritative request/correction/spec provenance → contract → artifact/diff → raw evidence → implementer narrative. It does not self-certify, repair, or authorize release. Ordinary tasks stay at `BUILT`. When authoritative source provenance is unreadable, acceptance may report contract-relative conformance, but cannot claim original-intent fidelity or grant `ACCEPTED`; formal `goal_fidelity` remains `BLOCKED` or `NOT_RUN`.
 
-Standard acceptance is result-anchored free review. Answer three questions with whatever probes professional judgment selects, in any order, with no dimension bookkeeping: (1) Does the frozen goal's observable after-state hold? (2) Is any hard boundary violated? (3) Is every claim within its evidence and observer limits? Report findings result-first in plain prose, ordered by consequence.
+Standard acceptance is result-anchored free review. Answer three questions with whatever probes professional judgment selects, in any order, with no dimension bookkeeping: (1) When authoritative source provenance is readable, are the frozen goal, scope, and non-goals faithful to it, and does the observable after-state hold? (2) Is any hard boundary violated? (3) Is every claim within its evidence and observer limits? Report findings result-first in plain prose, ordered by consequence.
 
 The four-dimension conjunctive method in [acceptance-review.md](references/acceptance-review.md) is `assurance: formal` or release-bound acceptance only.
 
@@ -136,6 +138,8 @@ Lead with exactly one adaptive [User Result Summary](references/contracts.md#use
 - Missing profile, CLI, hooks, or user-directory access degrades to normal Core behavior.
 - Execution reads before editing, protects scope, and stops at `BUILT` after self-QA.
 - Formal acceptance is fresh-context, raw-evidence-first, conjunctive, and bound to exact artifacts. Standard acceptance is result-anchored free review.
+- Current-state evidence cannot rewrite target obligations; Fixed, Guided, and Open mechanism identity follows source and wording.
+- A material correction preserves raw evidence but invalidates dependent current claim/verdict bindings until the affected path is rerun.
 - Capability claims have mechanical sources; unknown capability remains `NOT_RUN`.
 - No local mode performs or implies an external, destructive, deploy, publish, or release action.
 - Results follow Result Attention and do not expose internal profile/receipt machinery by default.

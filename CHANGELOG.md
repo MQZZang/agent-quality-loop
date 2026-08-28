@@ -2,6 +2,16 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## 3.2.0 — 2026-08-28
+
+- Separated current-state evidence from target-state authority so observed implementation state identifies a gap but cannot rewrite current-turn or authoritative target obligations.
+- Classified named mechanisms as Fixed, Guided, or Open from source and wording instead of automatically downgrading them to hypotheses.
+- Made acceptance source-fidelity-aware: readable authoritative request/correction/spec provenance precedes the contract; unreadable provenance permits contract-relative review but blocks formal `goal_fidelity` and `ACCEPTED`.
+- Preserved raw evidence across material corrections while invalidating only dependent current claim/verdict bindings; unaffected evidence remains reusable.
+- Routed code reasoning by intent: defects require causal evidence, while feature/greenfield/outcome-led work follows outcomes, invariants, consumer paths, and trade-offs.
+- Removed the fixed visible alignment block from routine work while retaining the internal material-decision record and existing formal G3.
+- Added five-layer package/runtime provenance diagnostics, 27 evaluation cases, 58 envelope regressions, and preregistered paired M0/H0/H1 fixtures. Controlled behavioral and product-benefit results remain `NOT_RUN`.
+
 ## 3.1.1 — 2026-08-19
 
 - Fixed a date-rollover defect in two shipped self-tests: `profile-v2.test.js` and `validate-profile-projection.js --self-test` pinned the projection context to `as_of: 2026-08-18` while remembered entries take `valid_from: today()`, so every projection assertion flipped to `not_yet_valid` once a runner's UTC date passed that day. Both suites now derive their dates from the runtime clock and pass at simulated clock offsets of 0, +1, +45, and +400 days; CI on 2026-08-19 UTC is the end-to-end confirmation on a genuinely later date. The defect entered with the 3.0 packaging commit `f0fdb08`; the released `v3.1.0` bytes carry it, which is why this is a patch release rather than a moved tag.

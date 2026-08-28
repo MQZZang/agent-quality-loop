@@ -22,6 +22,7 @@ const COMMANDS = [
   ["scripts/validate-corpus-claims.js", "--self-test"],
   ["scripts/validate-corpus-claims.js", "--claims", "docs/research/llm-learning-corpus/claim-ledger.json", "--inventory", "docs/research/llm-learning-corpus/inventory.json", "--check"],
   ["scripts/validate-writing-probes.js"],
+  ["scripts/calibrate-adjudication.js", "--self-test"],
   ["scripts/aql-doctor.js", "--self-test"],
   ["scripts/test-release-workflow-logic.js"],
   ["integrations/cursor-hooks/test.js"],

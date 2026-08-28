@@ -22,6 +22,8 @@
 | 3.1 Phase C trigger control | BLIND_RUNTIME **PASS** | Merged 48/48 runs `BORDERLINE` (6/8 + 8/8) → protocol-allowed rev2 description → rerun of failing direction 24/24 triggered (8/8); silence 8/8 stands from rev1. Runner caveat (Task vs best-of-n) disclosed in `docs/experiments/aql-3.1/phase-c-results.md`. |
 | 3.1 Phase B0 ablation | BLIND_RUNTIME `NO_LARGE_EFFECT_DETECTED` | 18 cells blind-graded; goal parity B0 vs B2 at n=6; qualitative hard-gate-adjacent differences on F1/F2 favor skill arms; not promoted to product value. `docs/experiments/aql-3.1/phase-b0-results.md`. |
 | 3.1 Phase D candidate gate | BLIND_RUNTIME **PASS** | B2 vs B3, 9 families, blind-graded; seven pass conditions PASS on raw numbers; tested tree `9307a60`, final tree `1d72894` spot-verified on hidden fixtures. `docs/experiments/aql-3.1/phase-d-results.md`. |
+| Five-layer package/runtime provenance | STATIC + SELF_TEST | `aql-doctor --active-skill` reports canonical and explicitly supplied snapshot digests, but host discovery, runtime read/mount, and behavioral application remain `NOT_RUN` without their own trace. The supplied path is not an installer-ownership claim. |
+| 3.2 six semantic patches | SPEC + SELF_TEST | Packaged semantics, 12 paired fixtures, M0/H0/H1 calibration anchors, and validator regressions are present. Controlled forced-load and natural-discovery behavior runs remain `NOT_RUN`; no product-benefit claim. See `docs/experiments/aql-3.2/`. |
 | Cross-host automatic profile synchronization | N/A | Not claimed. Same-storage portability and explicit export/import only. |
 
 Structural checks, hashes, and receipts prove only their named mechanism. They do not prove acceptance, release authorization, product benefit, or long-term value.

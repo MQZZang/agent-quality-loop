@@ -9,7 +9,7 @@ Require an `ALIGNED` and `EVIDENCED` parent contract containing:
 - goal, success observables, counterexamples, scope allowlist, and non-goals;
 - assurance and action authority;
 - workspace/baseline identity and dirty-state caveat;
-- causal evidence, assumptions, unknowns, pause conditions, and semantic must-hold checks when applicable.
+- causal evidence for diagnose/defect work, or outcome drivers and trade-offs for feature/greenfield/outcome-led work, plus assumptions, unknowns, pause conditions, and semantic must-hold checks when applicable.
 
 If any conclusion-changing input is absent or stale, return to the parent lifecycle for read-only reconstruction. Do not create a second goal contract.
 
@@ -44,14 +44,14 @@ Escalation triggers (generic; stop and report, do not self-dispose):
 When dispatching a sub-executor, use a Dispatch Brief (above).
 
 1. **Inspect** — re-read target files, callers, tests, configuration, and related contracts. Protect unrelated dirty work.
-2. **Plan Gate** — choose the smallest root-cause change. Confirm scope, semantics, cross-file impact, acceptance method, and pause conditions. Only `Pass` or `Pass with Risk` permits editing.
+2. **Plan Gate** — for diagnose/defect work, choose the smallest change supported by causal evidence. For feature, greenfield, and outcome-led work, choose the smallest change that satisfies the frozen outcome and invariants; use causal probes only when they discriminate candidate designs. Confirm scope, semantics, cross-file impact, acceptance method, and pause conditions. Only `Pass` or `Pass with Risk` permits editing.
 3. **Code** — edit only allowlisted surfaces, follow existing architecture, preserve must-hold checks, and stop on scope expansion or authority conflict.
 4. **Self-QA** — run the smallest sufficient checks for the inherited assurance. Record passing, failing, and not-run evidence; do not convert proxy evidence into a user-outcome claim.
 
 Assurance controls verification cost, not authority:
 
 - `fast`: trivial reversible change, focused diff/check.
-- `standard`: default root-cause change with focused tests and relevant cross-file checks.
+- `standard`: intent-appropriate change with focused tests and relevant cross-file checks.
 - `formal`: stronger implementation evidence for later independent acceptance; this adapter still ends at `BUILT`.
 
 ## Output

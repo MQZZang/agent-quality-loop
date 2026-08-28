@@ -2,21 +2,21 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) 3.1.1** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
+**Agent Quality Loop (AQL) 3.2.0** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
 
 AQL is not another IDE or hosted service, and it does not publish anything on its own. The main workflow works without Profile v2, the optional CLI, Cursor hooks, or access to your user directory.
 
-中文速览：[AQL 3.1 快速开始](docs/quickstart.zh-CN.md)。The exact implementation rules are the [3.0 product and execution contract](docs/aql-3.0-product-contract.md) as amended by the 3.1 entries in [CHANGELOG.md](CHANGELOG.md); where a document and the shipped bytes disagree, the Skill source under `.cursor/skills/agent-quality-loop/` is authoritative.
+中文速览：[AQL 3.2 快速开始](docs/quickstart.zh-CN.md)。The exact implementation rules are the [3.0 product and execution contract](docs/aql-3.0-product-contract.md) as amended by later entries in [CHANGELOG.md](CHANGELOG.md); where a document and the shipped bytes disagree, the Skill source under `.cursor/skills/agent-quality-loop/` is authoritative.
 
 | Where this repository stands | Status |
 |---|---|
-| Source package version | `3.1.1` |
+| Source package version | `3.2.0` working source |
 | Product surface | One Skill: `agent-quality-loop` |
 | Contract for each task | One Task Contract |
-| GitHub release | Created only after an exact `v3.1.1` tag passes the release workflow |
+| GitHub release | Current release `v3.1.1`; `v3.2.0` exists only after its exact tag passes the release workflow |
 | License | MIT |
 
-> **Before you install:** `v3.1.1` is the current release tag and the branch tip is the working source. Check out the tag when you need an immutable artifact; use a branch when you are evaluating or developing. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
+> **Before you install:** `v3.1.1` is the current release tag; the branch tip is the `3.2.0` working source. Check out the tag when you need an immutable published artifact; use a branch when you want the current working source. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
 
 ## Why AQL exists
 
@@ -24,7 +24,7 @@ Getting an answer or patch from an agent is easy. The harder part is deciding wh
 
 AQL keeps those decisions visible without asking you to fill out a form:
 
-- **You can see what “done” means.** Before substantial work, the agent states the result, the edit boundary, and the most likely misunderstanding.
+- **You can inspect what “done” means.** The agent keeps the result, edit boundary, and material misunderstanding aligned, and surfaces them when they change your decision, scope, authority, or risk.
 - **The plan starts from the real project.** Files, behavior, and key assumptions are checked before the agent commits to a plan. If the request rests on a false premise, you hear that first.
 - **Each claim has matching evidence.** A test, receipt, or review proves only what it actually checked.
 - **You get the result before the process details.** Routine replies lead with the outcome, the important evidence, and anything you still need to do.
@@ -131,11 +131,19 @@ Ordinary language is the main interface. If your host lets you select a Skill, c
 
 `status` confirms that the installed copy exists and still matches the installer’s record. It cannot confirm that a running host loaded the Skill. After installation:
 
-1. run `node scripts/install.js status --to <your-target>` and require `OWNED ... @3.1.1`;
+1. run `node scripts/install.js status --to <your-target>` and require the `OWNED` version to match the source you installed (`3.2.0` for this branch, `3.1.1` for the current release tag);
 2. start or reload the target host and use its Skill discovery view to find `agent-quality-loop`;
 3. ask a small read-only task and confirm the result preserves the requested boundary.
 
 If status reports `UNOWNED` or drift, inspect the target before you update or uninstall it. Copied files alone do not prove that every host loaded and used the Skill correctly.
+
+For a read-only identity comparison, point the doctor at the Skill path the host is expected to discover:
+
+```bash
+node scripts/aql-doctor.js --json --root . --active-skill <path-to-agent-quality-loop>
+```
+
+The report keeps five claims separate: canonical source digest, explicitly supplied snapshot digest, host discovery observation, runtime read-or-mount identity, and behavioral application evidence. The last three remain `NOT_RUN` unless their own trace exists; matching files never imply that a running model loaded or followed them. Without `--active-skill`, doctor audits only the working package trees. The supplied path is not an installer-ownership claim; installer `status` remains the authority for ownership.
 
 ## Optional Profile v2
 
@@ -184,7 +192,7 @@ Optional [Cursor hooks](integrations/cursor-hooks/README.md) handle only rules a
 
 ## What the current evidence supports
 
-The [21 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
+The [27 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
 
 | Adoption question | Current evidence boundary |
 |---|---|
@@ -193,6 +201,7 @@ The [21 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluatio
 | Will every listed host load and behave identically? | The package layouts pass validation. Live behavior still has to be checked in each host. |
 | Were the 3.1 behavior changes checked by running them? | Yes, on one model and host pair (`cursor-grok-4.5-high-fast`). Skill trigger and silence gates passed 8/8 and 8/8, and the candidate-acceptance gate passed its seven conditions under blind grading. See the [3.1 acceptance record](docs/aql-3.1-acceptance-record.md). |
 | Does the full Skill beat a minimal kernel? | Not shown. The ablation returned `NO_LARGE_EFFECT_DETECTED` on goal correctness at n=6 per arm; only hard-gate-adjacent qualitative differences favored the Skill arms. |
+| Do the six 3.2 semantic patches improve model behavior? | `NOT_RUN`. Their M0/H0/H1 rubric, paired fixtures, patch isolation, combined-package rule, and discovery separation are preregistered under `docs/experiments/aql-3.2/`; deterministic calibration proves only protocol structure. |
 | Is AQL 3.0 better than 2.8, or is Profile v2 product-effective? | Both preregistered screenings remain `NOT_RUN`. |
 | Did the historical Profile v1 experiment prove value? | No. Its mechanism evidence is historical and its A/B/C value control is `INVALID`. |
 | Does AQL prove long-term user or productivity improvement? | No. Longitudinal and causal claims remain `NOT_RUN`. |
@@ -201,10 +210,10 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 
 ## Version and release model
 
-`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.1.1`, and [CHANGELOG.md](CHANGELOG.md) dates that entry. A GitHub Release still exists only after the exact `v3.1.1` tag passes the release workflow. Published tags are never moved: a defect found after release ships as the next patch version.
+`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.2.0`, and [CHANGELOG.md](CHANGELOG.md) dates that source entry. The current GitHub Release remains `v3.1.1`; a `v3.2.0` release exists only after the exact tag passes the release workflow. Published tags are never moved.
 
 - Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
-- Creating `v3.1.1` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
+- Creating `v3.2.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
 - Passing local checks or an independent review does not publish a release.
 
 ## Repository map

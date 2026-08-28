@@ -70,7 +70,7 @@ Model choice and quota policy stay at the host orchestration layer (e.g. Cursor 
 - Subagent output = evidence, never a verdict or phase grant.
 - Default **single round**; no multi-round debate loops (avoids multi-agent text-self-consistency).
 - ACCEPT prefers acceptor context/model-family distinct from the implementer when the host can supply it; record actual `acceptance_independence` honestly.
-- Acceptor feed order: contract → artifacts/diff → raw evidence → only then implementer narrative.
+- Acceptor feed order: available authoritative request/correction/spec provenance → contract → artifacts/diff → raw evidence → only then implementer narrative.
 - Subagent authority inherits the parent ceiling per [Delegated-Agent Authority Inheritance](contracts.md#delegated-agent-authority-inheritance); do not restate that rule here.
 - Main context owns diffs, question synthesis, dimension status, and lifecycle mapping.
 - Probe agreement is not correctness evidence; source-alignment outranks consensus.

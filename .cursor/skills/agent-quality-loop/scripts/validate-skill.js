@@ -8,7 +8,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "3.1.1";
+const MANIFEST_VERSION = "3.2.0";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
@@ -248,7 +248,7 @@ function requireAll(relativePath, requiredTerms, forbiddenTerms = []) {
 requireAll("references/contracts.md", [
   "## User Result Summary",
   "1–3 lines",
-  "local unreleased AQL 3.1.1 build",
+  "local unreleased AQL 3.2.0 build",
   "## Result Detail Budget",
   "injected_refs:",
   "kind: lesson | profile | preset | domain_profile | probe | route",
@@ -314,6 +314,39 @@ requireAll("references/writing-collaboration-adapter.md", [
 requireAll("references/evaluation-cases.md", [
   "## 1.",
   "## 16.",
+  "## 27.",
+]);
+
+requireAll("SKILL.md", [
+  "Current reality may prove a gap but cannot rewrite the target.",
+  "Do not automatically downgrade it to an assumption.",
+  "invalidate every current claim or verdict binding",
+  "When authoritative source provenance is readable, are the frozen goal, scope, and non-goals faithful to it",
+  "cannot claim original-intent fidelity or grant `ACCEPTED`",
+  "formal `goal_fidelity` remains `BLOCKED` or `NOT_RUN`",
+], [
+  "Treat a requested mechanism as an assumption, not the goal.",
+]);
+
+requireAll("references/alignment-compiler.md", [
+  "workspace reality is baseline evidence, not authority to rewrite the target",
+  "never a fixed alignment block",
+  "mechanisms stated as mandatory",
+], [
+  "and three alignment lines",
+]);
+
+requireAll("references/code-implementation-adapter.md", [
+  "For feature, greenfield, and outcome-led work",
+], [
+  "choose the smallest root-cause change",
+  "default root-cause change",
+]);
+
+requireAll("references/acceptance-review.md", [
+  "available authoritative request/correction/spec provenance",
+  "cannot claim original-intent fidelity or grant lifecycle `ACCEPTED`",
+  "formal `goal_fidelity` is `BLOCKED` or `NOT_RUN`",
 ]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");

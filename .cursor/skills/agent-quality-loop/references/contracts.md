@@ -65,7 +65,9 @@ Compile facts from the cheapest sufficient rung, in order; every rung is read-on
 3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
 4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
 
-A mechanism named in the request compiles as the outcome it serves plus a hypothesis entry, with the inferred outcome stated in the alignment lines.
+A mechanism named in the request is classified by source and wording without adding schema: Fixed when explicitly required or part of acceptance, Guided when preferred or a replaceable default, and Open when illustrative or delegated. Preserve the outcome it serves, but do not automatically downgrade a Fixed mechanism to a hypothesis or harden a Guided/Open mechanism into an obligation.
+
+Observable environment evidence is authoritative for current-state claims. Current-turn instructions and authoritative specifications are authoritative for target-state obligations; current reality records the baseline/gap and cannot silently rewrite the target. Disclose any conflict before freezing the contract.
 
 Depth by tier: `fast` verifies only referents the task already touches; `standard` adds every referent the request names; `formal` verifies every conclusion-changing referent. After a mismatch, disclosure comes first: at most one bounded pass over the named referents and their immediate directories before disclosing — disclosure precedes any wider search.
 
@@ -384,9 +386,9 @@ acceptance_independence:
 
 Qualified independent acceptance for `ACCEPTED` requires distinct non-empty context references, `relation: fresh_context`, non-empty `separation_evidence_ref`, and raw evidence first. Record `different_role` only as a downgrade/audit note — it does not qualify for `ACCEPTED`. Otherwise remain `phase: BUILT`, `verdict: PENDING`.
 
-Rebuild the envelope after a baseline change, conflicting concurrent edit, evidence expiry, goal/scope change, or failed acceptance. Do not infer authority from an old envelope.
+Rebuild the envelope after a baseline change, conflicting concurrent edit, evidence expiry, material user correction, authoritative-source update, goal/scope change, or failed acceptance. Preserve raw evidence with its original baseline and provenance, but invalidate every current claim/verdict binding that depends on a superseded premise. Return affected dimensions to `BLOCKED`/`NOT_RUN` and rerun only the affected dependency path; unaffected evidence remains usable. Do not infer authority from an old envelope.
 
-Resume discovery order is: explicit `resume_ref`; the same canonical envelope in available host persistence or an output handoff; then its permitted local cache at `.agent-quality-loop/envelope.json`. The envelope must preserve every Task Contract field above under the same name; do not rely on undocumented aliases such as `goal` or `authority`. This discovery order is distinct from reality-first trust: when recovered content conflicts with observable current workspace reality, the observable reality wins. If no complete envelope is available, set `reconstruction_status: incomplete`, reconstruct read-only, and request only the missing outcome-changing information. An incomplete reconstruction remains at or before `EVIDENCED`, uses `action_authority: read`, returns `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize a transition from `EVIDENCED` to `BUILT`. Never promise persistence the host does not provide.
+Resume discovery order is: explicit `resume_ref`; the same canonical envelope in available host persistence or an output handoff; then its permitted local cache at `.agent-quality-loop/envelope.json`. The envelope must preserve every Task Contract field above under the same name; do not rely on undocumented aliases such as `goal` or `authority`. This discovery order is distinct from current-state trust: when recovered content conflicts with observable current workspace reality, observable reality wins for current-state claims. It does not rewrite target obligations sourced from current-turn instructions or authoritative specifications. If no complete envelope is available, set `reconstruction_status: incomplete`, reconstruct read-only, and request only the missing outcome-changing information. An incomplete reconstruction remains at or before `EVIDENCED`, uses `action_authority: read`, returns `BLOCKED` or `PENDING` with an actionable blocker, and cannot authorize a transition from `EVIDENCED` to `BUILT`. Never promise persistence the host does not provide.
 
 ## Envelope Persistence (Canonical Carrier and Optional Cache)
 
@@ -455,7 +457,7 @@ Apply these semantic rules:
 
 Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.1.1`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.1.1 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.2.0`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.2.0 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 
@@ -525,6 +527,8 @@ reproducibility
 ```
 
 `goal_fidelity`, `semantic_invariants`, `user_observable_result`, and `reproducibility` are always required. Classify every other canonical dimension as `required` or `not_applicable`; the latter needs a task-specific rationale and evidence reference. Missing evidence is `NOT_RUN` or `BLOCKED`, never `not_applicable`.
+
+When authoritative request/correction/spec provenance is readable, `goal_fidelity: PASS` binds evidence in both directions: source to frozen contract, and frozen contract to delivered result. When that provenance is unreadable, the acceptor may assess conformance relative to the supplied contract, but formal `goal_fidelity` remains `BLOCKED` or `NOT_RUN`; original-intent fidelity and `ACCEPTED` cannot be claimed.
 
 `user_observable_result`: when the artifact is consumable in its native medium, require a cold-consumption probe from the declared `target_user_or_system` perspective (see [domain-profiles.md](domain-profiles.md) for domain methods). A `PASS` must bind probe process evidence; if a probe is infeasible, use `NOT_RUN` and disclose why. Text self-check must not substitute for cold consumption.
 

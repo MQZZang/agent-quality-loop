@@ -11,9 +11,16 @@
  */
 
 const fs = require("fs");
+const crypto = require("crypto");
 const path = require("path");
 const { spawnSync } = require("child_process");
-const { checkManifestConsistency, listPackageSkillDirs, MANIFEST_VERSION } = require("./gen-manifest");
+const {
+  checkManifestConsistency,
+  listPackageSkillDirs,
+  MANIFEST_VERSION,
+  sha256File,
+  walkFiles,
+} = require("./gen-manifest");
 
 const STATUS = {
   PASS: "PASS",
@@ -38,6 +45,15 @@ function resolveWorkspaceRoot(argv) {
   return process.cwd();
 }
 
+function resolveOptionalPath(argv, name) {
+  const prefix = `--${name}=`;
+  const inline = argv.find((arg) => arg.startsWith(prefix));
+  if (inline) return path.resolve(inline.slice(prefix.length));
+  const idx = argv.indexOf(`--${name}`);
+  if (idx >= 0 && argv[idx + 1]) return path.resolve(argv[idx + 1]);
+  return null;
+}
+
 function packageRepoRoot() {
   return path.resolve(__dirname, "..");
 }
@@ -48,6 +64,108 @@ function readJsonSafe(filePath) {
   } catch (error) {
     return { ok: false, error: error.message };
   }
+}
+
+function skillDirectory(inputPath) {
+  if (!inputPath) return null;
+  if (!fs.existsSync(inputPath)) return inputPath;
+  return fs.statSync(inputPath).isFile() ? path.dirname(inputPath) : inputPath;
+}
+
+function portableTreeDigest(directory) {
+  const hash = crypto.createHash("sha256");
+  for (const relativePath of walkFiles(directory)) {
+    hash.update(relativePath, "utf8");
+    hash.update("\0", "utf8");
+    hash.update(sha256File(path.join(directory, relativePath)), "utf8");
+    hash.update("\n", "utf8");
+  }
+  return hash.digest("hex");
+}
+
+function inspectSkillSnapshot(inputPath) {
+  const directory = skillDirectory(inputPath);
+  if (!directory || !fs.existsSync(directory)) {
+    return { status: "NOT_OBSERVED", path: directory, reason: "path does not exist" };
+  }
+  const manifestPath = path.join(directory, "manifest.json");
+  const skillPath = path.join(directory, "SKILL.md");
+  if (!fs.existsSync(manifestPath) || !fs.existsSync(skillPath)) {
+    return {
+      status: "NOT_OBSERVED",
+      path: directory,
+      reason: "path is not an AQL Skill snapshot (manifest.json or SKILL.md missing)",
+    };
+  }
+
+  const parsed = readJsonSafe(manifestPath);
+  if (!parsed.ok) {
+    return { status: "NOT_OBSERVED", path: directory, reason: `invalid manifest: ${parsed.error}` };
+  }
+
+  const stat = fs.lstatSync(directory);
+  let linkTarget = null;
+  if (stat.isSymbolicLink()) {
+    try {
+      linkTarget = fs.readlinkSync(directory);
+    } catch {
+      linkTarget = "unreadable";
+    }
+  }
+  return {
+    status: "OBSERVED",
+    path: path.resolve(directory),
+    realpath: fs.realpathSync.native(directory),
+    path_kind: stat.isSymbolicLink() ? "link_or_junction" : "directory",
+    link_target: linkTarget,
+    version: parsed.value.version || null,
+    manifest_sha256: sha256File(manifestPath),
+    skill_sha256: sha256File(skillPath),
+    portable_tree_sha256: portableTreeDigest(directory),
+  };
+}
+
+function checkPackageProvenance(activeSkillPath = null) {
+  const canonicalPath = path.join(packageRepoRoot(), ".cursor", "skills", "agent-quality-loop");
+  const canonical = inspectSkillSnapshot(canonicalPath);
+  const installed = activeSkillPath
+    ? inspectSkillSnapshot(activeSkillPath)
+    : { status: "NOT_RUN", reason: "no --active-skill path was supplied" };
+
+  let status = STATUS.PASS;
+  let message = "canonical source identity observed; runtime/application claims remain explicitly unrun";
+  if (canonical.status !== "OBSERVED") {
+    status = STATUS.FAIL;
+    message = "canonical source identity could not be observed";
+  } else if (activeSkillPath && installed.status !== "OBSERVED") {
+    status = STATUS.FAIL;
+    message = "the supplied active Skill snapshot could not be observed";
+  } else if (
+    installed.status === "OBSERVED"
+    && canonical.portable_tree_sha256 !== installed.portable_tree_sha256
+  ) {
+    status = STATUS.WARN;
+    message = "the supplied Skill snapshot differs from the canonical source snapshot";
+  } else if (installed.status === "OBSERVED") {
+    message = "canonical source and supplied Skill snapshot identities match";
+  }
+
+  return [finding("package_provenance", status, message, {
+    canonical_source_digest: canonical,
+    supplied_snapshot_digest: installed,
+    host_discovery_observed: {
+      status: "NOT_RUN",
+      reason: "filesystem presence does not prove host discovery; supply a host discovery trace separately",
+    },
+    runtime_read_or_mount_identity: {
+      status: "NOT_RUN",
+      reason: "doctor did not observe the running agent read or mount this snapshot",
+    },
+    behavioral_application_evidence: {
+      status: "NOT_RUN",
+      reason: "package identity does not prove instruction application or user-value improvement",
+    },
+  })];
 }
 
 function findSkillTrees(workspaceRoot) {
@@ -401,8 +519,9 @@ function aggregateStatus(findings) {
   return STATUS.PASS;
 }
 
-function runDoctor(workspaceRoot) {
+function runDoctor(workspaceRoot, options = {}) {
   const findings = [
+    ...checkPackageProvenance(options.activeSkillPath || null),
     ...checkCorePackageVersions(workspaceRoot),
     ...checkManifestHelpers(workspaceRoot),
     ...checkHooksAndGates(workspaceRoot),
@@ -446,8 +565,42 @@ function runSelfTest() {
     }
   }
 
+  const provenance = report.findings.find((item) => item.id === "package_provenance");
+  if (!provenance || provenance.detail.canonical_source_digest.status !== "OBSERVED") {
+    errors.push("canonical package provenance must be observed");
+  }
+  for (const key of [
+    "host_discovery_observed",
+    "runtime_read_or_mount_identity",
+    "behavioral_application_evidence",
+  ]) {
+    if (!provenance || provenance.detail[key].status !== "NOT_RUN") {
+      errors.push(`${key} must remain NOT_RUN without external trace evidence`);
+    }
+  }
+
+  const activeReport = runDoctor(packageRepoRoot(), {
+    activeSkillPath: path.join(packageRepoRoot(), ".cursor", "skills", "agent-quality-loop"),
+  });
+  const activeProvenance = activeReport.findings.find((item) => item.id === "package_provenance");
+  if (!activeProvenance || activeProvenance.detail.supplied_snapshot_digest.status !== "OBSERVED") {
+    errors.push("explicit active Skill snapshot must be observed");
+  } else if (
+    activeProvenance.detail.canonical_source_digest.portable_tree_sha256
+    !== activeProvenance.detail.supplied_snapshot_digest.portable_tree_sha256
+  ) {
+    errors.push("canonical and identical supplied snapshot digests must match");
+  }
+
   // Invoke CLI --json once to ensure argv path works.
-  const cli = spawnSync(process.execPath, [__filename, "--json", "--root", packageRepoRoot()], {
+  const cli = spawnSync(process.execPath, [
+    __filename,
+    "--json",
+    "--root",
+    packageRepoRoot(),
+    "--active-skill",
+    path.join(packageRepoRoot(), ".cursor", "skills", "agent-quality-loop"),
+  ], {
     encoding: "utf8",
     shell: false,
   });
@@ -485,7 +638,7 @@ function printHuman(report) {
 
 function main(argv = process.argv.slice(2)) {
   if (argv.includes("--help") || argv.includes("-h")) {
-    console.log("Usage: node scripts/aql-doctor.js [--json] [--root <dir>] | --self-test");
+    console.log("Usage: node scripts/aql-doctor.js [--json] [--root <dir>] [--active-skill <dir-or-SKILL.md>] | --self-test");
     console.log("Read-only diagnostics. Never mutates hooks, profile, envelope history, or projects.");
     return 0;
   }
@@ -493,8 +646,10 @@ function main(argv = process.argv.slice(2)) {
     return runSelfTest();
   }
 
-  const workspaceRoot = resolveWorkspaceRoot(argv.filter((a) => a !== "--json"));
-  const report = runDoctor(workspaceRoot);
+  const filteredArgv = argv.filter((a) => a !== "--json");
+  const workspaceRoot = resolveWorkspaceRoot(filteredArgv);
+  const activeSkillPath = resolveOptionalPath(filteredArgv, "active-skill");
+  const report = runDoctor(workspaceRoot, { activeSkillPath });
   if (argv.includes("--json")) {
     console.log(JSON.stringify(report, null, 2));
   } else {
@@ -511,5 +666,7 @@ module.exports = {
   main,
   runDoctor,
   runSelfTest,
+  inspectSkillSnapshot,
+  checkPackageProvenance,
   STATUS,
 };

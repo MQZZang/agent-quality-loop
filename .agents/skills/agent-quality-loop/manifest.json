@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
-  "version": "3.1.1",
-  "generated_at": "2026-08-19T02:50:57.406Z",
+  "version": "3.2.0",
+  "generated_at": "2026-08-28T07:39:25.701Z",
   "files": {
-    "SKILL.md": "dad62190ab31c9b22ffda8a3f6467b875bc8038b18cd7b75c06e73f64f99ec8e",
+    "SKILL.md": "fc3389dac96552b240d41a8b3a296468578b2ae062329e1af3b475bcf9b72f45",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "fixtures/capability-receipt-valid.json": "ad718c2dfa3c471fc2d88c6e1a15a0639a0414f8fec860ac22276109059afb6b",
     "fixtures/gates-g1-g3/g1-derived-lockfile/expected.json": "b8cf2358e8261d6f4d8088cc6ca13c418b454d110eeb76f91966f8a0cd6f8079",
@@ -39,14 +39,14 @@
     "fixtures/gates-g1-g3/g3-valid-record/expected.json": "3055da81a37f086cb9b6147663779ce63cd4d7867bc60d2e4cbbbeda10d3d625",
     "fixtures/gates-g1-g3/g3-valid-record/input.json": "31a4a57f124764a907c0baa308fdc882a0b70167790db1ce83493d1869d34373",
     "fixtures/profile-v2-empty.json": "20954a5e688faccee5c41d5dda62bff0e04999e2fc0ef03cde12321f57563f19",
-    "references/acceptance-review.md": "c19c88b9f1713e0af21af1a999a3ec672756ebb665af118ae341568e7a75b57e",
-    "references/alignment-compiler.md": "46928f2ee531198d4160c042cf3ee7331f6375d8ce532a3cedd55571f9eec8fe",
-    "references/code-implementation-adapter.md": "cd43cec2ff7bd585a71c7c431737a8f6449c7cde9a1f0fc105b1b5c84906d132",
+    "references/acceptance-review.md": "e75752c7b62e3cbfd456e4d60fcd8f3f28f6c73a0f63fb6013711ebf6048868d",
+    "references/alignment-compiler.md": "fc41f2d1fba823ec10e8b0fdc71670b58f745859c511fca9760c727beeeb710f",
+    "references/code-implementation-adapter.md": "1201cc3fcedc0dd2b1f2ea7fb707bd5210557ff15ead31fd346089d8a80ca2e1",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "3dc8e1a027d7f35b35c6045e7bcf5fd5e8ba789ed7afb81ffa4b4cf967d66cd9",
-    "references/domain-profiles.md": "e520f3dd651f0f2a5c860feb42cfc385176bcc4c440d0a8cddd97c12093e3099",
-    "references/evaluation-cases.md": "9bab64d197546425c45328488072aa17210faaedadf4b43d3e6d0914db5bb6f5",
-    "references/multi-agent-leverage.md": "578e233d2d6b3fd0a7598642e35026c1b83f7736663a940eae6a993b047e2868",
+    "references/contracts.md": "0b3f19cbb10929e92f80ebf4ad3c9dd2d852d2c8daa156586c33d1692667ac9f",
+    "references/domain-profiles.md": "6fe667bf13344a0e426a3dfd144cfbaeddc1fd191da5175fc9427df5e6aa5166",
+    "references/evaluation-cases.md": "9d640c747cdf9a8f9e4e428a2328bd53926ce860f773c788a8faa05a20ba0bc0",
+    "references/multi-agent-leverage.md": "5e04c33f39a8b8dd32e05b819b03ed73ca765bd9e4b536be61dae398d42386a7",
     "references/personalization.md": "b1597412b228da1532693da17b7c66538c71f8c48a9dbb8ed44375b854199f53",
     "references/profile-projection.md": "4e1eaefe2029ce51080edbaf8e3a51447b0beef9458f79adb631ed93abb24d8b",
     "references/result-attention.md": "2d164c427b678ed7d65884972aafff988c7c95acbc14a6284ec319c0a85aae74",
@@ -61,9 +61,9 @@
     "scripts/profile-v2.js": "8c3bc33ff2af203537f98db151d5be1d2a10bc723401b23bdcd5b6e271725f71",
     "scripts/profile-v2.test.js": "962caa978eab558c20e82760e2203d74a00151fc2a1af3384c5862a14907b8e0",
     "scripts/snapshot-chain.js": "ba08d37001c2da63e40935f43700a9c730a1ba747d387b260e97464f8ba8a797",
-    "scripts/validate-envelope.js": "243a7260233a37bc6cf7e0589e0fde6c542d213c53581a6ae7afc8b6c70d6847",
+    "scripts/validate-envelope.js": "59dc69325d452363d1f745c8251393329ac9a8848c949fb95bd1a8509570f5df",
     "scripts/validate-profile-projection.js": "fc1211a322222c762fbd419d3358d999971c09e976206b238f4667fafc982dbf",
     "scripts/validate-profile.js": "e537786dbdcbb77b06b47d1000d8b9130ab7a5b6f68269a0a343baba122d9250",
-    "scripts/validate-skill.js": "c933557e32ca8b71491b667c3620df37f0176a40b9321f2162994815469989a3"
+    "scripts/validate-skill.js": "bbd99baad54e136a532c4ba06ca54a733f3b052290090b77c3cf97f668d24058"
   }
 }

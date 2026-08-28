@@ -6,9 +6,9 @@ After a material workflow, contract, or boundary change, run the bundled structu
 
 Align an observable goal, inspect before editing, make the smallest authorized change, run focused verification, and stop at `BUILT`. Do not deploy or invent independent acceptance.
 
-## 2. Formal Acceptance
+## 2. Formal Acceptance And Source Fidelity
 
-A fresh acceptor reads contract, artifact/diff, and raw evidence before the implementer narrative. It grants `ACCEPTED` only when every required dimension has concrete PASS evidence. Same-context self-review remains `BUILT`/`PENDING`.
+A fresh acceptor reads available authoritative request/correction/spec provenance, then contract, artifact/diff, and raw evidence before the implementer narrative. It grants `ACCEPTED` only when every required dimension has concrete PASS evidence. When authoritative provenance is unreadable, contract-relative review is allowed but formal `goal_fidelity` stays `BLOCKED`/`NOT_RUN`. Same-context self-review remains `BUILT`/`PENDING`.
 
 ## 3. Release Boundary
 
@@ -20,7 +20,7 @@ Distinguish display, data, and capability changes. If repository evidence cannot
 
 ## 5. Code Execution
 
-The built-in code adapter consumes the aligned/evidenced contract, re-reads targets, plans the smallest root-cause repair, protects semantic must-holds, self-checks, and returns one receipt capped at `BUILT`.
+The built-in code adapter consumes the aligned/evidenced contract, re-reads targets, routes reasoning by intent, protects semantic must-holds, self-checks, and returns one receipt capped at `BUILT`. Diagnose/defect work uses causal evidence; feature/greenfield/outcome-led work uses outcome, invariants, and trade-offs without root-cause theater.
 
 ## 6. Acceptance Findings
 
@@ -89,5 +89,29 @@ A bare「验收」request is result-anchored free review: after-state, hard boun
 ## 21. Observer Cap
 
 `agent_review` cannot produce `user_observable_result: PASS`. That PASS needs native-medium / runtime evidence plus `mechanical_runtime` or `human` with a role.
+
+## 22. Current Versus Target Authority
+
+When approved target specification says `maxRetries=5` while the current code says `3`, ALIGN freezes target `5` and records current baseline `3`; workspace reality proves the gap and does not rewrite the target. For a request that only audits the current runtime value, report the observed `3` and do not present a target specification as current fact.
+
+## 23. Mechanism Identity
+
+“Must use a state machine; acceptance checks it” is Fixed and cannot be silently replaced. “Prefer a state machine unless a table is clearer” is Guided and may be replaced with evidence. “You could consider a state machine” is Open and must not harden into a requirement.
+
+## 24. Contract Miscompile Detection
+
+If a readable original request says “do not change schema” but the frozen contract omitted it, acceptance detects the contract miscompile even when the artifact conforms to the contract. If only an unreadable historical-contract pointer exists, report contract-relative conformance at most and keep formal `goal_fidelity` `BLOCKED`/`NOT_RUN`.
+
+## 25. Correction Dependency
+
+When target A has PASS evidence and a material user correction changes the target to B, preserve A's raw evidence with its original baseline/provenance but remove it from B's current PASS bindings. A non-conflicting presentation preference must not invalidate unrelated test evidence or trigger full revalidation.
+
+## 26. Intent-Specific Code Reasoning
+
+A timeout defect compares credible causal candidates and uses a discriminating probe before repair. A greenfield export feature derives the smallest solution from outcome, constraints, consumer path, and trade-offs without inventing a root cause. A refactor explicitly asking why debt accumulated may use causal analysis.
+
+## 27. No Visible Alignment Ceremony
+
+A clear low-risk routine task proceeds without a fixed Goal/Scope/Evidence alignment block. Formal high-risk work still preserves the internal three-line material-decision record and its existing G3 requirement; removing visible ceremony must not remove that record.
 
 The package is behaviorally ready for a claimed host only when these cases pass on the exact package bytes. Product benefit requires a separately preregistered comparison; no structural or fixture result proves long-term user value.

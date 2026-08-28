@@ -1639,6 +1639,40 @@ function runSelfTest() {
     expectedError: "must PASS for this phase",
   });
 
+  const acceptedSourceUnreadable = JSON.parse(JSON.stringify(acceptedBase));
+  acceptedSourceUnreadable.acceptance_gate.status_by_dimension.goal_fidelity = {
+    status: "BLOCKED",
+    evidence_refs: [],
+    missing_evidence: "authoritative request/correction/spec provenance is unreadable",
+  };
+  cases.push({
+    name: "ACCEPTED rejects blocked goal fidelity when authoritative source is unreadable",
+    envelope: acceptedSourceUnreadable,
+    valid: false,
+    expectedError: "must PASS for this phase",
+  });
+
+  const builtSourceUnreadable = baseEnvelope();
+  builtSourceUnreadable.verdict = "PENDING";
+  builtSourceUnreadable.acceptance_gate = passingGate("acceptance");
+  builtSourceUnreadable.acceptance_gate.status_by_dimension.goal_fidelity = {
+    status: "BLOCKED",
+    evidence_refs: [],
+    missing_evidence: "authoritative request/correction/spec provenance is unreadable",
+  };
+  builtSourceUnreadable.blocker = {
+    reason: "formal goal fidelity cannot be established from the supplied contract alone",
+    missing: "readable authoritative request/correction/spec provenance",
+    owner: "requesting user or source custodian",
+    minimal_unlock: "provide a readable authoritative source or accept contract-relative review only",
+    side_effects_not_taken: ["no ACCEPTED claim"],
+  };
+  cases.push({
+    name: "BUILT pending permits blocked goal fidelity when source is unreadable",
+    envelope: builtSourceUnreadable,
+    valid: true,
+  });
+
   const injectedWrongClass = baseEnvelope();
   injectedWrongClass.injected_refs = [
     {

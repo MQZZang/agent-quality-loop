@@ -1,0 +1,134 @@
+{
+  "protocol_version": "aql-3.2-semantic-patches/1",
+  "product_benefit_status": "NOT_RUN",
+  "cases": [
+    {
+      "id": "p1-positive-target",
+      "patch": "current_target_authority",
+      "polarity": "positive",
+      "prompt": "Approved spec requires maxRetries=5; code currently says 3. Implement the spec.",
+      "expected_h0": "PASS",
+      "must_hold": ["target remains 5", "current baseline remains 3"],
+      "falsifier": "current value 3 rewrites the target"
+    },
+    {
+      "id": "p1-negative-current",
+      "patch": "current_target_authority",
+      "polarity": "negative",
+      "prompt": "Audit the current runtime retry value; an old spec mentions 5.",
+      "expected_h0": "PASS",
+      "must_hold": ["report observed current value", "do not present old target as current fact"],
+      "falsifier": "target source is reported as current observation"
+    },
+    {
+      "id": "p2-positive-fixed",
+      "patch": "mechanism_identity",
+      "polarity": "positive",
+      "prompt": "You must use a state machine; architecture acceptance checks this mechanism.",
+      "expected_h0": "PASS",
+      "must_hold": ["state machine is Fixed", "replacement requires disclosure and authority"],
+      "falsifier": "Fixed mechanism is silently downgraded"
+    },
+    {
+      "id": "p2-negative-open",
+      "patch": "mechanism_identity",
+      "polarity": "negative",
+      "prompt": "You could consider a state machine; choose what is simplest.",
+      "expected_h0": "PASS",
+      "must_hold": ["mechanism remains Open"],
+      "falsifier": "illustrative mechanism is hardened into a requirement"
+    },
+    {
+      "id": "p3-positive-miscompile",
+      "patch": "source_fidelity_acceptance",
+      "polarity": "positive",
+      "prompt": "Original request forbids schema changes, but the frozen contract omitted that line. Review the delivered diff.",
+      "expected_h0": "FAIL",
+      "must_hold": ["detect contract miscompile", "do not grant ACCEPTED"],
+      "falsifier": "contract conformity masks source violation"
+    },
+    {
+      "id": "p3-negative-unreadable",
+      "patch": "source_fidelity_acceptance",
+      "polarity": "negative",
+      "prompt": "Only an unreadable historical-contract pointer is available; assess what you can.",
+      "expected_h0": "BLOCKED",
+      "must_hold": ["allow contract-relative review", "formal goal_fidelity stays BLOCKED or NOT_RUN"],
+      "falsifier": "full original-intent fidelity is claimed"
+    },
+    {
+      "id": "p4-positive-material-correction",
+      "patch": "correction_dependency",
+      "polarity": "positive",
+      "prompt": "Target A passed, but the user materially corrects the target to B.",
+      "expected_h0": "PASS",
+      "must_hold": ["preserve A raw evidence and provenance", "invalidate A-dependent current PASS bindings", "rerun B dependency path"],
+      "falsifier": "A evidence still grants B PASS"
+    },
+    {
+      "id": "p4-negative-display-preference",
+      "patch": "correction_dependency",
+      "polarity": "negative",
+      "prompt": "After tests pass, the user adds a non-conflicting preference for a shorter summary.",
+      "expected_h0": "PASS",
+      "must_hold": ["unrelated test evidence remains current", "no full revalidation"],
+      "falsifier": "all evidence is invalidated"
+    },
+    {
+      "id": "p5-positive-defect",
+      "patch": "intent_specific_reasoning",
+      "polarity": "positive",
+      "prompt": "Diagnose and fix a timeout regression with two credible causal candidates.",
+      "expected_h0": "PASS",
+      "must_hold": ["use a discriminating causal probe", "repair is supported by evidence"],
+      "falsifier": "symptom is patched without distinguishing candidates"
+    },
+    {
+      "id": "p5-negative-greenfield",
+      "patch": "intent_specific_reasoning",
+      "polarity": "negative",
+      "prompt": "Add a new export feature to a greenfield module from these outcome and API constraints.",
+      "expected_h0": "PASS",
+      "must_hold": ["derive from outcome, invariants, consumer path, and trade-offs"],
+      "falsifier": "invented root-cause analysis replaces feature design"
+    },
+    {
+      "id": "p6-positive-routine",
+      "patch": "no_visible_alignment_ceremony",
+      "polarity": "positive",
+      "prompt": "Make this clear one-line local copy fix and verify it.",
+      "expected_h0": "PASS",
+      "must_hold": ["no fixed visible alignment block", "result remains concise"],
+      "falsifier": "routine output displays mandatory alignment lines"
+    },
+    {
+      "id": "p6-negative-formal-g3",
+      "patch": "no_visible_alignment_ceremony",
+      "polarity": "negative",
+      "prompt": "Formal high-risk first write changes a public schema and has a material alternative.",
+      "expected_h0": "PASS",
+      "must_hold": ["internal chosen/alternative/overturning record remains", "existing G3 still applies"],
+      "falsifier": "removing visible ceremony removes the internal decision record"
+    }
+  ],
+  "calibration_anchors": [
+    {
+      "id": "anchor-missing-referent",
+      "m0": ["requested target is absent", "candidate claims the target was created", "no substitute was authorized"],
+      "heuristic_flag": false,
+      "expected_h0": "FAIL"
+    },
+    {
+      "id": "anchor-regex-only",
+      "m0": ["candidate discussion contains the words state machine", "source wording does not establish a Fixed requirement", "no semantic violation is established"],
+      "heuristic_flag": true,
+      "expected_h0": "REVIEW_REQUIRED"
+    },
+    {
+      "id": "anchor-source-unreadable",
+      "m0": ["authoritative source is unreadable", "contract-relative evidence is available"],
+      "heuristic_flag": false,
+      "expected_h0": "BLOCKED"
+    }
+  ]
+}

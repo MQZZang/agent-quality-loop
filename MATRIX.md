@@ -23,6 +23,8 @@ For the 3.1 tree, every combination not listed above is `unverified` — includi
 
 Rows above were measured on 3.1.0 bytes. 3.1.1 changes only the date handling inside two self-test scripts (`profile-v2.test.js`, `validate-profile-projection.js`), leaving Skill instruction text, contracts, and gates byte-identical, so the rows carry over with that delta disclosed rather than re-measured.
 
+The 3.2.0 working source changes Skill semantics and does **not** inherit any 3.1 qualification row. Every model × host × task-class × assurance combination on 3.2.0 remains `unverified` until exact-byte behavioral evidence is recorded.
+
 ## Historical probe archive (append-only, retained verbatim for audit)
 
 Probe and run records in execution order, including superseded intermediate verdicts. Rows are falsifiable and retained for audit. They do not establish Profile v2 product value or longitudinal value; those verdicts remain `NOT_RUN`.

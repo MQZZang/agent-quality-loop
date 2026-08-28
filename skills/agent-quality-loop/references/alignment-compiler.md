@@ -27,6 +27,8 @@ This stack is an internal diagnostic, not a required questionnaire or a new cont
 
 State the gap: what is true now versus what must be true after. If the current state is unknown, record it under `unknowns` (or investigate first) — do not invent a baseline.
 
+For current-state claims, observable workspace reality wins over memory, cache, and stale narrative. For target-state obligations, current-turn instructions and authoritative specifications win; workspace reality is baseline evidence, not authority to rewrite the target. Disclose conflicts explicitly.
+
 ### 3. Full-scope evidence coverage
 
 Every in-scope deliverable needs an evidence path. Passing tests cover only what they exercise; they are never evidence for untested docs, configs, UX, rollout, or release surfaces named in scope.
@@ -56,7 +58,7 @@ Prefer existing active truth over rewriting:
 3. Issue, todo, or accepted tracker item  
 4. Prior envelope or cache  
 
-When sources conflict, **workspace reality wins**. Disclose the conflict; do not silently prefer memory or cache.
+Apply the current/target authority rule above. Disclose source conflicts; do not silently prefer memory, cache, or the current implementation over a target obligation.
 
 ### 9. Proportionate confirmation
 
@@ -70,15 +72,15 @@ Do **not** hijack:
 - low-risk execute with a clear local after-state  
 - plan-only / diagnose-only turns that already have a usable contract shape  
 
-into a separate goal-compiler ritual. ALIGN still emits only the existing AQL contract fields and three alignment lines — never a parallel goal document, `.goal-task/` store, or new lifecycle phase.
+into a separate goal-compiler ritual. ALIGN emits only the existing AQL contract fields. Expose only decision-relevant goal, scope, uncertainty, or authority information in natural prose under the Skill's ordinary-output rule — never a fixed alignment block, parallel goal document, `.goal-task/` store, or new lifecycle phase.
 
 ## Fixed, Guided, and Open Space
 
 After grounding, classify each outcome-changing input without adding schema:
 
-- **Fixed:** explicit user constraints, authoritative facts, permissions, non-goals, safety boundaries, and acceptance obligations. Preserve them exactly enough to test.
-- **Guided:** preferences, examples, trade-offs, or source signals that influence the solution but permit several valid choices. Record their source and strength; do not silently harden them.
-- **Open:** strategy the user delegated to the AI—structure, sequencing, candidate mechanisms, wording, examples, or implementation choices not fixed elsewhere.
+- **Fixed:** explicit user constraints, authoritative facts, permissions, non-goals, safety boundaries, acceptance obligations, and mechanisms stated as mandatory (`must`, `use X`, `acceptance requires X`). Preserve them exactly enough to test.
+- **Guided:** preferences, examples, trade-offs, source signals, and mechanisms stated as preferred or replaceable (`prefer X`, `default to X unless...`). Record their source and strength; do not silently harden or discard them.
+- **Open:** strategy the user delegated to the AI—structure, sequencing, wording, examples, or mechanisms stated as illustrative/delegated (`for example`, `maybe`, `choose as appropriate`) and implementation choices not fixed elsewhere.
 
 Run a bidirectional trace before contract freeze and before acceptance: every fixed constraint maps forward to a contract obligation/evidence path, and every contract obligation maps backward to a user statement, authoritative source, or disclosed agent judgment. A choice with no source is open or an agent assumption, never a user requirement. If nothing meaningful remains open on a creative/professional task, check for accidental over-constraint; if a fixed item has no downstream check, the compile is incomplete.
 
