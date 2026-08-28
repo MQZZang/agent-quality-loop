@@ -13,10 +13,10 @@ AQL is not another IDE or hosted service, and it does not publish anything on it
 | Source package version | `3.2.0` working source |
 | Product surface | One Skill: `agent-quality-loop` |
 | Contract for each task | One Task Contract |
-| GitHub release | Current release `v3.1.1`; `v3.2.0` exists only after its exact tag passes the release workflow |
+| GitHub release | Current release `v3.2.0`, validated from its exact tag on Ubuntu, Windows, and macOS |
 | License | MIT |
 
-> **Before you install:** `v3.1.1` is the current release tag; the branch tip is the `3.2.0` working source. Check out the tag when you need an immutable published artifact; use a branch when you want the current working source. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
+> **Before you install:** `v3.2.0` is the current release tag; the branch tip is the `3.2.0` working source. Check out the tag when you need an immutable published artifact; use a branch when you want the current working source. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
 
 ## Why AQL exists
 
@@ -83,7 +83,7 @@ The main workflow runs from the Skill instructions and starts no background serv
 ```bash
 git clone https://github.com/MQZZang/agent-quality-loop.git
 cd agent-quality-loop
-git checkout v3.1.1   # or stay on a branch to evaluate the working source
+git checkout v3.2.0   # or stay on a branch to evaluate the working source
 node --version
 node scripts/install.js install --to cursor --dry-run
 node scripts/install.js install --to cursor
@@ -131,7 +131,7 @@ Ordinary language is the main interface. If your host lets you select a Skill, c
 
 `status` confirms that the installed copy exists and still matches the installer’s record. It cannot confirm that a running host loaded the Skill. After installation:
 
-1. run `node scripts/install.js status --to <your-target>` and require the `OWNED` version to match the source you installed (`3.2.0` for this branch, `3.1.1` for the current release tag);
+1. run `node scripts/install.js status --to <your-target>` and require the `OWNED` version to match the source you installed (`3.2.0` for both the current branch and release tag);
 2. start or reload the target host and use its Skill discovery view to find `agent-quality-loop`;
 3. ask a small read-only task and confirm the result preserves the requested boundary.
 
@@ -210,10 +210,10 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 
 ## Version and release model
 
-`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.2.0`, and [CHANGELOG.md](CHANGELOG.md) dates that source entry. The current GitHub Release remains `v3.1.1`; a `v3.2.0` release exists only after the exact tag passes the release workflow. Published tags are never moved.
+`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.2.0`, and [CHANGELOG.md](CHANGELOG.md) dates that source entry. The current GitHub Release is `v3.2.0`, bound to its exact validated tag. Published tags are never moved.
 
 - Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
-- Creating `v3.2.0` is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
+- Creating any version tag is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.
 - Passing local checks or an independent review does not publish a release.
 
 ## Repository map
