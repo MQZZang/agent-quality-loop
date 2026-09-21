@@ -8,7 +8,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const MANIFEST_VERSION = "3.2.0";
+const MANIFEST_VERSION = "3.2.1";
 const MANIFEST_NAME = "manifest.json";
 const TEXT_EXTENSIONS = new Set([".md", ".js", ".mjs", ".json", ".yaml", ".yml", ".mdc", ".txt"]);
 const requiredFiles = [
@@ -248,7 +248,7 @@ function requireAll(relativePath, requiredTerms, forbiddenTerms = []) {
 requireAll("references/contracts.md", [
   "## User Result Summary",
   "1–3 lines",
-  "local unreleased AQL 3.2.0 build",
+  "local unreleased AQL 3.2.1 build",
   "## Result Detail Budget",
   "injected_refs:",
   "kind: lesson | profile | preset | domain_profile | probe | route",
@@ -315,6 +315,7 @@ requireAll("references/evaluation-cases.md", [
   "## 1.",
   "## 16.",
   "## 27.",
+  "## 32.",
 ]);
 
 requireAll("SKILL.md", [
@@ -324,6 +325,9 @@ requireAll("SKILL.md", [
   "When authoritative source provenance is readable, are the frozen goal, scope, and non-goals faithful to it",
   "cannot claim original-intent fidelity or grant `ACCEPTED`",
   "formal `goal_fidelity` remains `BLOCKED` or `NOT_RUN`",
+  "necessary read scope distinct from allowed write scope",
+  "one unobtainable fact decides the next safe action",
+  "A fully specified task may legitimately leave no Open choice.",
 ], [
   "Treat a requested mechanism as an assumption, not the goal.",
 ]);
@@ -332,6 +336,7 @@ requireAll("references/alignment-compiler.md", [
   "workspace reality is baseline evidence, not authority to rewrite the target",
   "never a fixed alignment block",
   "mechanisms stated as mandatory",
+  "absence of Open space is not a defect",
 ], [
   "and three alignment lines",
 ]);
@@ -347,6 +352,16 @@ requireAll("references/acceptance-review.md", [
   "available authoritative request/correction/spec provenance",
   "cannot claim original-intent fidelity or grant lifecycle `ACCEPTED`",
   "formal `goal_fidelity` is `BLOCKED` or `NOT_RUN`",
+]);
+
+requireAll("references/multi-agent-leverage.md", [
+  "an inspection signal, not by itself a dispatch trigger",
+  "divergence is a lead to investigate, not proof of true ambiguity",
+  "Probe agreement is not correctness evidence",
+]);
+
+requireAll("references/result-attention.md", [
+  "Include every independent caution that would change the user's decision",
 ]);
 
 const metadataPath = path.join(root, "agents", "openai.yaml");

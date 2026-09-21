@@ -2,7 +2,7 @@
 
 [![validate](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/MQZZang/agent-quality-loop/actions/workflows/validate.yml)
 
-**Agent Quality Loop (AQL) 3.2.0** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
+**Agent Quality Loop (AQL) 3.2.1** is a portable Skill for work where “done” needs to mean more than an agent saying it is done. You describe the job in ordinary language. AQL turns it into one Task Contract: what result you want, what may change, what evidence will count, and how far the agent may act.
 
 AQL is not another IDE or hosted service, and it does not publish anything on its own. The main workflow works without Profile v2, the optional CLI, Cursor hooks, or access to your user directory.
 
@@ -10,13 +10,13 @@ AQL is not another IDE or hosted service, and it does not publish anything on it
 
 | Where this repository stands | Status |
 |---|---|
-| Source package version | `3.2.0` working source |
+| Source package version | `3.2.1` working source |
 | Product surface | One Skill: `agent-quality-loop` |
 | Contract for each task | One Task Contract |
-| GitHub release | Current release `v3.2.0`, validated from its exact tag on Ubuntu, Windows, and macOS |
+| GitHub release | Current release `v3.2.1`, validated from its exact tag on Ubuntu, Windows, and macOS |
 | License | MIT |
 
-> **Before you install:** `v3.2.0` is the current release tag; the branch tip is the `3.2.0` working source. Check out the tag when you need an immutable published artifact; use a branch when you want the current working source. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
+> **Before you install:** `v3.2.1` is the current release tag; the branch tip is the `3.2.1` working source. Check out the tag when you need an immutable published artifact; use a branch when you want the current working source. Do not use `v3.1.0`: its bundled self-tests fail on any date after 2026-08-18 ([3.1.1 changelog](CHANGELOG.md)).
 
 ## Why AQL exists
 
@@ -83,7 +83,7 @@ The main workflow runs from the Skill instructions and starts no background serv
 ```bash
 git clone https://github.com/MQZZang/agent-quality-loop.git
 cd agent-quality-loop
-git checkout v3.2.0   # or stay on a branch to evaluate the working source
+git checkout v3.2.1   # or stay on a branch to evaluate the working source
 node --version
 node scripts/install.js install --to cursor --dry-run
 node scripts/install.js install --to cursor
@@ -131,7 +131,7 @@ Ordinary language is the main interface. If your host lets you select a Skill, c
 
 `status` confirms that the installed copy exists and still matches the installer’s record. It cannot confirm that a running host loaded the Skill. After installation:
 
-1. run `node scripts/install.js status --to <your-target>` and require the `OWNED` version to match the source you installed (`3.2.0` for both the current branch and release tag);
+1. run `node scripts/install.js status --to <your-target>` and require the `OWNED` version to match the source you installed (`3.2.1` for both the current branch and release tag);
 2. start or reload the target host and use its Skill discovery view to find `agent-quality-loop`;
 3. ask a small read-only task and confirm the result preserves the requested boundary.
 
@@ -192,7 +192,7 @@ Optional [Cursor hooks](integrations/cursor-hooks/README.md) handle only rules a
 
 ## What the current evidence supports
 
-The [27 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
+The [32 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluation-cases.md) and automated suites check specific AQL mechanics. They do not show that AQL improves a product or a person over time.
 
 | Adoption question | Current evidence boundary |
 |---|---|
@@ -202,6 +202,7 @@ The [27 evaluation cases](.cursor/skills/agent-quality-loop/references/evaluatio
 | Were the 3.1 behavior changes checked by running them? | Yes, on one model and host pair (`cursor-grok-4.5-high-fast`). Skill trigger and silence gates passed 8/8 and 8/8, and the candidate-acceptance gate passed its seven conditions under blind grading. See the [3.1 acceptance record](docs/aql-3.1-acceptance-record.md). |
 | Does the full Skill beat a minimal kernel? | Not shown. The ablation returned `NO_LARGE_EFFECT_DETECTED` on goal correctness at n=6 per arm; only hard-gate-adjacent qualitative differences favored the Skill arms. |
 | Do the six 3.2 semantic patches improve model behavior? | `NOT_RUN`. Their M0/H0/H1 rubric, paired fixtures, patch isolation, combined-package rule, and discovery separation are preregistered under `docs/experiments/aql-3.2/`; deterministic calibration proves only protocol structure. |
+| Does the 3.2.1 information-alignment patch improve the screened behavior? | No measured uplift on the retained candidate: same-model forced-load A/B was parity at 13 PASS / 3 NOT_DECIDABLE per arm with zero hard-boundary violations. The patch is retained only as a source-consistency and coverage fix; natural discovery, Excel fidelity, and general product benefit remain `NOT_RUN`. See `docs/experiments/aql-3.2-information-alignment/`. |
 | Is AQL 3.0 better than 2.8, or is Profile v2 product-effective? | Both preregistered screenings remain `NOT_RUN`. |
 | Did the historical Profile v1 experiment prove value? | No. Its mechanism evidence is historical and its A/B/C value control is `INVALID`. |
 | Does AQL prove long-term user or productivity improvement? | No. Longitudinal and causal claims remain `NOT_RUN`. |
@@ -210,7 +211,7 @@ See the [claim evidence matrix](docs/claim-evidence-matrix.md) and [3.0 screenin
 
 ## Version and release model
 
-`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.2.0`, and [CHANGELOG.md](CHANGELOG.md) dates that source entry. The current GitHub Release is `v3.2.0`, bound to its exact validated tag. Published tags are never moved.
+`manifest.json`, the Skill metadata, and `plugin.json` agree on version `3.2.1`, and [CHANGELOG.md](CHANGELOG.md) dates that source entry. The current GitHub Release is `v3.2.1`, bound to its exact validated tag. Published tags are never moved.
 
 - Pushes to `master` and pull requests run `node scripts/validate-all.js` on Ubuntu, Windows, and macOS.
 - Creating any version tag is a separate release action. The release workflow checks the exact tagged commit on all three platforms, confirms that every version marker points to the same commit, generates an attestation, and only then creates a GitHub Release.

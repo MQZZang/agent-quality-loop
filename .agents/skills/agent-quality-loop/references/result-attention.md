@@ -16,7 +16,7 @@ Put build identity, hashes, commands, machine receipts, and long transcripts lat
 
 ## Attention Budget
 
-Render at most one primary conclusion, one key caution, and one required user action. Omit empty sections. Routine success is normally 1–3 lines; formal analysis may expand, but the first screen still carries the conclusion, boundary, and evidence strength.
+Render at most one primary conclusion and one required user action. Include every independent caution that would change the user's decision, authority, rollback, or safety; combine cautions only when they share one cause and one mitigation. Omit empty sections. Routine success is normally 1–3 lines; formal analysis may expand, but the first screen still carries the conclusion, boundary, and evidence strength.
 
 Machine receipts appear only when the user asks for them, or when a handoff, formal audit, or blocking diagnosis requires them. Ordinary Chinese results use precise natural-language status instead of internal lifecycle enums. Do not add cards, badges, emoji, dashboards, or decorative UI chrome to manufacture hierarchy.
 

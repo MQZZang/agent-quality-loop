@@ -26,16 +26,9 @@ Do not fan out for ritual coverage, consensus theater, or averaging opinions.
 
 ### ALIGN divergence probes
 
-**Open when any of:**
+**Open only when:** one bounded read-only grounding pass still leaves at least two credible, high-impact interpretations whose difference another independent reader can test, or the user explicitly requests a divergence probe. `assurance: formal`, a semantic-risk word, a contradiction keyword, or an open-ended creative task is an inspection signal, not by itself a dispatch trigger.
 
-- `assurance: formal`
-- semantic-risk terms or contradiction detection hits ([contracts.md](contracts.md) Semantic Change Classes / ALIGN contradiction disclosure)
-- high-ambiguity creative work (narrative, design, UX direction, dual-lens game design, etc.)
-- user explicitly requests a divergence probe
-
-**`standard` tier (decided):** open on ambiguity-signal hit - same triggers above other than formal-only. Do not wait for `formal`.
-
-**`fast` tier:** not required; open only on explicit user request.
+For every assurance tier, skip the probe when source inspection already resolves the reading, the request is fully specified, or fan-out would only restate the same evidence. Formal quality still requires genuinely independent acceptance later; it does not require multiple ALIGN compilers.
 
 **Procedure:**
 
@@ -43,12 +36,12 @@ Do not fan out for ritual coverage, consensus theater, or averaging opinions.
 2. Each returns exactly the three ALIGN lines — goal, boundary, most likely misunderstanding — labelled the way ALIGN would label them for this user, so probe output can be compared against the contract without re-mapping.
 3. Two-phase aggregation — **source-align before any cross-probe compare:**
    - **Phase 1 (per probe, before compare):** bidirectional source check — (a) every hard constraint in the user's words appears in that probe's compile; (b) every compiled item traces to the user's words or readable repo evidence, else must be labeled inference. Fail either direction → drop that probe before compare.
-   - **Phase 2 (compare survivors):** divergence = proven true ambiguity; synthesize **at most one** evidence-backed confirmation question. **Agreement ≠ validation:** shared omission of a hard constraint, or shared addition of an untraceable constraint, is shared-prior risk — disclose in ALIGN; never silently adopt.
+   - **Phase 2 (compare survivors):** divergence is a lead to investigate, not proof of true ambiguity. Trace each difference back to the request and observable facts; ask **at most one** confirmation question only if multiple credible, result-changing readings remain after that check. **Agreement ≠ validation:** shared omission of a hard constraint, or shared addition of an untraceable constraint, is shared-prior risk — disclose in ALIGN; never silently adopt.
 4. Probe Briefs reuse the **Dispatch Brief** format in [code-implementation-adapter.md](code-implementation-adapter.md) (goal anchor, scope allowlist/non-goals, baseline, must-holds, verification, escalation triggers, receipt). Do not duplicate that field set here.
 
 ### ACCEPT blind consumer
 
-**Open when:** `assurance: formal`, **or** the artifact is experiential (see [domain-profiles.md](domain-profiles.md): document / UI / game design / narrative, and experiential slices of mixed work).
+**Open when:** the artifact is experiential (see [domain-profiles.md](domain-profiles.md): document / UI / game design / narrative, and experiential slices of mixed work) and a cold consumer pass supplies evidence the independent acceptance actually needs. Formal acceptance always needs a fresh acceptor, but a separate blind-consumer agent is not automatic for a non-experiential artifact.
 
 **Procedure:**
 
@@ -61,7 +54,7 @@ If the host cannot isolate a blind agent, the acceptor still cold-consumes first
 
 ### EVIDENCE parallel explore
 
-When the host can run read-only leaves concurrently, split independent evidence lanes (files, configs, logs, repros) across them. Merge labeled claims in the main context.
+When the host can run read-only leaves concurrently, split independent evidence lanes (files, configs, logs, repros) across them only when the latency or independence benefit exceeds briefing and merge cost. Merge labeled claims in the main context.
 
 Model choice and quota policy stay at the host orchestration layer (e.g. Cursor model-routing). This skill does **not** hardcode model names.
 
@@ -90,7 +83,7 @@ Never invent a review that did not run. Never upgrade `same_context` self-check 
 
 | Lever | Cap |
 |---|---|
-| Assurance gating | `fast` does not mandate probes or blind consumers |
+| Assurance gating | No assurance tier alone mandates ALIGN probes or a separate blind consumer |
 | Rounds | Single round by default; no debate tournament |
 | ALIGN probes | 2-3 readers max; one confirmation question max |
 | ACCEPT blind | One blind consumer pass per acceptance attempt unless the user re-authorizes |

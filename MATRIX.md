@@ -23,7 +23,7 @@ For the 3.1 tree, every combination not listed above is `unverified` — includi
 
 Rows above were measured on 3.1.0 bytes. 3.1.1 changes only the date handling inside two self-test scripts (`profile-v2.test.js`, `validate-profile-projection.js`), leaving Skill instruction text, contracts, and gates byte-identical, so the rows carry over with that delta disclosed rather than re-measured.
 
-The 3.2.0 working source changes Skill semantics and does **not** inherit any 3.1 qualification row. Every model × host × task-class × assurance combination on 3.2.0 remains `unverified` until exact-byte behavioral evidence is recorded.
+The 3.2.1 working source changes Skill semantics and does **not** inherit any 3.1 qualification row. Every model × host × task-class × assurance combination on 3.2.1 remains `unverified` until exact-byte qualification evidence is recorded. The focused forced-load screen in `docs/experiments/aql-3.2-information-alignment/` is parity evidence, not a qualification row.
 
 ## Historical probe archive (append-only, retained verbatim for audit)
 

@@ -35,11 +35,11 @@ Every in-scope deliverable needs an evidence path. Passing tests cover only what
 
 ### 4. Ground real context
 
-Ground load-bearing referents read-only before the contract freezes (see contracts grounding ladder). Depth is proportionate: stop when further inspection would not change the contract. Do not survey the whole repo for a one-line local fix.
+Ground load-bearing referents read-only before the contract freezes (see contracts grounding ladder). Follow identifiers, relations, shared records, and effect rules when they determine selection or blast radius; name matching alone is insufficient. A restriction on what may be modified does not by itself restrict necessary authorized reads, and evidence needs never justify unrelated or private scanning. Depth is proportionate: stop when further inspection would not change the contract. Do not survey the whole repo for a one-line local fix.
 
 ### 5. Material-question threshold
 
-Ask at most the material questions whose answers change direction, authority, or success criteria and cannot be derived safely. Prefer inspection over interrogation. Style words and process preferences are not material goals.
+Ask at most the material questions whose answers change direction, authority, or success criteria and cannot be derived safely. A question is justified either by multiple credible result-changing interpretations or by one unobtainable fact that decides the next safe action. Prefer inspection over interrogation. Style words and process preferences are not material goals.
 
 ### 6. Skip-investigation semantics
 
@@ -82,7 +82,11 @@ After grounding, classify each outcome-changing input without adding schema:
 - **Guided:** preferences, examples, trade-offs, source signals, and mechanisms stated as preferred or replaceable (`prefer X`, `default to X unless...`). Record their source and strength; do not silently harden or discard them.
 - **Open:** strategy the user delegated to the AI—structure, sequencing, wording, examples, or mechanisms stated as illustrative/delegated (`for example`, `maybe`, `choose as appropriate`) and implementation choices not fixed elsewhere.
 
-Run a bidirectional trace before contract freeze and before acceptance: every fixed constraint maps forward to a contract obligation/evidence path, and every contract obligation maps backward to a user statement, authoritative source, or disclosed agent judgment. A choice with no source is open or an agent assumption, never a user requirement. If nothing meaningful remains open on a creative/professional task, check for accidental over-constraint; if a fixed item has no downstream check, the compile is incomplete.
+Run a bidirectional trace before contract freeze and before acceptance: every fixed constraint maps forward to a contract obligation/evidence path, and every contract obligation maps backward to a user statement, authoritative source, or disclosed agent judgment. A choice with no source is open or an agent assumption, never a user requirement. A task whose goal and method are fully specified may legitimately have no Open choice; absence of Open space is not a defect. If a fixed item has no downstream check, the compile is incomplete.
+
+## Partial Blocking
+
+An unresolved conflict or unknown blocks only the action or conclusion that depends on it. Continue authorized read-only investigation and deliver independently supported findings when they remain useful, while keeping the affected action paused and the overall status honest. A root-goal contradiction may still block the whole task; do not manufacture busywork merely to show progress.
 
 ## Fail-closed compile checks
 
@@ -94,7 +98,7 @@ Before leaving ALIGN for non-trivial work:
 | Evidence map | A named deliverable has no decidable evidence path |
 | Unknowns | Skipped investigation is papered over with invented facts |
 | Attribution | Agent judgment is labeled as the user's decision |
-| Freedom/traceability | An unsourced choice is hardened as fixed, no meaningful solution space remains, or a fixed constraint has no downstream evidence path |
+| Freedom/traceability | An unsourced choice is hardened as fixed, or a fixed constraint has no downstream evidence path |
 | Conflicts | Project rules / workspace contradict the compiled goal and the conflict is not disclosed |
 | Handoff | Compressed resume drops a conjunctive gate or required dimension |
 | Observability | A counterexample or success observable is non-decidable |

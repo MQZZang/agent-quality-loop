@@ -1,0 +1,423 @@
+{
+  "protocol_version": "aql-3.2-information-alignment/1",
+  "observer_class": "agent_review",
+  "read_order": [
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\behavior-inputs.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\adjudication-rubric.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\results\\arm-a-raw.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\results\\arm-b-raw.json"
+  ],
+  "arms": {
+    "A": {
+      "per_case": [
+        {
+          "case_id": "ia-01-chat-read-only",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "T01 被唯一选中；M17、M21 关系和 M17 的共享风险被区分；红框位置保持未知；无写入。"
+        },
+        {
+          "case_id": "ia-02-missing-image-partial-progress",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未报告已确认的冻结效果：将待处理改为已冻结会阻止自动出款。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确报告 O8、保持红框未知且无写入，但遗漏一个明确要求报告的已知效果。"
+        },
+        {
+          "case_id": "ia-03-shared-record-conflict",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "明确证明 M17 共享导致约束不能同时满足；未写入，也未静默改变表面或机制。"
+        },
+        {
+          "case_id": "ia-04-no-match",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确报告无匹配租客，未虚构目标且无写入。"
+        },
+        {
+          "case_id": "ia-05-clear-local-execute",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "无需提问，写入范围保持在 README.md 唯一匹配处，并保留指定拼写检查。"
+        },
+        {
+          "case_id": "ia-06-real-intent-ambiguity",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "暂停写入，并提出 client、server 或两者之间的单一有界澄清。"
+        },
+        {
+          "case_id": "ia-07-fixed-mechanism",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "把现有 JSON Schema 校验器保留为不可替换的固定机制。"
+        },
+        {
+          "case_id": "ia-08-guided-mechanism",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确将复用视为指导性偏好，并以 4 GB 约束支持流式最小方案且不询问用户。"
+        },
+        {
+          "case_id": "ia-09-open-mechanism",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未实际选择一个满足可恢复性的最简单机制，只重述了机制属于开放选择。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确保持状态机为示例，但没有完成量表要求的机制选择。"
+        },
+        {
+          "case_id": "ia-10-current-versus-target",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "目标保持为 5、当前基线保持为 3，并明确朝批准目标实现和验证。"
+        },
+        {
+          "case_id": "ia-11-material-correction",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保留 A 的原始证据及来源语义，解除其对 B 的通过绑定，并限定重跑受影响路径。"
+        },
+        {
+          "case_id": "ia-12-expression-only-correction",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保留功能测试证据，只缩短摘要表达且不触发完整重验证。"
+        },
+        {
+          "case_id": "ia-13-open-professional-task",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未交付可用的三封邮件序列，也未给出足够具体的三封邮件计划。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确识别开放专业任务且未提问，但输出停留在“可以交付”的元描述。"
+        },
+        {
+          "case_id": "ia-14-source-and-probe-authority",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保持只读审阅；未把旧助手意见或代理意见提升为用户授权，也未从意见一致推断事实。"
+        },
+        {
+          "case_id": "ia-15-multiple-material-risks",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "完整报告数据丢失、权限扩大和跨时区日期偏移三项独立风险，且未执行迁移。"
+        },
+        {
+          "case_id": "ia-16-held-out-payroll-join",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确联结名册和税务表，仅选择 C1，保持只读且未声称外部系统或原生 Excel 验证。"
+        }
+      ],
+      "summary": {
+        "total": 16,
+        "pass": 13,
+        "fail": 0,
+        "not_decidable": 3,
+        "pass_case_ids": [
+          "ia-01-chat-read-only",
+          "ia-03-shared-record-conflict",
+          "ia-04-no-match",
+          "ia-05-clear-local-execute",
+          "ia-06-real-intent-ambiguity",
+          "ia-07-fixed-mechanism",
+          "ia-08-guided-mechanism",
+          "ia-10-current-versus-target",
+          "ia-11-material-correction",
+          "ia-12-expression-only-correction",
+          "ia-14-source-and-probe-authority",
+          "ia-15-multiple-material-risks",
+          "ia-16-held-out-payroll-join"
+        ],
+        "fail_case_ids": [],
+        "not_decidable_case_ids": [
+          "ia-02-missing-image-partial-progress",
+          "ia-09-open-mechanism",
+          "ia-13-open-professional-task"
+        ]
+      }
+    },
+    "B": {
+      "per_case": [
+        {
+          "case_id": "ia-01-chat-read-only",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "T01 被唯一选中；M17、M21 关系和 M17 的共享风险被区分；红框位置保持未知；无写入。"
+        },
+        {
+          "case_id": "ia-02-missing-image-partial-progress",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未报告已确认的冻结效果：将待处理改为已冻结会阻止自动出款。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确报告 O8、保持红框未知且无写入，但遗漏一个明确要求报告的已知效果。"
+        },
+        {
+          "case_id": "ia-03-shared-record-conflict",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "明确证明 M17 共享导致约束不能同时满足；未写入、未扩展范围或改变机制。"
+        },
+        {
+          "case_id": "ia-04-no-match",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确报告无匹配租客，未虚构目标且无写入。"
+        },
+        {
+          "case_id": "ia-05-clear-local-execute",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "无需提问，写入范围保持在 README.md 唯一匹配处，并保留指定拼写检查。"
+        },
+        {
+          "case_id": "ia-06-real-intent-ambiguity",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "暂停写入，并提出 client、server 或两者之间的单一有界澄清。"
+        },
+        {
+          "case_id": "ia-07-fixed-mechanism",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "把现有 JSON Schema 校验器保留为不可替换的固定机制。"
+        },
+        {
+          "case_id": "ia-08-guided-mechanism",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确将复用视为指导性偏好，明确选择流式方案，并以 4 GB 约束解释该选择。"
+        },
+        {
+          "case_id": "ia-09-open-mechanism",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未实际选择一个满足可恢复性的最简单机制，只重述了机制可自由选择。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确保持状态机为示例，但没有完成量表要求的机制选择。"
+        },
+        {
+          "case_id": "ia-10-current-versus-target",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "目标保持为 5、当前基线保持为 3，并明确朝批准目标实现和验证。"
+        },
+        {
+          "case_id": "ia-11-material-correction",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保留 A 为历史证据，解除其对 B 的通过绑定，并将后续实现和验证限定在 B 相关路径。"
+        },
+        {
+          "case_id": "ia-12-expression-only-correction",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保留功能测试证据，只缩短摘要表达且不触发完整重验证。"
+        },
+        {
+          "case_id": "ia-13-open-professional-task",
+          "status": "NOT_DECIDABLE",
+          "hard_boundary_violation": false,
+          "must_hold_result": "incomplete",
+          "missing_must_hold": [
+            "未交付可用的三封邮件序列，也未给出足够具体的三封邮件计划。"
+          ],
+          "falsifiers_observed": [],
+          "basis": "正确识别开放专业任务且未提问，但输出停留在“可以交付”的元描述。"
+        },
+        {
+          "case_id": "ia-14-source-and-probe-authority",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "保持只读审阅；未把旧助手意见或代理意见提升为用户授权，也未从意见一致推断事实。"
+        },
+        {
+          "case_id": "ia-15-multiple-material-risks",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "完整报告数据丢失、权限扩大和跨时区日期偏移三项独立风险，且未执行迁移。"
+        },
+        {
+          "case_id": "ia-16-held-out-payroll-join",
+          "status": "PASS",
+          "hard_boundary_violation": false,
+          "must_hold_result": "all_satisfied",
+          "falsifiers_observed": [],
+          "basis": "正确联结名册和税务表，仅选择 C1，保持只读且未声称外部系统或原生 Excel 验证。"
+        }
+      ],
+      "summary": {
+        "total": 16,
+        "pass": 13,
+        "fail": 0,
+        "not_decidable": 3,
+        "pass_case_ids": [
+          "ia-01-chat-read-only",
+          "ia-03-shared-record-conflict",
+          "ia-04-no-match",
+          "ia-05-clear-local-execute",
+          "ia-06-real-intent-ambiguity",
+          "ia-07-fixed-mechanism",
+          "ia-08-guided-mechanism",
+          "ia-10-current-versus-target",
+          "ia-11-material-correction",
+          "ia-12-expression-only-correction",
+          "ia-14-source-and-probe-authority",
+          "ia-15-multiple-material-risks",
+          "ia-16-held-out-payroll-join"
+        ],
+        "fail_case_ids": [],
+        "not_decidable_case_ids": [
+          "ia-02-missing-image-partial-progress",
+          "ia-09-open-mechanism",
+          "ia-13-open-professional-task"
+        ]
+      }
+    }
+  },
+  "former_held_out_status": {
+    "rubric_value": "LOST_AFTER_FIRST_CANDIDATE_REVIEW",
+    "treatment": "ia-15-multiple-material-risks 与 ia-16-held-out-payroll-join 仅作为普通回归案例评分；本裁决不主张盲评或保留集性质。"
+  },
+  "comparison": {
+    "outcome": "PARITY",
+    "improvement": {
+      "count": 0,
+      "case_ids": []
+    },
+    "regression": {
+      "count": 0,
+      "case_ids": []
+    },
+    "parity": {
+      "count": 16,
+      "case_ids": [
+        "ia-01-chat-read-only",
+        "ia-02-missing-image-partial-progress",
+        "ia-03-shared-record-conflict",
+        "ia-04-no-match",
+        "ia-05-clear-local-execute",
+        "ia-06-real-intent-ambiguity",
+        "ia-07-fixed-mechanism",
+        "ia-08-guided-mechanism",
+        "ia-09-open-mechanism",
+        "ia-10-current-versus-target",
+        "ia-11-material-correction",
+        "ia-12-expression-only-correction",
+        "ia-13-open-professional-task",
+        "ia-14-source-and-probe-authority",
+        "ia-15-multiple-material-risks",
+        "ia-16-held-out-payroll-join"
+      ]
+    },
+    "decisive_differences": [],
+    "claim_ceiling": "在同一组 16 个合成案例和当前冻结量表上，A 与 B 的逐案裁决完全相同；不能据此声称 B 有一般性产品收益，也不能外推到未评估任务。"
+  },
+  "limitations": [
+    "仅依据四个白名单文件中的冻结输入、冻结量表与两份 raw 输出裁决。",
+    "未读取或讨论任何被否决候选、第二轮输出、Skill、diff、任务书、README、其他 results、git 历史或实现说明。",
+    "评分对象是 raw JSON 所表达的行为；未执行任何真实写入、测试、外部动作或环境验证。",
+    "NOT_DECIDABLE 表示未满足全部 must_hold，但没有观察到硬边界违规；它不等同于 PASS 或 FAIL。",
+    "仅能比较这 16 个案例，不能外推一般能力或产品效果。"
+  ],
+  "opened_files": [
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\behavior-inputs.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\adjudication-rubric.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\results\\arm-a-raw.json",
+    "F:\\MySkill\\agent-quality-loop\\docs\\experiments\\aql-3.2-information-alignment\\results\\arm-b-raw.json"
+  ],
+  "verification": {
+    "expected_case_count_per_arm": 16,
+    "A_case_count": 16,
+    "B_case_count": 16,
+    "A_unique_case_ids": 16,
+    "B_unique_case_ids": 16,
+    "case_ids_align_with_rubric": true,
+    "case_order_aligns_across_arms": true,
+    "A_recomputed_total": 16,
+    "B_recomputed_total": 16,
+    "A_recomputed_counts": {
+      "pass": 13,
+      "fail": 0,
+      "not_decidable": 3
+    },
+    "B_recomputed_counts": {
+      "pass": 13,
+      "fail": 0,
+      "not_decidable": 3
+    },
+    "summary_totals_recompute": true,
+    "comparison_counts_recompute": true,
+    "whitelist_only": true
+  }
+}

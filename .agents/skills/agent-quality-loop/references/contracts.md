@@ -48,7 +48,7 @@ pause_conditions: conditions that prohibit the next phase
 injected_refs: optional source records for lessons, profile entries, presets, domain profiles, probes, or routes actually applied
 ```
 
-Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority.
+Do not force the user to fill this schema. Infer from the request, repository, and available history. Label inferred fields and ask only about unresolved choices that change the outcome or authority, or an unobtainable fact that decides the next safe action.
 
 When a Profile v2 entry materially contributes, record its opaque entry id in `injected_refs`. This records use, not a second contract, profile copy, or authority grant. Do not record raw profile content, user-directory paths, or capability receipts in the Task Contract.
 
@@ -61,11 +61,13 @@ Identifier, request, goal, target, problem, workspace, reconstruction, and expir
 Compile facts from the cheapest sufficient rung, in order; every rung is read-only:
 
 1. The request and retained conversation context.
-2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents here before the contract freezes; a premise the environment contradicts is a contradiction to disclose before any edit, never to silently resolve toward either side. Never fabricate a missing referent to satisfy the letter of the request — a mechanical edit that cannot produce the user-observable outcome is a miscompile, not a resolution.
+2. The observable environment — repository, artifacts, runtime state. Verify the request's load-bearing referents and the identifiers, relations, shared records, and effect rules that determine selection or blast radius before the contract freezes; a premise the environment contradicts is a contradiction to disclose before any edit, never to silently resolve toward either side. A write allowlist limits mutation, not the necessary authorized reads used to determine the correct target; those reads do not expand write authority or justify unrelated/private scanning. Never fabricate a missing referent to satisfy the letter of the request — a mechanical edit that cannot produce the user-observable outcome is a miscompile, not a resolution.
 3. Authoritative external sources, when the compile depends on facts or conventions outside the project (host paths, APIs, standards) — fresh lookup over model memory; record source and date in `assumptions` or the evidence notes.
 4. The user — only for intent, priorities, and facts no lower rung answers safely, within the two-question rule.
 
 A mechanism named in the request is classified by source and wording without adding schema: Fixed when explicitly required or part of acceptance, Guided when preferred or a replaceable default, and Open when illustrative or delegated. Preserve the outcome it serves, but do not automatically downgrade a Fixed mechanism to a hypothesis or harden a Guided/Open mechanism into an obligation.
+
+A fully specified task may legitimately contain only Fixed and Guided inputs. Open space is a classification of delegated choices, not a quota or a prerequisite for execution.
 
 Observable environment evidence is authoritative for current-state claims. Current-turn instructions and authoritative specifications are authoritative for target-state obligations; current reality records the baseline/gap and cannot silently rewrite the target. Disclose any conflict before freezing the contract.
 
@@ -157,6 +159,8 @@ Use the narrowest class supported by the user's words:
 - `mixed`: use only when the request explicitly requires multiple classes; list each boundary.
 
 Words such as “删除、去掉、开放、上线、当前、正式、完成” are semantic-risk terms. Resolve their class before execution.
+
+These terms trigger semantic inspection, not automatic delegation, questioning, or workflow expansion. Dispatch decisions require a concrete failure mode that another context or parallel evidence lane can actually reduce.
 
 Quantifiers (“全部、所有、每个”, all/every) and negative-scope markers (“不要动、保持、除了”, do not touch/keep/except) are compile-risk terms: over-broad quantity and a dropped negative boundary are the two most common miscompiles. Preserve each one explicitly in `scope_allowlist` / `non_goals`.
 
@@ -415,7 +419,7 @@ This is an information grammar, not a fixed long template. Omit empty sections. 
 
 ### Result Attention Rendering
 
-Within the existing User Result Summary and Result Detail Budget, apply [result-attention.md](result-attention.md): make the first 5–8 lines answer, in order, the conclusion, user impact or boundary, decisive evidence, risk or uncertainty, and any necessary user action. Render at most one primary conclusion, one key caution, and one necessary action. This is presentation of the existing Task Contract, not a Result Attention Contract or another persisted state source.
+Within the existing User Result Summary and Result Detail Budget, apply [result-attention.md](result-attention.md): make the first 5–8 lines answer, in order, the conclusion, user impact or boundary, decisive evidence, risk or uncertainty, and any necessary user action. Render at most one primary conclusion and one necessary action, but include every independent decision-changing caution; combine cautions only when one cause and one mitigation genuinely cover them. This is presentation of the existing Task Contract, not a Result Attention Contract or another persisted state source.
 
 Machine receipts belong in the visible result only when the user explicitly asks, or for handoff, formal audit, or blocking diagnosis. In ordinary Chinese results, do not default to internal enums such as `BUILT` or `ACCEPTED`; use the precise plain-language status only when it changes the user's decision. Do not add cards, emoji, or UI chrome to create attention hierarchy.
 
@@ -457,7 +461,7 @@ Apply these semantic rules:
 
 Status language remains precise: 已对齐 / 证据结论完成 / 实现与自检通过 / 独立质量验收通过 / 发布准备检查通过 / 已发布 / 生产结果已验证. Do not use vague spans such as 完成 / 全部完成 / 正式完成 / 已验收可发布.
 
-For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.2.0`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.2.0 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
+For formal, dirty, handoff/resume, release, or audit work, distinguish package contract version from the exact artifact. A clean released package may show `AQL 3.2.1`. A dirty/unreleased artifact must say, for example, `local unreleased AQL 3.2.1 build (HEAD <sha>; dirty diff <digest>)`. Formal acceptance binds the full commit/tree/diff or content digest; a package version alone never identifies dirty bytes.
 
 ## Envelope Consistency Check
 

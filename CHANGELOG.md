@@ -2,6 +2,14 @@
 
 Versions are the `manifest.json` / frontmatter `metadata.version` value for the packaged product Skill. Release integrity rule: acceptance evidence binds the exact shipped bytes — verify against the tagged commit, not a report hash.
 
+## Unreleased
+
+## 3.2.1 — 2026-09-21
+
+- Tightened information alignment on the common path: preserve result-changing objects, relations, negative scope, named mechanisms, this-turn authority, and the distinction between read and write scope; an unobtainable decisive fact may justify one bounded question while unrelated read-only work continues.
+- Removed three over-broad rules: fully specified work no longer fails for lacking Open space, semantic-risk words/formal assurance no longer force ALIGN fan-out, and probe disagreement is evidence to investigate rather than proof of ambiguity.
+- Result rendering now preserves every independent decision-changing caution while retaining one primary conclusion and one necessary action. Added focused evaluation cases and a 16-case synthetic forced-load screening. The retained candidate tied the baseline at 13 PASS / 3 NOT_DECIDABLE with zero hard-boundary violations; a broader follow-up was rejected after one improvement and one regression. No behavior-uplift, Excel, natural-discovery, or general product-benefit claim is implied.
+
 ## 3.2.0 — 2026-08-28
 
 - Separated current-state evidence from target-state authority so observed implementation state identifies a gap but cannot rewrite current-turn or authoritative target obligations.

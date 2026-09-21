@@ -51,6 +51,8 @@ Before drafting, separate:
 2. **Guided choices** — structure, emphasis, tone, examples, and trade-offs for which the request or authoritative sources provide direction without fixing one answer.
 3. **Open AI space** — connective prose, candidate phrasing, and permitted invention left genuinely undecided.
 
+A fully specified writing task may legitimately leave no Open AI space. Classify what is actually delegated; do not manufacture options or an approval checkpoint to satisfy a freedom quota.
+
 Keep enough local traceability to explain which source or constraint controls a material passage. This is working evidence in the existing contract/receipt and is never persisted as a separate state surface.
 
 Choose a task-local posture as a source-backed assumption:

@@ -1,9 +1,9 @@
 {
   "name": "agent-quality-loop",
-  "version": "3.2.0",
-  "generated_at": "2026-08-28T07:39:25.701Z",
+  "version": "3.2.1",
+  "generated_at": "2026-09-21T09:30:19.523Z",
   "files": {
-    "SKILL.md": "fc3389dac96552b240d41a8b3a296468578b2ae062329e1af3b475bcf9b72f45",
+    "SKILL.md": "9fd4b731e143ba8354856bf2aaf4eaee49852d1da2446653775d37a1f48a0aa4",
     "agents/openai.yaml": "ffe3d11f81971811cfff54482486625787fd65a3c639ff332201536a339552a5",
     "fixtures/capability-receipt-valid.json": "ad718c2dfa3c471fc2d88c6e1a15a0639a0414f8fec860ac22276109059afb6b",
     "fixtures/gates-g1-g3/g1-derived-lockfile/expected.json": "b8cf2358e8261d6f4d8088cc6ca13c418b454d110eeb76f91966f8a0cd6f8079",
@@ -40,17 +40,17 @@
     "fixtures/gates-g1-g3/g3-valid-record/input.json": "31a4a57f124764a907c0baa308fdc882a0b70167790db1ce83493d1869d34373",
     "fixtures/profile-v2-empty.json": "20954a5e688faccee5c41d5dda62bff0e04999e2fc0ef03cde12321f57563f19",
     "references/acceptance-review.md": "e75752c7b62e3cbfd456e4d60fcd8f3f28f6c73a0f63fb6013711ebf6048868d",
-    "references/alignment-compiler.md": "fc41f2d1fba823ec10e8b0fdc71670b58f745859c511fca9760c727beeeb710f",
+    "references/alignment-compiler.md": "f11e39602912f6e5d6352e94b0cd418b1521c7f009018a833571feb9ad1b83cb",
     "references/code-implementation-adapter.md": "1201cc3fcedc0dd2b1f2ea7fb707bd5210557ff15ead31fd346089d8a80ca2e1",
     "references/contract-presets.md": "efeccb3ec77a4aa012dbfa700b57cffa73d8c6a5fdd53cb5d42da247e628f707",
-    "references/contracts.md": "0b3f19cbb10929e92f80ebf4ad3c9dd2d852d2c8daa156586c33d1692667ac9f",
+    "references/contracts.md": "42f991bea465a37413e782c3d18d2c23bb1b24dc96726dea9d8fd0f442fc7674",
     "references/domain-profiles.md": "6fe667bf13344a0e426a3dfd144cfbaeddc1fd191da5175fc9427df5e6aa5166",
-    "references/evaluation-cases.md": "9d640c747cdf9a8f9e4e428a2328bd53926ce860f773c788a8faa05a20ba0bc0",
-    "references/multi-agent-leverage.md": "5e04c33f39a8b8dd32e05b819b03ed73ca765bd9e4b536be61dae398d42386a7",
+    "references/evaluation-cases.md": "e762d3f147ed9e54ffff99bce4724c7378478b6065bd7816cc8a69c994b7c821",
+    "references/multi-agent-leverage.md": "d5667095bd704453789b12eecfebad27bf49b0352bcdf7d908df8914b02cd9ff",
     "references/personalization.md": "b1597412b228da1532693da17b7c66538c71f8c48a9dbb8ed44375b854199f53",
     "references/profile-projection.md": "4e1eaefe2029ce51080edbaf8e3a51447b0beef9458f79adb631ed93abb24d8b",
-    "references/result-attention.md": "2d164c427b678ed7d65884972aafff988c7c95acbc14a6284ec319c0a85aae74",
-    "references/writing-collaboration-adapter.md": "11aa8b064504884576680b6b571a754e2729a0b0185f1d23aa7796c590be4fe4",
+    "references/result-attention.md": "a886787e0ad73723d081ec62124645f9aa22f73b38a5dcb72f509b999e0f70e4",
+    "references/writing-collaboration-adapter.md": "0bd41afa1a85b428119d0c67810f0436017e9df7cfbbe77696e465f15b850ec5",
     "schemas/capability-receipt.schema.json": "d2d3ac02a1d31f4186ef26c36ad708e7f5d98deb9cc6924493093a81339dad4d",
     "schemas/profile-v2.schema.json": "49fa151b9a15373b3293b6d8a673d253e93eb9caf1f90a1f5825d0e171933c6f",
     "scripts/aql-envelope.js": "eeaae64b95b12a8898d4735cb447906ddfa180d2965f85a5040259247e8ef836",
@@ -64,6 +64,6 @@
     "scripts/validate-envelope.js": "59dc69325d452363d1f745c8251393329ac9a8848c949fb95bd1a8509570f5df",
     "scripts/validate-profile-projection.js": "fc1211a322222c762fbd419d3358d999971c09e976206b238f4667fafc982dbf",
     "scripts/validate-profile.js": "e537786dbdcbb77b06b47d1000d8b9130ab7a5b6f68269a0a343baba122d9250",
-    "scripts/validate-skill.js": "bbd99baad54e136a532c4ba06ca54a733f3b052290090b77c3cf97f668d24058"
+    "scripts/validate-skill.js": "44974bbf3363c7c56991460f29e559a9e883328dadfc207bd15a5dc7da4482a9"
   }
 }

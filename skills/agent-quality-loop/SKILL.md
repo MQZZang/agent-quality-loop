@@ -4,7 +4,7 @@ description: Use when a coding or workspace task needs scoped alignment, evidenc
 license: MIT
 metadata:
   author: MQZZang
-  version: "3.2.0"
+  version: "3.2.1"
 ---
 
 # Agent Quality Loop
@@ -71,13 +71,15 @@ Mechanical scope/decision gates exist only for `assurance: formal` when a frozen
 
 ### ALIGN
 
-Compile a compact internal Task Contract. For routine work, keep the six-field card; do not load the full [contracts.md](references/contracts.md) machine protocol. Expand that file only for formal, handoff, resume, release, or envelope writes. State the goal, relevant scope/non-goals, and any material semantic or authority uncertainty in natural prose when it helps the user decide. Resolve discoverable questions by read-only inspection first.
+Compile a compact internal Task Contract. For routine work, keep the six-field card; do not load the full [contracts.md](references/contracts.md) machine protocol. Expand that file only for formal, handoff, resume, release, or envelope writes. Preserve every result-changing object, condition, quantity, negative boundary, named mechanism, this-turn deliverable, and action limit. Keep the eventual goal distinct from what may happen this turn, necessary read scope distinct from allowed write scope, and observed current state distinct from target obligations. State only decision-relevant goal, scope/non-goals, and semantic or authority uncertainty in natural prose. Resolve discoverable questions by read-only inspection first.
 
-Ask only when, after read-only grounding, at least two credible interpretations remain AND they lead to different after-states, authority, scope, or success criteria. Do not ask to fill a contract field for its own sake. Prefer a closed choice when the credible options are exhaustive; otherwise ask one bounded open question that names the decision boundary. No broad questionnaires. At most two questions in one early checkpoint. External-write, destructive, and release authorization remain a separate checkpoint.
+Ask only when, after read-only grounding, either (a) at least two credible interpretations remain and lead to different after-states, authority, scope, or success criteria, or (b) one unobtainable fact decides the next safe action. Do not ask to fill a contract field for its own sake. Prefer a closed choice when the credible options are exhaustive; otherwise ask one bounded open question that names the decision boundary. No broad questionnaires. At most two questions in one early checkpoint. External-write, destructive, and release authorization remain a separate checkpoint.
 
 When the user's single message already supplies goal, scope, target, operation, and current-turn authorization, act on it; do not re-split a combined authorization into ceremonial confirmations.
 
-For non-trivial work, define an observable after-state, distinguish fixed / guided / open choices, and ground load-bearing terms. Observable reality calibrates the current state; current-turn instructions and authoritative specifications determine target obligations. Current reality may prove a gap but cannot rewrite the target. Classify a named mechanism by source and wording: Fixed when explicitly required or part of acceptance, Guided when preferred or replaceable, and Open when illustrative or delegated. Do not automatically downgrade it to an assumption. On contradiction, disclose the mismatch, then stop or ask.
+For non-trivial work, define an observable after-state, distinguish fixed / guided / open choices, and ground load-bearing terms. Trace load-bearing objects through their identifiers, relations, shared records, and effect rules rather than keyword matching alone. A write restriction does not forbid reading necessary authorized evidence, and necessary reading does not widen write authority or justify unrelated/private scanning. Observable reality calibrates the current state; current-turn instructions and authoritative specifications determine target obligations. Current reality may prove a gap but cannot rewrite the target. Classify a named mechanism by source and wording: Fixed when explicitly required or part of acceptance, Guided when preferred or replaceable, and Open when illustrative or delegated. Do not automatically downgrade it to an assumption. A fully specified task may legitimately leave no Open choice. On contradiction, disclose the mismatch and pause only the dependent action; continue useful read-only work that does not rely on the disputed premise without presenting the whole task as complete.
+
+The rules above are the self-contained common path. Read [alignment-compiler.md](references/alignment-compiler.md) only when complex ambiguity, source conflict, material correction, or handoff/resume needs the expanded compile discipline; do not turn its diagnostic layers into a routine questionnaire.
 
 On a material user correction or authoritative-source update, recompile the affected obligations. Preserve raw evidence with its original baseline and provenance, but invalidate every current claim or verdict binding that depends on the superseded premise. Rerun only the affected dependency path.
 
